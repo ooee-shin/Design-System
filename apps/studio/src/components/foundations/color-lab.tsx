@@ -10,10 +10,12 @@ import {
 } from "@ooee/tokens";
 
 import { Input } from "@/components/ui/input";
+import { SemanticTokenCatalog } from "@/components/foundations/semantic-token-catalog";
 
 const DEFAULT_SEED = "#2563EB";
 
 export function ColorLab() {
+  const [view, setView] = useState<"semantic" | "brand">("semantic");
   const [seed, setSeed] = useState(DEFAULT_SEED);
   const [draft, setDraft] = useState(DEFAULT_SEED);
   const [copied, setCopied] = useState<string | null>(null);
@@ -36,6 +38,29 @@ export function ColorLab() {
 
   return (
     <div className="space-y-6">
+      <div className="flex w-fit rounded-lg border bg-background p-0.5 shadow-xs">
+        <button
+          type="button"
+          onClick={() => setView("semantic")}
+          aria-pressed={view === "semantic"}
+          className={view === "semantic" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
+        >
+          OE Semantic
+        </button>
+        <button
+          type="button"
+          onClick={() => setView("brand")}
+          aria-pressed={view === "brand"}
+          className={view === "brand" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
+        >
+          Brand Primitive
+        </button>
+      </div>
+
+      {view === "semantic" ? (
+        <SemanticTokenCatalog brandLight={light} brandDark={dark} />
+      ) : (
+        <>
       <section className="rounded-2xl border bg-background p-4 shadow-sm sm:p-6">
         <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
           <div className="space-y-4">
@@ -122,6 +147,8 @@ export function ColorLab() {
           <SemanticPreview mode="dark" mapping={dark} />
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }
@@ -159,14 +186,14 @@ type SemanticMapping = ReturnType<typeof createBrandSemanticMapping>;
 
 function SemanticPreview({ mode, mapping }: { mode: "light" | "dark"; mapping: SemanticMapping }) {
   const variables = {
-    "--lab-fg-primary": mapping.foregroundPrimary,
-    "--lab-fg-secondary": mapping.foregroundSecondary,
-    "--lab-bg-primary": mapping.backgroundPrimary,
-    "--lab-bg-secondary": mapping.backgroundSecondary,
-    "--lab-bg-overlay": mapping.backgroundOverlayPrimary,
-    "--lab-border-primary": mapping.borderPrimary,
-    "--lab-border-secondary": mapping.borderSecondary,
-    "--lab-focus": mapping.focusRing,
+    "--lab-fg-primary": mapping.foregroundPrimary.value,
+    "--lab-fg-secondary": mapping.foregroundSecondary.value,
+    "--lab-bg-primary": mapping.backgroundPrimary.value,
+    "--lab-bg-secondary": mapping.backgroundSecondary.value,
+    "--lab-bg-overlay": mapping.backgroundOverlayPrimary.value,
+    "--lab-border-primary": mapping.borderPrimary.value,
+    "--lab-border-secondary": mapping.borderSecondary.value,
+    "--lab-focus": mapping.focusRing.value,
   } as CSSProperties;
   const dark = mode === "dark";
 
@@ -182,7 +209,15 @@ function SemanticPreview({ mode, mapping }: { mode: "light" | "dark"; mapping: S
         </div>
       </div>
       <dl className="grid gap-2 text-[11px] sm:grid-cols-2">
-        {Object.entries(mapping).map(([name, value]) => <div key={name} className="flex items-center justify-between gap-2 border-b py-1.5 opacity-70"><dt>{name}</dt><dd className="font-mono">{value}</dd></div>)}
+        {Object.entries(mapping).map(([name, reference]) => (
+          <div key={name} className="flex items-center justify-between gap-2 border-b py-1.5 opacity-70">
+            <dt>{name}</dt>
+            <dd className="text-right">
+              <span className="block font-mono">{reference.primitive}</span>
+              <span className="block font-mono text-[10px] opacity-60">{reference.value}</span>
+            </dd>
+          </div>
+        ))}
       </dl>
     </article>
   );

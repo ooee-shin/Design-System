@@ -45,11 +45,14 @@
 
 ## 다음 작업 후보
 
-1. 여러 seed로 HCT palette 품질을 검수한다.
-2. Color Lab에 대비 측정과 경고를 추가한다.
-3. Inbox에 선택한 brand theme을 연결한다.
-4. 실제 반복 사용을 확인한 후 oe semantic token을 확정한다.
-5. Candidate 컴포넌트를 Storybook으로 추출한다.
+1. `docs/foundations/color.md`의 “다음 검토 체크포인트”에 있는 다섯 질문에 답한다.
+2. 답변을 기준으로 최소 oe semantic token과 Light/Dark 임시 매핑을 고친다.
+3. 여러 seed로 HCT palette 품질을 검수하고 대비 측정과 경고를 추가한다.
+4. Inbox에 선택한 brand theme을 연결해 실제 역할을 검증한다.
+5. 실제 반복 사용을 확인한 후 oe semantic token을 확정한다.
+6. Candidate 컴포넌트를 Storybook 역할의 검수 페이지로 추출한다.
+
+현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 Stable로 승격하거나 다른 컴포넌트에 일괄 적용하지 않는다.
 
 ## 새 작업에서 사용할 시작 요청 예시
 

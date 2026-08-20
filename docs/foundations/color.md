@@ -15,6 +15,8 @@
 
 HCT는 palette 계산 도구로 사용한다. Material의 semantic role이나 컴포넌트 색상 체계를 그대로 채택하지 않는다.
 
+Color Foundation 화면은 `OE Semantic`과 `Brand Primitive`를 한 페이지의 분리된 탭으로 제공한다. Sidebar와 Chart는 특수 목적의 shadcn token으로 유지하며 oe 공용 semantic 목록에 포함하지 않는다.
+
 ## Solid primitive
 
 | Token | HCT tone |
@@ -100,3 +102,44 @@ oe-focus-ring                        → brand-400
 - 브랜드별 semantic override 저장 형식
 - 대비 검증 기준과 자동 경고 수준
 - Neutral 및 status palette 생성 규칙
+
+## 다음 검토 체크포인트
+
+현재 Studio의 OE Semantic 표와 위 `Semantic mapping v0`은 구조를 눈으로 확인하기 위한 임시안이다. 아래 질문에 답하기 전에는 실제 컴포넌트의 Stable 계약이나 최종 매핑으로 간주하지 않는다.
+
+### 제안하는 최소 역할
+
+```text
+Neutral
+oe-foreground-primary / secondary / disabled / inverse
+oe-background-primary / secondary / disabled / bold-primary
+oe-border-primary / secondary / disabled
+oe-focus-ring
+
+Brand 및 danger / warning / success / info
+oe-{role}-foreground-primary / secondary
+oe-{role}-background-primary / secondary / bold-primary
+oe-{role}-border-primary / secondary
+```
+
+- `primary/secondary`는 사용 빈도가 아니라 같은 role/property 안의 **시각적 강조 위계**만 나타낸다.
+- `background-primary`는 `background-secondary`보다 시각적으로 강해야 한다.
+- `background-bold-primary`는 버튼, 배지, 강한 선택 상태처럼 채도가 높거나 어두운 solid fill의 후보 이름이다.
+- overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다.
+
+### 다음 작업에서 먼저 답할 질문
+
+1. Neutral surface에서 페이지 canvas를 `oe-background-secondary`, Card/Popover처럼 분리된 surface를 `oe-background-primary`로 두는가?
+2. Focus를 border 계열인 `oe-border-focus`로 둘 것인가, 독립 접근성 역할인 `oe-focus-ring`으로 둘 것인가? 현재 추천은 `oe-focus-ring`이다.
+3. 강한 solid fill의 modifier 이름을 `bold`로 확정할 것인가? 대안은 `strong`이다.
+4. 지금 실제로 반복되는 overlay 용례는 무엇인가? 예: 이미지 위 border, 이미지 hover, 선택 행, brand tint, scrim. 확인 전에는 공통 overlay semantic을 늘리지 않는다.
+5. status role을 `danger`, `warning`, `success`, `info` 네 가지로 확정하고 `negative`, `caution`, `positive`, `information` 같은 중복 용어는 제거하는가?
+
+답변 후에는 다음을 함께 수정한다.
+
+- 이 문서의 Light/Dark 매핑
+- `packages/tokens/src/index.ts`의 semantic reference
+- Studio의 OE Semantic catalog
+- 필요한 경우 전역 CSS 변수와 shadcn compatibility mapping
+
+특히 현재 Light brand background의 `primary → brand-50`, `secondary → brand-100`은 위계 정의와 반대일 수 있다. 질문 1의 기준을 확정한 뒤 `primary → brand-100`, `secondary → brand-50` 후보와 실제 화면을 비교한다.

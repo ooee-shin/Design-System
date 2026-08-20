@@ -64,6 +64,7 @@ oe-warning-border-secondary
 - 같은 의미로 반복되면 semantic token 승격을 검토한다.
 - Primitive는 모드에 독립적이고 semantic mapping은 Light/Dark에서 달라질 수 있다.
 - HCT의 Material semantic roles를 oe semantic roles로 자동 채택하지 않는다.
+- Sidebar와 Chart token은 특수 목적의 shadcn token으로 유지하고 oe 공용 semantic에 흡수하지 않는다.
 
 세부 규칙과 현재 Provisional 매핑은 `docs/foundations/color.md`를 따른다. 실행 가능한 생성 규칙의 원본은 `packages/tokens/src/index.ts`다.
 
@@ -97,4 +98,3 @@ pnpm build
 ```
 
 인터랙션이나 반응형을 변경했다면 Studio의 실제 화면에서도 해당 동작을 검수한다.
-

@@ -49,28 +49,37 @@ export function createBrandPalette(source: string): BrandPalette {
 }
 
 export function createBrandSemanticMapping(palette: BrandPalette, mode: "light" | "dark") {
+  const solid = (step: BrandStep) => ({
+    primitive: `brand-${step}` as const,
+    value: palette.solid[step],
+  });
+  const alpha = (step: BrandAlphaStep) => ({
+    primitive: `brand-alpha-${String(step).padStart(2, "0")}` as `brand-alpha-${string}`,
+    value: palette.alpha[step],
+  });
+
   if (mode === "dark") {
     return {
-      foregroundPrimary: palette.solid[200],
-      foregroundSecondary: palette.solid[400],
-      backgroundPrimary: palette.solid[950],
-      backgroundSecondary: palette.solid[900],
-      backgroundOverlayPrimary: palette.alpha[16],
-      borderPrimary: palette.solid[500],
-      borderSecondary: palette.alpha[30],
-      focusRing: palette.solid[400],
+      foregroundPrimary: solid(200),
+      foregroundSecondary: solid(400),
+      backgroundPrimary: solid(950),
+      backgroundSecondary: solid(900),
+      backgroundOverlayPrimary: alpha(16),
+      borderPrimary: solid(500),
+      borderSecondary: alpha(30),
+      focusRing: solid(400),
     };
   }
 
   return {
-    foregroundPrimary: palette.solid[800],
-    foregroundSecondary: palette.solid[600],
-    backgroundPrimary: palette.solid[50],
-    backgroundSecondary: palette.solid[100],
-    backgroundOverlayPrimary: palette.alpha[8],
-    borderPrimary: palette.solid[500],
-    borderSecondary: palette.solid[200],
-    focusRing: palette.solid[600],
+    foregroundPrimary: solid(800),
+    foregroundSecondary: solid(600),
+    backgroundPrimary: solid(50),
+    backgroundSecondary: solid(100),
+    backgroundOverlayPrimary: alpha(8),
+    borderPrimary: solid(500),
+    borderSecondary: solid(200),
+    focusRing: solid(600),
   };
 }
 
