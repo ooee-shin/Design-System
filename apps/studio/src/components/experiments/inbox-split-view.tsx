@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { MessageBubble } from "@/components/candidates/message-bubble";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -380,38 +381,38 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
   }
 
   return (
-    <div className="grid h-[min(46rem,calc(100vh-11rem))] min-h-[36rem] overflow-hidden rounded-2xl border bg-background shadow-sm md:grid-cols-[22rem_minmax(0,1fr)]">
+    <div className="grid h-[min(46rem,calc(100vh-11rem))] min-h-[36rem] overflow-hidden rounded-2xl border border-oe-border-primary bg-oe-background-primary text-oe-foreground-primary shadow-sm md:grid-cols-[22rem_minmax(0,1fr)]">
       <aside
         aria-label={copy.conversationList}
         className={cn(
-          "min-w-0 flex-col border-r",
+          "min-w-0 flex-col border-r border-oe-border-secondary",
           mobileThreadOpen ? "hidden md:flex" : "flex",
         )}
       >
         <div className="flex items-center gap-2 px-4 pt-4 pb-2">
           <h2 className="text-sm font-semibold">{copy.inbox}</h2>
           {unreadCount > 0 && (
-            <span className="text-xs tabular-nums text-muted-foreground" aria-label={copy.unread(unreadCount)}>
+            <span className="text-xs tabular-nums text-oe-foreground-secondary" aria-label={copy.unread(unreadCount)}>
               {unreadCount}
             </span>
           )}
-          <Button variant="ghost" size="icon-sm" className="ml-auto text-muted-foreground" aria-label={copy.filter}>
+          <Button variant="ghost" size="icon-sm" className="oe-hover-layer ml-auto text-oe-foreground-tertiary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.filter}>
             <Filter />
           </Button>
         </div>
 
         <div className="relative px-4 pb-3">
-          <Search className="pointer-events-none absolute top-2 left-6.5 size-3.5 text-muted-foreground" aria-hidden="true" />
+          <Search className="pointer-events-none absolute top-2 left-6.5 size-3.5 text-oe-foreground-tertiary" aria-hidden="true" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={copy.search}
             aria-label={copy.search}
-            className="h-8 bg-muted/50 pl-8"
+            className="h-8 border-oe-border-secondary bg-oe-background-secondary pl-8 text-oe-foreground-primary placeholder:text-oe-foreground-tertiary focus-visible:border-oe-focus-ring focus-visible:ring-oe-focus-ring/30"
           />
         </div>
 
-        <div className="flex-1 divide-y overflow-y-auto">
+        <div className="flex-1 divide-y divide-oe-border-secondary overflow-y-auto">
           {filteredThreads.map((thread) => {
             const selected = thread.id === selectedId;
             return (
@@ -421,25 +422,25 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
                 onClick={() => openThread(thread.id)}
                 aria-pressed={selected}
                 className={cn(
-                  "flex w-full gap-3 px-4 py-3 text-left outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-                  selected && "bg-muted",
+                  "oe-hover-layer flex w-full gap-3 px-4 py-3 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-inset",
+                  selected && "bg-oe-background-secondary",
                 )}
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-oe-background-secondary text-xs font-medium text-oe-foreground-secondary">
                   {thread.initials}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium">{thread.sender}</span>
                   <span className="block truncate text-sm">{thread.subject}</span>
-                  <span className="mt-0.5 block truncate text-xs leading-snug text-muted-foreground">
+                  <span className="mt-0.5 block truncate text-xs leading-snug text-oe-foreground-secondary">
                     {thread.preview}
                   </span>
                 </span>
                 <span className="flex min-w-13 shrink-0 flex-col items-end gap-1.5">
-                  <span className="text-[11px] text-muted-foreground">{thread.time}</span>
+                  <span className="text-[11px] text-oe-foreground-tertiary">{thread.time}</span>
                   {thread.unreadCount > 0 && (
                     <span
-                      className="min-w-5 rounded-full bg-primary px-1.5 py-0.5 text-center text-[10px] font-medium leading-none text-primary-foreground"
+                      className="min-w-5 rounded-full bg-oe-accent-background-bold-primary px-1.5 py-0.5 text-center text-[10px] font-medium leading-none text-oe-foreground-inverse"
                       aria-label={copy.unread(thread.unreadCount)}
                     >
                       {formatUnreadCount(thread.unreadCount)}
@@ -450,7 +451,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
             );
           })}
           {filteredThreads.length === 0 && (
-            <p className="px-4 py-10 text-center text-sm text-muted-foreground">{copy.empty}</p>
+            <p className="px-4 py-10 text-center text-sm text-oe-foreground-secondary">{copy.empty}</p>
           )}
         </div>
       </aside>
@@ -459,11 +460,11 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
         aria-label={copy.readingPane}
         className={cn("min-w-0 flex-1 flex-col", mobileThreadOpen ? "flex" : "hidden md:flex")}
       >
-        <header className="flex items-start gap-3 border-b px-4 py-3.5 sm:px-6 sm:py-4">
+        <header className="flex items-start gap-3 border-b border-oe-border-secondary px-4 py-3.5 sm:px-6 sm:py-4">
           <Button
             variant="ghost"
             size="icon-sm"
-            className="mt-0.5 md:hidden"
+            className="oe-hover-layer mt-0.5 hover:bg-transparent md:hidden focus-visible:ring-oe-focus-ring"
             onClick={() => setMobileThreadOpen(false)}
             aria-label={copy.back}
           >
@@ -471,39 +472,31 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
           </Button>
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-semibold">{selectedThread.subject}</h2>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">{selectedThread.people}</p>
+            <p className="mt-0.5 truncate text-xs text-oe-foreground-secondary">{selectedThread.people}</p>
           </div>
-          <div className="flex shrink-0 gap-1 text-muted-foreground">
-            <Button variant="ghost" size="icon-sm" aria-label={copy.archive}><Archive /></Button>
-            <Button variant="ghost" size="icon-sm" aria-label={copy.snooze}><Clock3 /></Button>
-            <Button variant="ghost" size="icon-sm" aria-label={copy.more}><MoreHorizontal /></Button>
+          <div className="flex shrink-0 gap-1 text-oe-foreground-tertiary">
+            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.archive}><Archive /></Button>
+            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.snooze}><Clock3 /></Button>
+            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.more}><MoreHorizontal /></Button>
           </div>
         </header>
 
         <div ref={threadBodyRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
           {selectedThread.messages.map((message, index) => (
-            <div key={`${message.time}-${index}`} className={cn("flex gap-3", message.mine && "flex-row-reverse")}>
-              <span className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-medium",
-                message.mine ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground",
-              )}>
-                {message.initials}
-              </span>
-              <div className={cn(
-                "max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed sm:max-w-[72%]",
-                message.mine ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
-              )}>
-                <p className={cn("mb-1 text-xs", message.mine ? "text-primary-foreground/60" : "text-muted-foreground")}>
-                  {message.from} · {message.time}
-                </p>
-                {message.text}
-              </div>
-            </div>
+            <MessageBubble
+              key={`${message.time}-${index}`}
+              direction={message.mine ? "outgoing" : "incoming"}
+              author={message.from}
+              initials={message.initials}
+              time={message.time}
+            >
+              {message.text}
+            </MessageBubble>
           ))}
         </div>
 
-        <form onSubmit={sendReply} className="border-t p-3 sm:p-4">
-          <div className="rounded-xl border bg-background transition-shadow focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/20">
+        <form onSubmit={sendReply} className="border-t border-oe-border-secondary p-3 sm:p-4">
+          <div className="rounded-xl border border-oe-border-primary bg-oe-background-primary transition-shadow focus-within:border-oe-focus-ring focus-within:ring-3 focus-within:ring-oe-focus-ring/20">
             <Textarea
               value={reply}
               onChange={(event) => setReply(event.target.value)}
@@ -513,11 +506,11 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
               className="min-h-16 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
             />
             <div className="flex items-center justify-between px-2.5 pb-2">
-              <Button type="button" variant="ghost" size="sm" className="text-muted-foreground">
+              <Button type="button" variant="ghost" size="sm" className="oe-hover-layer text-oe-foreground-tertiary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring">
                 <Paperclip data-icon="inline-start" />
                 {copy.attach}
               </Button>
-              <Button type="submit" size="sm" disabled={!reply.trim()}>
+              <Button type="submit" size="sm" disabled={!reply.trim()} className="oe-hover-layer bg-oe-background-bold-primary text-oe-foreground-inverse hover:bg-oe-background-bold-primary focus-visible:ring-oe-focus-ring disabled:bg-oe-background-disabled disabled:text-oe-foreground-disabled disabled:opacity-100">
                 <Send data-icon="inline-start" />
                 {copy.send}
               </Button>

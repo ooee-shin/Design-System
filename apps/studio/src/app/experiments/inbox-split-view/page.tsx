@@ -47,7 +47,10 @@ export default function InboxSplitViewPage() {
           <span>Source · VibePrompt</span>
           <span>Base · shadcn Base UI / Nova</span>
           <span>Stage · Experiment</span>
-          <span>oe token mapping · Not started</span>
+          <span>oe token mapping · Provisional applied</span>
+          <Link href="/components/message-bubble" className="font-medium text-foreground underline-offset-4 hover:underline">
+            MessageBubble Candidate
+          </Link>
         </footer>
       </div>
     </main>

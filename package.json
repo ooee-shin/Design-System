@@ -3,10 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@10.32.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "pnpm --filter @ooee/studio dev",
     "dev:studio": "pnpm --filter @ooee/studio dev",
     "build": "pnpm --filter @ooee/studio build",
-    "lint": "pnpm --filter @ooee/studio lint"
+    "lint": "pnpm --filter @ooee/studio lint",
+    "check": "pnpm lint && pnpm build"
   }
 }

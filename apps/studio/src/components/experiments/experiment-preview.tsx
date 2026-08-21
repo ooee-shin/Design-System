@@ -51,7 +51,7 @@ export function ExperimentPreview() {
 
       <div
         className={cn(
-          "preview-canvas bg-muted/40 p-3 text-foreground sm:p-4",
+          "preview-canvas bg-oe-background-canvas-secondary p-3 text-oe-foreground-primary sm:p-4",
           theme === "dark" && "dark",
         )}
         lang={typography}

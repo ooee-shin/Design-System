@@ -14,7 +14,7 @@ const workspaces = [
   {
     title: "Candidates",
     description: "화면에서 발견한 컴포넌트와 패턴의 상태·인터랙션을 검수합니다.",
-    status: "다음 단계",
+    status: "MessageBubble 검수 중",
     icon: Layers3,
   },
   {

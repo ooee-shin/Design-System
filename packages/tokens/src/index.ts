@@ -53,20 +53,15 @@ export function createBrandSemanticMapping(palette: BrandPalette, mode: "light" 
     primitive: `brand-${step}` as const,
     value: palette.solid[step],
   });
-  const alpha = (step: BrandAlphaStep) => ({
-    primitive: `brand-alpha-${String(step).padStart(2, "0")}` as `brand-alpha-${string}`,
-    value: palette.alpha[step],
-  });
-
   if (mode === "dark") {
     return {
       foregroundPrimary: solid(200),
       foregroundSecondary: solid(400),
       backgroundPrimary: solid(950),
       backgroundSecondary: solid(900),
-      backgroundOverlayPrimary: alpha(16),
+      backgroundBoldPrimary: solid(400),
       borderPrimary: solid(500),
-      borderSecondary: alpha(30),
+      borderSecondary: solid(800),
       focusRing: solid(400),
     };
   }
@@ -76,7 +71,7 @@ export function createBrandSemanticMapping(palette: BrandPalette, mode: "light" 
     foregroundSecondary: solid(600),
     backgroundPrimary: solid(50),
     backgroundSecondary: solid(100),
-    backgroundOverlayPrimary: alpha(8),
+    backgroundBoldPrimary: solid(700),
     borderPrimary: solid(500),
     borderSecondary: solid(200),
     focusRing: solid(600),

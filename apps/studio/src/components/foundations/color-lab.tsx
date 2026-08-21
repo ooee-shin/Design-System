@@ -190,7 +190,7 @@ function SemanticPreview({ mode, mapping }: { mode: "light" | "dark"; mapping: S
     "--lab-fg-secondary": mapping.foregroundSecondary.value,
     "--lab-bg-primary": mapping.backgroundPrimary.value,
     "--lab-bg-secondary": mapping.backgroundSecondary.value,
-    "--lab-bg-overlay": mapping.backgroundOverlayPrimary.value,
+    "--lab-bg-bold": mapping.backgroundBoldPrimary.value,
     "--lab-border-primary": mapping.borderPrimary.value,
     "--lab-border-secondary": mapping.borderSecondary.value,
     "--lab-focus": mapping.focusRing.value,
@@ -205,7 +205,7 @@ function SemanticPreview({ mode, mapping }: { mode: "light" | "dark"; mapping: S
         <p className="mt-1 text-xs" style={{ color: "var(--lab-fg-secondary)" }}>Secondary content over a brand surface</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button className="rounded-lg border px-3 py-1.5 text-xs font-medium outline-3 outline-offset-2" style={{ color: "var(--lab-fg-primary)", borderColor: "var(--lab-border-primary)", outlineColor: "var(--lab-focus)" }}>Focus sample</button>
-          <span className="rounded-lg px-3 py-1.5 text-xs" style={{ background: "var(--lab-bg-overlay)", color: "var(--lab-fg-primary)" }}>Overlay  primary</span>
+          <span className="rounded-lg px-3 py-1.5 text-xs" style={{ background: "var(--lab-bg-bold)", color: dark ? "#0a0a0a" : "#ffffff" }}>Bold primary</span>
         </div>
       </div>
       <dl className="grid gap-2 text-[11px] sm:grid-cols-2">

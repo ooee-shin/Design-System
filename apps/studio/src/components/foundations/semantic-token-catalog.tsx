@@ -11,15 +11,21 @@ type TokenRow = {
 
 const neutralTokens: TokenRow[] = [
   token("oe-foreground-primary", "neutral-950", "neutral-50"),
-  token("oe-foreground-secondary", "neutral-600", "neutral-400"),
+  token("oe-foreground-secondary", "neutral-700", "neutral-300"),
+  token("oe-foreground-tertiary", "neutral-500", "neutral-500"),
   token("oe-foreground-disabled", "neutral-400", "neutral-600"),
-  token("oe-foreground-inverse", "white", "white"),
-  token("oe-background-primary", "white", "neutral-950"),
-  token("oe-background-secondary", "neutral-50", "neutral-900"),
+  token("oe-foreground-inverse", "white", "neutral-950"),
+  token("oe-foreground-inverse-secondary", "white / 60%", "neutral-950 / 60%"),
+  token("oe-background-canvas-primary", "white", "neutral-950"),
+  token("oe-background-canvas-secondary", "neutral-50", "neutral-900"),
+  token("oe-background-primary", "white", "neutral-900"),
+  token("oe-background-secondary", "neutral-100", "neutral-800"),
+  token("oe-background-bold-primary", "neutral-950", "neutral-50"),
   token("oe-background-disabled", "neutral-100", "neutral-800"),
   token("oe-border-primary", "neutral-300", "neutral-700"),
   token("oe-border-secondary", "neutral-200", "neutral-800"),
   token("oe-border-disabled", "neutral-100", "neutral-900"),
+  token("oe-interaction-hover", "black / 5%", "white / 8%"),
 ];
 
 const statusFamilies = [
@@ -27,6 +33,10 @@ const statusFamilies = [
   statusFamily("Danger", "danger", "red"),
   statusFamily("Success", "success", "green"),
   statusFamily("Info", "info", "blue"),
+];
+
+const accentTokens: TokenRow[] = [
+  token("oe-accent-background-bold-primary", "red-600", "red-400"),
 ];
 
 export function SemanticTokenCatalog({
@@ -46,6 +56,7 @@ export function SemanticTokenCatalog({
 
       <TokenFamily title="Neutral" description="일반 foreground, background, border" rows={neutralTokens} />
       <TokenFamily title="Brand" description="현재 Brand Primitive 탭의 seed에서 생성된 동적 매핑" rows={brandTokens} />
+      <TokenFamily title="Accent" description="상태 의미 없이 시선을 끄는 강조색" rows={accentTokens} />
 
       <div className="grid gap-6 xl:grid-cols-2">
         {statusFamilies.map((family) => (
@@ -103,6 +114,7 @@ function groupRowsByProperty(rows: TokenRow[]) {
     { key: "background", label: "Background", description: "Surface와 채움" },
     { key: "border", label: "Border", description: "경계와 구분선" },
     { key: "focus", label: "Focus", description: "키보드 포커스 표시" },
+    { key: "interaction", label: "Interaction", description: "상태 변화에 합성하는 layer" },
   ];
 
   return definitions
@@ -142,6 +154,7 @@ function statusFamily(title: string, role: string, palette: string) {
       token(`oe-${role}-foreground-secondary`, `${palette}-600`, `${palette}-400`),
       token(`oe-${role}-background-primary`, `${palette}-50`, `${palette}-950`),
       token(`oe-${role}-background-secondary`, `${palette}-100`, `${palette}-900`),
+      token(`oe-${role}-background-bold-primary`, `${palette}-700`, `${palette}-400`),
       token(`oe-${role}-border-primary`, `${palette}-500`, `${palette}-500`),
       token(`oe-${role}-border-secondary`, `${palette}-200`, `${palette}-800`),
     ],
@@ -154,7 +167,7 @@ function brandRows(light: SemanticMapping, dark: SemanticMapping): TokenRow[] {
     foregroundSecondary: "oe-brand-foreground-secondary",
     backgroundPrimary: "oe-brand-background-primary",
     backgroundSecondary: "oe-brand-background-secondary",
-    backgroundOverlayPrimary: "oe-brand-background-overlay-primary",
+    backgroundBoldPrimary: "oe-brand-background-bold-primary",
     borderPrimary: "oe-brand-border-primary",
     borderSecondary: "oe-brand-border-secondary",
     focusRing: "oe-focus-ring",
@@ -169,6 +182,10 @@ function brandRows(light: SemanticMapping, dark: SemanticMapping): TokenRow[] {
 
 const primitiveClasses: Record<string, string> = {
   white: "bg-white",
+  "white / 8%": "bg-white/8",
+  "white / 60%": "bg-white/60",
+  "black / 5%": "bg-black/5",
+  "neutral-950 / 60%": "bg-neutral-950/60",
   "neutral-50": "bg-neutral-50",
   "neutral-100": "bg-neutral-100",
   "neutral-200": "bg-neutral-200",

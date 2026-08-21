@@ -39,6 +39,25 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-oe-foreground-primary: var(--oe-foreground-primary);
+  --color-oe-foreground-secondary: var(--oe-foreground-secondary);
+  --color-oe-foreground-tertiary: var(--oe-foreground-tertiary);
+  --color-oe-foreground-disabled: var(--oe-foreground-disabled);
+  --color-oe-foreground-inverse: var(--oe-foreground-inverse);
+  --color-oe-foreground-inverse-secondary: var(--oe-foreground-inverse-secondary);
+  --color-oe-background-canvas-primary: var(--oe-background-canvas-primary);
+  --color-oe-background-canvas-secondary: var(--oe-background-canvas-secondary);
+  --color-oe-background-primary: var(--oe-background-primary);
+  --color-oe-background-secondary: var(--oe-background-secondary);
+  --color-oe-background-bold-primary: var(--oe-background-bold-primary);
+  --color-oe-background-disabled: var(--oe-background-disabled);
+  --color-oe-accent-background-bold-primary: var(--oe-accent-background-bold-primary);
+  --color-oe-danger-foreground-primary: var(--oe-danger-foreground-primary);
+  --color-oe-border-primary: var(--oe-border-primary);
+  --color-oe-border-secondary: var(--oe-border-secondary);
+  --color-oe-border-disabled: var(--oe-border-disabled);
+  --color-oe-focus-ring: var(--oe-focus-ring);
+  --color-oe-interaction-hover: var(--oe-interaction-hover);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -81,6 +100,25 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --oe-foreground-primary: var(--color-neutral-950);
+  --oe-foreground-secondary: var(--color-neutral-700);
+  --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-disabled: var(--color-neutral-400);
+  --oe-foreground-inverse: var(--color-white);
+  --oe-foreground-inverse-secondary: rgb(255 255 255 / 60%);
+  --oe-background-canvas-primary: var(--color-white);
+  --oe-background-canvas-secondary: var(--color-neutral-50);
+  --oe-background-primary: var(--color-white);
+  --oe-background-secondary: var(--color-neutral-100);
+  --oe-background-bold-primary: var(--color-neutral-950);
+  --oe-background-disabled: var(--color-neutral-100);
+  --oe-accent-background-bold-primary: var(--color-red-600);
+  --oe-danger-foreground-primary: var(--color-red-800);
+  --oe-border-primary: var(--color-neutral-300);
+  --oe-border-secondary: var(--color-neutral-200);
+  --oe-border-disabled: var(--color-neutral-100);
+  --oe-focus-ring: var(--color-blue-600);
+  --oe-interaction-hover: rgb(0 0 0 / 5%);
 }
 
 .dark {
@@ -115,6 +153,25 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --oe-foreground-primary: var(--color-neutral-50);
+  --oe-foreground-secondary: var(--color-neutral-300);
+  --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-disabled: var(--color-neutral-600);
+  --oe-foreground-inverse: var(--color-neutral-950);
+  --oe-foreground-inverse-secondary: rgb(10 10 10 / 60%);
+  --oe-background-canvas-primary: var(--color-neutral-950);
+  --oe-background-canvas-secondary: var(--color-neutral-900);
+  --oe-background-primary: var(--color-neutral-900);
+  --oe-background-secondary: var(--color-neutral-800);
+  --oe-background-bold-primary: var(--color-neutral-50);
+  --oe-background-disabled: var(--color-neutral-800);
+  --oe-accent-background-bold-primary: var(--color-red-400);
+  --oe-danger-foreground-primary: var(--color-red-200);
+  --oe-border-primary: var(--color-neutral-700);
+  --oe-border-secondary: var(--color-neutral-800);
+  --oe-border-disabled: var(--color-neutral-900);
+  --oe-focus-ring: var(--color-blue-400);
+  --oe-interaction-hover: rgb(255 255 255 / 8%);
 }
 
 @layer base {
@@ -130,8 +187,16 @@
 }
 
 @layer utilities {
+  .oe-hover-layer:hover {
+    background-image: linear-gradient(var(--oe-interaction-hover), var(--oe-interaction-hover));
+  }
+
   .preview-canvas:lang(ko) {
     font-family: "Pretendard", "SUIT", "Apple SD Gothic Neo", Arial, sans-serif;
+  }
+
+  .preview-canvas:lang(ko) .oe-message-bubble {
+    line-height: 1.5;
   }
 
   .preview-canvas:lang(en) {

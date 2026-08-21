@@ -65,7 +65,7 @@ oe-brand-foreground-primary          → brand-800
 oe-brand-foreground-secondary        → brand-600
 oe-brand-background-primary          → brand-50
 oe-brand-background-secondary        → brand-100
-oe-brand-background-overlay-primary  → brand-alpha-08
+oe-brand-background-bold-primary     → brand-700
 oe-brand-border-primary              → brand-500
 oe-brand-border-secondary            → brand-200
 oe-focus-ring                        → brand-600
@@ -78,9 +78,9 @@ oe-brand-foreground-primary          → brand-200
 oe-brand-foreground-secondary        → brand-400
 oe-brand-background-primary          → brand-950
 oe-brand-background-secondary        → brand-900
-oe-brand-background-overlay-primary  → brand-alpha-16
+oe-brand-background-bold-primary     → brand-400
 oe-brand-border-primary              → brand-500
-oe-brand-border-secondary            → brand-alpha-30
+oe-brand-border-secondary            → brand-800
 oe-focus-ring                        → brand-400
 ```
 
@@ -111,10 +111,16 @@ oe-focus-ring                        → brand-400
 
 ```text
 Neutral
-oe-foreground-primary / secondary / disabled / inverse
+oe-foreground-primary / secondary / tertiary / disabled / inverse
+oe-foreground-inverse-secondary
+oe-background-canvas-primary / canvas-secondary
 oe-background-primary / secondary / disabled / bold-primary
 oe-border-primary / secondary / disabled
 oe-focus-ring
+oe-interaction-hover
+
+Accent
+oe-accent-background-bold-primary
 
 Brand 및 danger / warning / success / info
 oe-{role}-foreground-primary / secondary
@@ -122,16 +128,22 @@ oe-{role}-background-primary / secondary / bold-primary
 oe-{role}-border-primary / secondary
 ```
 
-- `primary/secondary`는 사용 빈도가 아니라 같은 role/property 안의 **시각적 강조 위계**만 나타낸다.
-- `background-primary`는 `background-secondary`보다 시각적으로 강해야 한다.
+- `primary/secondary`는 사용 빈도가 아니라 같은 role/property 안의 **시각적 위계**를 나타낸다.
+- Light Neutral background는 primary에서 secondary 순으로 어두워진다. Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다.
+- Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다.
 - `background-bold-primary`는 버튼, 배지, 강한 선택 상태처럼 채도가 높거나 어두운 solid fill의 후보 이름이다.
+- `bold`는 background 전용 modifier로 사용한다.
+- `interaction-hover`는 기존 background를 교체하지 않고 위에 합성하는 state layer다. 초기값은 Light `black / 5%`, Dark `white / 8%`이며 화면 검증 후 조율한다.
+- `foreground-inverse-secondary`는 bold fill 위의 약한 메타 정보에 사용한다.
+- `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
+- `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.
 - overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다.
 
 ### 다음 작업에서 먼저 답할 질문
 
-1. Neutral surface에서 페이지 canvas를 `oe-background-secondary`, Card/Popover처럼 분리된 surface를 `oe-background-primary`로 두는가?
+1. ~~Neutral canvas와 component surface의 구조~~: `canvas-primary/secondary`와 `background-primary/secondary`를 분리하는 안으로 현재 검토 화면에 반영했다.
 2. Focus를 border 계열인 `oe-border-focus`로 둘 것인가, 독립 접근성 역할인 `oe-focus-ring`으로 둘 것인가? 현재 추천은 `oe-focus-ring`이다.
-3. 강한 solid fill의 modifier 이름을 `bold`로 확정할 것인가? 대안은 `strong`이다.
+3. ~~강한 solid fill의 modifier 이름~~: `bold`를 background 전용 modifier로 사용하기로 결정했다.
 4. 지금 실제로 반복되는 overlay 용례는 무엇인가? 예: 이미지 위 border, 이미지 hover, 선택 행, brand tint, scrim. 확인 전에는 공통 overlay semantic을 늘리지 않는다.
 5. status role을 `danger`, `warning`, `success`, `info` 네 가지로 확정하고 `negative`, `caution`, `positive`, `information` 같은 중복 용어는 제거하는가?
 
@@ -142,4 +154,45 @@ oe-{role}-border-primary / secondary
 - Studio의 OE Semantic catalog
 - 필요한 경우 전역 CSS 변수와 shadcn compatibility mapping
 
-특히 현재 Light brand background의 `primary → brand-50`, `secondary → brand-100`은 위계 정의와 반대일 수 있다. 질문 1의 기준을 확정한 뒤 `primary → brand-100`, `secondary → brand-50` 후보와 실제 화면을 비교한다.
+현재 매핑은 전체 Color catalog에서 컨펌하기 위한 Provisional 후보이며, 접근성 대비와 실제 컴포넌트 검증 후 Stable로 승격한다.
+
+## 컴포넌트 작업에서의 확장 방식
+
+이 Color v0는 가능한 조합을 미리 모두 생성하는 닫힌 목록이 아니다. 이후 컴포넌트와 화면을 만들면서 기존 token으로 설명하기 어려운 패턴이 발견되면 다음 순서로 고도화한다.
+
+```text
+새 색상 패턴 발견
+→ 기존 semantic token이나 component recipe로 해결 가능한지 확인
+→ 해결되지 않으면 사용자에게 알림
+→ Candidate 등록
+→ 다른 상태·모드·컴포넌트에서 재검증
+→ 공용 semantic token / component token / 일회성 recipe 중 하나로 분류
+→ 승인 후 Provisional 또는 Stable에 반영
+```
+
+Candidate에는 최소한 다음을 기록한다.
+
+- 발견한 화면과 컴포넌트
+- 상태와 사용 맥락
+- 해결하려는 의미와 시각적 역할
+- 사용한 임시 primitive 또는 alpha 값
+- 기존 token을 재사용하지 못한 이유
+- Light/Dark 및 접근성 검수 여부
+
+같은 의미로 세 번 반복되거나 두 개 이상의 독립 컴포넌트에서 필요하면 공용 semantic token 승격을 검토한다. 접근성, theme, 시스템 경계에 필수적인 값은 첫 용례에서도 등록할 수 있다. 특정 컴포넌트에만 의미가 있다면 공용 token을 늘리지 않고 component token 또는 recipe로 유지한다.
+
+## 첫 적용: Inbox split view
+
+`/experiments/inbox-split-view`는 Color v0의 첫 실제 검증 화면이다. 다음 역할을 Provisional로 연결한다.
+
+- Preview 바탕: `oe-background-canvas-secondary`
+- Inbox와 reading pane surface: `oe-background-primary`
+- 검색창, 선택 행, incoming bubble: `oe-background-secondary` (Light `neutral-100`, Dark `neutral-800`)
+- Outgoing bubble과 Send button: `oe-background-bold-primary`
+- Unread count badge: `oe-accent-background-bold-primary`
+- 본문, 보조 정보, timestamp와 leading icon: `oe-foreground-primary / secondary / tertiary`
+- Bold fill 위 콘텐츠: `oe-foreground-inverse`
+- 외곽과 내부 divider: `oe-border-primary / secondary`
+- 키보드 focus: `oe-focus-ring`
+
+Hover는 `oe-interaction-hover` layer를 기존 background 위에 합성한다. Outgoing message metadata의 낮은 강조는 `oe-foreground-inverse-secondary`를 사용한다. 두 token은 Inbox에서 필요성이 확인되어 Provisional로 승격했으며, 다른 컴포넌트와 여러 배경에서 alpha 및 대비를 추가 검증한다.

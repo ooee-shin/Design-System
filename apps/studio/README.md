@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# @ooee/studio
 
-## Getting Started
+ooee UI 자산을 화면 맥락에서 구현하고 검수하는 Next.js App Router 애플리케이션이다. 프로젝트 목적과 전체 작업 규칙은 루트 `README.md`, `AGENTS.md`, `docs/WORKING_CONTEXT.md`를 기준으로 한다.
 
-First, run the development server:
+명령은 repository root에서 실행한다.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+corepack enable
+pnpm install --frozen-lockfile
+pnpm dev:studio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+기본 주소는 `http://localhost:3000`이다. 포트를 지정하려면 `pnpm dev:studio -- --port 3002`를 사용한다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+현재 주요 검수 경로:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/experiments/inbox-split-view`
+- `/components/message-bubble`
+- `/foundations/color`
 
-## Learn More
+검증:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm check
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+현재 필수 환경변수는 없다. `AGENTS.md`는 Next.js 버전에 맞는 로컬 문서를 먼저 확인하도록 요구하므로 앱 코드를 변경하기 전에 함께 읽는다.

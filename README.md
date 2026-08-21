@@ -14,11 +14,22 @@ shadcn/ui를 구현 기반으로 사용하지만 shadcn의 시각 언어를 그�
 - React 19, TypeScript, Tailwind CSS v4
 - shadcn CLI v4, Base UI, Nova 프리셋
 - pnpm workspace
+- Node.js `>=20.9.0`
+- pnpm `10.32.0` (`packageManager`에 고정)
 
 ```bash
-pnpm install
+corepack enable
+pnpm install --frozen-lockfile
 pnpm dev:studio
 ```
+
+기본 주소는 `http://localhost:3000`이다. 다른 포트가 필요하면 `pnpm dev:studio -- --port 3002`처럼 지정한다.
+
+```bash
+pnpm check
+```
+
+현재 실행에 필요한 환경변수는 없다. 이후 환경변수가 생기면 실제 값은 `.env.local`에 두고 Git에는 올리지 않으며, 필요한 변수 이름과 설명만 `.env.example`에 기록한다.
 
 shadcn의 스타일과 토큰은 외부 자료를 받아들이는 초기 기준점이다. 검증을 마친 Stable 자산은 이후 `packages/tokens`, `packages/ui`, `packages/patterns`의 oe 계층으로 승격한다.
 
@@ -190,17 +201,22 @@ Neutral token에서 `primary`와 `secondary`는 브랜드 primary가 아니라 �
 ```text
 oe-foreground-primary
 oe-foreground-secondary
+oe-foreground-tertiary
 oe-foreground-disabled
 oe-foreground-inverse
+oe-foreground-inverse-secondary
 
+oe-background-canvas-primary
+oe-background-canvas-secondary
 oe-background-primary
 oe-background-secondary
+oe-background-bold-primary
 oe-background-disabled
 
 oe-border-primary
 oe-border-secondary
 oe-border-disabled
-oe-border-focus
+oe-focus-ring
 ```
 
 의미는 다음과 같다.
@@ -213,9 +229,9 @@ oe-border-focus
 - `disabled`: 사용할 수 없는 상태
 - `inverse`: 진한 표면 위의 범용 반전 foreground
 
-`background-primary`는 기본 canvas, `background-secondary`는 그 위에 구분되는 surface로 정의한다. `border-primary`는 비교적 명확한 외곽이나 컨트롤 경계, `border-secondary`는 내부의 약한 divider로 정의한다.
+Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다. Light Neutral background는 primary에서 secondary 순으로 어두워지며, Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다. `border-primary`는 비교적 명확한 외곽이나 컨트롤 경계, `border-secondary`는 내부의 약한 divider로 정의한다.
 
-초기 버전에서는 `tertiary`를 만들지 않는다. 실제 사용 사례에서 `secondary`만으로 서로 다른 의미를 처리해야 하는 문제가 반복될 때 추가를 검토한다.
+`foreground-tertiary`는 leading icon, timestamp와 더 약한 메타 정보의 실제 용례가 확인되어 사용한다. 다른 property와 role에는 필요성이 확인되기 전까지 tertiary를 기계적으로 확장하지 않는다.
 
 ### Semantic status token
 
@@ -526,7 +542,7 @@ Obra를 품질 참고자료로 활용해 전체 화면을 먼저 완성한다.
 - Primitive는 Tailwind 기본 팔레트를 사용한다.
 - `oe`는 semantic token에만 사용한다.
 - foreground는 텍스트와 아이콘을 우선 통합한다.
-- neutral hierarchy는 초기에는 primary/secondary만 사용한다.
+- Neutral foreground에는 실제 용례가 확인된 tertiary를 사용하되 다른 property와 role로 자동 확장하지 않는다.
 - semantic role은 danger/warning/success/info를 사용한다.
 - 불투명 색상은 기본값으로 이름에서 생략한다.
 - 반투명 합성이 필요할 때만 overlay를 명시한다.
@@ -553,3 +569,42 @@ Obra를 품질 참고자료로 활용해 전체 화면을 먼저 완성한다.
 - [Obra license](https://shadcn.obra.studio/license)
 - [Atlassian Design Tokens](https://atlassian.design/foundations/tokens/design-tokens/)
 - [GitHub Primer Color Usage](https://www.primer.style/product/getting-started/foundations/color-usage/)
+
+## 15. 문서와 Git을 공유 기억으로 사용하는 방법
+
+두 기기나 서로 다른 Codex 계정은 대화 기록과 로컬 working tree를 공유하지 않는다. repository 안의 문서와 push된 Git commit만 공통 기준으로 사용한다.
+
+문서 책임은 다음처럼 최소화한다.
+
+- `README.md`: 프로젝트 목적, 구조, 장기 원칙, 설치·검증 방법
+- `AGENTS.md`: Codex를 포함한 AI 작업자가 매번 지켜야 하는 강제 규칙
+- `docs/WORKING_CONTEXT.md`: 현재 구현, 열린 결정, 바로 다음 작업처럼 계속 변하는 정보
+- `docs/foundations/*`: token과 foundation별 결정 및 근거
+- `docs/components/*`: Candidate/Provisional 컴포넌트의 API, 상태와 미검증 항목
+
+같은 내용을 여러 문서에 복제하지 않는다. 고정 원칙이 바뀌면 README/AGENTS를, 현재 구현이나 우선순위가 바뀌면 WORKING_CONTEXT를, 특정 자산 판단이 바뀌면 해당 영역 문서만 수정한다.
+
+### 교대 작업의 최소 절차
+
+작업을 시작할 때:
+
+```bash
+git status -sb
+git pull --ff-only
+corepack enable
+pnpm install --frozen-lockfile
+```
+
+그다음 `AGENTS.md`, `docs/WORKING_CONTEXT.md`, 작업 대상 문서를 읽는다. working tree가 깨끗하지 않거나 pull이 fast-forward 되지 않으면 작업을 시작하기 전에 기존 변경의 소유자와 범위를 확인한다.
+
+기기를 바꾸기 전:
+
+```bash
+pnpm check
+git status -sb
+git diff --check
+```
+
+diff를 검토하고 관련 문서를 갱신한 뒤 commit과 push를 완료한다. push되지 않은 변경, 로컬 개발 서버 상태와 Codex 대화 내용은 다른 환경에 전달되지 않는다.
+
+두 환경에서 동시에 작업해야 한다면 같은 branch를 공유하지 말고 각각 별도 branch를 사용한다. 번갈아 작업하는 경우에는 하나의 활성 branch를 사용하되 항상 이전 환경에서 push를 마친 뒤 다음 환경에서 pull한다.
