@@ -2,6 +2,7 @@ import { Hct, TonalPalette, argbFromHex, hexFromArgb } from "@material/material-
 
 export const BRAND_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 export const BRAND_ALPHA_STEPS = [5, 8, 10, 16, 20, 30, 40, 50, 60, 70, 80, 90] as const;
+export const DEFAULT_BRAND_SEED = "#2563EB";
 
 export type BrandStep = (typeof BRAND_STEPS)[number];
 export type BrandAlphaStep = (typeof BRAND_ALPHA_STEPS)[number];

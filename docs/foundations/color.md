@@ -94,7 +94,7 @@ oe-focus-ring                        → brand-400
 - 밝은 브랜드 배경에서는 `oe-foreground-primary`처럼 대비가 확보되는 중립 foreground를 사용한다.
 - Primitive 숫자는 컴포넌트 의미가 아니다. Stable 컴포넌트는 가능한 semantic token을 사용한다.
 - Alpha 결과는 합성되는 배경에 따라 달라지므로 Light, Dark, 이미지 배경에서 각각 검수한다.
-- Focus ring은 브랜드 원색보다 식별 가능성과 대비를 우선한다.
+- `oe-focus-ring`은 적용된 brand seed를 기반으로 Light `brand-600`, Dark `brand-400`에 연결한다. 브랜드 기반이어도 식별 가능성과 대비 검증을 우선한다.
 
 ## 아직 확정하지 않은 항목
 
@@ -134,6 +134,7 @@ oe-{role}-border-primary / secondary
 - `background-bold-primary`는 버튼, 배지, 강한 선택 상태처럼 채도가 높거나 어두운 solid fill의 후보 이름이다.
 - `bold`는 background 전용 modifier로 사용한다.
 - `interaction-hover`는 기존 background를 교체하지 않고 위에 합성하는 state layer다. 초기값은 Light `black / 5%`, Dark `white / 8%`이며 화면 검증 후 조율한다.
+- 클릭 가능한 아이콘은 공통적으로 hover 시 `interaction-hover` 회색조 state layer를 표시하고, keyboard focus 시 `oe-focus-ring`을 표시한다.
 - `foreground-inverse-secondary`는 bold fill 위의 약한 메타 정보에 사용한다.
 - `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
 - `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.

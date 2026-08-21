@@ -5,29 +5,30 @@ import { Check, Copy } from "lucide-react";
 import {
   BRAND_ALPHA_STEPS,
   BRAND_STEPS,
+  DEFAULT_BRAND_SEED,
   createBrandPalette,
   createBrandSemanticMapping,
 } from "@ooee/tokens";
 
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { SemanticTokenCatalog } from "@/components/foundations/semantic-token-catalog";
-
-const DEFAULT_SEED = "#2563EB";
+import { useBrandTheme } from "@/components/brand-theme-provider";
 
 export function ColorLab() {
+  const { seed: appliedSeed, applySeed } = useBrandTheme();
   const [view, setView] = useState<"semantic" | "brand">("semantic");
-  const [seed, setSeed] = useState(DEFAULT_SEED);
-  const [draft, setDraft] = useState(DEFAULT_SEED);
+  const [editor, setEditor] = useState({ draft: appliedSeed || DEFAULT_BRAND_SEED, appliedSeed });
+  const draft = editor.appliedSeed === appliedSeed ? editor.draft : appliedSeed;
+  const validDraft = /^#[0-9a-fA-F]{6}$/.test(draft);
+  const seed = validDraft ? draft.toUpperCase() : appliedSeed;
   const [copied, setCopied] = useState<string | null>(null);
   const palette = useMemo(() => createBrandPalette(seed), [seed]);
   const light = createBrandSemanticMapping(palette, "light");
   const dark = createBrandSemanticMapping(palette, "dark");
-  const validDraft = /^#[0-9a-fA-F]{6}$/.test(draft);
-
   function updateDraft(value: string) {
     const next = value.startsWith("#") ? value : `#${value}`;
-    setDraft(next);
-    if (/^#[0-9a-fA-F]{6}$/.test(next)) setSeed(next.toUpperCase());
+    setEditor({ draft: next, appliedSeed });
   }
 
   async function copyValue(label: string, value: string) {
@@ -87,7 +88,16 @@ export function ColorLab() {
                 className="font-mono uppercase"
                 aria-invalid={!validDraft}
               />
+              <Button type="button" variant="outline" onClick={() => updateDraft("#0073FF")}>
+                초기화
+              </Button>
+              <Button type="button" onClick={() => applySeed(seed)} disabled={!validDraft || seed === appliedSeed}>
+                반영
+              </Button>
             </div>
+            <p className="text-[11px] text-muted-foreground" role="status">
+              {seed === appliedSeed ? `현재 적용값 ${appliedSeed}` : `미리보기 ${seed} · 반영 전`}
+            </p>
             <dl className="grid grid-cols-2 gap-2 text-xs">
               <Metric label="HCT hue" value={palette.hue.toFixed(1)} />
               <Metric label="HCT chroma" value={palette.chroma.toFixed(1)} />

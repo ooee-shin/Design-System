@@ -7,15 +7,13 @@ import {
   Clock3,
   Filter,
   MoreHorizontal,
-  Paperclip,
   Search,
-  Send,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { MessageBubble } from "@/components/candidates/message-bubble";
+import { MessageComposer } from "@/components/candidates/message-composer";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -513,7 +511,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
           </div>
         </header>
 
-        <div ref={threadBodyRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
+        <div ref={threadBodyRef} className="oe-conversation-stack flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
           {selectedThread.messages.map((message, index) => (
             <MessageBubble
               key={`${message.time}-${index}`}
@@ -521,6 +519,8 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
               author={message.from}
               initials={message.initials}
               time={message.time}
+              grouped={index > 0 && selectedThread.messages[index - 1].from === message.from && selectedThread.messages[index - 1].time === message.time}
+              showTime={index === selectedThread.messages.length - 1 || selectedThread.messages[index + 1].from !== message.from || selectedThread.messages[index + 1].time !== message.time}
               deleted={message.deleted}
               deletedLabel={copy.deletedMessage}
               actions={{
@@ -535,28 +535,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
           ))}
         </div>
 
-        <form onSubmit={sendReply} className="border-t border-oe-border-secondary p-3 sm:p-4">
-          <div className="rounded-xl border border-oe-border-primary bg-oe-background-primary transition-shadow focus-within:border-oe-focus-ring focus-within:ring-3 focus-within:ring-oe-focus-ring/20">
-            <Textarea
-              value={reply}
-              onChange={(event) => setReply(event.target.value)}
-              rows={2}
-              placeholder={copy.reply}
-              aria-label={copy.reply}
-              className="min-h-16 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
-            />
-            <div className="flex items-center justify-between px-2.5 pb-2">
-              <Button type="button" variant="ghost" size="sm" className="oe-hover-layer text-oe-foreground-tertiary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring">
-                <Paperclip data-icon="inline-start" />
-                {copy.attach}
-              </Button>
-              <Button type="submit" size="sm" disabled={!reply.trim()} className="oe-hover-layer bg-oe-background-bold-primary text-oe-foreground-inverse hover:bg-oe-background-bold-primary focus-visible:ring-oe-focus-ring disabled:bg-oe-background-disabled disabled:text-oe-foreground-disabled disabled:opacity-100">
-                <Send data-icon="inline-start" />
-                {copy.send}
-              </Button>
-            </div>
-          </div>
-        </form>
+        <MessageComposer value={reply} onValueChange={setReply} onSubmit={sendReply} placeholder={copy.reply} attachLabel={copy.attach} sendLabel={copy.send} />
       </section>
     </div>
   );

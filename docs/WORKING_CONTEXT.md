@@ -55,6 +55,7 @@
 - 상태 의미 없이 시선을 끄는 강조에는 `oe-accent-*` role을 사용하며, 첫 토큰은 unread badge용 `oe-accent-background-bold-primary`다. shadcn `accent`와 직접 매핑하지 않는다.
 - Primitive에는 `oe` prefix를 붙이지 않는다.
 - Alpha primitive는 미리 생성하되 직접 사용을 남발하지 않는다.
+- `oe-focus-ring`은 적용된 brand seed에서 생성하며 Light는 `brand-600`, Dark는 `brand-400`을 사용한다.
 - 외부 UI는 화면으로 먼저 구현하고 검수 후 자산을 추출한다.
 - 컴포넌트 작업 중 새 색상 패턴이 발견되면 알림과 근거를 남긴 Candidate로 등록하고, 반복 검증 후 token 또는 recipe로 승격한다.
 
@@ -64,7 +65,6 @@
 - Light/Dark brand semantic mapping
 - 기본 ooee brand seed
 - 대표 solid action token 이름
-- focus ring을 Brand에 연결하는 브랜드별 조건
 - Neutral 및 status palette 생성 방식
 
 ## 재현 가능한 글꼴 기준

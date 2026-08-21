@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+
+import { StudioNavigation } from "@/components/studio-navigation";
+import { BrandThemeProvider } from "@/components/brand-theme-provider";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,7 +13,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full">
+        <BrandThemeProvider>
+          <StudioNavigation />
+          {children}
+        </BrandThemeProvider>
+      </body>
     </html>
   );
 }

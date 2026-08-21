@@ -14,11 +14,11 @@ export default function MessageBubblePage() {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight">Message bubble</h1>
+              <h1 className="text-xl font-semibold tracking-tight">Chat</h1>
               <span className="rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">Candidate</span>
             </div>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Inbox 화면에서 추출한 메시지 버블의 레이아웃, 전달 상태, 언어와 테마를 검수합니다.
+              채팅의 통합 사용 흐름과 메시지, 날짜, 읽음 처리, 첨부, 입력 및 테마 사례를 한곳에서 검수합니다.
             </p>
           </div>
         </header>

@@ -8,19 +8,22 @@ const workspaces = [
   {
     title: "Experiments",
     description: "VibePrompt, Obra, shadcn 자료를 화면 단위로 구현하고 비교합니다.",
-    status: "준비됨",
+    status: "Inbox split view",
+    href: "/experiments/inbox-split-view",
     icon: FlaskConical,
   },
   {
     title: "Candidates",
     description: "화면에서 발견한 컴포넌트와 패턴의 상태·인터랙션을 검수합니다.",
-    status: "MessageBubble 검수 중",
+    status: "Chat workbench",
+    href: "/components/message-bubble",
     icon: Layers3,
   },
   {
-    title: "Stable assets",
-    description: "반복 검증을 통과하고 oe 토큰으로 정규화된 자산을 모읍니다.",
-    status: "다음 단계",
+    title: "Foundations",
+    description: "색상과 타이포그래피처럼 모든 자산이 공유하는 기반 결정을 검수합니다.",
+    status: "Brand color lab",
+    href: "/foundations/color",
     icon: Boxes,
   },
 ];
@@ -69,10 +72,11 @@ export default function Home() {
             <span className="text-xs text-muted-foreground">Experiment → Candidate → Stable</span>
           </div>
           <div className="grid overflow-hidden rounded-xl border bg-background md:grid-cols-3">
-            {workspaces.map(({ title, description, status, icon: Icon }, index) => (
-              <article
+            {workspaces.map(({ title, description, status, href, icon: Icon }, index) => (
+              <Link
                 key={title}
-                className="flex min-h-56 flex-col justify-between gap-8 border-b p-6 last:border-b-0 md:border-r md:border-b-0 md:last:border-r-0"
+                href={href}
+                className="group flex min-h-56 flex-col justify-between gap-8 border-b p-6 outline-none last:border-b-0 hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring md:border-r md:border-b-0 md:last:border-r-0"
               >
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
@@ -86,8 +90,11 @@ export default function Home() {
                     <p className="text-sm leading-6 text-muted-foreground">{description}</p>
                   </div>
                 </div>
-                <span className="text-xs text-muted-foreground">{status}</span>
-              </article>
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
+                  {status}
+                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                </span>
+              </Link>
             ))}
           </div>
         </section>
