@@ -89,6 +89,7 @@ oe-warning-border-secondary
 - Candidate는 실제 사용 위치, 해결하려는 역할, 임시 primitive 값, 기존 token으로 해결할 수 없는 이유를 포함한다.
 - Candidate를 발견했다는 이유만으로 공용 semantic token이나 Stable token에 즉시 추가하지 않는다.
 - 새 token은 한 번의 편의를 위해 추가하지 않는다. 같은 의미로 세 번 반복되거나 두 개 이상의 독립 컴포넌트에서 필요하면 승격을 검토한다.
+- semantic token에 이미 alpha나 강조 위계가 포함되어 있으면 컴포넌트에서 임의 opacity를 중첩해 위계를 다시 바꾸지 않는다. 추가 감쇠가 필요하면 기존 token 선택이 맞는지 먼저 확인하고, 해결되지 않을 때만 별도 상태 또는 token Candidate로 검토한다.
 - 접근성, theme 또는 시스템 경계에 필요한 token은 첫 사용에도 추가할 수 있다.
 - shadcn update를 oe에 자동 덮어쓰지 않는다. Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
 - 고객 납품물은 특정 시점의 project snapshot이며 이후 ooee 변경과 자동 연결하지 않는다.

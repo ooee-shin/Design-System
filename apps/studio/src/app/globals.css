@@ -53,6 +53,7 @@
   --color-oe-background-disabled: var(--oe-background-disabled);
   --color-oe-accent-background-bold-primary: var(--oe-accent-background-bold-primary);
   --color-oe-danger-foreground-primary: var(--oe-danger-foreground-primary);
+  --color-oe-danger-background-primary: var(--oe-danger-background-primary);
   --color-oe-border-primary: var(--oe-border-primary);
   --color-oe-border-secondary: var(--oe-border-secondary);
   --color-oe-border-disabled: var(--oe-border-disabled);
@@ -114,6 +115,7 @@
   --oe-background-disabled: var(--color-neutral-100);
   --oe-accent-background-bold-primary: var(--color-red-600);
   --oe-danger-foreground-primary: var(--color-red-800);
+  --oe-danger-background-primary: var(--color-red-50);
   --oe-border-primary: var(--color-neutral-300);
   --oe-border-secondary: var(--color-neutral-200);
   --oe-border-disabled: var(--color-neutral-100);
@@ -167,6 +169,7 @@
   --oe-background-disabled: var(--color-neutral-800);
   --oe-accent-background-bold-primary: var(--color-red-400);
   --oe-danger-foreground-primary: var(--color-red-200);
+  --oe-danger-background-primary: var(--color-red-950);
   --oe-border-primary: var(--color-neutral-700);
   --oe-border-secondary: var(--color-neutral-800);
   --oe-border-disabled: var(--color-neutral-900);

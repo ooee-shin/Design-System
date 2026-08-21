@@ -24,6 +24,7 @@ type Message = {
   time: string;
   mine: boolean;
   text: string;
+  deleted?: boolean;
 };
 
 type Thread = {
@@ -167,6 +168,11 @@ const localeCopy = {
     archive: "대화 보관",
     snooze: "나중에 알림",
     more: "더보기",
+    deleteMessage: "메시지 삭제",
+    deletedMessage: "삭제된 메시지입니다.",
+    replyToMessage: "답장",
+    copyMessage: "복사",
+    forwardMessage: "전달",
     reply: "답장 입력…",
     attach: "첨부",
     send: "보내기",
@@ -185,6 +191,11 @@ const localeCopy = {
     archive: "Archive conversation",
     snooze: "Snooze conversation",
     more: "More actions",
+    deleteMessage: "Delete message",
+    deletedMessage: "This message was deleted.",
+    replyToMessage: "Reply",
+    copyMessage: "Copy",
+    forwardMessage: "Forward",
     reply: "Reply…",
     attach: "Attach",
     send: "Send",
@@ -203,6 +214,11 @@ const localeCopy = {
     archive: "会話をアーカイブ",
     snooze: "後で通知",
     more: "その他の操作",
+    deleteMessage: "メッセージを削除",
+    deletedMessage: "削除されたメッセージです。",
+    replyToMessage: "返信",
+    copyMessage: "コピー",
+    forwardMessage: "転送",
     reply: "返信を入力…",
     attach: "添付",
     send: "送信",
@@ -306,13 +322,14 @@ function getInitialThreads(locale: InboxLocale) {
 
   return initialThreads.map((thread, threadIndex) => ({
     ...thread,
+    sender: locale === "ko" ? koreanName(thread.sender) : thread.sender,
     time: translations[threadIndex].time,
     subject: translations[threadIndex].subject,
     people: translations[threadIndex].people,
     preview: translations[threadIndex].preview,
     messages: thread.messages.map((message, messageIndex) => ({
       ...message,
-      from: message.mine ? localeCopy[locale].you : message.from,
+      from: message.mine ? localeCopy[locale].you : locale === "ko" ? koreanName(message.from) : message.from,
       time:
         message.time === "Yesterday"
           ? locale === "ko" ? "어제" : "昨日"
@@ -324,6 +341,15 @@ function getInitialThreads(locale: InboxLocale) {
   }));
 }
 
+function koreanName(name: string) {
+  return ({
+    "Priya Kapoor": "프리야 카푸르",
+    Finance: "재무팀",
+    "Jonas Ohlsson": "요나스 올손",
+    "Mei Tanaka": "메이 다나카",
+  } as Record<string, string>)[name] ?? name;
+}
+
 export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
   const copy = localeCopy[locale];
   const initialLocalizedThreads = getInitialThreads(locale);
@@ -333,6 +359,12 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
   const [reply, setReply] = useState("");
   const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
   const threadBodyRef = useRef<HTMLDivElement>(null);
+
+  function deleteMessage(messageIndex: number) {
+    setThreads((current) => current.map((thread) => thread.id === selectedId
+      ? { ...thread, messages: thread.messages.map((message, index) => index === messageIndex ? { ...message, deleted: true } : message) }
+      : thread));
+  }
 
   const selectedThread = threads.find((thread) => thread.id === selectedId) ?? threads[0];
   const unreadCount = threads.reduce((total, thread) => total + thread.unreadCount, 0);
@@ -489,6 +521,14 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
               author={message.from}
               initials={message.initials}
               time={message.time}
+              deleted={message.deleted}
+              deletedLabel={copy.deletedMessage}
+              actions={{
+                copyLabel: copy.copyMessage,
+                deleteLabel: copy.deleteMessage,
+                onCopy: () => { void navigator.clipboard.writeText(message.text); },
+                onDelete: () => deleteMessage(index),
+              }}
             >
               {message.text}
             </MessageBubble>

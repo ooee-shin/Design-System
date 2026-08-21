@@ -16,13 +16,16 @@ type Theme = "light" | "dark";
 
 const copy = {
   ko: {
-    incomingAuthor: "Priya Kapoor",
+    incomingAuthor: "프리야 카푸르",
     outgoingAuthor: "나",
     incoming: "공용 풀 사용률이 높아졌어요. 출시 주간에 전용 러너 두 대를 확보할 수 있을까요?",
     outgoing: "네. 두 대를 예약하고 풀의 확장 기준을 낮추겠습니다.",
     long: "여러 줄로 이어지는 메시지에서 한글의 행간과 버블 내부 여백이 과하게 벌어지지 않는지 확인합니다. 화면 폭이 줄어들어도 읽기 편해야 합니다.",
     typing: "Priya Kapoor님이 작성 중입니다.",
-    states: { sending: "전송 중", sent: "전송됨", delivered: "전달됨", read: "읽음", failed: "전송 실패" },
+    deleted: "삭제된 메시지입니다.",
+    unreadRecipients: (count: number) => `아직 읽지 않은 참여자 ${count}명`,
+    actions: { delete: "메시지 삭제", copy: "메시지 복사" },
+    states: { sending: "전송 중", sent: "전송됨", read: "모두 읽음", failed: "전송 실패" },
   },
   en: {
     incomingAuthor: "Priya Kapoor",
@@ -31,7 +34,10 @@ const copy = {
     outgoing: "Yes. I’ll reserve two and lower the scaling threshold.",
     long: "This longer message checks line length, wrapping, and the internal spacing of the bubble across narrower layouts without making the conversation difficult to scan.",
     typing: "Priya Kapoor is typing.",
-    states: { sending: "Sending", sent: "Sent", delivered: "Delivered", read: "Read", failed: "Failed" },
+    deleted: "This message was deleted.",
+    unreadRecipients: (count: number) => `${count} recipients have not read this message`,
+    actions: { delete: "Delete message", copy: "Copy message" },
+    states: { sending: "Sending", sent: "Sent", read: "Read by all", failed: "Failed" },
   },
   ja: {
     incomingAuthor: "Priya Kapoor",
@@ -40,7 +46,10 @@ const copy = {
     outgoing: "はい。2台を予約し、スケール基準を下げます。",
     long: "複数行のメッセージで行間や吹き出し内の余白を確認します。画面幅が狭くなっても読みやすさを保つ必要があります。",
     typing: "Priya Kapoorさんが入力しています。",
-    states: { sending: "送信中", sent: "送信済み", delivered: "配信済み", read: "既読", failed: "送信失敗" },
+    deleted: "削除されたメッセージです。",
+    unreadRecipients: (count: number) => `未読の参加者${count}人`,
+    actions: { delete: "メッセージを削除", copy: "メッセージをコピー" },
+    states: { sending: "送信中", sent: "送信済み", read: "全員既読", failed: "送信失敗" },
   },
 } satisfies Record<Locale, {
   incomingAuthor: string;
@@ -49,10 +58,13 @@ const copy = {
   outgoing: string;
   long: string;
   typing: string;
+  deleted: string;
+  unreadRecipients: (count: number) => string;
+  actions: { delete: string; copy: string };
   states: Record<MessageDeliveryState, string>;
 }>;
 
-const states: MessageDeliveryState[] = ["sending", "sent", "delivered", "read", "failed"];
+const states: MessageDeliveryState[] = ["sending", "sent", "read", "failed"];
 
 export function MessageBubbleWorkbench() {
   const [theme, setTheme] = useState<Theme>("light");
@@ -61,6 +73,10 @@ export function MessageBubbleWorkbench() {
   const [showAvatar, setShowAvatar] = useState(true);
   const [longMessage, setLongMessage] = useState(false);
   const activeCopy = copy[locale];
+  const messageActions = {
+    copyLabel: activeCopy.actions.copy,
+    deleteLabel: activeCopy.actions.delete,
+  };
 
   return (
     <section className="overflow-hidden rounded-2xl border bg-background shadow-sm">
@@ -93,6 +109,7 @@ export function MessageBubbleWorkbench() {
                 initials={direction === "outgoing" ? "SM" : "PK"}
                 time="09:26"
                 showAvatar={showAvatar}
+                actions={messageActions}
               >
                 {longMessage ? activeCopy.long : direction === "outgoing" ? activeCopy.outgoing : activeCopy.incoming}
               </MessageBubble>
@@ -100,8 +117,10 @@ export function MessageBubbleWorkbench() {
 
             <WorkbenchSection title="Conversation states" description="Typing indicator는 MessageBubble과 분리된 thread 상태입니다.">
               <div className="space-y-4">
-                <MessageBubble direction="incoming" author={activeCopy.incomingAuthor} initials="PK" time="09:12">{activeCopy.incoming}</MessageBubble>
-                <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:20">{activeCopy.outgoing}</MessageBubble>
+                <MessageBubble direction="incoming" author={activeCopy.incomingAuthor} initials="PK" time="09:12" actions={messageActions}>{activeCopy.incoming}</MessageBubble>
+                <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:20" actions={messageActions}>{activeCopy.outgoing}</MessageBubble>
+                <MessageBubble direction="incoming" author={activeCopy.incomingAuthor} initials="PK" time="09:24" deleted deletedLabel={activeCopy.deleted}>{activeCopy.incoming}</MessageBubble>
+                <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:25" deleted deletedLabel={activeCopy.deleted}>{activeCopy.outgoing}</MessageBubble>
                 <TypingIndicator initials="PK" label={activeCopy.typing} />
               </div>
             </WorkbenchSection>
@@ -118,8 +137,11 @@ export function MessageBubbleWorkbench() {
                     initials="SM"
                     time="09:20"
                     deliveryState={state}
+                    unreadRecipientCount={state === "sent" ? 3 : state === "read" ? 0 : undefined}
+                    unreadRecipientLabel={state === "sent" ? activeCopy.unreadRecipients(3) : undefined}
                     deliveryCopy={activeCopy.states}
                     showAvatar={false}
+                    actions={messageActions}
                   >
                     {activeCopy.outgoing}
                   </MessageBubble>

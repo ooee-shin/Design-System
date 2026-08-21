@@ -156,6 +156,8 @@ oe-{role}-border-primary / secondary
 
 현재 매핑은 전체 Color catalog에서 컨펌하기 위한 Provisional 후보이며, 접근성 대비와 실제 컴포넌트 검증 후 Stable로 승격한다.
 
+MessageBubble의 삭제 action hover에서 `oe-danger-background-primary`가 첫 실제 용례로 확인되었다. 초기 매핑은 Light `red-50`, Dark `red-950`이며 다른 danger surface와 함께 대비를 추가 검증한다.
+
 ## 컴포넌트 작업에서의 확장 방식
 
 이 Color v0는 가능한 조합을 미리 모두 생성하는 닫힌 목록이 아니다. 이후 컴포넌트와 화면을 만들면서 기존 token으로 설명하기 어려운 패턴이 발견되면 다음 순서로 고도화한다.

@@ -39,7 +39,7 @@
 - `/components/message-bubble`
   - Inbox에서 추출한 첫 Candidate 컴포넌트 Workbench
   - incoming/outgoing, avatar, 긴 콘텐츠, 국문/영문/일어, Light/Dark 검수
-  - sending/sent/delivered/read/failed 및 별도 TypingIndicator 비교
+  - sending/sent/read/failed 및 별도 TypingIndicator 비교
 
 ## 확정된 결정
 
