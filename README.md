@@ -14,8 +14,9 @@ shadcn/ui를 구현 기반으로 사용하지만 shadcn의 시각 언어를 그�
 - React 19, TypeScript, Tailwind CSS v4
 - shadcn CLI v4, Base UI, Nova 프리셋
 - pnpm workspace
-- Node.js `>=20.9.0`
+- Node.js `22.22.1` (`.nvmrc`와 `.node-version`에 고정)
 - pnpm `10.32.0` (`packageManager`에 고정)
+- repository에 고정된 preview font: 국문 Pretendard, 영문 Inter, 일문 Noto Sans JP
 
 ```bash
 corepack enable
@@ -29,7 +30,11 @@ pnpm dev:studio
 pnpm check
 ```
 
+`pnpm check`는 lint, 공용 자산 test와 production build를 차례로 실행한다. GitHub도 pull request와 `main` push에서 같은 검사를 자동 실행한다. 안전한 branch 작업 방법은 `docs/GIT_WORKFLOW.md`를 따른다.
+
 현재 실행에 필요한 환경변수는 없다. 이후 환경변수가 생기면 실제 값은 `.env.local`에 두고 Git에는 올리지 않으며, 필요한 변수 이름과 설명만 `.env.example`에 기록한다.
+
+확정된 언어별 font 기준은 공용 `packages/fonts`가 소유하고 각 앱이 이를 사용한다. font는 build 결과에 포함되며 로컬 시스템 설치 여부에 의존하지 않는다.
 
 shadcn의 스타일과 토큰은 외부 자료를 받아들이는 초기 기준점이다. 검증을 마친 Stable 자산은 이후 `packages/tokens`, `packages/ui`, `packages/patterns`의 oe 계층으로 승격한다.
 

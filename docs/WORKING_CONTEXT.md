@@ -9,14 +9,17 @@
 ## Git 작업 기준
 
 - Remote: `https://github.com/ooee-shin/ooee-ui.git` (private)
-- GitHub default 및 현재 활성 작업 branch: `codex/initial-studio-foundation`
+- 공식 기준 branch: `main` (초기 작업 branch에서 전환)
 - 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
 - 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
 - 현재 repository에는 필수 환경변수가 없다.
+- `main`을 항상 정상 작동하는 공식 원본으로 사용하고, 변경은 별도 branch와 pull request를 거친다.
+- GitHub의 `Quality` 자동 검사가 성공한 변경만 `main`에 합친다.
 
 ## 현재 기술 환경
 
 - pnpm workspace
+- Node.js 22.22.1 고정
 - Next.js App Router Studio
 - React 19, TypeScript, Tailwind CSS v4
 - shadcn CLI v4
@@ -64,10 +67,17 @@
 - focus ring을 Brand에 연결하는 브랜드별 조건
 - Neutral 및 status palette 생성 방식
 
+## 재현 가능한 글꼴 기준
+
+- 국문 preview는 Pretendard Variable을 사용한다.
+- 영문 preview는 Inter Variable을 사용한다.
+- 일문 preview는 Noto Sans JP Variable을 사용한다.
+- 세 글꼴은 확정된 Foundation 자산으로 `packages/fonts`가 소유한다. Studio는 이를 검수·소비할 뿐 별도의 글꼴 기준을 갖지 않는다.
+- 공용 패키지의 의존성과 lockfile에 버전을 고정하며 운영체제의 system font 설치 여부에 의존하지 않는다.
+- 브라우저와 운영체제의 rasterization 차이는 남을 수 있지만 font family, glyph metrics와 줄바꿈 기준은 repository에서 재현 가능하게 유지한다.
+
 ## 알려진 로컬 환경 차이
 
-- 국문/영문/일어 preview font는 현재 시스템 font fallback을 사용한다. Pretendard, SUIT, Inter, Noto Sans JP 설치 여부에 따라 기기별 렌더링과 줄바꿈이 달라질 수 있다.
-- 정확한 시각 회귀가 필요해지면 사용할 font 파일 또는 web font 공급 방식을 별도로 결정하고 repository에서 재현 가능하게 고정해야 한다.
 - Obra Pro 자료는 실행 필수 의존성이 아니며 repository에 포함하지 않는다. 참고가 필요하면 각 계정과 기기에서 적법한 구매 권한으로 접근해야 한다.
 - 로컬 개발 포트와 브라우저 탭 상태는 공유되지 않는다. 기본 포트는 3000이며 필요하면 명령에서 3002처럼 지정한다.
 

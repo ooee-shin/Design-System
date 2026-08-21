@@ -1,3 +1,4 @@
+@import "@ooee/fonts/styles.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -7,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--oe-font-family-ko);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -195,7 +196,7 @@
   }
 
   .preview-canvas:lang(ko) {
-    font-family: "Pretendard", "SUIT", "Apple SD Gothic Neo", Arial, sans-serif;
+    font-family: var(--oe-font-family-ko);
   }
 
   .preview-canvas:lang(ko) .oe-message-bubble {
@@ -203,10 +204,10 @@
   }
 
   .preview-canvas:lang(en) {
-    font-family: Inter, Arial, Helvetica, sans-serif;
+    font-family: var(--oe-font-family-en);
   }
 
   .preview-canvas:lang(ja) {
-    font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    font-family: var(--oe-font-family-ja);
   }
 }

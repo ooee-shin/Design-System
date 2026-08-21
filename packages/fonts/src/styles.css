@@ -1,0 +1,9 @@
+@import "pretendard/dist/web/variable/pretendardvariable.css";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/noto-sans-jp/wght.css";
+
+:root {
+  --oe-font-family-ko: "Pretendard Variable", sans-serif;
+  --oe-font-family-en: "Inter Variable", sans-serif;
+  --oe-font-family-ja: "Noto Sans JP Variable", sans-serif;
+}

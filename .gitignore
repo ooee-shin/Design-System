@@ -5,6 +5,7 @@ node_modules/
 .next/
 out/
 storybook-static/
+coverage/
 
 # Local environment
 .env*
@@ -13,6 +14,8 @@ storybook-static/
 # Logs and system files
 *.log
 .DS_Store
+*.pem
+.vercel/
 
 # TypeScript
 *.tsbuildinfo

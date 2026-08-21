@@ -96,11 +96,10 @@ oe-warning-border-secondary
 
 ## 검증
 
-코드 변경 후 최소한 다음을 실행한다.
+코드 변경 후 최소한 다음을 실행한다. 이 명령은 lint, 공용 자산 test와 production build를 모두 포함한다.
 
 ```bash
-pnpm lint
-pnpm build
+pnpm check
 ```
 
 인터랙션이나 반응형을 변경했다면 Studio의 실제 화면에서도 해당 동작을 검수한다.
@@ -108,6 +107,7 @@ pnpm build
 ## 여러 환경에서 이어서 작업할 때
 
 - Git remote의 push된 commit만 다른 기기와 계정이 공유할 수 있는 상태로 간주한다. Codex 대화와 로컬 미커밋 변경에 의존하지 않는다.
+- `main`은 항상 검사를 통과한 공식 원본으로 유지한다. 일반 변경은 별도 branch와 pull request를 거치며 GitHub `Quality` 검사가 성공한 뒤 합친다.
 - 작업 시작 시 working tree가 깨끗한지 확인하고, 깨끗할 때만 현재 작업 branch를 `git pull --ff-only`로 최신화한다.
 - 두 기기에서 같은 branch를 동시에 수정하지 않는다. 동시에 작업해야 하면 기기별 branch를 사용하고 한쪽에서 merge한 뒤 다른 쪽이 다시 pull한다.
 - 의미 있는 구현·규칙·다음 작업이 바뀌면 관련 영역 문서와 `docs/WORKING_CONTEXT.md`를 최소한으로 갱신한다.
