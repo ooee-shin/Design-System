@@ -15,7 +15,9 @@
 
 HCT는 palette 계산 도구로 사용한다. Material의 semantic role이나 컴포넌트 색상 체계를 그대로 채택하지 않는다.
 
-Color Foundation 화면은 `OE Semantic`과 `Brand Primitive`를 한 페이지의 분리된 탭으로 제공한다. Sidebar와 Chart는 특수 목적의 shadcn token으로 유지하며 oe 공용 semantic 목록에 포함하지 않는다.
+Color Foundation 화면은 `Tailwind Primitive`, `OE Semantic`, `Brand Color`를 한 페이지의 분리된 탭으로 제공한다. Tailwind Primitive에는 Tailwind CSS v4의 white/black과 22개 기본 palette 전체를 표시한다. OE Semantic은 실제 컴포넌트가 우선 사용하는 의미 토큰을, Brand Color는 seed와 HCT로 생성한 ooee 전용 palette 및 semantic mapping 후보를 표시한다. Sidebar와 Chart는 특수 목적의 shadcn token으로 유지하며 oe 공용 semantic 목록에 포함하지 않는다.
+
+Neutral, Accent, Warning, Danger, Success, Info의 이름과 Light/Dark primitive 매핑은 `packages/tokens/src/index.ts`의 `CORE_SEMANTIC_TOKENS`가 단일 실행 원본이다. Color Foundation 표와 Studio 전역 CSS 변수는 이 정의를 함께 사용하며 표시용 목록을 별도로 복제하지 않는다.
 
 ## Solid primitive
 
@@ -146,7 +148,7 @@ oe-{role}-border-primary / secondary
 2. Focus를 border 계열인 `oe-border-focus`로 둘 것인가, 독립 접근성 역할인 `oe-focus-ring`으로 둘 것인가? 현재 추천은 `oe-focus-ring`이다.
 3. ~~강한 solid fill의 modifier 이름~~: `bold`를 background 전용 modifier로 사용하기로 결정했다.
 4. 지금 실제로 반복되는 overlay 용례는 무엇인가? 예: 이미지 위 border, 이미지 hover, 선택 행, brand tint, scrim. 확인 전에는 공통 overlay semantic을 늘리지 않는다.
-5. status role을 `danger`, `warning`, `success`, `info` 네 가지로 확정하고 `negative`, `caution`, `positive`, `information` 같은 중복 용어는 제거하는가?
+5. ~~Status role 명칭~~: `danger`, `warning`, `success`, `info` 네 가지를 공용 명칭으로 사용하고 중복 용어는 만들지 않는다.
 
 답변 후에는 다음을 함께 수정한다.
 

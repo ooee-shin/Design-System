@@ -1,0 +1,325 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { RiCalendarLine, RiEyeLine, RiEyeOffLine, RiGlobalLine, RiLink, RiLockPasswordLine, RiSearchLine, RiUserLine } from "@remixicon/react";
+
+import { Input } from "@ooee/ui";
+import { InputCustomExamples } from "@/components/candidates/input-custom-examples";
+import { OnThisPage } from "@/components/component-detail-navigation";
+import { useStudioPreferences } from "@/components/studio-preferences-provider";
+
+type PlaygroundIcon = "placeholder" | "search" | "password" | "user" | "global" | "calendar";
+type PlaygroundState = "default" | "focus" | "invalid" | "disabled" | "readOnly";
+
+const copy = {
+  ko: {
+    description: "한 줄 텍스트를 입력하는 컴포넌트입니다. Label, 도움말과 오류 문구는 Input 내부가 아니라 별도 Field가 담당합니다.",
+    placeholder: "Placeholder",
+    search: "검색어를 입력하세요",
+    website: "웹사이트 주소",
+    amount: "금액",
+    clear: "입력 내용 지우기",
+    showPassword: "비밀번호 보기",
+    hidePassword: "비밀번호 숨기기",
+    customInputDescription: "특수한 포맷이나 마스킹 등의 기능이 필요한 경우, 포맷과 동작을 직접 정의해서 사용할 수 있습니다.",
+  },
+  en: {
+    description: "A single-line text entry component. Labels, help text, and error messages belong to a separate Field.",
+    placeholder: "Placeholder",
+    search: "Search",
+    website: "Website address",
+    amount: "Amount",
+    clear: "Clear input",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    customInputDescription: "When a special format or masking behavior is required, define the format and interaction directly.",
+  },
+} as const;
+
+const inputSections = [
+  { id: "playground", label: "Playground" },
+  { id: "anatomy", label: "Anatomy" },
+  { id: "style", label: "Style" },
+  { id: "size", label: "Size" },
+  { id: "state", label: "State" },
+  { id: "elements", label: "Elements" },
+  { id: "custom-input", label: "Custom input" },
+  { id: "property-map", label: "Property map" },
+];
+
+export function InputWorkbench() {
+  const { locale } = useStudioPreferences();
+  const c = copy[locale];
+  const [clearValue, setClearValue] = useState(locale === "ko" ? "지울 수 있는 입력값" : "Clearable value");
+  const [playgroundVariant, setPlaygroundVariant] = useState<"outline" | "filled">("outline");
+  const [playgroundSize, setPlaygroundSize] = useState<"small" | "regular" | "large" | "xlarge">("regular");
+  const [playgroundLayout, setPlaygroundLayout] = useState<"fill" | "fixed">("fill");
+  const [playgroundWidth, setPlaygroundWidth] = useState(240);
+  const [playgroundPlaceholder, setPlaygroundPlaceholder] = useState<string>(c.placeholder);
+  const [playgroundState, setPlaygroundState] = useState<PlaygroundState>("default");
+  const [playgroundElements, setPlaygroundElements] = useState({
+    showLeading: false,
+    leadingIcon: "placeholder" as PlaygroundIcon,
+    showPrefix: false,
+    prefixText: "https://",
+    showSuffix: false,
+    suffixText: ".com",
+    showTrailing: false,
+    trailingIcon: "placeholder" as PlaygroundIcon,
+    showClear: true,
+  });
+  const [playgroundValue, setPlaygroundValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("ooee-password");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  return (
+    <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
+      <div className="min-w-0 space-y-5">
+      <header id="overview" className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5">
+        <h2 className="text-lg font-semibold text-oe-foreground-primary">Input</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-6 text-oe-foreground-secondary">{c.description}</p>
+      </header>
+
+      <Section id="playground" title="🚩 Playground" description="확정된 Style, Size와 Optional element를 조합하여 실제 입력 상태에서 확인합니다.">
+        <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[1000px]:grid-cols-[minmax(18rem,1fr)_minmax(36rem,1.4fr)]">
+          <div className="flex min-h-52 h-full items-start rounded-xl bg-oe-background-primary p-5">
+            <Input
+              variant={playgroundVariant}
+              controlSize={playgroundSize}
+              {...(playgroundLayout === "fixed" ? { layout: "fixed" as const, fixedWidth: playgroundWidth } : { layout: "fill" as const })}
+              value={playgroundValue}
+              onChange={(event) => setPlaygroundValue(event.target.value)}
+              placeholder={playgroundPlaceholder}
+              aria-invalid={playgroundState === "invalid" ? "true" : undefined}
+              disabled={playgroundState === "disabled"}
+              readOnly={playgroundState === "readOnly"}
+              containerClassName={playgroundState === "focus" ? "border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" : undefined}
+              leadingElement={playgroundElements.showLeading ? <PlaygroundIconGraphic icon={playgroundElements.leadingIcon} /> : undefined}
+              prefix={playgroundElements.showPrefix ? playgroundElements.prefixText : undefined}
+              suffix={playgroundElements.showSuffix ? playgroundElements.suffixText : undefined}
+              trailingElement={playgroundElements.showTrailing ? <PlaygroundIconGraphic icon={playgroundElements.trailingIcon} /> : undefined}
+              clearable={playgroundElements.showClear && playgroundValue.length > 0}
+              clearLabel={c.clear}
+              onClear={() => setPlaygroundValue("")}
+            />
+          </div>
+          <div className="grid gap-5 @min-[720px]:grid-cols-2">
+            <div className="space-y-4">
+              <ControlSection title="Appearance"><ControlGroup label="Style">{(["outline", "filled"] as const).map((value) => <ControlButton key={value} active={playgroundVariant === value} onClick={() => setPlaygroundVariant(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
+              <ControlSection title="Size"><ControlGroup label="Control size">{(["small", "regular", "large", "xlarge"] as const).map((value) => <ControlButton key={value} active={playgroundSize === value} onClick={() => setPlaygroundSize(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
+              <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((value) => <ControlButton key={value} active={playgroundLayout === value} onClick={() => setPlaygroundLayout(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup>{playgroundLayout === "fixed" ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">Width · px</span><input type="number" min={120} max={640} step={8} value={playgroundWidth} onChange={(event) => setPlaygroundWidth(Number(event.target.value))} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label> : null}</ControlSection>
+              <ControlSection title="State"><ControlGroup label="Preview state">{(["default", "focus", "invalid", "disabled", "readOnly"] as const).map((value) => <ControlButton key={value} active={playgroundState === value} onClick={() => setPlaygroundState(value)}>{value === "readOnly" ? "Read only" : capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
+            </div>
+            <div className="space-y-4">
+              <ControlSection title="Content"><TextControl label="Value" value={playgroundValue} onChange={setPlaygroundValue} /><TextControl label="Placeholder" value={playgroundPlaceholder} onChange={setPlaygroundPlaceholder} /></ControlSection>
+              <ControlSection title="Elements">
+                <div className="divide-y divide-oe-border-secondary">
+                  <div className="pb-3"><ElementControl label="Leading element" visible={playgroundElements.showLeading} icon={playgroundElements.leadingIcon} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showLeading: value }))} onIconChange={(value) => setPlaygroundElements((current) => ({ ...current, leadingIcon: value }))} /></div>
+                  <div className="py-3"><TextElementControl label="Prefix" visible={playgroundElements.showPrefix} text={playgroundElements.prefixText} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showPrefix: value }))} onTextChange={(value) => setPlaygroundElements((current) => ({ ...current, prefixText: value }))} /></div>
+                  <div className="py-3"><BooleanControl label="Show clear button" value={playgroundElements.showClear} onChange={(value) => setPlaygroundElements((current) => ({ ...current, showClear: value }))} /></div>
+                  <div className="py-3"><TextElementControl label="Suffix" visible={playgroundElements.showSuffix} text={playgroundElements.suffixText} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showSuffix: value }))} onTextChange={(value) => setPlaygroundElements((current) => ({ ...current, suffixText: value }))} /></div>
+                  <div className="pt-3"><ElementControl label="Trailing element" visible={playgroundElements.showTrailing} icon={playgroundElements.trailingIcon} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showTrailing: value }))} onIconChange={(value) => setPlaygroundElements((current) => ({ ...current, trailingIcon: value }))} /></div>
+                </div>
+              </ControlSection>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section id="anatomy" title="Anatomy" description="Input을 구성하는 실제 요소와 문서에서 사용하는 명칭입니다.">
+        <InputAnatomy placeholder={c.website} />
+      </Section>
+
+      <Section id="style" title="Properties · Style" description="Outline은 테두리로, Filled는 중립 회색조 배경으로 입력 영역을 구분합니다.">
+        <PropertyGroup label="Outline"><Input placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Filled"><Input variant="filled" placeholder={c.placeholder} /></PropertyGroup>
+      </Section>
+
+      <Section id="size" title="Properties · Size" description="공통 Control Height입니다. 같은 Size의 Button과 한 줄 Form control이 동일한 외곽 높이를 사용합니다.">
+        <PropertyGroup label="Small · 32px"><Input controlSize="small" placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Regular · 36px · Default"><Input controlSize="regular" placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Large · 40px"><Input controlSize="large" placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="XLarge · 48px"><Input controlSize="xlarge" placeholder={c.placeholder} /></PropertyGroup>
+      </Section>
+
+      <Section id="state" title="Properties · State" description="상태의 시각값이 바뀌지 않도록 모든 예시의 마우스와 키보드 상호작용을 차단했습니다.">
+        <PropertyGroup label="Empty / Placeholder" fixed><Input readOnly tabIndex={-1} placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Default · With value" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "입력된 값" : "Entered value"} /></PropertyGroup>
+        <PropertyGroup label="Focus" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "포커스 상태" : "Focused"} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></PropertyGroup>
+        <PropertyGroup label="Invalid" fixed><Input readOnly tabIndex={-1} aria-invalid="true" defaultValue={locale === "ko" ? "올바르지 않은 값" : "Invalid value"} /></PropertyGroup>
+        <PropertyGroup label="Disabled" fixed><Input disabled tabIndex={-1} defaultValue={locale === "ko" ? "비활성화" : "Disabled"} /></PropertyGroup>
+        <PropertyGroup label="Read only" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "읽기 전용" : "Read only"} /></PropertyGroup>
+      </Section>
+
+      <Section id="elements" title="Properties · Elements" description="실제 input field를 제외한 요소는 모두 선택 사항이며 전달한 요소만 표시합니다.">
+        <PropertyGroup label="Leading element"><Input leadingElement={<RiSearchLine />} placeholder={c.search} /></PropertyGroup>
+        <PropertyGroup label="Prefix"><Input prefix="https://" placeholder={c.website} /></PropertyGroup>
+        <PropertyGroup label="Clear button"><Input value={clearValue} onChange={(event) => setClearValue(event.target.value)} clearable={clearValue.length > 0} clearLabel={c.clear} onClear={() => setClearValue("")} aria-label={c.clear} /></PropertyGroup>
+        <PropertyGroup label="Suffix"><Input inputMode="numeric" placeholder={c.amount} suffix="KRW" /></PropertyGroup>
+        <PropertyGroup label="Trailing element · Password">
+          <Input
+            type={passwordVisible ? "text" : "password"}
+            value={passwordValue}
+            onChange={(event) => setPasswordValue(event.target.value)}
+            placeholder="Password"
+            clearable={passwordValue.length > 0}
+            clearLabel={c.clear}
+            onClear={() => setPasswordValue("")}
+            trailingElement={
+              <button type="button" aria-label={passwordVisible ? c.hidePassword : c.showPassword} aria-pressed={passwordVisible} onClick={() => setPasswordVisible((visible) => !visible)} className="flex size-6 items-center justify-center rounded-md transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
+                {passwordVisible ? <RiEyeOffLine aria-hidden="true" /> : <RiEyeLine aria-hidden="true" />}
+              </button>
+            }
+          />
+        </PropertyGroup>
+        <PropertyGroup label="Combined"><Input leadingElement={<RiLink />} prefix="https://" suffix=".com" trailingElement={<RiCalendarLine />} placeholder="example" /></PropertyGroup>
+      </Section>
+
+      <Section id="custom-input" title="Custom input" description={c.customInputDescription}>
+        <InputCustomExamples />
+      </Section>
+
+      <Section id="property-map" title="Property map" description="상위 Property와 현재 허용하는 하위 값을 한 번에 확인합니다.">
+        <div className="col-span-full overflow-x-auto">
+          <table className="w-full min-w-[42rem] text-left text-xs">
+            <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead>
+            <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
+              <MapRow property="variant" values="outline | filled" defaultValue="outline" />
+              <MapRow property="controlSize" values="small | regular | large | xlarge" defaultValue="regular" />
+              <MapRow property="layout" values="fill | fixed" defaultValue="fill" />
+              <MapRow property="fixedWidth" values="CSS width" defaultValue="required when fixed" note="Fixed only" />
+              <MapRow property="state" values="empty / placeholder | default with value | focus | invalid | disabled | readOnly" defaultValue="empty / placeholder" note="Native attributes and focus" />
+              <MapRow property="elements" values="leadingElement | prefix | clearable | suffix | trailingElement" defaultValue="none" note="Optional" />
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      </div>
+      <OnThisPage items={inputSections} relatedItems={[{ href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }, { href: "/components/textarea", title: "Textarea", description: "여러 줄 텍스트 입력과 높이 동작을 다룹니다." }]} />
+    </div>
+  );
+}
+
+function InputAnatomy({ placeholder }: { placeholder: string }) {
+  const parts = [
+    [1, "Container", false],
+    [2, "Leading element", true],
+    [3, "Prefix", true],
+    [4, "Input field", false],
+    [5, "Clear button", true],
+    [6, "Suffix", true],
+    [7, "Trailing element", true],
+  ] as const;
+
+  return (
+    <div className="col-span-full min-w-0">
+      <div role="img" aria-label="Input anatomy" className="overflow-x-auto rounded-xl bg-oe-background-secondary px-5 py-7">
+        <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
+          <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 768 352" fill="none" aria-hidden="true">
+            {/* Container is shown as a bracket around the whole control, not a single-point callout. */}
+            <path d="M116 151V132H652V151" stroke="currentColor" strokeWidth="1" />
+            <path d="M384 88V132" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={384} y={72} number={1} />
+
+            <path d="M144 94V172" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={144} y={76} number={2} />
+
+            <path d="M200 94V172" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={200} y={76} number={3} />
+
+            <path d="M372 245V190" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={372} y={263} number={4} />
+
+            <path d="M528 245V190" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={528} y={263} number={5} />
+
+            <path d="M576 94V172" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={576} y={76} number={6} />
+
+            <path d="M624 245V190" stroke="currentColor" strokeWidth="1" />
+            <AnatomyNumber x={624} y={263} number={7} />
+          </svg>
+
+          <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
+            <RiSearchLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+            <span className="text-oe-foreground-secondary">https://</span>
+            <span className="min-w-0 truncate text-oe-foreground-placeholder">{placeholder}</span>
+            <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary" aria-hidden="true">×</span>
+            <span className="text-oe-foreground-secondary">.com</span>
+            <RiCalendarLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+      <ol className="mt-4 flex flex-wrap justify-start gap-x-5 gap-y-2 px-1 text-left text-xs text-oe-foreground-primary">
+        {parts.map(([number, label, optional]) => (
+          <li key={label} className="flex items-baseline gap-1.5 whitespace-nowrap">
+            <span className="font-semibold">{number}.</span>
+            <span>{label}</span>
+            {optional ? <span className="text-oe-foreground-placeholder">(Optional)</span> : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function AnatomyNumber({ x, y, number }: { x: number; y: number; number: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r="9" fill="var(--oe-foreground-secondary)" />
+      <text x={x} y={y + 0.5} textAnchor="middle" dominantBaseline="middle" fill="var(--oe-foreground-inverse)" fontSize="10" fontWeight="600">{number}</text>
+    </g>
+  );
+}
+
+function Section({ id, title, description, children }: { id?: string; title: string; description: string; children: ReactNode }) {
+  return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
+}
+
+function PropertyGroup({ label, description, children, fixed = false }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
+  return <div className={`flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4 ${fixed ? "pointer-events-none select-none" : ""}`}><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><div className="mt-auto">{children}</div></div>;
+}
+
+function ControlGroup({ label, children }: { label: string; children: ReactNode }) {
+  return <fieldset><legend className="mb-2 text-[11px] font-medium text-oe-foreground-tertiary">{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>;
+}
+
+function ControlSection({ title, children }: { title: string; children: ReactNode }) {
+  return <section className="space-y-3 border-t border-oe-border-secondary pt-3 first:border-t-0 first:pt-0"><h4 className="text-xs font-semibold text-oe-foreground-primary">{title}</h4>{children}</section>;
+}
+
+function TextControl({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none placeholder:text-oe-foreground-placeholder focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label>;
+}
+
+function ControlButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+  return <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${active ? "border-oe-foreground-primary bg-oe-background-bold-primary text-oe-foreground-inverse" : "border-oe-border-secondary bg-oe-background-primary text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}>{children}</button>;
+}
+
+function BooleanControl({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) {
+  return <div className="flex items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring/40 ${value ? "bg-oe-background-bold-primary" : "bg-oe-background-secondary ring-1 ring-inset ring-oe-border-primary"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-oe-background-primary shadow-sm transition-[left] ${value ? "left-[18px]" : "left-0.5"}`} /></button></div>;
+}
+
+function ElementControl({ label, visible, icon, onVisibleChange, onIconChange }: { label: string; visible: boolean; icon: PlaygroundIcon; onVisibleChange: (value: boolean) => void; onIconChange: (value: PlaygroundIcon) => void }) {
+  const icons: Array<[PlaygroundIcon, string]> = [["placeholder", "Position"], ["search", "Search"], ["password", "Password lock"], ["user", "User"], ["global", "Global"], ["calendar", "Calendar"]];
+  return <div className="space-y-2"><BooleanControl label={`Show ${label.toLowerCase()}`} value={visible} onChange={onVisibleChange} />{visible ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">Icon</span><div className="flex h-8 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 focus-within:border-oe-focus-ring focus-within:ring-2 focus-within:ring-oe-focus-ring/30"><PlaygroundIconGraphic icon={icon} /><select value={icon} onChange={(event) => onIconChange(event.target.value as PlaygroundIcon)} className="h-full min-w-0 flex-1 bg-transparent text-xs text-oe-foreground-primary outline-none">{icons.map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></div></label> : null}</div>;
+}
+
+function TextElementControl({ label, visible, text, onVisibleChange, onTextChange }: { label: string; visible: boolean; text: string; onVisibleChange: (value: boolean) => void; onTextChange: (value: string) => void }) {
+  return <div className="space-y-2"><BooleanControl label={`Show ${label.toLowerCase()}`} value={visible} onChange={onVisibleChange} />{visible ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">{label} text</span><input value={text} onChange={(event) => onTextChange(event.target.value)} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label> : null}</div>;
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function PlaygroundIconGraphic({ icon }: { icon: PlaygroundIcon }) {
+  if (icon === "placeholder") return <span className="block size-4 rounded-[2px] border border-dashed border-oe-border-primary" aria-hidden="true" />;
+  const Icon = icon === "search" ? RiSearchLine : icon === "password" ? RiLockPasswordLine : icon === "user" ? RiUserLine : icon === "global" ? RiGlobalLine : RiCalendarLine;
+  return <Icon className="size-4" aria-hidden="true" />;
+}
+
+function MapRow({ property, values, defaultValue, note = "Confirmed" }: { property: string; values: string; defaultValue: string; note?: string }) {
+  return <tr><td className="py-3 font-mono text-[11px] text-oe-foreground-primary">{property}</td><td className="font-mono text-[11px]">{values}</td><td className="font-mono text-[11px]">{defaultValue}</td><td>{note}</td></tr>;
+}

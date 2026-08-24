@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
-import { Check, Copy } from "lucide-react";
+import { useMemo, useState, type ChangeEvent, type CSSProperties } from "react";
+import { RiCheckLine as Check, RiFileCopyLine as Copy } from "@remixicon/react";
 import {
   BRAND_ALPHA_STEPS,
   BRAND_STEPS,
@@ -10,14 +10,14 @@ import {
   createBrandSemanticMapping,
 } from "@ooee/tokens";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Button, Input } from "@ooee/ui";
 import { SemanticTokenCatalog } from "@/components/foundations/semantic-token-catalog";
+import { TailwindColorCatalog } from "@/components/foundations/tailwind-color-catalog";
 import { useBrandTheme } from "@/components/brand-theme-provider";
 
 export function ColorLab() {
   const { seed: appliedSeed, applySeed } = useBrandTheme();
-  const [view, setView] = useState<"semantic" | "brand">("semantic");
+  const [view, setView] = useState<"primitive" | "semantic" | "brand">("primitive");
   const [editor, setEditor] = useState({ draft: appliedSeed || DEFAULT_BRAND_SEED, appliedSeed });
   const draft = editor.appliedSeed === appliedSeed ? editor.draft : appliedSeed;
   const validDraft = /^#[0-9a-fA-F]{6}$/.test(draft);
@@ -39,7 +39,15 @@ export function ColorLab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex w-fit rounded-lg border bg-background p-0.5 shadow-xs">
+      <div className="flex w-fit max-w-full overflow-x-auto rounded-lg border bg-background p-0.5 shadow-xs">
+        <button
+          type="button"
+          onClick={() => setView("primitive")}
+          aria-pressed={view === "primitive"}
+          className={view === "primitive" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
+        >
+          Tailwind Primitive
+        </button>
         <button
           type="button"
           onClick={() => setView("semantic")}
@@ -54,11 +62,13 @@ export function ColorLab() {
           aria-pressed={view === "brand"}
           className={view === "brand" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
         >
-          Brand Primitive
+          Brand Color
         </button>
       </div>
 
-      {view === "semantic" ? (
+      {view === "primitive" ? (
+        <TailwindColorCatalog />
+      ) : view === "semantic" ? (
         <SemanticTokenCatalog brandLight={light} brandDark={dark} />
       ) : (
         <>
@@ -83,7 +93,7 @@ export function ColorLab() {
               </label>
               <Input
                 value={draft}
-                onChange={(event) => updateDraft(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => updateDraft(event.target.value)}
                 aria-label="Brand seed hex"
                 className="font-mono uppercase"
                 aria-invalid={!validDraft}

@@ -1,0 +1,26 @@
+{
+  "name": "@ooee/patterns",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./breadcrumb-page-header": "./src/breadcrumb-page-header.tsx",
+    "./collapsible-sidebar-nav": "./src/collapsible-sidebar-nav.tsx",
+    "./inbox-split-view": "./src/inbox-split-view.tsx"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "@ooee/ui": "workspace:*",
+    "@remixicon/react": "^4.9.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "react": "19.2.8"
+  }
+}

@@ -36,7 +36,7 @@ pnpm check
 
 확정된 언어별 font 기준은 공용 `packages/fonts`가 소유하고 각 앱이 이를 사용한다. font는 build 결과에 포함되며 로컬 시스템 설치 여부에 의존하지 않는다.
 
-shadcn의 스타일과 토큰은 외부 자료를 받아들이는 초기 기준점이다. 검증을 마친 Stable 자산은 이후 `packages/tokens`, `packages/ui`, `packages/patterns`의 oe 계층으로 승격한다.
+shadcn의 스타일과 토큰은 외부 자료를 받아들이는 초기 기준점이다. 외부 원본을 그대로 검토하는 초기 Experiment는 Studio에 둘 수 있지만, 사용자가 수정하거나 ooee 자산으로 채택한 순간부터 실제 원본은 성숙도와 관계없이 `packages/tokens`, `packages/ui`, `packages/patterns`가 소유한다. Studio는 공용 자산을 불러와 검수·설명한다.
 
 ## 1. 프로젝트 목표
 
@@ -394,7 +394,7 @@ URL, 출처, 확인일, 라이선스 상태와 참고 목적을 기록한다.
 
 ### 8. Stable 승격과 배포
 
-품질 기준을 통과한 자산만 정식 package와 `@ooee` registry에 등록한다.
+채택된 Candidate와 Provisional 자산도 공용 package에서 실제 구현으로 관리한다. Stable은 package 이동 시점이 아니라 API, 접근성, 토큰과 호환성의 검증 완료 상태다. 외부 배포용 `@ooee` registry에는 해당 배포 기준을 통과한 자산만 등록한다.
 
 ## 9. 단계별 코드 규칙
 

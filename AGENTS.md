@@ -34,6 +34,15 @@ External reference
 
 초기 Experiment에서는 shadcn token과 primitive를 사용할 수 있다. Stable 컴포넌트에서는 raw color와 shadcn visual token을 제거하고 oe semantic token을 우선한다.
 
+## 코드 소유 경계
+
+- `apps/studio`는 Workbench, 예시 콘텐츠, 출처, 성숙도, viewport·theme·locale 검수 control만 소유한다.
+- 외부 원본을 그대로 검토하는 초기 Experiment는 Studio에 둘 수 있다.
+- 사용자가 수정하거나 ooee 자산으로 채택한 UI는 Candidate/Provisional이어도 `packages/ui`에 실제 원본을 둔다.
+- 채택된 조합 패턴은 내부를 성급하게 분해하지 않고 전체 단위로 `packages/patterns`에 실제 원본을 둔다.
+- Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
+- Stable은 package 이동 조건이 아니라 검증 완료 상태다.
+
 ## 토큰 문법
 
 - Tailwind 및 생성된 색상 palette는 primitive이며 `oe` prefix를 붙이지 않는다.
@@ -53,6 +62,16 @@ oe-warning-border-secondary
 ```
 
 일반 surface는 Neutral이다. Brand와 status는 명시된 role에서만 사용한다.
+
+## 아이콘 Foundation
+
+- 공용 아이콘의 Primary 공급원은 Remix Icon이며 React 구현은 `@remixicon/react`를 우선 사용한다.
+- Secondary 공급원은 Google Material Symbols다. Remix Icon에 의미가 맞는 아이콘이 없을 때만 두 번째로 검토한다.
+- 같은 의미의 Remix Icon이 있으면 Material Symbols나 다른 아이콘 라이브러리를 혼용하지 않는다.
+- 기본 스타일은 의미가 없는 장식용 fill보다 `Line` variant를 우선하고, 선택·상태 강조처럼 실제 의미가 있을 때만 `Fill` variant를 사용한다.
+- Remix Icon과 Material Symbols에 적절한 아이콘이 없거나 제품 고유 아이콘이 필요한 경우에만 다른 공급원 또는 자체 SVG를 검토하고, 사용 이유를 관련 Foundation/Component 문서에 남긴다.
+- Secondary 및 예외 공급원의 패키지는 실제 사용처가 생길 때만 추가한다.
+- 아이콘의 크기, 색상, hover와 focus는 컴포넌트의 oe semantic token 및 interaction 규칙을 따른다.
 
 어두운 solid brand/status 배경 위에는 공통 `oe-foreground-inverse`를 먼저 검토한다. 밝은 배경에는 대비가 확보되는 Neutral foreground를 사용한다. 반복되는 실제 예외가 생기기 전에는 `on-*` token을 만들지 않는다.
 

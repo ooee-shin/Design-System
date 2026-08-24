@@ -2,19 +2,16 @@
 
 import { FormEvent, useMemo, useRef, useState } from "react";
 import {
-  Archive,
-  ArrowLeft,
-  Clock3,
-  Filter,
-  MoreHorizontal,
-  Search,
-} from "lucide-react";
+  RiArchiveLine as Archive,
+  RiArrowLeftLine as ArrowLeft,
+  RiFilterLine as Filter,
+  RiMoreLine as MoreHorizontal,
+  RiSearchLine as Search,
+  RiTimeLine as Clock3,
+} from "@remixicon/react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { MessageBubble } from "@/components/candidates/message-bubble";
-import { MessageComposer } from "@/components/candidates/message-composer";
-import { cn } from "@/lib/utils";
+import { Badge, Button, Input, MessageBubble, MessageComposer } from "@ooee/ui";
+import { cn } from "./utils";
 
 type Message = {
   from: string;
@@ -469,12 +466,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
                 <span className="flex min-w-13 shrink-0 flex-col items-end gap-1.5">
                   <span className="text-[11px] text-oe-foreground-tertiary">{thread.time}</span>
                   {thread.unreadCount > 0 && (
-                    <span
-                      className="min-w-5 rounded-full bg-oe-accent-background-bold-primary px-1.5 py-0.5 text-center text-[10px] font-medium leading-none text-oe-foreground-inverse"
-                      aria-label={copy.unread(thread.unreadCount)}
-                    >
-                      {formatUnreadCount(thread.unreadCount)}
-                    </span>
+                    <Badge type="number" value={thread.unreadCount} max={99} label={copy.unread(thread.unreadCount)} tone="accent" appearance="fill" />
                   )}
                 </span>
               </button>
@@ -539,8 +531,4 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
       </section>
     </div>
   );
-}
-
-function formatUnreadCount(count: number) {
-  return count > 99 ? "99+" : String(count);
 }

@@ -1,7 +1,13 @@
 @import "@ooee/fonts/styles.css";
 @import "tailwindcss";
+@import "../../../../packages/tokens/src/styles.css";
+@import "../../../../packages/ui/src/styles.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+@source "../../../../packages/ui/src";
+@source "../../../../packages/patterns/src";
+@source inline("bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,8 +17,6 @@
   --font-sans: var(--oe-font-family-ko);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
-  --text-oe-label: 0.8125rem;
-  --text-oe-label--line-height: 1rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -42,26 +46,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-oe-foreground-primary: var(--oe-foreground-primary);
-  --color-oe-foreground-secondary: var(--oe-foreground-secondary);
-  --color-oe-foreground-tertiary: var(--oe-foreground-tertiary);
-  --color-oe-foreground-disabled: var(--oe-foreground-disabled);
-  --color-oe-foreground-inverse: var(--oe-foreground-inverse);
-  --color-oe-foreground-inverse-secondary: var(--oe-foreground-inverse-secondary);
-  --color-oe-background-canvas-primary: var(--oe-background-canvas-primary);
-  --color-oe-background-canvas-secondary: var(--oe-background-canvas-secondary);
-  --color-oe-background-primary: var(--oe-background-primary);
-  --color-oe-background-secondary: var(--oe-background-secondary);
-  --color-oe-background-bold-primary: var(--oe-background-bold-primary);
-  --color-oe-background-disabled: var(--oe-background-disabled);
-  --color-oe-accent-background-bold-primary: var(--oe-accent-background-bold-primary);
-  --color-oe-danger-foreground-primary: var(--oe-danger-foreground-primary);
-  --color-oe-danger-background-primary: var(--oe-danger-background-primary);
-  --color-oe-border-primary: var(--oe-border-primary);
-  --color-oe-border-secondary: var(--oe-border-secondary);
-  --color-oe-border-disabled: var(--oe-border-disabled);
-  --color-oe-focus-ring: var(--oe-focus-ring);
-  --color-oe-interaction-hover: var(--oe-interaction-hover);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -104,26 +88,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --oe-foreground-primary: var(--color-neutral-950);
-  --oe-foreground-secondary: var(--color-neutral-700);
-  --oe-foreground-tertiary: var(--color-neutral-500);
-  --oe-foreground-disabled: var(--color-neutral-400);
-  --oe-foreground-inverse: var(--color-white);
-  --oe-foreground-inverse-secondary: rgb(255 255 255 / 60%);
-  --oe-background-canvas-primary: var(--color-white);
-  --oe-background-canvas-secondary: var(--color-white);
-  --oe-background-primary: var(--color-white);
-  --oe-background-secondary: var(--color-neutral-100);
-  --oe-background-bold-primary: var(--color-neutral-950);
-  --oe-background-disabled: var(--color-neutral-100);
-  --oe-accent-background-bold-primary: var(--color-red-600);
-  --oe-danger-foreground-primary: var(--color-red-800);
-  --oe-danger-background-primary: var(--color-red-50);
-  --oe-border-primary: var(--color-neutral-300);
-  --oe-border-secondary: var(--color-neutral-200);
-  --oe-border-disabled: var(--color-neutral-100);
   --oe-focus-ring: var(--oe-brand-light-focus-ring, var(--color-blue-600));
-  --oe-interaction-hover: rgb(0 0 0 / 5%);
 }
 
 .dark {
@@ -158,26 +123,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --oe-foreground-primary: var(--color-neutral-50);
-  --oe-foreground-secondary: var(--color-neutral-300);
-  --oe-foreground-tertiary: var(--color-neutral-500);
-  --oe-foreground-disabled: var(--color-neutral-600);
-  --oe-foreground-inverse: var(--color-neutral-950);
-  --oe-foreground-inverse-secondary: rgb(10 10 10 / 60%);
-  --oe-background-canvas-primary: var(--color-neutral-950);
-  --oe-background-canvas-secondary: var(--color-neutral-900);
-  --oe-background-primary: var(--color-neutral-900);
-  --oe-background-secondary: var(--color-neutral-800);
-  --oe-background-bold-primary: var(--color-neutral-50);
-  --oe-background-disabled: var(--color-neutral-800);
-  --oe-accent-background-bold-primary: var(--color-red-400);
-  --oe-danger-foreground-primary: var(--color-red-200);
-  --oe-danger-background-primary: var(--color-red-950);
-  --oe-border-primary: var(--color-neutral-700);
-  --oe-border-secondary: var(--color-neutral-800);
-  --oe-border-disabled: var(--color-neutral-900);
   --oe-focus-ring: var(--oe-brand-dark-focus-ring, var(--color-blue-400));
-  --oe-interaction-hover: rgb(255 255 255 / 8%);
 }
 
 @layer base {
@@ -192,31 +138,7 @@
   }
 }
 
-.oe-message-bubble-incoming {
-  background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
-  color: var(--oe-message-incoming-foreground, var(--oe-foreground-primary));
-  box-shadow: inset 0 0 0 1px var(--oe-message-incoming-border, transparent);
-}
-
-.oe-message-bubble-outgoing {
-  background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary));
-  color: var(--oe-message-outgoing-foreground, var(--oe-foreground-inverse));
-  box-shadow: inset 0 0 0 1px var(--oe-message-outgoing-border, transparent);
-}
-
-.oe-message-bubble-outgoing-strong {
-  color: var(--oe-message-outgoing-foreground, var(--oe-foreground-inverse));
-}
-
-.oe-conversation-stack > [data-direction="outgoing"]:not(:last-child) {
-  margin-block-end: 1.25rem;
-}
-
 @layer utilities {
-  .oe-hover-layer:hover {
-    background-image: linear-gradient(var(--oe-interaction-hover), var(--oe-interaction-hover));
-  }
-
   .preview-canvas:lang(ko) {
     font-family: var(--oe-font-family-ko);
   }

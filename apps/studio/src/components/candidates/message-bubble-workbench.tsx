@@ -3,56 +3,40 @@
 import { useState, type CSSProperties, type FormEvent } from "react";
 import { Tooltip } from "@base-ui/react/tooltip";
 import { Popover } from "@base-ui/react/popover";
-import { CalendarDays, Info, Languages, Moon, Sun } from "lucide-react";
+import {
+  RiCalendarLine as CalendarDays,
+  RiInformationLine as Info,
+} from "@remixicon/react";
 
 import {
   MessageBubble,
   TypingIndicator,
   type MessageDeliveryState,
   type MessageDirection,
-} from "@/components/candidates/message-bubble";
-import { MessageComposer } from "@/components/candidates/message-composer";
-import { MessageFileAttachment } from "@/components/candidates/message-attachment";
+  MessageComposer,
+  MessageFileAttachment,
+} from "@ooee/ui";
+import { Badge } from "@ooee/ui";
+import { useStudioPreferences } from "@/components/studio-preferences-provider";
 import { cn } from "@/lib/utils";
+import { createCoreSemanticCssVariables } from "@ooee/tokens";
 
 type Locale = "ko" | "en" | "ja";
-type Theme = "light" | "dark";
 type ChatTheme = "neutralLight" | "neutralDark" | "brandLight" | "brandDark";
 
 const neutralLightTheme = {
-    "--oe-background-canvas-secondary": "var(--color-white)",
-    "--oe-background-primary": "var(--color-white)",
-    "--oe-background-secondary": "var(--color-neutral-100)",
-    "--oe-background-bold-primary": "var(--color-neutral-950)",
-    "--oe-background-disabled": "var(--color-neutral-100)",
-    "--oe-foreground-primary": "var(--color-neutral-950)",
-    "--oe-foreground-secondary": "var(--color-neutral-700)",
-    "--oe-foreground-tertiary": "var(--color-neutral-500)",
-    "--oe-foreground-inverse": "var(--color-white)",
-    "--oe-foreground-disabled": "var(--color-neutral-400)",
-    "--oe-border-primary": "var(--color-neutral-300)",
-    "--oe-border-secondary": "var(--color-neutral-200)",
+    ...createCoreSemanticCssVariables("light"),
     "--oe-focus-ring": "var(--oe-brand-light-focus-ring, var(--color-blue-600))",
-    "--oe-danger-foreground-primary": "var(--color-red-800)",
-    "--oe-danger-background-primary": "var(--color-red-50)",
 } as CSSProperties;
 
 const neutralDarkTheme = {
+    ...createCoreSemanticCssVariables("dark"),
+    // Chat-only surface adjustments confirmed in the theme workbench.
     "--oe-background-canvas-secondary": "var(--color-neutral-950)",
     "--oe-background-primary": "var(--color-neutral-800)",
-    "--oe-background-secondary": "var(--color-neutral-800)",
-    "--oe-background-bold-primary": "var(--color-neutral-50)",
     "--oe-background-disabled": "var(--color-neutral-700)",
-    "--oe-foreground-primary": "var(--color-neutral-50)",
-    "--oe-foreground-secondary": "var(--color-neutral-300)",
-    "--oe-foreground-tertiary": "var(--color-neutral-500)",
-    "--oe-foreground-inverse": "var(--color-neutral-950)",
     "--oe-foreground-disabled": "var(--color-neutral-500)",
-    "--oe-border-primary": "var(--color-neutral-700)",
-    "--oe-border-secondary": "var(--color-neutral-800)",
     "--oe-focus-ring": "var(--oe-brand-dark-focus-ring, var(--color-blue-400))",
-    "--oe-danger-foreground-primary": "var(--color-red-200)",
-    "--oe-danger-background-primary": "var(--color-red-950)",
 } as CSSProperties;
 
 const chatThemeStyles: Record<ChatTheme, CSSProperties> = {
@@ -88,7 +72,7 @@ const copy = {
     typing: "Priya Kapoor님이 작성 중입니다.",
     deleted: "삭제된 메시지입니다.",
     unreadRecipients: (count: number) => `아직 읽지 않은 참여자 ${count}명`,
-    actions: { delete: "메시지 삭제", copy: "메시지 복사" },
+    actions: { delete: "메시지 삭제", copy: "메시지 복사", retry: "재전송" },
     states: { sending: "전송 중", sent: "전송됨", read: "모두 읽음", failed: "전송 실패" },
     readHandling: {
       title: "읽음 처리",
@@ -119,7 +103,7 @@ const copy = {
     typing: "Priya Kapoor is typing.",
     deleted: "This message was deleted.",
     unreadRecipients: (count: number) => `${count} recipients have not read this message`,
-    actions: { delete: "Delete message", copy: "Copy message" },
+    actions: { delete: "Delete message", copy: "Copy message", retry: "Retry" },
     states: { sending: "Sending", sent: "Sent", read: "Read by all", failed: "Failed" },
     readHandling: {
       title: "Read handling",
@@ -150,7 +134,7 @@ const copy = {
     typing: "Priya Kapoorさんが入力しています。",
     deleted: "削除されたメッセージです。",
     unreadRecipients: (count: number) => `未読の参加者${count}人`,
-    actions: { delete: "メッセージを削除", copy: "メッセージをコピー" },
+    actions: { delete: "メッセージを削除", copy: "メッセージをコピー", retry: "再送信" },
     states: { sending: "送信中", sent: "送信済み", read: "全員既読", failed: "送信失敗" },
     readHandling: {
       title: "既読処理",
@@ -181,7 +165,7 @@ const copy = {
   typing: string;
   deleted: string;
   unreadRecipients: (count: number) => string;
-  actions: { delete: string; copy: string };
+  actions: { delete: string; copy: string; retry: string };
   states: Record<MessageDeliveryState, string>;
   readHandling: {
     title: string;
@@ -202,8 +186,7 @@ const copy = {
 
 const states: MessageDeliveryState[] = ["sending", "sent", "read", "failed"];
 export function MessageBubbleWorkbench() {
-  const [theme, setTheme] = useState<Theme>("light");
-  const [locale, setLocale] = useState<Locale>("ko");
+  const { theme, locale } = useStudioPreferences();
   const [direction, setDirection] = useState<MessageDirection>("incoming");
   const [showAvatar, setShowAvatar] = useState(true);
   const [longMessage, setLongMessage] = useState(false);
@@ -222,6 +205,10 @@ export function MessageBubbleWorkbench() {
   const outgoingSenderDescription = senderContext === "multi" ? activeCopy.outgoingGroupDescription : undefined;
   const messageActions = {
     copyLabel: activeCopy.actions.copy,
+    deleteLabel: activeCopy.actions.delete,
+  };
+  const failedMessageActions = {
+    retryLabel: activeCopy.actions.retry,
     deleteLabel: activeCopy.actions.delete,
   };
   const setHandlingMode = (mode: "automatic" | "manual") => {
@@ -253,21 +240,8 @@ export function MessageBubbleWorkbench() {
   };
 
   return (
-    <section className="overflow-hidden rounded-2xl border bg-background shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b p-3 sm:px-4">
-        <div className="flex flex-wrap gap-3">
-          <Control label="모드">
-            <Toggle active={theme === "light"} onClick={() => setTheme("light")}><Sun className="size-3.5" />라이트</Toggle>
-            <Toggle active={theme === "dark"} onClick={() => setTheme("dark")}><Moon className="size-3.5" />다크</Toggle>
-          </Control>
-          <Control label="언어" icon={<Languages className="size-3.5" />}>
-            {(["ko", "en", "ja"] as const).map((value) => <Toggle key={value} active={locale === value} onClick={() => setLocale(value)}>{value.toUpperCase()}</Toggle>)}
-          </Control>
-        </div>
-        <span className="rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">Candidate</span>
-      </div>
-
-      <div className={cn("preview-canvas bg-oe-background-canvas-secondary p-4 text-oe-foreground-primary sm:p-6", theme === "dark" && "dark")} lang={locale}>
+    <section className="rounded-2xl border bg-background shadow-sm">
+      <div className={cn("preview-canvas rounded-2xl bg-oe-background-canvas-secondary p-4 text-oe-foreground-primary sm:p-6", theme === "dark" && "dark")} lang={locale}>
         <div className="mb-6">
           <WorkbenchSection title="통합 채팅 예시" description="확정한 요소가 실제 대화 흐름에서 함께 작동하는지 확인합니다. 날짜는 Studio 검수용으로 눌러 예시를 변경할 수 있습니다.">
             <div className="mb-4">
@@ -282,7 +256,7 @@ export function MessageBubbleWorkbench() {
                 <MessageBubble direction="incoming" author={activeCopy.incomingAuthor} initials="PK" time="09:58" actions={messageActions}>
                   {activeCopy.long}
                 </MessageBubble>
-                <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:59" outgoingSenderLabel={outgoingSenderLabel} outgoingSenderDescription={outgoingSenderDescription} deliveryState="read" deliveryCopy={activeCopy.states} actions={messageActions}>
+                <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:59" outgoingSenderLabel={outgoingSenderLabel} outgoingSenderDescription={outgoingSenderDescription} deliveryState="read" unreadRecipientCount={0} deliveryCopy={activeCopy.states} actions={messageActions}>
                   {activeCopy.outgoing}
                 </MessageBubble>
                 <div data-direction="incoming" className="space-y-1.5">
@@ -297,7 +271,7 @@ export function MessageBubbleWorkbench() {
                   <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="10:03" showTime={false} actions={messageActions}>
                     {activeCopy.outgoing}
                   </MessageBubble>
-                  <MessageBubble grouped direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="10:03" showTime outgoingSenderLabel={outgoingSenderLabel} outgoingSenderDescription={outgoingSenderDescription} deliveryState="read" deliveryCopy={activeCopy.states} actions={messageActions}>
+                  <MessageBubble grouped direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="10:03" showTime outgoingSenderLabel={outgoingSenderLabel} outgoingSenderDescription={outgoingSenderDescription} deliveryState="read" unreadRecipientCount={0} deliveryCopy={activeCopy.states} actions={messageActions}>
                     {activeCopy.outgoingFollowUp}
                   </MessageBubble>
                 </div>
@@ -369,6 +343,7 @@ export function MessageBubbleWorkbench() {
                     deliveryCopy={activeCopy.states}
                     showAvatar={false}
                     actions={messageActions}
+                    failedActions={state === "failed" ? failedMessageActions : undefined}
                   >
                     {activeCopy.outgoing}
                   </MessageBubble>
@@ -397,7 +372,7 @@ export function MessageBubbleWorkbench() {
                     <span className="h-px flex-1 bg-oe-border-secondary" />
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-oe-foreground-secondary">
                       {activeCopy.readHandling.newMessages}
-                      <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-oe-accent-background-bold-primary px-1.5 py-0.5 text-[11px] leading-none text-oe-foreground-inverse">1</span>
+                      <Badge type="number" value={1} label={activeCopy.readHandling.unreadMessages(1)} tone="accent" appearance="fill" />
                     </span>
                     <span className="h-px flex-1 bg-oe-border-secondary" />
                   </div>
@@ -499,6 +474,7 @@ export function MessageBubbleWorkbench() {
                     deliveryState="failed"
                     deliveryCopy={activeCopy.states}
                     actions={messageActions}
+                    failedActions={failedMessageActions}
                   >
                     {activeCopy.outgoing}
                   </MessageBubble>
@@ -563,7 +539,7 @@ function DateDivider({ locale }: { locale: Locale }) {
       <div className="relative -translate-x-1.5 bg-oe-background-canvas-secondary px-3">
         <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Trigger className="inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-xs font-medium text-oe-foreground-secondary outline-none hover:text-oe-foreground-primary focus-visible:ring-2 focus-visible:ring-oe-focus-ring" aria-label={`${label}, 날짜 선택`}>
-            <CalendarDays className="size-3.5 text-oe-foreground-tertiary" strokeWidth={1.75} aria-hidden="true" />
+            <CalendarDays className="size-3.5 text-oe-foreground-tertiary" aria-hidden="true" />
             {label}
           </Popover.Trigger>
           <Popover.Portal>

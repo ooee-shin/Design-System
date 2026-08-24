@@ -1,12 +1,12 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { Paperclip, Send } from "lucide-react";
+import { RiAttachmentLine as Paperclip, RiSendPlane2Line as Send } from "@remixicon/react";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "./button";
+import { Textarea } from "./textarea";
 
-type MessageComposerProps = {
+export type MessageComposerProps = {
   value: string;
   onValueChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;

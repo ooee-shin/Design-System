@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { RiArrowLeftLine as ArrowLeft } from "@remixicon/react";
 
 import { MessageBubbleWorkbench } from "@/components/candidates/message-bubble-workbench";
+import { StudioPreviewFrame } from "@/components/studio-preview-frame";
 
 export default function MessageBubblePage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-5">
         <header className="space-y-2">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+          <Link href="/components" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
             <ArrowLeft className="size-3.5" aria-hidden="true" />
             Components
           </Link>
@@ -22,7 +23,7 @@ export default function MessageBubblePage() {
             </p>
           </div>
         </header>
-        <MessageBubbleWorkbench />
+        <StudioPreviewFrame><MessageBubbleWorkbench /></StudioPreviewFrame>
       </div>
     </main>
   );

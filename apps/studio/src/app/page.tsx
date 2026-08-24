@@ -1,30 +1,34 @@
 import Link from "next/link";
-import { ArrowRight, Boxes, FlaskConical, Layers3 } from "lucide-react";
+import {
+  RiArrowRightLine as ArrowRight,
+  RiBox3Line as Boxes,
+  RiStackLine as Layers3,
+} from "@remixicon/react";
 
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 
 const workspaces = [
   {
-    title: "Experiments",
-    description: "VibePrompt, Obra, shadcn 자료를 화면 단위로 구현하고 비교합니다.",
-    status: "Inbox split view",
-    href: "/experiments/inbox-split-view",
-    icon: FlaskConical,
+    title: "Foundations",
+    description: "색상, 글꼴, 아이콘처럼 모든 자산이 공유하는 기반 결정을 검수합니다.",
+    status: "Color · Icon rules",
+    href: "/foundations",
+    icon: Boxes,
   },
   {
-    title: "Candidates",
-    description: "화면에서 발견한 컴포넌트와 패턴의 상태·인터랙션을 검수합니다.",
-    status: "Chat workbench",
-    href: "/components/message-bubble",
+    title: "Components",
+    description: "독립적인 의미와 상태를 가진 재사용 가능한 UI 요소를 검수합니다.",
+    status: "Message Bubble",
+    href: "/components",
     icon: Layers3,
   },
   {
-    title: "Foundations",
-    description: "색상과 타이포그래피처럼 모든 자산이 공유하는 기반 결정을 검수합니다.",
-    status: "Brand color lab",
-    href: "/foundations/color",
-    icon: Boxes,
+    title: "Patterns",
+    description: "여러 컴포넌트가 제품 목적을 위해 결합된 화면 구조를 검수합니다.",
+    status: "Inbox · Page Header",
+    href: "/patterns",
+    icon: Layers3,
   },
 ];
 
@@ -54,12 +58,12 @@ export default function Home() {
             </p>
           </div>
           <div className="flex gap-2 lg:justify-end">
-            <Link href="/experiments/inbox-split-view" className={cn(buttonVariants({ size: "lg" }))}>
-              첫 실험 시작
+            <Link href="/patterns" className={cn(buttonVariants({ size: "lg" }))}>
+              Patterns 보기
               <ArrowRight data-icon="inline-end" />
             </Link>
-            <Link href="/foundations/color" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-              색상 Foundation
+            <Link href="/foundations" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+              Foundations 보기
             </Link>
           </div>
         </section>

@@ -1,8 +1,8 @@
 "use client";
 
-import { Download, FileText } from "lucide-react";
+import { RiDownloadLine as Download, RiFileTextLine as FileText } from "@remixicon/react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "./utils";
 
 export function MessageFileAttachment({ className }: { className?: string }) {
   return (

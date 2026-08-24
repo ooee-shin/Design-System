@@ -2,9 +2,17 @@
 
 import { Tooltip } from "@base-ui/react/tooltip";
 import { Popover } from "@base-ui/react/popover";
-import { Check, CheckCheck, Clock3, Copy, Info, Trash2 } from "lucide-react";
+import {
+  RiCheckDoubleLine as CheckCheck,
+  RiCheckLine as Check,
+  RiDeleteBinLine as Trash2,
+  RiFileCopyLine as Copy,
+  RiInformationLine as Info,
+  RiRestartLine as RotateCcw,
+  RiTimeLine as Clock3,
+} from "@remixicon/react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "./utils";
 
 export type MessageDirection = "incoming" | "outgoing";
 export type MessageDeliveryState = "sending" | "sent" | "read" | "failed";
@@ -32,6 +40,7 @@ export function MessageBubble({
   outgoingSenderLabel,
   outgoingSenderDescription,
   actions,
+  failedActions,
   className,
 }: {
   direction: MessageDirection;
@@ -57,6 +66,12 @@ export function MessageBubble({
     copyLabel: string;
     deleteLabel: string;
     onCopy?: () => void;
+    onDelete?: () => void;
+  };
+  failedActions?: {
+    retryLabel: string;
+    deleteLabel: string;
+    onRetry?: () => void;
     onDelete?: () => void;
   };
   className?: string;
@@ -123,7 +138,7 @@ export function MessageBubble({
                   !
                 </span>
               )}
-              {actions && (
+              {actions && deliveryState !== "failed" && (
                 <div className="absolute right-0 bottom-0">
                   <MessageActions {...actions} canDelete />
                 </div>
@@ -145,10 +160,10 @@ export function MessageBubble({
           ) : null}
         </div>
         {timeVisible && (
-          <div className={cn("mt-1 flex min-w-0 items-center gap-1 px-1 text-xs text-oe-foreground-tertiary", outgoing ? "justify-end" : "justify-start")}>
+          <div className={cn("mt-1 flex min-h-5 min-w-0 items-center gap-1 px-1 text-xs text-oe-foreground-tertiary", outgoing ? "justify-end" : "justify-start")}>
             {outgoing && outgoingSenderLabel && (
               <>
-                <span className="inline-flex min-w-0 items-center gap-1 truncate font-medium text-oe-foreground-secondary">
+                <span className="inline-flex min-w-0 items-center gap-0 truncate font-medium text-oe-foreground-secondary">
                   {outgoingSenderDescription && <SenderInfoTooltip description={outgoingSenderDescription} />}
                   <span className="truncate">{outgoingSenderLabel}</span>
                 </span>
@@ -159,10 +174,32 @@ export function MessageBubble({
             {deliveryState && deliveryCopy && (
               <DeliveryState state={deliveryState} label={deliveryCopy[deliveryState]} hasUnreadCount={unreadRecipientCount !== undefined} />
             )}
+            {outgoing && deliveryState === "failed" && failedActions && (
+              <FailedRecoveryActions {...failedActions} />
+            )}
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function FailedRecoveryActions({
+  retryLabel,
+  deleteLabel,
+  onRetry,
+  onDelete,
+}: {
+  retryLabel: string;
+  deleteLabel: string;
+  onRetry?: () => void;
+  onDelete?: () => void;
+}) {
+  return (
+    <span className="ml-0.5 inline-flex shrink-0 items-center gap-0.5" aria-label={`${retryLabel}, ${deleteLabel}`}>
+      <ActionTooltip label={retryLabel} onClick={onRetry} icon={<RotateCcw className="size-3.5" aria-hidden="true" />} />
+      <ActionTooltip label={deleteLabel} onClick={onDelete} danger icon={<Trash2 className="size-3.5" aria-hidden="true" />} />
+    </span>
   );
 }
 
@@ -197,11 +234,19 @@ function MessageActions({
   canDelete: boolean;
 }) {
   return (
-    <div className="pointer-events-none relative flex shrink-0 items-center rounded-lg border border-oe-border-secondary bg-oe-background-primary p-0.5 opacity-0 transition-opacity group-hover/message:pointer-events-auto group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:opacity-100">
+    <ActionBar>
       <ActionTooltip label={copyLabel} onClick={onCopy} icon={<Copy className="size-3.5" aria-hidden="true" />} />
       {canDelete && (
         <ActionTooltip label={deleteLabel} onClick={onDelete} danger icon={<Trash2 className="size-3.5" aria-hidden="true" />} />
       )}
+    </ActionBar>
+  );
+}
+
+function ActionBar({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="pointer-events-none relative flex shrink-0 items-center rounded-lg border border-oe-border-secondary bg-oe-background-primary p-0.5 opacity-0 transition-opacity group-hover/message:pointer-events-auto group-hover/message:opacity-100 group-focus-within/message:pointer-events-auto group-focus-within/message:opacity-100">
+      {children}
     </div>
   );
 }
