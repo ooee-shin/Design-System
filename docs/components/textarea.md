@@ -79,7 +79,7 @@ Focus는 `oe-focus-ring`의 1px border와 외부 1px ring을 같은 진한 색�
 - Size property
 - 자동 높이의 최대값과 이후 스크롤 정책
 - 최대 높이 계산에 사용할 reserved layout space의 정확한 값
-- 글자 수 표시와 최대 글자 수 UI
+- Character count의 기본 소유자는 이후 Field에서 정의한다. Textarea 내부 표시가 필요한 실제 사례가 확인되면 별도 배치 방식을 다시 검토한다.
 - Label, Helper text, Error message를 소유할 Field API
 
 확인되지 않은 항목은 Studio에 공식 Property처럼 표시하지 않는다. Label, Helper text, Error message 조합은 이후 별도 Field 컴포넌트에서 결정한다.

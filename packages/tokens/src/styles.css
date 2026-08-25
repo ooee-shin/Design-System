@@ -3,6 +3,12 @@
   --spacing-oe-control-regular: 2.25rem;
   --spacing-oe-control-large: 2.5rem;
   --spacing-oe-control-xlarge: 3rem;
+  --spacing-oe-chip-default: 1.5rem;
+  --spacing-oe-icon-xsmall: 0.75rem;
+  --spacing-oe-icon-small: 1rem;
+  --spacing-oe-icon-medium: 1.25rem;
+  --spacing-oe-icon-large: 1.5rem;
+  --spacing-oe-icon-xlarge: 2rem;
   --text-oe-label: 0.8125rem;
   --text-oe-label--line-height: 1rem;
   --color-oe-foreground-primary: var(--oe-foreground-primary);
@@ -18,7 +24,15 @@
   --color-oe-background-secondary: var(--oe-background-secondary);
   --color-oe-background-bold-primary: var(--oe-background-bold-primary);
   --color-oe-background-disabled: var(--oe-background-disabled);
+  --color-oe-background-disabled-selected: var(--oe-background-disabled-selected);
   --color-oe-accent-background-bold-primary: var(--oe-accent-background-bold-primary);
+  --color-oe-brand-foreground-primary: var(--oe-brand-foreground-primary);
+  --color-oe-brand-foreground-secondary: var(--oe-brand-foreground-secondary);
+  --color-oe-brand-background-primary: var(--oe-brand-background-primary);
+  --color-oe-brand-background-secondary: var(--oe-brand-background-secondary);
+  --color-oe-brand-background-bold-primary: var(--oe-brand-background-bold-primary);
+  --color-oe-brand-border-primary: var(--oe-brand-border-primary);
+  --color-oe-brand-border-secondary: var(--oe-brand-border-secondary);
   --color-oe-warning-foreground-primary: var(--oe-warning-foreground-primary);
   --color-oe-warning-foreground-secondary: var(--oe-warning-foreground-secondary);
   --color-oe-warning-background-primary: var(--oe-warning-background-primary);

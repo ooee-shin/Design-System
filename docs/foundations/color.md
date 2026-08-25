@@ -91,6 +91,7 @@ oe-focus-ring                        → brand-400
 ## 공통 사용 규칙
 
 - Neutral surface는 `oe-background-*`, 브랜드 표현은 `oe-brand-background-*`를 사용한다.
+- 직접 조작하는 form control의 식별 보더는 `oe-border-primary`, control과 Label 등을 하나의 영역으로 감싸는 form container 보더는 `oe-border-secondary`를 사용한다.
 - 상태색은 `oe-danger-*`, `oe-warning-*`, `oe-success-*`, `oe-info-*`로 분리한다.
 - 어두운 solid 배경 위의 텍스트와 아이콘은 공통 `oe-foreground-inverse`를 우선 검토한다.
 - 밝은 브랜드 배경에서는 `oe-foreground-primary`처럼 대비가 확보되는 중립 foreground를 사용한다.
@@ -116,7 +117,7 @@ Neutral
 oe-foreground-primary / secondary / tertiary / disabled / inverse
 oe-foreground-inverse-secondary
 oe-background-canvas-primary / canvas-secondary
-oe-background-primary / secondary / disabled / bold-primary
+oe-background-primary / secondary / disabled / disabled-selected / bold-primary
 oe-border-primary / secondary / disabled
 oe-focus-ring
 oe-interaction-hover
@@ -138,6 +139,7 @@ oe-{role}-border-primary / secondary
 - `interaction-hover`는 기존 background를 교체하지 않고 위에 합성하는 state layer다. 초기값은 Light `black / 5%`, Dark `white / 8%`이며 화면 검증 후 조율한다.
 - 클릭 가능한 아이콘은 공통적으로 hover 시 `interaction-hover` 회색조 state layer를 표시하고, keyboard focus 시 `oe-focus-ring`을 표시한다.
 - `foreground-inverse-secondary`는 bold fill 위의 약한 메타 정보에 사용한다.
+- `background-disabled-selected`는 선택값을 유지한 채 조작만 제한된 control의 Neutral fill이다. Light/Dark 모두 `neutral-400`을 사용한다.
 - `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
 - `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.
 - overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다.

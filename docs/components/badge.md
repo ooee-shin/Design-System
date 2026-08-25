@@ -21,7 +21,7 @@
 - `Badge` (`chip`): Label 필수, Leading element와 Trailing element는 각각 선택적으로 표시/숨김
   - Leading element: 현재 Icon, 이후 다른 요소로 확장 가능한 slot
   - Trailing element: 현재 Icon, 이후 다른 요소로 확장 가능한 slot
-  - Size: 현재 검수값 Small 20px, Medium 24px. 고정 규격이 아니며 실제 화면을 다듬은 뒤 확정
+  - Size: 현재 검수값 XSmall 16px(좌우 6px), Small 20px, Medium 24px. 고정 규격이 아니며 실제 화면을 다듬은 뒤 확정
   - Shape: Pill, Rounded 8px
   - Style: Tonal(밝은 단계), Solid(Tailwind 600 원색과 흰색 텍스트)
   - Color: Tailwind primitive 체계의 22개 기본 palette 전체 지원
@@ -51,7 +51,7 @@
 - 한 자리 수가 원처럼 보여도 별도 circle shape API를 만들지 않으며 두 자리 이상에서 자연스럽게 가로 확장한다.
 - `dot`의 outline은 결합 대상 surface와 분리하기 위한 것이다.
 - 시각 콘텐츠만으로 의미를 전달하지 않도록 number와 dot은 접근 가능한 label을 필수로 받는다.
-- Badge는 현재 `span`으로 렌더링되며 자체 interaction 또는 state property가 없다. 인터랙티브 Badge 정책은 현재 정의 없음이다.
+- Badge는 현재 `span`으로 렌더링되며 자체 interaction 또는 state property가 없다. 제거 action이 필요한 선택값은 별도 `Chip` 컴포넌트를 사용한다.
 
 ## 현재 실제 적용
 

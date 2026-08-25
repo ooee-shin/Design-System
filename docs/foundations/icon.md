@@ -22,10 +22,20 @@ ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com
 - 클릭 가능한 아이콘은 공통 hover state layer와 `oe-focus-ring`을 사용한다.
 - 아이콘과 텍스트 사이 간격은 아이콘 버튼의 내부 클릭 영역을 포함해 판단하며 불필요한 외부 gap을 중첩하지 않는다.
 
+## 크기 토큰
+
+공용 아이콘은 다음 크기 토큰을 사용한다. 숫자나 임의의 Tailwind 크기를 직접 선택하지 않고 컴포넌트 맥락에 맞는 단계로 참조한다.
+
+- `oe-icon-xsmall`: 12px
+- `oe-icon-small`: 16px
+- `oe-icon-medium`: 20px
+- `oe-icon-large`: 24px
+- `oe-icon-xlarge`: 32px
+
 ## 현재 적용
 
 - Studio의 기존 Lucide React 사용처를 Remix Icon 대응 아이콘으로 정규화했다.
 - 메시지 action, 전달 상태, 날짜, 첨부, navigation과 Studio 검수 control이 같은 공급원을 사용한다.
 - 현재 Material Symbols가 필요한 실제 사용처는 없으므로 Secondary 패키지는 설치하지 않았다.
-- 구체적인 아이콘 선택과 크기는 아직 각 화면에서 시각 검수하며, 반복되는 size recipe는 실제 용례가 쌓인 뒤 승격한다.
+- 구체적인 아이콘 선택은 각 화면에서 시각 검수하며, 크기는 공용 `oe-icon-*` 토큰을 사용한다.
 - `/foundations/icon`은 현재 실제 코드에서 등록해 사용하는 Remix Icon asset과 공급원 상태를 표시한다.

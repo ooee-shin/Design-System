@@ -31,6 +31,7 @@ Workbench의 모드·언어는 전체 Studio 검수 콘텐츠에 영향을 주�
 
 ## 레이아웃 규칙
 
+- MessageComposer처럼 자체 외곽 Container가 border와 focus 표시를 소유하는 조합에서는 내부 Textarea Container를 투명·무테두리로 사용한다. 두 경계를 중첩하지 않으며 focus 표시는 바깥 Composer Container 하나가 담당한다.
 - 작성자는 bubble 위의 metadata row에 두고, 시간과 전달 상태는 bubble fill에 포함하지 않은 채 그룹 마지막 메시지 아래에 둔다. Incoming은 왼쪽, Outgoing은 오른쪽으로 각 말풍선 시작 방향에 맞춘다.
 - Outgoing은 방향만으로 현재 사용자의 메시지임을 식별할 수 있으므로 `나` 또는 사용자 이름을 반복 표시하지 않는다.
 - 1:1 대화의 Outgoing은 발신자 표시를 생략한다. 여러 관리자가 동일한 사용자와 채팅하는 관리자 화면에서는 그룹 마지막 시간 왼쪽에 관리자 icon과 `소속팀 이름 · 시간` 형식의 `outgoingSenderLabel`을 표시한다. 이 이름은 관리자 간 구분을 위한 내부 전용 정보이며 사용자 화면이나 사용자에게 전달되는 메시지 payload에는 절대 노출하지 않는다.

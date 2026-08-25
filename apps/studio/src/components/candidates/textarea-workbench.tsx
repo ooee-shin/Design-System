@@ -116,7 +116,7 @@ export function TextareaWorkbench() {
           </div>
         </Section>
       </div>
-      <OnThisPage items={textareaSections} relatedItems={[{ href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }, { href: "/components/input", title: "Input", description: "한 줄 텍스트 입력과 내부 선택 요소를 다룹니다." }]} />
+      <OnThisPage items={textareaSections} relatedItems={[{ href: "/components/input", title: "Input", description: "한 줄 텍스트 입력과 내부 선택 요소를 다룹니다." }, { href: "/components/checkbox", title: "Checkbox", description: "항목의 선택과 부분 선택 상태를 다룹니다." }, { href: "/components/combobox", title: "Combobox", description: "검색 가능한 선택 목록과 다중 선택을 다룹니다." }, { href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }]} />
     </div>
   );
 }
@@ -131,8 +131,9 @@ function TextareaAnatomy({ value }: { value: string }) {
             <path d="M320 48V92" stroke="currentColor" strokeWidth="1" />
             <TextareaAnatomyNumber x={320} y={32} number={1} />
 
-            <path d="M320 238V190" stroke="currentColor" strokeWidth="1" />
+            <path d="M320 238V166" stroke="currentColor" strokeWidth="1" />
             <TextareaAnatomyNumber x={320} y={254} number={2} />
+
           </svg>
 
           <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-primary whitespace-pre-line">

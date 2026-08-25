@@ -9,6 +9,7 @@ import {
   CORE_SEMANTIC_TOKENS,
   createCoreSemanticCssVariables,
   CONTROL_HEIGHTS,
+  ICON_SIZES,
 } from "./index.ts";
 
 test("control heights expose the shared form and button size scale", () => {
@@ -17,6 +18,16 @@ test("control heights expose the shared form and button size scale", () => {
     regular: 36,
     large: 40,
     xlarge: 48,
+  });
+});
+
+test("icon sizes expose the shared icon size scale", () => {
+  assert.deepEqual(ICON_SIZES, {
+    xsmall: 12,
+    small: 16,
+    medium: 20,
+    large: 24,
+    xlarge: 32,
   });
 });
 
@@ -40,6 +51,10 @@ test("core semantic tokens expose every status family through executable CSS var
   assert.equal(light["--oe-background-canvas-secondary"], "var(--color-white)");
   assert.equal(light["--oe-foreground-placeholder"], "var(--color-neutral-400)");
   assert.equal(dark["--oe-foreground-placeholder"], "var(--color-neutral-500)");
+  assert.equal(light["--oe-foreground-tertiary"], "var(--color-neutral-500)");
+  assert.equal(dark["--oe-foreground-tertiary"], "var(--color-neutral-500)");
+  assert.equal(light["--oe-background-disabled-selected"], "var(--color-neutral-400)");
+  assert.equal(dark["--oe-background-disabled-selected"], "var(--color-neutral-400)");
   assert.equal(light["--oe-border-bold-primary"], "var(--color-neutral-950)");
   assert.equal(dark["--oe-border-bold-primary"], "var(--color-neutral-50)");
 });

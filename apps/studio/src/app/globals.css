@@ -88,6 +88,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --oe-brand-foreground-primary: var(--oe-brand-light-foreground-primary, var(--color-blue-800));
+  --oe-brand-foreground-secondary: var(--oe-brand-light-foreground-secondary, var(--color-blue-600));
+  --oe-brand-background-primary: var(--oe-brand-light-background-primary, var(--color-blue-50));
+  --oe-brand-background-secondary: var(--oe-brand-light-background-secondary, var(--color-blue-100));
+  --oe-brand-background-bold-primary: var(--oe-brand-light-background-bold-primary, var(--color-blue-700));
+  --oe-brand-border-primary: var(--oe-brand-light-border-primary, var(--color-blue-500));
+  --oe-brand-border-secondary: var(--oe-brand-light-border-secondary, var(--color-blue-200));
   --oe-focus-ring: var(--oe-brand-light-focus-ring, var(--color-blue-600));
 }
 
@@ -123,6 +130,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --oe-brand-foreground-primary: var(--oe-brand-dark-foreground-primary, var(--color-blue-200));
+  --oe-brand-foreground-secondary: var(--oe-brand-dark-foreground-secondary, var(--color-blue-400));
+  --oe-brand-background-primary: var(--oe-brand-dark-background-primary, var(--color-blue-950));
+  --oe-brand-background-secondary: var(--oe-brand-dark-background-secondary, var(--color-blue-900));
+  --oe-brand-background-bold-primary: var(--oe-brand-dark-background-bold-primary, var(--color-blue-400));
+  --oe-brand-border-primary: var(--oe-brand-dark-border-primary, var(--color-blue-500));
+  --oe-brand-border-secondary: var(--oe-brand-dark-border-secondary, var(--color-blue-800));
   --oe-focus-ring: var(--oe-brand-dark-focus-ring, var(--color-blue-400));
 }
 

@@ -30,13 +30,21 @@ export function BrandThemeProvider({ children }: { children: ReactNode }) {
     BRAND_STEPS.forEach((step) => root.style.setProperty(`--brand-${step}`, palette.solid[step]));
     BRAND_ALPHA_STEPS.forEach((step) => root.style.setProperty(`--brand-alpha-${String(step).padStart(2, "0")}`, palette.alpha[step]));
     root.style.setProperty("--brand-source", palette.source);
+    root.style.setProperty("--oe-brand-light-foreground-primary", light.foregroundPrimary.value);
+    root.style.setProperty("--oe-brand-light-foreground-secondary", light.foregroundSecondary.value);
     root.style.setProperty("--oe-brand-light-background-primary", light.backgroundPrimary.value);
     root.style.setProperty("--oe-brand-light-background-secondary", light.backgroundSecondary.value);
     root.style.setProperty("--oe-brand-light-background-bold-primary", light.backgroundBoldPrimary.value);
+    root.style.setProperty("--oe-brand-light-border-primary", light.borderPrimary.value);
+    root.style.setProperty("--oe-brand-light-border-secondary", light.borderSecondary.value);
     root.style.setProperty("--oe-brand-light-focus-ring", light.focusRing.value);
+    root.style.setProperty("--oe-brand-dark-foreground-primary", dark.foregroundPrimary.value);
+    root.style.setProperty("--oe-brand-dark-foreground-secondary", dark.foregroundSecondary.value);
     root.style.setProperty("--oe-brand-dark-background-primary", dark.backgroundPrimary.value);
     root.style.setProperty("--oe-brand-dark-background-secondary", dark.backgroundSecondary.value);
     root.style.setProperty("--oe-brand-dark-background-bold-primary", dark.backgroundBoldPrimary.value);
+    root.style.setProperty("--oe-brand-dark-border-primary", dark.borderPrimary.value);
+    root.style.setProperty("--oe-brand-dark-border-secondary", dark.borderSecondary.value);
     root.style.setProperty("--oe-brand-dark-focus-ring", dark.focusRing.value);
   }, [dark, light, palette]);
 

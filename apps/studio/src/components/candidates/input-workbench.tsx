@@ -196,7 +196,7 @@ export function InputWorkbench() {
       </Section>
 
       </div>
-      <OnThisPage items={inputSections} relatedItems={[{ href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }, { href: "/components/textarea", title: "Textarea", description: "여러 줄 텍스트 입력과 높이 동작을 다룹니다." }]} />
+      <OnThisPage items={inputSections} relatedItems={[{ href: "/components/textarea", title: "Textarea", description: "여러 줄 텍스트 입력과 높이 동작을 다룹니다." }, { href: "/components/checkbox", title: "Checkbox", description: "항목의 선택과 부분 선택 상태를 다룹니다." }, { href: "/components/combobox", title: "Combobox", description: "검색 가능한 선택 목록과 다중 선택을 다룹니다." }, { href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }]} />
     </div>
   );
 }

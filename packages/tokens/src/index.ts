@@ -13,6 +13,16 @@ export const CONTROL_HEIGHTS = {
 
 export type ControlSize = keyof typeof CONTROL_HEIGHTS;
 
+export const ICON_SIZES = {
+  xsmall: 12,
+  small: 16,
+  medium: 20,
+  large: 24,
+  xlarge: 32,
+} as const;
+
+export type IconSize = keyof typeof ICON_SIZES;
+
 export type SemanticFamily = "neutral" | "accent" | "warning" | "danger" | "success" | "info";
 export type SemanticTokenDefinition = {
   name: string;
@@ -47,6 +57,7 @@ export const CORE_SEMANTIC_TOKENS: readonly SemanticTokenDefinition[] = [
   semantic("neutral", "oe-background-secondary", "neutral-100", "neutral-800"),
   semantic("neutral", "oe-background-bold-primary", "neutral-950", "neutral-50"),
   semantic("neutral", "oe-background-disabled", "neutral-100", "neutral-800"),
+  semantic("neutral", "oe-background-disabled-selected", "neutral-400", "neutral-400"),
   semantic("neutral", "oe-border-primary", "neutral-300", "neutral-700"),
   semantic("neutral", "oe-border-bold-primary", "neutral-950", "neutral-50"),
   semantic("neutral", "oe-border-secondary", "neutral-200", "neutral-800"),

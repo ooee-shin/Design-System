@@ -59,7 +59,8 @@ function BadgePanel({ content: c }: { content: Content }) {
           </div>
         </div>
       </SpecSection>
-      <SpecSection title="Properties · Size" description="Small과 Medium은 현재 화면 검수를 위한 구현값이며 고정 규격이 아닙니다. 추후 실제 화면을 다듬으며 확정합니다.">
+      <SpecSection title="Properties · Size" description="XSmall, Small과 Medium은 현재 화면 검수를 위한 구현값이며 고정 규격이 아닙니다. 추후 실제 화면을 다듬으며 확정합니다.">
+        <VariantGroup label="XSmall · 16px"><Badge size="xsmall" leadingElement={<RiTimeLine />} trailingElement={<RiArrowDownSLine />}>{c.scheduled}</Badge></VariantGroup>
         <VariantGroup label="Small · 20px"><Badge size="small" leadingElement={<RiTimeLine />} trailingElement={<RiArrowDownSLine />}>{c.scheduled}</Badge></VariantGroup>
         <VariantGroup label="Medium · 24px"><Badge size="medium" leadingElement={<RiTimeLine />} trailingElement={<RiArrowDownSLine />}>{c.scheduled}</Badge></VariantGroup>
       </SpecSection>
@@ -114,8 +115,8 @@ function SpecificationTable() {
     ["Container height", "Small 20px", "Medium 24px"],
     ["Padding X", "Small 6px", "Medium 8px"],
     ["Element gap", "Small 2px", "Medium 4px"],
-    ["Label size", "Small 11px", "Medium 12px"],
-    ["Element size", "Small 12px", "Medium 14px"],
+    ["Label size", "XSmall 10px", "Small 11px · Medium 12px"],
+    ["Element size", "XSmall 10px", "Small 12px · Medium 14px"],
     ["Pill radius", "rounded-full", "Tailwind utility"],
     ["Rounded radius", "8px", "확정값"],
   ];

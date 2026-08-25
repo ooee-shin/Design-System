@@ -5,7 +5,7 @@ import { cn } from "./utils";
 export type BadgeTone = "neutral" | "accent" | "warning" | "danger" | "success" | "info";
 export type BadgeAppearance = "tonal" | "solid" | "fill";
 export type BadgeColor = "slate" | "gray" | "zinc" | "neutral" | "stone" | "red" | "orange" | "amber" | "yellow" | "lime" | "green" | "emerald" | "teal" | "cyan" | "sky" | "blue" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose";
-export type BadgeSize = "small" | "medium";
+export type BadgeSize = "xsmall" | "small" | "medium";
 export type BadgeShape = "pill" | "rounded";
 
 type CommonProps = {
@@ -118,14 +118,14 @@ export function Badge(props: BadgeProps) {
   return (
     <span className={cn(
       "inline-flex items-center font-medium",
-      size === "small" ? "h-5 gap-0.5 px-1.5 text-[11px]" : "h-6 gap-1 px-2 text-xs",
+      size === "xsmall" ? "h-4 gap-0.5 px-1.5 text-[10px] leading-none" : size === "small" ? "h-5 gap-0.5 px-1.5 text-[11px]" : "h-6 gap-1 px-2 text-xs",
       shape === "pill" ? "rounded-full" : "rounded-[8px]",
       chipColorClasses[color][chipAppearance],
       className,
     )}>
-      {leadingElement && <span className={cn("shrink-0", size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{leadingElement}</span>}
+      {leadingElement && <span className={cn("shrink-0", size === "xsmall" ? "[&_svg]:size-2.5" : size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{leadingElement}</span>}
       <span>{props.children}</span>
-      {trailingElement && <span className={cn("shrink-0", size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{trailingElement}</span>}
+      {trailingElement && <span className={cn("shrink-0", size === "xsmall" ? "[&_svg]:size-2.5" : size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{trailingElement}</span>}
     </span>
   );
 }

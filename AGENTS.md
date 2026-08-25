@@ -63,6 +63,8 @@ oe-warning-border-secondary
 
 일반 surface는 Neutral이다. Brand와 status는 명시된 role에서만 사용한다.
 
+폼에서 직접 조작하는 Input, Checkbox 같은 control의 식별 보더는 `oe-border-primary`를 사용한다. 여러 폼 요소나 Label을 하나의 선택·입력 영역으로 감싸는 낮은 위계의 form container는 `oe-border-secondary`를 사용한다.
+
 ## 아이콘 Foundation
 
 - 공용 아이콘의 Primary 공급원은 Remix Icon이며 React 구현은 `@remixicon/react`를 우선 사용한다.
@@ -101,6 +103,29 @@ oe-warning-border-secondary
 
 폰트만 바꾸지 말고 언어를 선택하면 실제 콘텐츠와 `lang`도 함께 바꾼다.
 
+### Component 상세 페이지 순서
+
+- 기본 정보 흐름은 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map` 순서다.
+- Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
+- 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
+- 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다.
+- 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
+- Property map이나 Playground control에만 존재하고 별도 설명 카드가 없는 주요 Property를 발견하면 자동으로 카드를 만들지 말고 사용자에게 카드가 필요한지 묻는다.
+- `name`, `value`, `form`처럼 native 연결을 위한 기술 속성까지 모두 시각 카드로 만들지는 않는다. 시각·구조·동작을 이해하는 데 독립 설명이 필요한 상위 Property를 카드 점검 대상으로 삼는다.
+
+### Component 화면 확정 검수
+
+- 사용자가 “스튜디오 화면 확정”, “페이지 확정” 또는 같은 의미로 요청하면 문서 구조, 실제 Props, Anatomy, Property별 설명 카드, State coverage, token, theme·locale·viewport, interaction, accessibility, 공용 package 소유 경계와 `pnpm check`를 함께 점검한다.
+- 확인된 구현·문서 불일치는 수정할 수 있지만, 누락된 Property 카드의 필요성이나 새로운 사용 정책처럼 판단이 필요한 내용은 모아서 사용자에게 질문한다.
+- 화면 확정만으로 Candidate를 Stable로 승격하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청 또는 별도 승격 검토가 필요하다.
+
+### Anatomy swap 표시
+
+- Studio의 Anatomy에서 `leadingElement`, `trailingElement` 또는 `swap`이라고 부르는 교체 가능 영역은 공통 `AnatomySwapSlot` 표시를 사용한다.
+- 기본 표시는 1px Pink 점선, 4px radius와 옅은 Pink 배경이다. 영역 크기만 실제 Slot 규격에 맞게 조정할 수 있다.
+- 이 표시는 Studio 문서에서 교체 가능한 Slot을 설명하기 위한 것이며 실제 제품 컴포넌트의 border나 background 스타일로 포함하지 않는다.
+- Component 문서와 Anatomy 명칭에는 해당 영역의 Optional 여부를 함께 표시한다.
+
 ## 변경 원칙
 
 - 사용자의 명시적 디자인 판단을 문서와 코드에 함께 반영한다.
@@ -112,6 +137,19 @@ oe-warning-border-secondary
 - 접근성, theme 또는 시스템 경계에 필요한 token은 첫 사용에도 추가할 수 있다.
 - shadcn update를 oe에 자동 덮어쓰지 않는다. Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
 - 고객 납품물은 특정 시점의 project snapshot이며 이후 ooee 변경과 자동 연결하지 않는다.
+
+## 컴포넌트 상태 점검
+
+컴포넌트 구현이나 상세 문서를 마무리하기 전에 다음을 반드시 대조한다.
+
+1. 실제 Props와 기반 라이브러리에서 지원하는 상태를 전부 나열한다.
+2. Default, 선택 상태, Hover, Pressed, Focus visible, Disabled, Read-only, Required, Invalid/Error, Loading과 조합 상태 중 실제 존재하는 항목을 확인한다.
+3. 코드 구현, Studio 검수 예시, Component 문서 세 곳에 같은 상태가 반영됐는지 비교한다.
+4. 구현됐지만 검수 화면에서 누락된 상태는 추가한다.
+5. 일반적으로 있을 법하지만 현재 구현이나 정책에 없는 상태는 만들지 않고 `현재 정의 없음`으로 기록한다.
+6. 상태 조합에서 색상이나 우선순위 판단이 필요한 경우 임의로 선택하지 않고 현재 확인된 내용과 충돌 지점을 사용자에게 보고한다.
+
+완료 보고에는 누락 상태가 없는지 점검한 결과와, 남아 있는 미정 상태가 있으면 그 목록을 포함한다.
 
 ## 검증
 
