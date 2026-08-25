@@ -127,11 +127,11 @@ function TextareaAnatomy({ value }: { value: string }) {
       <div role="img" aria-label="Textarea anatomy" className="overflow-x-auto rounded-xl bg-oe-background-secondary px-5 py-7">
         <div className="relative mx-auto h-[18rem] w-[40rem] text-oe-foreground-secondary">
           <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 640 288" fill="none" aria-hidden="true">
-            <path d="M96 112V92H544V112" stroke="currentColor" strokeWidth="1" />
-            <path d="M320 48V92" stroke="currentColor" strokeWidth="1" />
+            <path d="M96 112V92H544V112" stroke="var(--oe-border-primary)" strokeWidth="1" />
+            <path d="M320 48V92" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <TextareaAnatomyNumber x={320} y={32} number={1} />
 
-            <path d="M320 238V166" stroke="currentColor" strokeWidth="1" />
+            <path d="M320 238V166" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <TextareaAnatomyNumber x={320} y={254} number={2} />
 
           </svg>

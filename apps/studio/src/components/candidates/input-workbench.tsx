@@ -218,26 +218,26 @@ function InputAnatomy({ placeholder }: { placeholder: string }) {
         <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
           <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 768 352" fill="none" aria-hidden="true">
             {/* Container is shown as a bracket around the whole control, not a single-point callout. */}
-            <path d="M116 151V132H652V151" stroke="currentColor" strokeWidth="1" />
-            <path d="M384 88V132" stroke="currentColor" strokeWidth="1" />
+            <path d="M116 151V132H652V151" stroke="var(--oe-border-primary)" strokeWidth="1" />
+            <path d="M384 88V132" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={384} y={72} number={1} />
 
-            <path d="M144 94V172" stroke="currentColor" strokeWidth="1" />
+            <path d="M144 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={144} y={76} number={2} />
 
-            <path d="M200 94V172" stroke="currentColor" strokeWidth="1" />
+            <path d="M200 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={200} y={76} number={3} />
 
-            <path d="M372 245V190" stroke="currentColor" strokeWidth="1" />
+            <path d="M372 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={372} y={263} number={4} />
 
-            <path d="M528 245V190" stroke="currentColor" strokeWidth="1" />
+            <path d="M528 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={528} y={263} number={5} />
 
-            <path d="M576 94V172" stroke="currentColor" strokeWidth="1" />
+            <path d="M576 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={576} y={76} number={6} />
 
-            <path d="M624 245V190" stroke="currentColor" strokeWidth="1" />
+            <path d="M624 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <AnatomyNumber x={624} y={263} number={7} />
           </svg>
 

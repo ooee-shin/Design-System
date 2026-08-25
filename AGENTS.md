@@ -101,6 +101,8 @@ oe-warning-border-secondary
 - 인터랙션과 상태
 - 출처, 성숙도, oe mapping 상태
 
+컴포넌트 Anatomy의 연결선은 Light/Dark 모두 `oe-border-primary` 회색조를 사용한다. 연결선과 숫자 마커의 진한 배경은 서로 다른 역할로 분리하며, 연결선에 foreground 또는 black 직접값을 사용하지 않는다.
+
 폰트만 바꾸지 말고 언어를 선택하면 실제 콘텐츠와 `lang`도 함께 바꾼다.
 
 ### Component 상세 페이지 순서
