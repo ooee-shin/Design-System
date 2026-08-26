@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getComponentRelations, type ComponentKey } from "@/components/component-registry";
 
 type PageSection = { id: string; label: string };
 type RelatedItem = { href: string; title: string; description: string };
 
-export function OnThisPage({ items, relatedItems = [] }: { items: PageSection[]; relatedItems?: RelatedItem[] }) {
+export function OnThisPage({ items, componentKey, similarItems, worksWithItems }: { items: PageSection[]; componentKey?: ComponentKey; similarItems?: RelatedItem[]; worksWithItems?: RelatedItem[] }) {
+  const registryRelations = componentKey ? getComponentRelations(componentKey) : { similarItems: [], worksWithItems: [] };
+  const resolvedSimilarItems = similarItems ?? registryRelations.similarItems;
+  const resolvedWorksWithItems = worksWithItems ?? registryRelations.worksWithItems;
   const [activeIds, setActiveIds] = useState<string[]>(items[0] ? [items[0].id] : []);
 
   useEffect(() => {
@@ -43,20 +47,33 @@ export function OnThisPage({ items, relatedItems = [] }: { items: PageSection[];
           </li>
         ))}
       </ol>
-      {relatedItems.length > 0 ? (
+      {resolvedSimilarItems.length > 0 || resolvedWorksWithItems.length > 0 ? (
         <div className="mt-5 rounded-lg bg-oe-background-secondary p-3">
-          <h3 className="text-[11px] font-medium text-oe-foreground-tertiary">Related</h3>
-          <ul className="mt-2 space-y-1">
-            {relatedItems.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className="group flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-xs text-oe-foreground-tertiary transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary">
-                  <span>{item.title}</span><span className="text-oe-foreground-placeholder transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="space-y-4">
+            <RelatedGroup title="Similar" items={resolvedSimilarItems} />
+            <RelatedGroup title="Works with" items={resolvedWorksWithItems} />
+          </div>
         </div>
       ) : null}
     </nav>
+  );
+}
+
+function RelatedGroup({ title, items }: { title: string; items: RelatedItem[] }) {
+  if (items.length === 0) return null;
+
+  return (
+    <div>
+      <h4 className="px-2 text-[10px] font-medium uppercase tracking-wide text-oe-foreground-placeholder">{title}</h4>
+      <ul className="mt-1 space-y-1">
+        {items.map((item) => (
+          <li key={item.href}>
+            <Link href={item.href} title={item.description} className="group flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-xs text-oe-foreground-tertiary transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary">
+              <span>{item.title}</span><span className="text-oe-foreground-placeholder transition-transform group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

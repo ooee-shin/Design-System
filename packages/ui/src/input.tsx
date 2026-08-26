@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "./utils"
 
 const inputContainerVariants = cva(
-  "group/input flex w-full min-w-0 items-center rounded-lg border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] focus-within:border-oe-focus-ring focus-within:ring-1 focus-within:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary has-[:disabled]:cursor-not-allowed has-[:disabled]:border-oe-border-disabled has-[:disabled]:bg-oe-background-disabled has-[:disabled]:text-oe-foreground-disabled",
+  "group/input flex w-full min-w-0 items-center rounded-lg border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] focus-within:border-oe-focus-ring focus-within:ring-1 focus-within:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
   {
     variants: {
       variant: {
@@ -43,6 +43,7 @@ type InputProps = NativeInputProps &
     clearable?: boolean
     clearLabel?: string
     onClear?: () => void
+    textAlign?: "left" | "right"
   } & InputLayoutProps
 
 function Input({
@@ -59,6 +60,7 @@ function Input({
   clearable = false,
   clearLabel = "Clear input",
   onClear,
+  textAlign = "left",
   disabled,
   readOnly,
   ...props
@@ -69,6 +71,7 @@ function Input({
       data-variant={variant}
       data-size={controlSize}
       data-layout={layout}
+      data-disabled={disabled ? "true" : undefined}
       style={layout === "fixed" ? { width: fixedWidth } : undefined}
       className={cn(inputContainerVariants({ variant, controlSize }), layout === "fixed" ? "max-w-full shrink-0" : "w-full", containerClassName)}
     >
@@ -76,7 +79,7 @@ function Input({
       {prefix ? <span data-slot="input-prefix" className="shrink-0 text-oe-foreground-secondary">{prefix}</span> : null}
       <InputPrimitive
         data-slot="input"
-        className={cn("h-full min-w-0 flex-1 bg-transparent p-0 text-inherit outline-none placeholder:text-oe-foreground-placeholder disabled:cursor-not-allowed disabled:text-oe-foreground-disabled read-only:cursor-default", className)}
+        className={cn("h-full min-w-0 flex-1 bg-transparent p-0 text-inherit outline-none placeholder:text-oe-foreground-placeholder disabled:cursor-not-allowed disabled:text-oe-foreground-disabled read-only:cursor-default", textAlign === "right" ? "text-right" : "text-left", className)}
         disabled={disabled}
         readOnly={readOnly}
         {...props}

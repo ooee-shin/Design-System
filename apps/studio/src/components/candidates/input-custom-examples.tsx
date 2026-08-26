@@ -3,6 +3,7 @@
 import { useRef, useState, type ClipboardEvent, type KeyboardEvent, type ReactNode } from "react";
 
 import { Input, PartialMaskedInput } from "@ooee/ui";
+import { ColorSwatch } from "@/components/color-swatch";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
 const copy = {
@@ -14,6 +15,9 @@ const copy = {
     formattedNumber: "Formatted number",
     formattedNumberDescription: "숫자를 입력하면 지정된 형식을 자동 적용합니다. 전화번호나 사업자등록번호처럼 형식이 정해진 값에 사용할 수 있습니다.",
     amountDescription: "숫자를 입력하면 천 단위 구분을 자동 적용하고, 입력값과 통화 단위를 분리해 Suffix로 표시합니다.",
+    colorPickerInput: "HEX value",
+    colorPickerInputDescription: "HEX 값을 직접 입력하고 Leading color swatch로 현재 색상을 확인합니다.",
+    colorPickerInputLabel: "컬러 HEX 값",
     segmentedInput: "Segmented input · Single container",
     segmentedInputDescription: "하나의 외곽 Container 안에서 값을 여러 실제 Input 그룹으로 나누는 유형입니다. 각 그룹의 마스킹 여부는 용도에 따라 선택할 수 있습니다.",
     splitInput: "Split input · Multiple containers",
@@ -37,6 +41,9 @@ const copy = {
     formattedNumber: "Formatted number",
     formattedNumberDescription: "Applies a defined format automatically as digits are entered. It supports fixed formats such as phone or business registration numbers.",
     amountDescription: "Applies thousands separators automatically and keeps the currency unit separate as a suffix.",
+    colorPickerInput: "HEX value",
+    colorPickerInputDescription: "Enter a HEX value directly and preview the current color with a leading color swatch.",
+    colorPickerInputLabel: "Color HEX value",
     segmentedInput: "Segmented input · Single container",
     segmentedInputDescription: "Splits a value across multiple actual input groups inside one outer container. Masking can be enabled independently for each group.",
     splitInput: "Split input · Multiple containers",
@@ -57,8 +64,8 @@ const copy = {
 export function InputCustomExamples() {
   const { locale } = useStudioPreferences();
   const c = copy[locale];
-  const [phoneValue, setPhoneValue] = useState("010-1234-5678");
-  const [amountValue, setAmountValue] = useState("1000000");
+  const [phoneValue, setPhoneValue] = useState("");
+  const [amountValue, setAmountValue] = useState("");
   const [groupedNumberParts, setGroupedNumberParts] = useState(["", "", "", ""]);
   const groupedNumberRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [verificationCodeParts, setVerificationCodeParts] = useState(["", "", "", "", "", ""]);
@@ -76,7 +83,7 @@ export function InputCustomExamples() {
       </CustomInputCard>
 
       <CustomInputCard label="Amount" description={c.amountDescription}>
-        <Input type="text" inputMode="numeric" autoComplete="off" aria-label={c.amount} value={formatCurrencyAmount(amountValue)} onChange={(event) => setAmountValue(event.target.value.replace(/\D/g, ""))} placeholder="0" suffix={c.currencyUnit} clearable={amountValue.length > 0} clearLabel={c.clear} onClear={() => setAmountValue("")} className="text-right tabular-nums" containerClassName="gap-0 [&_[data-slot=input-suffix]]:ml-2 [&_[data-slot=input-clear]]:visible [&_[data-slot=input-clear]]:mr-0 [&_[data-slot=input-clear]]:w-0 [&_[data-slot=input-clear]]:overflow-hidden [&_[data-slot=input-clear]]:transition-[color,background-color,opacity,width,margin] focus-within:[&_[data-slot=input-clear]]:w-6" />
+        <Input type="text" inputMode="numeric" autoComplete="off" aria-label={c.amount} value={formatCurrencyAmount(amountValue)} onChange={(event) => setAmountValue(event.target.value.replace(/\D/g, ""))} placeholder="0" suffix={c.currencyUnit} clearable={amountValue.length > 0} clearLabel={c.clear} onClear={() => setAmountValue("")} textAlign="right" className="tabular-nums" containerClassName="gap-0 [&_[data-slot=input-suffix]]:ml-2 [&_[data-slot=input-clear]]:visible [&_[data-slot=input-clear]]:mr-0 [&_[data-slot=input-clear]]:w-0 [&_[data-slot=input-clear]]:overflow-hidden [&_[data-slot=input-clear]]:transition-[color,background-color,opacity,width,margin] focus-within:[&_[data-slot=input-clear]]:w-6" />
       </CustomInputCard>
 
       <CustomInputCard label={c.segmentedInput} description={c.segmentedInputDescription}>
@@ -101,7 +108,7 @@ export function InputCustomExamples() {
       </CustomInputCard>
 
       <CustomInputCard label={c.partialMaskedInput} description={c.partialMaskedInputDescription}>
-        <PartialMaskedInput inputLength={2} totalLength={4} aria-label={c.partialMaskedValue} value={partialMaskedValue} onValueChange={setPartialMaskedValue} />
+        <PartialMaskedInput inputLength={2} totalLength={4} maskInput={false} aria-label={c.partialMaskedValue} value={partialMaskedValue} onValueChange={setPartialMaskedValue} />
       </CustomInputCard>
 
       <CustomInputCard label={c.residentRegistrationNumber} description={c.residentRegistrationNumberDescription}>
@@ -111,11 +118,33 @@ export function InputCustomExamples() {
           </div>
           <span className="shrink-0 text-oe-foreground-placeholder" aria-hidden="true">-</span>
           <div className="min-w-0 flex-1">
-            <PartialMaskedInput ref={residentPrivateDigitRef} inputLength={1} totalLength={7} aria-label={c.residentPrivateDigit} value={residentPrivateDigit} onValueChange={setResidentPrivateDigit} onKeyDown={(event) => { if (event.key === "Backspace" && residentPrivateDigit.length === 0) residentBirthDateRef.current?.focus(); }} />
+            <PartialMaskedInput ref={residentPrivateDigitRef} inputLength={1} totalLength={7} maskInput={false} aria-label={c.residentPrivateDigit} value={residentPrivateDigit} onValueChange={setResidentPrivateDigit} onKeyDown={(event) => { if (event.key === "Backspace" && residentPrivateDigit.length === 0) residentBirthDateRef.current?.focus(); }} />
           </div>
         </div>
       </CustomInputCard>
     </>
+  );
+}
+
+export function InputColorExample() {
+  const { locale } = useStudioPreferences();
+  const c = copy[locale];
+  const [colorValue, setColorValue] = useState("#0073FF");
+
+  return (
+    <CustomInputCard label={c.colorPickerInput} description={c.colorPickerInputDescription}>
+      <Input
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        aria-label={c.colorPickerInputLabel}
+        value={colorValue}
+        onChange={(event) => setColorValue(formatHexColor(event.target.value))}
+        placeholder="#000000"
+        leadingElement={<ColorSwatch color={isCompleteHexColor(colorValue) ? colorValue : "#0073FF"} />}
+        className="font-mono tabular-nums uppercase"
+      />
+    </CustomInputCard>
   );
 }
 
@@ -133,6 +162,15 @@ function formatMobilePhone(value: string) {
 function formatCurrencyAmount(value: string) {
   if (!value) return "";
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function formatHexColor(value: string) {
+  const hex = value.replace(/[^0-9a-f]/gi, "").slice(0, 6).toUpperCase();
+  return hex.length > 0 ? `#${hex}` : "";
+}
+
+function isCompleteHexColor(value: string) {
+  return /^#[0-9A-F]{6}$/i.test(value);
 }
 
 function updateVerificationCode(index: number, value: string, current: string[], setValue: (value: string[]) => void, refs: Array<HTMLInputElement | null>) {

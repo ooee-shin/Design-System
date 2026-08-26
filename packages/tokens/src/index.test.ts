@@ -55,6 +55,10 @@ test("core semantic tokens expose every status family through executable CSS var
   assert.equal(dark["--oe-foreground-tertiary"], "var(--color-neutral-500)");
   assert.equal(light["--oe-background-disabled-selected"], "var(--color-neutral-400)");
   assert.equal(dark["--oe-background-disabled-selected"], "var(--color-neutral-400)");
+  assert.equal(light["--oe-background-control-off"], "var(--color-neutral-400)");
+  assert.equal(dark["--oe-background-control-off"], "var(--color-neutral-500)");
+  assert.equal(light["--oe-background-control-disabled"], "var(--color-neutral-300)");
+  assert.equal(dark["--oe-background-control-disabled"], "var(--color-neutral-600)");
   assert.equal(light["--oe-border-bold-primary"], "var(--color-neutral-950)");
   assert.equal(dark["--oe-border-bold-primary"], "var(--color-neutral-50)");
 });

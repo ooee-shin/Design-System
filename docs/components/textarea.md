@@ -59,6 +59,8 @@ Resize는 `autoSize=false`일 때만 적용한다.
 
 Focus는 `oe-focus-ring`의 1px border와 외부 1px ring을 같은 진한 색으로 사용한다. Invalid도 `oe-danger-border-primary`의 1px border와 외부 1px ring을 같은 색으로 사용한다. 외부 ring을 사용해 상태 전환 시 내부 크기와 배치가 흔들리지 않게 한다.
 
+Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.
+
 ## Specification
 
 - Width: `100%`

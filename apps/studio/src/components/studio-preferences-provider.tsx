@@ -47,13 +47,13 @@ export function StudioPreferencesProvider({ children }: { children: ReactNode })
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
-    root.lang = locale;
+    root.lang = "ko";
     Object.entries(createCoreSemanticCssVariables(theme)).forEach(([property, value]) => root.style.setProperty(property, value));
   }, [locale, theme]);
 
   return (
     <StudioPreferencesContext.Provider value={value}>
-      <div className={theme === "dark" ? "dark min-h-screen bg-background text-foreground" : "min-h-screen bg-background text-foreground"} lang={locale}>
+      <div className={theme === "dark" ? "dark min-h-screen bg-background text-foreground" : "min-h-screen bg-background text-foreground"} lang="ko">
         {children}
       </div>
     </StudioPreferencesContext.Provider>

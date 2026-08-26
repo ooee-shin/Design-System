@@ -118,6 +118,7 @@ oe-foreground-primary / secondary / tertiary / disabled / inverse
 oe-foreground-inverse-secondary
 oe-background-canvas-primary / canvas-secondary
 oe-background-primary / secondary / disabled / disabled-selected / bold-primary
+oe-background-control-off / control-disabled
 oe-border-primary / secondary / disabled
 oe-focus-ring
 oe-interaction-hover
@@ -140,9 +141,11 @@ oe-{role}-border-primary / secondary
 - 클릭 가능한 아이콘은 공통적으로 hover 시 `interaction-hover` 회색조 state layer를 표시하고, keyboard focus 시 `oe-focus-ring`을 표시한다.
 - `foreground-inverse-secondary`는 bold fill 위의 약한 메타 정보에 사용한다.
 - `background-disabled-selected`는 선택값을 유지한 채 조작만 제한된 control의 Neutral fill이다. Light/Dark 모두 `neutral-400`을 사용한다.
+- `background-control-off`는 조작 가능한 Boolean control의 Off Track이며 Light `neutral-400`, Dark `neutral-500`을 사용한다.
+- `background-control-disabled`는 조작할 수 없는 Boolean control의 Track이다. 이전 Off 색상인 Light `neutral-300`, Dark `neutral-600`을 사용해 Enabled Off보다 한 단계 낮은 위계를 만든다.
 - `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
 - `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.
-- overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다.
+- overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다. 현재 첫 실제 사례는 Color swatch의 내부 경계이며 Neutral border 대신 1px inset `black 10%`를 사용한다. 이미지와 색상 값에 같은 역할을 적용하는 방향은 확정했지만 정확한 alpha 강도와 semantic token 이름은 실제 이미지 사례에서 함께 재검수한다.
 
 ### 다음 작업에서 먼저 답할 질문
 

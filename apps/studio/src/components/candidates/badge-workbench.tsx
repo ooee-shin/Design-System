@@ -4,9 +4,14 @@ import { useState, type ReactNode } from "react";
 import { RiArrowDownSLine, RiShieldUserLine, RiTimeLine } from "@remixicon/react";
 
 import { Badge, type BadgeColor } from "@ooee/ui";
+import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface, AnatomySwapSlot } from "@/components/component-anatomy";
+import { OnThisPage } from "@/components/component-detail-navigation";
+import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
 const tabs = ["Badge", "Dot Badge", "Number Badge"] as const;
+const badgeSections = [{ id: "playground", label: "Playground" }, { id: "anatomy", label: "Anatomy" }, { id: "properties-style", label: "Style" }, { id: "properties-color", label: "Color" }, { id: "properties-size", label: "Size" }, { id: "properties-shape", label: "Shape" }, { id: "properties-elements", label: "Elements" }, { id: "layout", label: "Layout" }, { id: "behavior", label: "Behavior" }, { id: "examples", label: "Examples" }, { id: "specification", label: "Specification" }];
+const compactBadgeSections = [{ id: "styles", label: "Styles" }, { id: "examples", label: "Examples" }];
 type BadgeTab = (typeof tabs)[number];
 const badgeColors: BadgeColor[] = ["slate", "gray", "zinc", "neutral", "stone", "red", "orange", "amber", "yellow", "lime", "green", "emerald", "teal", "cyan", "sky", "blue", "indigo", "violet", "purple", "fuchsia", "pink", "rose"];
 const content = {
@@ -19,8 +24,10 @@ export function BadgeWorkbench() {
   const [activeTab, setActiveTab] = useState<BadgeTab>("Badge");
   const { locale } = useStudioPreferences();
   const c = content[locale];
+  const sections = activeTab === "Badge" ? badgeSections : compactBadgeSections;
   return (
-    <div className="space-y-5">
+    <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
+      <div className="min-w-0 space-y-5">
       <div className="overflow-x-auto border-b border-oe-border-secondary">
         <div className="flex min-w-max gap-6" role="tablist" aria-label="Badge components">
           {tabs.map((tab) => <button key={tab} type="button" role="tab" aria-selected={activeTab === tab} aria-controls="badge-component-panel" onClick={() => setActiveTab(tab)} className={`border-b-2 px-0.5 pb-3 text-sm transition-colors ${activeTab === tab ? "border-oe-foreground-primary font-medium text-oe-foreground-primary" : "border-transparent text-oe-foreground-tertiary hover:text-oe-foreground-primary"}`}>{tab}</button>)}
@@ -31,21 +38,26 @@ export function BadgeWorkbench() {
         {activeTab === "Dot Badge" && <DotBadgePanel content={c} />}
         {activeTab === "Number Badge" && <NumberBadgePanel content={c} />}
       </div>
+      </div>
+      <OnThisPage items={sections} componentKey="badge" />
     </div>
   );
 }
 
 function BadgePanel({ content: c }: { content: Content }) {
   return (
-    <ComponentSpec title="Badge" description="짧은 텍스트 정보를 표시하는 비인터랙티브 컴포넌트입니다. 현재 실제 구현과 사용자에게 확인된 속성만 정리합니다." specs={[["구조", "Container · Label · Optional elements"], ["스타일", "Tonal, Solid"], ["크기", "Small, Medium · 검수 중"], ["모양", "Pill, Rounded 8px"]]}>
+    <ComponentSpec title="Badge" description="짧은 텍스트 정보를 표시하는 비인터랙티브 컴포넌트입니다. 현재 실제 구현과 사용자에게 확인된 속성만 정리합니다." specs={[["구조", "Container · Label · Optional elements"], ["스타일", "Tonal, Solid"], ["크기", "XSmall, Small, Medium · 검수 중"], ["모양", "Pill, Rounded 8px"]]}>
       <SpecSection title="Overview" description="현재 확인된 역할과 구현 범위입니다.">
         <div className="col-span-full space-y-2 text-sm leading-6 text-oe-foreground-secondary">
           <p>Badge는 필수 Label과 선택적인 Leading/Trailing element로 구성됩니다. 자체 클릭, 선택 또는 토글 동작은 구현되어 있지 않습니다.</p>
           <p>현재 저장소의 실제 사용 사례는 Breadcrumb Page Header의 상태 표시입니다. 그 외의 사용 목적과 권장 정책은 아직 정의되지 않았습니다.</p>
         </div>
       </SpecSection>
+      <SpecSection title="Playground" description="확정된 Style, Size, Shape와 선택 요소를 한 예시에서 확인합니다.">
+        <div className="col-span-full rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4"><PreviewLocaleScope className="flex min-h-32 items-start rounded-xl bg-oe-background-primary p-5"><Badge color="blue" size="small" shape="rounded" leadingElement={<RiTimeLine />} trailingElement={<RiArrowDownSLine />}>{c.scheduled}</Badge></PreviewLocaleScope></div>
+      </SpecSection>
       <SpecSection title="Anatomy" description="실제 구현에 존재하는 구성 요소와 위치입니다.">
-        <BadgeAnatomy label={c.scheduled} />
+        <BadgeAnatomy label="Label" />
       </SpecSection>
       <SpecSection title="Properties · Style" description="Tonal은 밝은 단계, Solid는 Tailwind 600 원색을 사용합니다.">
         <VariantGroup label="Tonal"><Badge color="red">{c.danger}</Badge><Badge color="amber">{c.warning}</Badge><Badge color="blue">{c.info}</Badge></VariantGroup>
@@ -123,25 +135,7 @@ function SpecificationTable() {
   return <div className="col-span-full overflow-x-auto"><table className="w-full min-w-[36rem] text-left text-xs"><thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Current implementation</th><th className="py-2 font-medium">Source / status</th></tr></thead><tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">{rows.map(([property, value, status]) => <tr key={property}><td className="py-3">{property}</td><td className="font-mono text-[11px]">{value}</td><td>{status}</td></tr>)}</tbody></table></div>;
 }
 
-function BadgeAnatomy({ label }: { label: string }) {
-  return (
-    <div className="relative col-span-full flex min-h-72 items-center justify-center overflow-hidden rounded-xl bg-oe-background-secondary px-5 py-10">
-      <div className="grid grid-cols-[minmax(5rem,1fr)_2rem_auto_2rem_minmax(5rem,1fr)] grid-rows-[auto_2rem_auto_2rem_auto] items-center text-xs text-oe-foreground-secondary">
-        <span className="col-start-3 row-start-1 text-center">Label</span>
-        <span className="col-start-3 row-start-2 mx-auto h-full border-l border-dashed border-oe-border-primary" />
-        <span className="col-start-1 row-start-3 text-right">Leading element</span>
-        <span className="col-start-2 row-start-3 w-full border-t border-dashed border-oe-border-primary" />
-        <div className="col-start-3 row-start-3">
-          <Badge color="amber" leadingElement={<RiTimeLine />} trailingElement={<RiArrowDownSLine />}>{label}</Badge>
-        </div>
-        <span className="col-start-4 row-start-3 w-full border-t border-dashed border-oe-border-primary" />
-        <span className="col-start-5 row-start-3">Trailing element</span>
-        <span className="col-start-3 row-start-4 mx-auto h-full border-l border-dashed border-oe-border-primary" />
-        <span className="col-start-3 row-start-5 text-center">Container</span>
-      </div>
-    </div>
-  );
-}
+function BadgeAnatomy({ label }: { label: string }) { return <div className="col-span-full"><AnatomySurface ariaLabel="Badge anatomy" className="px-5 py-12"><div className="relative mx-auto flex h-32 max-w-sm items-center justify-center"><Badge color="amber" leadingElement={<AnatomySwapSlot className="size-4"><RiTimeLine className="size-3" /></AnatomySwapSlot>} trailingElement={<AnatomySwapSlot className="size-4"><RiArrowDownSLine className="size-3" /></AnatomySwapSlot>}>{label}</Badge><AnatomyNumber number={1} className="left-7 top-4" lineClassName="left-2.5 top-5 h-8 w-px" /><AnatomyNumber number={2} className="left-[6.75rem] bottom-3" lineClassName="bottom-5 left-2.5 h-8 w-px" /><AnatomyNumber number={3} className="left-[10.5rem] top-4" lineClassName="left-2.5 top-5 h-8 w-px" /><AnatomyNumber number={4} className="right-7 bottom-3" lineClassName="bottom-5 left-2.5 h-8 w-px" /></div></AnatomySurface><AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Label" }, { name: "Trailing element", optional: true }]} /><AnatomyDescription><p>Label은 필수이며 Leading element와 Trailing element는 각각 독립적으로 표시할 수 있습니다.</p></AnatomyDescription></div>; }
 
 function DotBadgePanel({ content: c }: { content: Content }) {
   return (
@@ -179,7 +173,7 @@ function ComponentSpec({ title, description, specs, children }: { title: string;
 }
 
 function SpecSection({ title, description, children }: { title: string; description: string; children: ReactNode }) {
-  return <section className="rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 lg:grid-cols-2">{children}</div></section>;
+  return <section id={title.toLowerCase().replace("properties · ", "properties-").replaceAll(" ", "-")} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 lg:grid-cols-2">{children}</div></section>;
 }
 
 function VariantGroup({ label, children }: { label: string; children: ReactNode }) {

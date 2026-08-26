@@ -77,6 +77,10 @@ oe-warning-border-secondary
 
 어두운 solid brand/status 배경 위에는 공통 `oe-foreground-inverse`를 먼저 검토한다. 밝은 배경에는 대비가 확보되는 Neutral foreground를 사용한다. 반복되는 실제 예외가 생기기 전에는 `on-*` token을 만들지 않는다.
 
+Outline 형태의 공용 Form control과 선택 요소는 Disabled 상태에서도 외곽선을 제거하거나 배경과 구분되지 않는 색으로 바꾸지 않는다. 구조를 인지할 수 있도록 기본 Outline border를 유지하고, Disabled 위계는 foreground와 background 및 상호작용 제한으로 표현한다. Filled 형태는 별도 Border가 없는 기존 구조를 유지한다.
+
+`fill | fixed` 너비 Layout을 지원하는 한 줄 Form control의 기본값은 `fill`이다. 공용 컴포넌트 API와 Studio Playground의 최초 선택값을 동일하게 유지한다. Checkbox·Radio처럼 별도의 `inline | block` Layout 체계를 가진 선택 요소에는 이 값을 억지로 적용하지 않는다.
+
 ## Brand primitive 규칙
 
 - 입력한 HEX는 `brand-source`로 보존한다.
@@ -103,7 +107,11 @@ oe-warning-border-secondary
 
 컴포넌트 Anatomy의 연결선은 Light/Dark 모두 `oe-border-primary` 회색조를 사용한다. 연결선과 숫자 마커의 진한 배경은 서로 다른 역할로 분리하며, 연결선에 foreground 또는 black 직접값을 사용하지 않는다.
 
-폰트만 바꾸지 말고 언어를 선택하면 실제 콘텐츠와 `lang`도 함께 바꾼다.
+Studio 문서 설명은 국문을 유지한다. 언어를 선택하면 컴포넌트 Preview 안의 Label, Value, Placeholder, 접근 가능한 이름과 해당 범위의 `lang`을 함께 바꾼다. 전체 문서 번역은 국문 문서가 완료된 뒤 별도 작업으로 다룬다.
+
+Component catalog의 title, description, maturity, 수정일, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다.
+
+Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용한다. 제목 앞에는 Remix `RiBookOpenLine` 16px을 Tertiary foreground로 배치하고 제목은 14px Semibold, 아이콘과 제목 간격은 8px로 유지한다. 컴포넌트별 Workbench에서 같은 스타일을 다시 만들지 않는다.
 
 ### Component 상세 페이지 순서
 
@@ -128,14 +136,34 @@ oe-warning-border-secondary
 - 이 표시는 Studio 문서에서 교체 가능한 Slot을 설명하기 위한 것이며 실제 제품 컴포넌트의 border나 background 스타일로 포함하지 않는다.
 - Component 문서와 Anatomy 명칭에는 해당 영역의 Optional 여부를 함께 표시한다.
 
+### Anatomy 번호와 범례
+
+- Anatomy Preview에는 실제 컴포넌트만 표시하고 요소 이름을 컴포넌트 안에 넣지 않는다.
+- 번호 마커는 실제 요소를 밀지 않도록 컴포넌트 바깥에 배치하고 1px `oe-border-primary` 안내선으로 대상을 연결한다.
+- Anatomy 유형명, 시각 예제와 번호별 요소명 범례는 하나의 Neutral 회색 Surface 안에서 `유형명 → 시각 예제 → 범례` 순서로 구성한다. 범례를 같은 색의 별도 블록이나 회색 Anatomy 영역 밖의 흰 배경에 분리하지 않는다. Optional은 요소 이름 뒤에 옅은 위계로 표시한다.
+- 구조 설명이 더 필요하면 범례 아래 별도 텍스트 블록에 작성한다. 구조와 상태가 겹쳐 복잡해지면 Anatomy Preview를 둘 이상으로 분리한다.
+- 기본 요소와 Optional 요소가 한 Preview에서 같은 대상을 가리키는 것처럼 보이면 `Basic anatomy`와 `Extended anatomy`로 분리한다. Basic에는 최소 구조만 표시하고 Extended에는 Basic 번호를 반복하지 않는다. 여러 텍스트 요소를 감싸는 Content container처럼 단일 Label과 구분하기 어려운 그룹 요소는 Extended에서 Container 평행선으로 범위를 표시한다.
+- Anatomy와 구조 검수용 Playground의 콘텐츠는 제품 사례 문구 대신 `Label`, `Right Description`, `Value / Placeholder`처럼 실제 요소 명칭을 사용한다. 제품 맥락의 실제 문구는 Examples와 Usage에서 보여준다.
+
+### Anatomy Container 표시
+
+- Container 번호의 연결선은 실제 Container 내부로 들어가지 않는다.
+- 실제 외곽선과 일정한 간격을 둔 평행선으로 Container 범위를 표시한다. 번호에서 시작한 연결선은 이 평행선에서 끝난다.
+- 번호가 Container의 왼쪽이나 오른쪽에 있으면 외곽과 나란한 수직선을 사용하고, 위나 아래에 있으면 수평선을 사용한다.
+- 평행선은 실제 Container의 높이 또는 너비 범위에 맞추되 외곽선과 붙이거나 겹치지 않는다.
+- `[` 또는 `]`처럼 끝이 꺾인 bracket 형태는 사용하지 않는다.
+
 ## 변경 원칙
 
+- 사용자가 직전 제안에 `ㄱ` 또는 `ㄱㄱ`로 답하면 해당 제안에 동의하며 바로 반영하라는 요청으로 해석한다.
 - 사용자의 명시적 디자인 판단을 문서와 코드에 함께 반영한다.
 - 컴포넌트 작업 중 기존 token으로 설명되지 않는 색상 패턴을 발견하면 사용자에게 알리고 Candidate로 기록한다.
 - Candidate는 실제 사용 위치, 해결하려는 역할, 임시 primitive 값, 기존 token으로 해결할 수 없는 이유를 포함한다.
 - Candidate를 발견했다는 이유만으로 공용 semantic token이나 Stable token에 즉시 추가하지 않는다.
 - 새 token은 한 번의 편의를 위해 추가하지 않는다. 같은 의미로 세 번 반복되거나 두 개 이상의 독립 컴포넌트에서 필요하면 승격을 검토한다.
 - semantic token에 이미 alpha나 강조 위계가 포함되어 있으면 컴포넌트에서 임의 opacity를 중첩해 위계를 다시 바꾸지 않는다. 추가 감쇠가 필요하면 기존 token 선택이 맞는지 먼저 확인하고, 해결되지 않을 때만 별도 상태 또는 token Candidate로 검토한다.
+- 이미지와 Color swatch처럼 콘텐츠 자체가 배경색을 갖는 값은 고정 Neutral border를 바깥에 두지 않고 내부 Black alpha layer를 중첩해 경계를 만든다. 정확한 alpha 강도와 semantic token은 실제 독립 용례가 반복될 때 확정한다.
+- `outline | filled` Style을 제공하는 Form control은 공용 API와 Studio 검수 화면 모두 `outline`을 기본값으로 사용한다.
 - 접근성, theme 또는 시스템 경계에 필요한 token은 첫 사용에도 추가할 수 있다.
 - shadcn update를 oe에 자동 덮어쓰지 않는다. Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
 - 고객 납품물은 특정 시점의 project snapshot이며 이후 ooee 변경과 자동 연결하지 않는다.
@@ -150,6 +178,8 @@ oe-warning-border-secondary
 4. 구현됐지만 검수 화면에서 누락된 상태는 추가한다.
 5. 일반적으로 있을 법하지만 현재 구현이나 정책에 없는 상태는 만들지 않고 `현재 정의 없음`으로 기록한다.
 6. 상태 조합에서 색상이나 우선순위 판단이 필요한 경우 임의로 선택하지 않고 현재 확인된 내용과 충돌 지점을 사용자에게 보고한다.
+
+Studio의 `Properties · State` 예시는 비교 대상의 value/state를 controlled 상태로 고정하되 Hover, Pressed, Focus visible, Popup 열림과 키보드 피드백은 실제로 확인할 수 있어야 한다. `pointer-events: none`, 전체 key event 차단 또는 `tabIndex=-1`로 상호작용을 막지 않는다. Disabled는 실제 disabled 동작을 유지하고, 상태 변화 자체를 보여 주는 것이 목적이면 Playground에서 별도로 검수한다.
 
 완료 보고에는 누락 상태가 없는지 점검한 결과와, 남아 있는 미정 상태가 있으면 그 목록을 포함한다.
 

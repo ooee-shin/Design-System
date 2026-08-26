@@ -4,8 +4,12 @@ export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTrigg
 export { Chip, type ChipProps } from "./chip";
 export { Checkbox, CheckboxContainer, CheckboxField, checkboxVariants, type CheckboxContainerProps, type CheckboxFieldProps, type CheckboxProps } from "./checkbox";
 export { Input, inputContainerVariants, type InputProps } from "./input";
+export { InputButton, type InputButtonProps } from "./input-button";
+export { NumberInput, type NumberInputProps } from "./number-input";
 export { PartialMaskedInput, type PartialMaskedInputProps } from "./partial-masked-input";
 export { Radio, RadioContainer, RadioField, RadioGroup, type RadioContainerProps, type RadioFieldProps, type RadioGroupProps, type RadioProps } from "./radio";
+export { MultiSelect, Select, selectionTriggerVariants, type MultiSelectProps, type SelectOption, type SelectOptionGroup, type SelectProps } from "./select";
+export { Switch, SwitchField, type SwitchFieldProps, type SwitchProps } from "./switch";
 export { Textarea, textareaContainerVariants, type TextareaProps } from "./textarea";
 export { MessageBubble, TypingIndicator, type MessageDeliveryState, type MessageDirection } from "./message-bubble";
 export { MessageComposer, type MessageComposerProps } from "./message-composer";

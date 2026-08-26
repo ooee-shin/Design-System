@@ -6,6 +6,10 @@ import { Badge, CheckboxContainer, CheckboxField } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { PreviewLocaleScope } from "@/components/preview-locale-scope";
+import { useStudioPreferences } from "@/components/studio-preferences-provider";
+
+const previewCopy = { ko: { label: "선택 항목", right: "우측 설명", bottom: "선택 항목에 대한 추가 설명입니다." }, en: { label: "Option", right: "Description", bottom: "Additional information about this option." } } as const;
 
 const sections = [
   { id: "playground", label: "Playground" },
@@ -16,11 +20,13 @@ const sections = [
 ];
 
 export function CheckboxWorkbench() {
+  const { locale } = useStudioPreferences();
+  const c = previewCopy[locale];
   const [checked, setChecked] = useState(false);
   const [indeterminate, setIndeterminate] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [showRightDescription, setShowRightDescription] = useState(false);
-  const [showBottomDescription, setShowBottomDescription] = useState(true);
+  const [showBottomDescription, setShowBottomDescription] = useState(false);
   const [isParent, setIsParent] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [layout, setLayout] = useState<"inline" | "block">("inline");
@@ -36,9 +42,7 @@ export function CheckboxWorkbench() {
 
         <Section id="playground" title="🚩 Playground" description="현재 구현된 선택, 부분 선택과 비활성 상태를 조합해 확인합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
-            <div className="min-h-44 rounded-xl bg-oe-background-primary p-5">
-              <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} label="선택 항목" rightDescription={showRightDescription ? "우측 설명" : undefined} bottomDescription={showBottomDescription ? "선택 항목에 대한 추가 설명입니다." : undefined} isParent={isParent} layout={layout} flipped={flipped} shape={shape} />
-            </div>
+            <div lang="en" className="min-h-44 rounded-xl bg-oe-background-primary p-5"><CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} shape={shape} /></div>
             <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
               <Toggle label="Checked" value={checked} onChange={(value) => { setChecked(value); if (value) setIndeterminate(false); }} />
               {shape === "square" ? <Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /> : null}
@@ -54,30 +58,64 @@ export function CheckboxWorkbench() {
         </Section>
 
         <Section id="anatomy" title="Anatomy" description="현재 Checkbox를 구성하는 실제 요소입니다.">
-          <div className="col-span-full">
-            <div className="rounded-xl bg-oe-background-secondary p-6">
-              <div className="relative mx-auto my-14 w-fit">
-                <CheckboxField defaultChecked label="Label" rightDescription="Right description" bottomDescription="Bottom description" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} />
-                <AnatomyMarker number="1" className="-left-12 top-2" lineClassName="left-5 top-2.5 h-px w-7" />
-                <AnatomyMarker number="2" className="left-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="3" className="left-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                <AnatomyMarker number="4" className="left-7 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="5" className="left-[54px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="6" className="left-[82px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="7" className="right-[34px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="8" className="right-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="9" className="left-7 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+          <div className="col-span-full grid gap-8">
+            <div className="rounded-xl bg-oe-background-secondary p-5">
+              <h4 className="text-xs font-semibold text-oe-foreground-primary">Basic anatomy</h4>
+              <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">CheckboxField의 기본 구조만 표시합니다.</p>
+              <div lang="en" className="mt-3 px-1 py-6">
+                <div className="relative mx-auto my-14 w-fit">
+                  <CheckboxField defaultChecked label="Label" />
+                  <FieldContainerMarker />
+                  <AnatomyMarker number="2" className="left-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyMarker number="3" className="left-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                  <AnatomyMarker number="4" className="right-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                </div>
               </div>
+              <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-oe-foreground-primary">
+                <li>1 · Field container</li><li>2 · Control container</li><li>3 · Selection indicator</li><li>4 · Label</li>
+              </ol>
             </div>
-            <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-oe-foreground-primary">
-              <li>1 · Field container</li><li>2 · Control</li><li>3 · Indicator</li><li>4 · Leading element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>5 · Content</li><li>6 · Label</li><li>7 · Right description <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>8 · Trailing element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>9 · Bottom description <span className="text-oe-foreground-placeholder">(Optional)</span></li>
-            </ol>
+
+            <div className="rounded-xl bg-oe-background-secondary p-5">
+              <h4 className="text-xs font-semibold text-oe-foreground-primary">Extended anatomy</h4>
+              <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">Basic 구조에 추가할 수 있는 Optional 요소만 번호로 표시합니다.</p>
+              <div lang="en" className="mt-3 px-1 py-6">
+                <div className="relative mx-auto my-14 w-fit">
+                  <CheckboxField defaultChecked label="Label" rightDescription="Right Description" bottomDescription="Bottom Description" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} />
+                  <ContentContainerMarker />
+                  <AnatomyMarker number="6" className="left-7 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyMarker number="7" className="right-[34px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyMarker number="8" className="right-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyMarker number="9" className="left-7 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                </div>
+              </div>
+              <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-oe-foreground-primary">
+                <li>5 · Content container</li><li>6 · Leading element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>7 · Right Description <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>8 · Trailing element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>9 · Bottom Description <span className="text-oe-foreground-placeholder">(Optional)</span></li>
+              </ol>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-semibold text-oe-foreground-primary">Structure map</h4>
+              <pre className="mt-3 overflow-x-auto rounded-lg bg-oe-background-secondary p-4 text-xs leading-6">
+                <code>
+                  <span className="text-oe-foreground-secondary">Field container</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">├─ </span><span className="text-oe-foreground-secondary">Control container</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">│  └─ </span><span className="text-oe-foreground-secondary">Selection indicator</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">└─ </span><span className="text-oe-foreground-secondary">Content container</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">   ├─ </span><span className="text-oe-foreground-secondary">Leading element</span><span className="text-oe-foreground-placeholder"> (Optional)</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">   ├─ </span><span className="text-oe-foreground-secondary">Label</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">   ├─ </span><span className="text-oe-foreground-secondary">Right Description</span><span className="text-oe-foreground-placeholder"> (Optional)</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">   ├─ </span><span className="text-oe-foreground-secondary">Trailing element</span><span className="text-oe-foreground-placeholder"> (Optional)</span>{"\n"}
+                  <span className="text-oe-foreground-placeholder">   └─ </span><span className="text-oe-foreground-secondary">Bottom Description</span><span className="text-oe-foreground-placeholder"> (Optional)</span>
+                </code>
+              </pre>
+            </div>
           </div>
         </Section>
 
         <Section id="appearance" title="Properties · Appearance" description="기본 Label은 Regular이며 부모 항목과 현재 확인 중인 Shape을 비교합니다.">
-          <StateExample label="Square · Default · Unchecked"><CheckboxField label="선택 항목" shape="square" /></StateExample>
-          <StateExample label="Ghost · Default · Unchecked"><CheckboxField label="선택 항목" shape="ghost" /></StateExample>
+          <StateExample label="Square · Default · Unchecked"><CheckboxField label={c.label} shape="square" /></StateExample>
+          <StateExample label="Ghost · Default · Unchecked"><CheckboxField label={c.label} shape="ghost" /></StateExample>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Parent item</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">여러 하위 선택 항목을 대표하거나 전체 선택을 제어하는 부모 항목에만 Semibold Label을 사용합니다. 일반 항목의 Label은 Regular입니다.</p>
@@ -111,28 +149,28 @@ export function CheckboxWorkbench() {
           </div>
         </Section>
 
-        <Section id="state" title="Properties · State" description="현재 구현에서 확인되는 상태만 정적으로 비교합니다.">
+        <Section id="state" title="Properties · State" description="선택값은 고정하고 Focus와 Pressed 피드백은 실제로 확인합니다.">
           <StateGroup title="Square" description="기본 Checkbox Shape입니다. 선택·부분 선택·Focus와 Disabled 상태를 모두 제공합니다.">
-            <StateExample label="Unchecked"><CheckboxField label="선택 항목" /></StateExample>
-            <StateExample label="Checked"><CheckboxField checked label="선택 항목" /></StateExample>
-            <StateExample label="Indeterminate"><CheckboxField indeterminate label="선택 항목" /></StateExample>
-            <StateExample label="Focus visible"><CheckboxField checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label="선택 항목" /></StateExample>
-            <StateExample label="Disabled · Unchecked"><CheckboxField disabled label="선택 항목" /></StateExample>
-            <StateExample label="Disabled · Checked"><CheckboxField disabled checked label="선택 항목" /></StateExample>
+            <StateExample label="Unchecked"><CheckboxField checked={false} onCheckedChange={() => undefined} label={c.label} /></StateExample>
+            <StateExample label="Checked"><CheckboxField checked onCheckedChange={() => undefined} label={c.label} /></StateExample>
+            <StateExample label="Indeterminate"><CheckboxField checked={false} onCheckedChange={() => undefined} indeterminate label={c.label} /></StateExample>
+            <StateExample label="Focus visible"><CheckboxField checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} /></StateExample>
+            <StateExample label="Disabled · Unchecked"><CheckboxField disabled label={c.label} /></StateExample>
+            <StateExample label="Disabled · Checked"><CheckboxField disabled checked label={c.label} /></StateExample>
           </StateGroup>
 
           <StateGroup title="Ghost" description="박스 없이 Check Indicator의 색상으로 선택 상태를 구분합니다. Ghost는 Indeterminate와 Disabled 상태를 제공하지 않습니다.">
-            <StateExample label="Unchecked"><CheckboxField label="선택 항목" shape="ghost" /></StateExample>
-            <StateExample label="Checked"><CheckboxField checked label="선택 항목" shape="ghost" /></StateExample>
-            <StateExample label="Focus visible"><CheckboxField checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label="선택 항목" shape="ghost" /></StateExample>
+            <StateExample label="Unchecked"><CheckboxField checked={false} onCheckedChange={() => undefined} label={c.label} shape="ghost" /></StateExample>
+            <StateExample label="Checked"><CheckboxField checked onCheckedChange={() => undefined} label={c.label} shape="ghost" /></StateExample>
+            <StateExample label="Focus visible"><CheckboxField checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} shape="ghost" /></StateExample>
           </StateGroup>
 
           <StateGroup title="Checkbox Container" description="별도의 Checkbox 동작을 만들지 않고 기본 Square Checkbox와 CheckboxField를 선택 가능한 전체 영역으로 감싼 구성입니다. 내부 Checkbox의 상태를 그대로 사용합니다.">
-            <StateExample label="Unchecked"><CheckboxContainer label="선택 항목" /></StateExample>
-            <StateExample label="Checked"><CheckboxContainer checked label="선택 항목" /></StateExample>
-            <StateExample label="Focus visible"><CheckboxContainer checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label="선택 항목" /></StateExample>
-            <StateExample label="Disabled · Unchecked"><CheckboxContainer disabled label="선택 항목" /></StateExample>
-            <StateExample label="Disabled · Checked"><CheckboxContainer disabled checked label="선택 항목" /></StateExample>
+            <StateExample label="Unchecked"><CheckboxContainer checked={false} onCheckedChange={() => undefined} label={c.label} /></StateExample>
+            <StateExample label="Checked"><CheckboxContainer checked onCheckedChange={() => undefined} label={c.label} /></StateExample>
+            <StateExample label="Focus visible"><CheckboxContainer checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} /></StateExample>
+            <StateExample label="Disabled · Unchecked"><CheckboxContainer disabled label={c.label} /></StateExample>
+            <StateExample label="Disabled · Checked"><CheckboxContainer disabled checked label={c.label} /></StateExample>
           </StateGroup>
         </Section>
 
@@ -164,12 +202,7 @@ export function CheckboxWorkbench() {
         </Section>
       </div>
 
-      <OnThisPage items={sections} relatedItems={[
-        { href: "/components/input", title: "Input", description: "한 줄 텍스트 입력을 다룹니다." },
-        { href: "/components/textarea", title: "Textarea", description: "여러 줄 텍스트 입력을 다룹니다." },
-        { href: "/components/combobox", title: "Combobox", description: "다중 선택 Option에서 Checkbox를 사용합니다." },
-        { href: "/components/field", title: "Field", description: "Label과 도움말 결합을 다룹니다." },
-      ]} />
+      <OnThisPage items={sections} componentKey="checkbox" />
     </div>
   );
 }
@@ -179,11 +212,19 @@ function Section({ id, title, description, children }: { id: string; title: stri
 }
 
 function StateExample({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><div className="pointer-events-none mt-auto">{children}</div></div>;
+  return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
 }
 
 function AnatomyMarker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) {
   return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>;
+}
+
+function FieldContainerMarker() {
+  return <span className="absolute -left-16 top-2 grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse">1<span aria-hidden="true" className="absolute left-5 top-2.5 h-px w-8 bg-oe-border-primary" /><span aria-hidden="true" className="absolute -top-2 left-13 h-9 w-px bg-oe-border-primary" /></span>;
+}
+
+function ContentContainerMarker() {
+  return <span className="absolute -right-16 top-2 grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse">5<span aria-hidden="true" className="absolute right-5 top-2.5 h-px w-8 bg-oe-border-primary" /><span aria-hidden="true" className="absolute -top-2 right-13 h-12 w-px bg-oe-border-primary" /></span>;
 }
 
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) {

@@ -23,6 +23,8 @@
   --color-oe-background-primary: var(--oe-background-primary);
   --color-oe-background-secondary: var(--oe-background-secondary);
   --color-oe-background-bold-primary: var(--oe-background-bold-primary);
+  --color-oe-background-control-off: var(--oe-background-control-off);
+  --color-oe-background-control-disabled: var(--oe-background-control-disabled);
   --color-oe-background-disabled: var(--oe-background-disabled);
   --color-oe-background-disabled-selected: var(--oe-background-disabled-selected);
   --color-oe-accent-background-bold-primary: var(--oe-accent-background-bold-primary);

@@ -2,6 +2,8 @@
 
 상태: `Candidate`
 
+현재 Studio 상세 화면의 구성과 검수 범위는 사용자 확인을 완료했다. 다른 화면에서 재사용해 API를 검증하기 전까지 성숙도는 Candidate를 유지한다.
+
 한 줄 텍스트 입력을 위한 공용 컴포넌트다. 구현 기반은 shadcn Input과 Base UI이며, 구조와 문서 정보 흐름은 Seed Design의 Text Input을 함께 참고했다. KT Text Field는 현재 기준에서 제외했다. ooee_bk V1은 기능 후보를 확인하는 참고자료이며 공식 규칙의 출처가 아니다.
 
 실제 구현 원본은 `packages/ui/src/input.tsx`, 검수 화면은 `/components/input`이다.
@@ -36,6 +38,7 @@
   - Fill: 부모가 제공하는 너비를 채우며 Field 결합의 기본 동작
   - Fixed: `fixedWidth`에 명시한 너비를 유지하되 부모보다 넓어지지 않음
   - Hug는 입력값 변화에 따라 외곽 너비가 달라질 수 있어 Input Container의 공식 Layout에서 제외
+- Text alignment: `left | right`, 기본값 `left`. 입력값과 Placeholder에만 적용
 - State: native 속성과 focus에서 확인되는 Empty / Placeholder, Default with value, Focus, Invalid, Disabled, Read only
 - Optional elements: `leadingElement`, `prefix`, `clearable`, `suffix`, `trailingElement`
 
@@ -43,7 +46,11 @@ Focus는 테두리와 바깥 ring에 동일한 `oe-focus-ring` 색을 사용한�
 
 Invalid/Error도 같은 1px border + 외부 1px ring 구조를 사용하며 두 영역 모두 `oe-danger-border-primary`를 적용한다. Focus와 외곽 두께 및 레이아웃 동작은 같고 의미 색상만 구분한다.
 
+Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지해 입력 영역의 구조가 사라지지 않게 한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.
+
 Placeholder는 실제 입력값과 명확히 구분하기 위해 전용 `oe-foreground-placeholder` semantic token을 사용한다. 현재 매핑은 Light `neutral-400`, Dark `neutral-500`이며 실제 입력값은 `oe-foreground-primary`를 유지한다.
+
+Input에는 별도 `numeric` Boolean Property를 추가하지 않는다. 수량·비율처럼 계산 가능한 숫자값은 Number Input을 사용하고, 증감 버튼이 필요 없으면 Number Input의 Controls를 숨긴다. 전화번호·사업자번호·카드번호처럼 숫자로 보이는 식별자는 Input의 native `inputMode="numeric"`와 필요한 포맷·`tabular-nums`를 조합한다.
 
 ## 공통 Control Height
 
@@ -73,6 +80,8 @@ Properties · Elements의 Trailing element 예시는 `Password input → Clear b
 
 Custom input 섹션은 카드 제목의 첫 줄에 유형을, 둘째 줄에 실제 구조와 동작을 설명한다. 반복되는 `Custom input` 접두어는 사용하지 않는다.
 
+`Color input`은 `Custom input`과 같은 상세 페이지 섹션 위계로 분리한다. HEX 값을 직접 입력하는 Input과 현재 색상을 보여주는 Leading color swatch를 조합하며, swatch는 Input Button의 선택 전용 Color picker 예시와 같은 16px 사각형 및 안쪽 Black alpha 10% 경계를 사용한다. Color Picker 팝업이 아직 완성되지 않았으므로 현재 예시의 swatch에는 클릭이나 팝업 상호작용을 연결하지 않는다. 추후 실제 Color Picker가 구현되면 직접 입력값과 팝업 선택값을 동기화하는 조합으로 검수한다.
+
 `Formatted number`는 전화번호, 사업자등록번호처럼 정해진 숫자 형식이 필요한 경우 포맷과 동작을 직접 정의하는 사례다. 현재 화면은 하나의 `tel` Input에서 숫자만 받아 `010-1234-5678` 형식으로 자동 포맷한다. `inputMode="numeric"`, `autoComplete="tel"`과 Clear button을 조합하며 Leading icon은 사용하지 않고 전화번호를 여러 필드로 분리하지 않는다. 사업자등록번호는 적용 가능한 용례이며 현재 화면에 별도 포맷 예시는 구현하지 않았다.
 
 `Amount`는 하나의 Input에서 숫자만 받아 천 단위 구분 쉼표를 자동 적용한다. 금액 입력값은 오른쪽 정렬한다. 입력값과 통화 단위는 분리하며 `원`은 Suffix로 표시한다. 영문 검수에서는 같은 위치에 `KRW`를 표시한다. 포커스 전에는 숨겨진 Clear button의 너비를 `0`으로 접어 금액과 Suffix 사이에 불필요한 공백을 남기지 않는다. 포커스되면 버튼 영역이 `24px`까지 애니메이션되며 펼쳐져 금액 텍스트가 자연스럽게 밀리고, 포커스가 빠지면 다시 접힌다.
@@ -81,9 +90,9 @@ Custom input 섹션은 카드 제목의 첫 줄에 유형을, 둘째 줄에 실�
 
 `Split input · Multiple containers`는 인증코드처럼 한 자리씩 입력하는 독립 Input Container 여섯 개로 하나의 값을 구성한다. 각 Container는 카드 너비를 채우지 않고 한 글자 입력에 필요한 폭만 유지하며, 여섯 칸 묶음은 카드 중앙에 정렬한다. 각 Input은 숫자 1자리만 받고, 입력하면 다음 Input으로 이동하며 빈 Input에서 Backspace를 누르면 이전 Input으로 돌아간다. 여러 자리 인증코드를 붙여넣으면 현재 위치부터 각 Input에 분배한다.
 
-`PartialMaskedInput`은 전체 자릿수 중 일부만 실제로 입력받고 나머지는 고정 masking으로 표시하는 공용 UI 컴포넌트다. `inputLength`와 `totalLength`로 실제 입력 자릿수와 전체 표시 자릿수를 구분하며, 실제 입력 영역과 고정 닷의 간격·자간·숫자 제한을 한 구현에서 소유한다. 실제 입력된 닷은 Primary foreground를 유지하고 아직 입력하지 않은 위치를 안내하는 고정 닷은 한 단계 옅은 Secondary foreground를 사용한다. 현재 검수 예시는 총 4자리 중 앞 2자리만 실제 `password` input으로 받고, 뒤의 2개 닷은 입력 필드가 아닌 고정 masking 표시로 구성한다. 카드 비밀번호와 주민등록번호처럼 일부 자리만 입력받아야 하는 흐름에서 같은 동작 규칙을 재사용할 수 있다.
+`PartialMaskedInput`은 전체 자릿수 중 일부만 실제로 입력받고 나머지는 고정 masking으로 표시하는 공용 UI 컴포넌트다. `inputLength`와 `totalLength`로 실제 입력 자릿수와 전체 표시 자릿수를 구분하며, 실제 입력 영역과 고정 닷의 간격·자간·숫자 제한을 한 구현에서 소유한다. 실제 입력 영역과 고정 마스킹 사이는 2px로 분리하고 각 영역 내부의 자간은 유지한다. `maskInput`으로 실제 입력 부분을 숫자로 표시할지 닷으로 가릴지 선택하며 기본값은 `true`다. 입력된 자릿수만 숫자 또는 입력 마스킹으로 치환하고 나머지 자리는 닷으로 유지한다. 아직 입력할 수 있는 미입력 자리는 Placeholder와 같은 `oe-foreground-placeholder`로 더 옅게 표시하며, 사용자가 입력할 수 없는 고정 마스킹 자리는 `oe-foreground-secondary`로 구분한다. 현재 일반 검수 예시는 `maskInput={false}`로 총 4자리 중 앞 2자리를 입력받으며, 한 자리만 입력한 경우에도 옅은 입력 가능 닷 1개와 고정 닷 2개를 유지한다. 두 자리를 모두 입력하면 숫자 2자리와 뒤의 고정 닷 2개를 표시한다. 주민등록번호 예시도 같은 표시 방식으로 뒷자리의 실제 입력 1자리는 숫자로 보이고, 이후 6자리만 고정 masking으로 표시한다.
 
-`Resident registration number`는 같은 `PartialMaskedInput`을 해당 형식에 적용한 별도 사례다. Input Container 두 개와 그 사이의 외부 separator `-`로 구성한다. 첫 Input은 생년월일 숫자 6자리이며 완료하면 두 번째 Input으로 이동한다. 두 번째 영역은 `inputLength={1}`, `totalLength={7}`을 사용해 실제 1자리와 고정 masking 6자리를 표시한다. 실제 개인정보 값은 예시에 저장하지 않는다.
+`Resident registration number`는 같은 `PartialMaskedInput`을 해당 형식에 적용한 별도 사례다. Input Container 두 개와 그 사이의 외부 separator `-`로 구성한다. 첫 Input은 생년월일 숫자 6자리이며 완료하면 두 번째 Input으로 이동한다. 두 번째 영역은 `inputLength={1}`, `totalLength={7}`, `maskInput={false}`를 사용해 실제 숫자 1자리와 고정 masking 6자리를 표시한다. Custom input의 기본 검수 상태는 개인정보처럼 보이는 가상 값도 미리 채우지 않은 빈 값이다.
 
 Playground Property editor의 공통 분류는 Appearance → Size → Layout → Content → Elements/Slots → Behavior → State다. 현재 Input에서 Clear button의 표시 여부는 Elements 안에서 실제 내부 배치 순서에 맞춰 제어하며 별도 Behavior 속성은 노출하지 않는다. State는 Default, Focus, Invalid, Disabled, Read only 중 하나를 Preview에 적용하며 아래의 정적 State 비교에는 영향을 주지 않는다. Empty/Placeholder와 With value는 State API가 아니라 Content 값의 유무로 확인한다.
 

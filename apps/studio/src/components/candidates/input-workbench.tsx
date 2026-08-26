@@ -4,8 +4,9 @@ import { useState, type ReactNode } from "react";
 import { RiCalendarLine, RiEyeLine, RiEyeOffLine, RiGlobalLine, RiLink, RiLockPasswordLine, RiSearchLine, RiUserLine } from "@remixicon/react";
 
 import { Input } from "@ooee/ui";
-import { InputCustomExamples } from "@/components/candidates/input-custom-examples";
+import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
 type PlaygroundIcon = "placeholder" | "search" | "password" | "user" | "global" | "calendar";
@@ -22,6 +23,7 @@ const copy = {
     showPassword: "비밀번호 보기",
     hidePassword: "비밀번호 숨기기",
     customInputDescription: "특수한 포맷이나 마스킹 등의 기능이 필요한 경우, 포맷과 동작을 직접 정의해서 사용할 수 있습니다.",
+    colorInputDescription: "색상값을 직접 입력하는 Input 조합입니다. 현재 Color Picker가 완성되지 않아 팝업 상호작용은 연결하지 않습니다.",
   },
   en: {
     description: "A single-line text entry component. Labels, help text, and error messages belong to a separate Field.",
@@ -33,6 +35,7 @@ const copy = {
     showPassword: "Show password",
     hidePassword: "Hide password",
     customInputDescription: "When a special format or masking behavior is required, define the format and interaction directly.",
+    colorInputDescription: "An Input composition for direct color-value entry. Popup interaction is not connected until the Color Picker is complete.",
   },
 } as const;
 
@@ -41,9 +44,11 @@ const inputSections = [
   { id: "anatomy", label: "Anatomy" },
   { id: "style", label: "Style" },
   { id: "size", label: "Size" },
+  { id: "alignment", label: "Text alignment" },
   { id: "state", label: "State" },
   { id: "elements", label: "Elements" },
   { id: "custom-input", label: "Custom input" },
+  { id: "color-input", label: "Color input" },
   { id: "property-map", label: "Property map" },
 ];
 
@@ -54,6 +59,7 @@ export function InputWorkbench() {
   const [playgroundVariant, setPlaygroundVariant] = useState<"outline" | "filled">("outline");
   const [playgroundSize, setPlaygroundSize] = useState<"small" | "regular" | "large" | "xlarge">("regular");
   const [playgroundLayout, setPlaygroundLayout] = useState<"fill" | "fixed">("fill");
+  const [playgroundTextAlign, setPlaygroundTextAlign] = useState<"left" | "right">("left");
   const [playgroundWidth, setPlaygroundWidth] = useState(240);
   const [playgroundPlaceholder, setPlaygroundPlaceholder] = useState<string>(c.placeholder);
   const [playgroundState, setPlaygroundState] = useState<PlaygroundState>("default");
@@ -87,6 +93,7 @@ export function InputWorkbench() {
               variant={playgroundVariant}
               controlSize={playgroundSize}
               {...(playgroundLayout === "fixed" ? { layout: "fixed" as const, fixedWidth: playgroundWidth } : { layout: "fill" as const })}
+              textAlign={playgroundTextAlign}
               value={playgroundValue}
               onChange={(event) => setPlaygroundValue(event.target.value)}
               placeholder={playgroundPlaceholder}
@@ -107,7 +114,7 @@ export function InputWorkbench() {
             <div className="space-y-4">
               <ControlSection title="Appearance"><ControlGroup label="Style">{(["outline", "filled"] as const).map((value) => <ControlButton key={value} active={playgroundVariant === value} onClick={() => setPlaygroundVariant(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
               <ControlSection title="Size"><ControlGroup label="Control size">{(["small", "regular", "large", "xlarge"] as const).map((value) => <ControlButton key={value} active={playgroundSize === value} onClick={() => setPlaygroundSize(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
-              <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((value) => <ControlButton key={value} active={playgroundLayout === value} onClick={() => setPlaygroundLayout(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup>{playgroundLayout === "fixed" ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">Width · px</span><input type="number" min={120} max={640} step={8} value={playgroundWidth} onChange={(event) => setPlaygroundWidth(Number(event.target.value))} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label> : null}</ControlSection>
+              <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((value) => <ControlButton key={value} active={playgroundLayout === value} onClick={() => setPlaygroundLayout(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup>{playgroundLayout === "fixed" ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">Width · px</span><input type="number" min={120} max={640} step={8} value={playgroundWidth} onChange={(event) => setPlaygroundWidth(Number(event.target.value))} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label> : null}<ControlGroup label="Text alignment">{(["left", "right"] as const).map((value) => <ControlButton key={value} active={playgroundTextAlign === value} onClick={() => setPlaygroundTextAlign(value)}>{capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
               <ControlSection title="State"><ControlGroup label="Preview state">{(["default", "focus", "invalid", "disabled", "readOnly"] as const).map((value) => <ControlButton key={value} active={playgroundState === value} onClick={() => setPlaygroundState(value)}>{value === "readOnly" ? "Read only" : capitalize(value)}</ControlButton>)}</ControlGroup></ControlSection>
             </div>
             <div className="space-y-4">
@@ -127,7 +134,7 @@ export function InputWorkbench() {
       </Section>
 
       <Section id="anatomy" title="Anatomy" description="Input을 구성하는 실제 요소와 문서에서 사용하는 명칭입니다.">
-        <InputAnatomy placeholder={c.website} />
+        <InputAnatomy />
       </Section>
 
       <Section id="style" title="Properties · Style" description="Outline은 테두리로, Filled는 중립 회색조 배경으로 입력 영역을 구분합니다.">
@@ -142,11 +149,16 @@ export function InputWorkbench() {
         <PropertyGroup label="XLarge · 48px"><Input controlSize="xlarge" placeholder={c.placeholder} /></PropertyGroup>
       </Section>
 
-      <Section id="state" title="Properties · State" description="상태의 시각값이 바뀌지 않도록 모든 예시의 마우스와 키보드 상호작용을 차단했습니다.">
-        <PropertyGroup label="Empty / Placeholder" fixed><Input readOnly tabIndex={-1} placeholder={c.placeholder} /></PropertyGroup>
-        <PropertyGroup label="Default · With value" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "입력된 값" : "Entered value"} /></PropertyGroup>
-        <PropertyGroup label="Focus" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "포커스 상태" : "Focused"} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></PropertyGroup>
-        <PropertyGroup label="Invalid" fixed><Input readOnly tabIndex={-1} aria-invalid="true" defaultValue={locale === "ko" ? "올바르지 않은 값" : "Invalid value"} /></PropertyGroup>
+      <Section id="alignment" title="Properties · Text alignment" description="입력값과 Placeholder를 왼쪽 또는 오른쪽에 정렬합니다. 기본값은 Left입니다.">
+        <PropertyGroup label="Left · Default"><Input defaultValue={locale === "ko" ? "입력값" : "Input value"} textAlign="left" readOnly /></PropertyGroup>
+        <PropertyGroup label="Right"><Input defaultValue="1,000" textAlign="right" readOnly /></PropertyGroup>
+      </Section>
+
+      <Section id="state" title="Properties · State" description="비교할 상태값은 유지하고 Hover, Focus와 키보드 피드백은 실제로 확인할 수 있습니다.">
+        <PropertyGroup label="Empty / Placeholder"><Input value="" onChange={() => undefined} placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Default · With value"><Input value={locale === "ko" ? "입력된 값" : "Entered value"} onChange={() => undefined} /></PropertyGroup>
+        <PropertyGroup label="Focus"><Input value={locale === "ko" ? "포커스 상태" : "Focused"} onChange={() => undefined} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></PropertyGroup>
+        <PropertyGroup label="Invalid"><Input aria-invalid="true" value={locale === "ko" ? "올바르지 않은 값" : "Invalid value"} onChange={() => undefined} /></PropertyGroup>
         <PropertyGroup label="Disabled" fixed><Input disabled tabIndex={-1} defaultValue={locale === "ko" ? "비활성화" : "Disabled"} /></PropertyGroup>
         <PropertyGroup label="Read only" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "읽기 전용" : "Read only"} /></PropertyGroup>
       </Section>
@@ -179,6 +191,10 @@ export function InputWorkbench() {
         <InputCustomExamples />
       </Section>
 
+      <Section id="color-input" title="Color input" description={c.colorInputDescription}>
+        <InputColorExample />
+      </Section>
+
       <Section id="property-map" title="Property map" description="상위 Property와 현재 허용하는 하위 값을 한 번에 확인합니다.">
         <div className="col-span-full overflow-x-auto">
           <table className="w-full min-w-[42rem] text-left text-xs">
@@ -188,6 +204,7 @@ export function InputWorkbench() {
               <MapRow property="controlSize" values="small | regular | large | xlarge" defaultValue="regular" />
               <MapRow property="layout" values="fill | fixed" defaultValue="fill" />
               <MapRow property="fixedWidth" values="CSS width" defaultValue="required when fixed" note="Fixed only" />
+              <MapRow property="textAlign" values="left | right" defaultValue="left" />
               <MapRow property="state" values="empty / placeholder | default with value | focus | invalid | disabled | readOnly" defaultValue="empty / placeholder" note="Native attributes and focus" />
               <MapRow property="elements" values="leadingElement | prefix | clearable | suffix | trailingElement" defaultValue="none" note="Optional" />
             </tbody>
@@ -196,12 +213,12 @@ export function InputWorkbench() {
       </Section>
 
       </div>
-      <OnThisPage items={inputSections} relatedItems={[{ href: "/components/textarea", title: "Textarea", description: "여러 줄 텍스트 입력과 높이 동작을 다룹니다." }, { href: "/components/checkbox", title: "Checkbox", description: "항목의 선택과 부분 선택 상태를 다룹니다." }, { href: "/components/combobox", title: "Combobox", description: "검색 가능한 선택 목록과 다중 선택을 다룹니다." }, { href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }]} />
+      <OnThisPage items={inputSections} componentKey="input" />
     </div>
   );
 }
 
-function InputAnatomy({ placeholder }: { placeholder: string }) {
+function InputAnatomy() {
   const parts = [
     [1, "Container", false],
     [2, "Leading element", true],
@@ -213,8 +230,9 @@ function InputAnatomy({ placeholder }: { placeholder: string }) {
   ] as const;
 
   return (
-    <div className="col-span-full min-w-0">
-      <div role="img" aria-label="Input anatomy" className="overflow-x-auto rounded-xl bg-oe-background-secondary px-5 py-7">
+    <div className="col-span-full min-w-0 rounded-xl bg-oe-background-secondary p-5">
+      <p className="text-xs font-semibold text-oe-foreground-primary">Input structure</p>
+      <div role="img" aria-label="Input anatomy" className="overflow-x-auto">
         <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
           <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 768 352" fill="none" aria-hidden="true">
             {/* Container is shown as a bracket around the whole control, not a single-point callout. */}
@@ -244,14 +262,14 @@ function InputAnatomy({ placeholder }: { placeholder: string }) {
           <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
             <RiSearchLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
             <span className="text-oe-foreground-secondary">https://</span>
-            <span className="min-w-0 truncate text-oe-foreground-placeholder">{placeholder}</span>
+            <span className="min-w-0 truncate text-oe-foreground-placeholder">Input field</span>
             <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary" aria-hidden="true">×</span>
             <span className="text-oe-foreground-secondary">.com</span>
             <RiCalendarLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
           </div>
         </div>
       </div>
-      <ol className="mt-4 flex flex-wrap justify-start gap-x-5 gap-y-2 px-1 text-left text-xs text-oe-foreground-primary">
+      <ol className="flex flex-wrap justify-start gap-x-5 gap-y-2 text-left text-xs text-oe-foreground-primary">
         {parts.map(([number, label, optional]) => (
           <li key={label} className="flex items-baseline gap-1.5 whitespace-nowrap">
             <span className="font-semibold">{number}.</span>
@@ -277,8 +295,8 @@ function Section({ id, title, description, children }: { id?: string; title: str
   return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
 }
 
-function PropertyGroup({ label, description, children, fixed = false }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
-  return <div className={`flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4 ${fixed ? "pointer-events-none select-none" : ""}`}><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><div className="mt-auto">{children}</div></div>;
+function PropertyGroup({ label, description, children }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
+  return <div className="flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
 }
 
 function ControlGroup({ label, children }: { label: string; children: ReactNode }) {

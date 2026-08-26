@@ -6,15 +6,24 @@ Checkbox는 항목의 선택 여부를 표시하고 제어한다. Combobox의 �
 
 ## Anatomy
 
+### Basic anatomy
+
 1. Field container: Control과 Content를 포함하는 전체 클릭 영역
-2. Control: 선택 상태, Border와 Focus를 표시하는 16px Checkbox 본체
-3. Indicator: Square의 Checked 상태에서는 Remix Check icon, Indeterminate에서는 Remix Minus icon을 표시한다. Ghost는 Check icon을 항상 표시하고 색상으로 선택 여부를 구분한다.
-4. Leading element: Content 앞에 교체 가능한 선택적 Slot
-5. Content: Label과 선택적 Description을 묶는 영역
-6. Label: 선택 항목의 필수 텍스트
-7. Right description: Label 우측의 선택적 설명
+2. Control container: 선택 상태, Border와 Focus를 표시하는 16px Checkbox 본체
+3. Selection indicator: Square의 Checked 상태에서는 Remix Check icon, Indeterminate에서는 Remix Minus icon을 표시한다. Ghost는 Check icon을 항상 표시하고 색상으로 선택 여부를 구분한다.
+4. Label: 선택 항목의 필수 텍스트
+
+### Extended anatomy
+
+Basic 구조는 반복해 번호를 표시하지 않는다. 단일 Label과 범위가 겹쳐 보이는 Content container는 여러 텍스트 요소가 표시되는 Extended 예시에서 그룹 영역으로 설명한다.
+
+5. Content container: Label과 선택적 Description, Leading/Trailing element를 묶는 영역
+6. Leading element: Content 앞에 교체 가능한 선택적 Slot
+7. Right Description: Label 우측의 선택적 설명
 8. Trailing element: Content 뒤에 교체 가능한 선택적 Slot
-9. Bottom description: Label 아래의 선택적 설명
+9. Bottom Description: Label 아래의 선택적 설명
+
+Studio는 시각 Anatomy 아래의 `Structure map`에서 위 포함 관계를 트리 형태로 시험 표시한다. 현재 Checkbox에서만 검수 중이며 다른 컴포넌트의 공통 형식으로 아직 확정하지 않았다. 요소명은 같은 Neutral foreground를 사용하고 연결선과 Optional 표시는 더 옅은 Neutral 위계로 구분한다.
 
 원자적인 `Checkbox`는 Control만 제공한다. `CheckboxField`는 Label, 선택적 Description과 Leading/Trailing element를 결합한다.
 
@@ -38,6 +47,8 @@ Checkbox는 항목의 선택 여부를 표시하고 제어한다. Combobox의 �
 - `trailingElement`: `ReactNode`, 텍스트 Content 뒤에 표시하는 선택적 Slot
 - `layout`: `inline | block`, 기본값 `inline`. `inline`은 콘텐츠 너비, `block`은 부모 너비 전체를 사용
 - `flipped`: `boolean`, 기본값 `false`. `false`는 Indicator를 왼쪽에, `true`는 오른쪽에 배치
+
+Studio Playground의 초기 상태는 Square · Unchecked · Label only의 Basic 구조다. `rightDescription`, `bottomDescription`, `leadingElement`, `trailingElement`는 모두 표시하지 않는 상태에서 시작한다. Playground와 Anatomy의 콘텐츠는 제품 사례 대신 `Label`, `Right Description`, `Bottom Description` 같은 구조 명칭을 사용한다.
 
 Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE Candidate로 대응한다. Control은 16px다. Square Indicator는 10px, 박스 없이 Indicator 자체로 구분하는 Ghost는 15px다. Ghost는 Default · Unchecked에서도 체크 아이콘을 `oe-foreground-placeholder`로 표시하고, Checked에서 Brand foreground로 강조한다. CheckboxField 행은 OOEE Regular form control과 같은 최소 36px다. Control은 Label의 20px 첫 줄 안에서 수직 중앙에 오도록 2px 보정한다. 기본 Label은 Regular이며 하위 항목을 대표하는 부모 항목만 Semibold다. Shape은 Square와 Ghost를 제공한다. Indeterminate와 Disabled 상태는 Square에만 제공하고 Ghost에는 제공하지 않는다.
 
@@ -76,7 +87,9 @@ CheckboxContainer는 별도의 선택 control이나 상태 로직을 만들지 �
 
 ## Behavior
 
-Base UI Checkbox를 구현 기반으로 사용한다. Controlled와 uncontrolled 값을 지원하며 hidden input으로 native form 제출에 참여한다. `disabled`가 변경되어도 기존 `checked` 또는 `indeterminate` 값은 보존한다. `indeterminate`는 Square에서 전체 선택 여부가 혼합된 상태를 표시하며 Ghost에서는 적용하지 않는다.
+Base UI Checkbox를 구현 기반으로 사용한다. Controlled와 uncontrolled 값을 지원하며 hidden input으로 native form 제출에 참여한다. CheckboxField의 보이는 Label은 `aria-labelledby`로 Control의 접근 가능한 이름에 연결한다. `disabled`가 변경되어도 기존 `checked` 또는 `indeterminate` 값은 보존한다. `indeterminate`는 Square에서 전체 선택 여부가 혼합된 상태를 표시하며 Ghost에서는 적용하지 않는다.
+
+Studio의 Properties · State 예시는 Checked/Indeterminate 값을 controlled 상태로 고정하지만 Pointer, Focus visible과 키보드 피드백은 차단하지 않는다. Disabled 예시만 실제 조작 불가 상태를 유지한다.
 
 ## Specification
 

@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 
 import { Textarea } from "@ooee/ui";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
 const copy = {
@@ -71,7 +72,7 @@ export function TextareaWorkbench() {
         </Section>
 
         <Section id="anatomy" title="Anatomy" description="Textarea를 구성하는 실제 요소와 문서에서 사용하는 명칭입니다.">
-          <TextareaAnatomy value={c.value} />
+          <TextareaAnatomy />
         </Section>
 
         <Section id="style" title="Properties · Style" description="Input과 동일하게 Outline과 Filled를 지원합니다.">
@@ -87,10 +88,10 @@ export function TextareaWorkbench() {
         </Section>
 
         <Section id="state" title="Properties · State" description="Input과 같은 단색 Focus/Error 외곽선 구조를 사용합니다.">
-          <Example label="Empty / Placeholder" fixed><Textarea readOnly tabIndex={-1} placeholder={c.placeholder} /></Example>
-          <Example label="Default · With value" fixed><Textarea readOnly tabIndex={-1} defaultValue={c.value} /></Example>
-          <Example label="Focus" fixed><Textarea readOnly tabIndex={-1} defaultValue={c.value} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></Example>
-          <Example label="Invalid" fixed><Textarea readOnly tabIndex={-1} aria-invalid="true" defaultValue={c.invalid} /></Example>
+          <Example label="Empty / Placeholder"><Textarea value="" onChange={() => undefined} placeholder={c.placeholder} /></Example>
+          <Example label="Default · With value"><Textarea value={c.value} onChange={() => undefined} /></Example>
+          <Example label="Focus"><Textarea value={c.value} onChange={() => undefined} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></Example>
+          <Example label="Invalid"><Textarea value={c.invalid} onChange={() => undefined} aria-invalid="true" /></Example>
           <Example label="Disabled" fixed><Textarea disabled tabIndex={-1} defaultValue={c.disabled} /></Example>
           <Example label="Read only" fixed><Textarea readOnly tabIndex={-1} defaultValue={c.readOnly} /></Example>
         </Section>
@@ -116,16 +117,18 @@ export function TextareaWorkbench() {
           </div>
         </Section>
       </div>
-      <OnThisPage items={textareaSections} relatedItems={[{ href: "/components/input", title: "Input", description: "한 줄 텍스트 입력과 내부 선택 요소를 다룹니다." }, { href: "/components/checkbox", title: "Checkbox", description: "항목의 선택과 부분 선택 상태를 다룹니다." }, { href: "/components/combobox", title: "Combobox", description: "검색 가능한 선택 목록과 다중 선택을 다룹니다." }, { href: "/components/field", title: "Field", description: "Label과 도움말, 오류 문구의 결합을 다룹니다." }]} />
+      <OnThisPage items={textareaSections} componentKey="textarea" />
     </div>
   );
 }
 
-function TextareaAnatomy({ value }: { value: string }) {
+function TextareaAnatomy() {
   return (
     <div className="col-span-full min-w-0">
-      <div role="img" aria-label="Textarea anatomy" className="overflow-x-auto rounded-xl bg-oe-background-secondary px-5 py-7">
-        <div className="relative mx-auto h-[18rem] w-[40rem] text-oe-foreground-secondary">
+      <div className="rounded-xl bg-oe-background-secondary p-5">
+        <p className="text-xs font-semibold text-oe-foreground-primary">Textarea structure</p>
+        <div role="img" aria-label="Textarea anatomy" className="overflow-x-auto">
+          <div className="relative mx-auto h-[18rem] w-[40rem] text-oe-foreground-secondary">
           <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 640 288" fill="none" aria-hidden="true">
             <path d="M96 112V92H544V112" stroke="var(--oe-border-primary)" strokeWidth="1" />
             <path d="M320 48V92" stroke="var(--oe-border-primary)" strokeWidth="1" />
@@ -137,20 +140,19 @@ function TextareaAnatomy({ value }: { value: string }) {
           </svg>
 
           <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-primary whitespace-pre-line">
-            {value}
+            Textarea field
+          </div>
           </div>
         </div>
+        <ol className="flex flex-wrap gap-x-5 gap-y-2 text-left text-xs text-oe-foreground-primary">
+          <li className="flex items-baseline gap-1.5"><span className="font-semibold">1.</span><span>Container</span></li>
+          <li className="flex items-baseline gap-1.5"><span className="font-semibold">2.</span><span>Textarea field</span></li>
+        </ol>
       </div>
-      <ol className="mt-4 grid gap-3 text-left text-xs @min-[720px]:grid-cols-2">
-        <li className="rounded-xl bg-oe-background-secondary p-4">
-          <div className="flex items-baseline gap-1.5 text-oe-foreground-primary"><span className="font-semibold">1.</span><span className="font-medium">Container</span></div>
-          <p className="mt-1 leading-5 text-oe-foreground-tertiary">전체 입력 영역입니다. 최소 높이는 88px이며 약 3.5줄의 입력 공간을 확보합니다.</p>
-        </li>
-        <li className="rounded-xl bg-oe-background-secondary p-4">
-          <div className="flex items-baseline gap-1.5 text-oe-foreground-primary"><span className="font-semibold">2.</span><span className="font-medium">Textarea field</span></div>
-          <p className="mt-1 leading-5 text-oe-foreground-tertiary">실제 여러 줄 입력 영역입니다. Auto size가 true이면 내용에 따라 Container와 함께 높이가 증가합니다.</p>
-        </li>
-      </ol>
+      <div className="mt-4 space-y-2 text-sm leading-6 text-oe-foreground-secondary">
+        <p><span className="font-semibold text-oe-foreground-primary">Container:</span> 전체 입력 영역입니다. 최소 높이는 88px이며 약 3.5줄의 입력 공간을 확보합니다.</p>
+        <p><span className="font-semibold text-oe-foreground-primary">Textarea field:</span> 실제 여러 줄 입력 영역입니다. Auto size가 true이면 내용에 따라 Container와 함께 높이가 증가합니다.</p>
+      </div>
     </div>
   );
 }
@@ -168,8 +170,8 @@ function Section({ id, title, description, children }: { id: string; title: stri
   return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
 }
 
-function Example({ label, description, children, fixed = false }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
-  return <div className={`flex min-h-40 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4 ${fixed ? "pointer-events-none select-none" : ""}`}><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><div className="mt-auto">{children}</div></div>;
+function Example({ label, description, children }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
+  return <div className="flex min-h-40 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
 }
 
 function Control({ label, children }: { label: string; children: ReactNode }) {

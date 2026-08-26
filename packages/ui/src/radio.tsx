@@ -60,14 +60,16 @@ function RadioGroup<Value = string>({ className, ...props }: RadioGroupProps<Val
 }
 
 function RadioField({ label, rightDescription, bottomDescription, leadingElement, trailingElement, layout = "inline", flipped = false, radioClassName, className, disabled, ...props }: RadioFieldProps) {
+  const labelId = React.useId()
+
   return (
     <label className={cn("flex min-h-oe-control-regular items-start gap-2 py-2", layout === "block" ? "w-full" : "w-fit", flipped && "flex-row-reverse", disabled && "cursor-not-allowed", className)}>
-      <Radio className={cn("mt-0.5", radioClassName)} disabled={disabled} {...props} />
+      <Radio aria-labelledby={labelId} className={cn("mt-0.5", radioClassName)} disabled={disabled} {...props} />
       <span className={cn("flex min-w-0 flex-col", layout === "block" && "flex-1")}>
         <span className="flex min-w-0 items-start gap-2">
           {leadingElement ? <span data-slot="radio-leading" className="mt-0.5 shrink-0">{leadingElement}</span> : null}
           <span className={cn("flex h-5 min-w-0 items-baseline gap-2 overflow-hidden", layout === "block" && !trailingElement && "flex-1")}>
-            <span className={cn("shrink-0 text-sm leading-5 font-normal text-oe-foreground-primary", disabled && "text-oe-foreground-disabled")}>{label}</span>
+            <span id={labelId} className={cn("shrink-0 text-sm leading-5 font-normal text-oe-foreground-primary", disabled && "text-oe-foreground-disabled")}>{label}</span>
             {rightDescription ? <span className={cn("min-w-0 truncate whitespace-nowrap text-xs leading-5 text-oe-foreground-tertiary", disabled && "text-oe-foreground-disabled")}>{rightDescription}</span> : null}
           </span>
           {trailingElement ? <span data-slot="radio-trailing" className="flex h-5 shrink-0 items-center">{trailingElement}</span> : null}

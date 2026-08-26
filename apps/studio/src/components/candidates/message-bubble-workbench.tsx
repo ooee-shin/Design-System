@@ -20,6 +20,9 @@ import { Badge } from "@ooee/ui";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 import { cn } from "@/lib/utils";
 import { createCoreSemanticCssVariables } from "@ooee/tokens";
+import { OnThisPage } from "@/components/component-detail-navigation";
+
+const sections = [{ id: "integrated", label: "Integrated example" }, { id: "playground", label: "Playground" }, { id: "conversation-states", label: "Conversation states" }, { id: "delivery-states", label: "Delivery states" }, { id: "read-handling", label: "Read handling" }, { id: "themes", label: "Themes" }, { id: "file-attachment", label: "File attachment" }];
 
 type Locale = "ko" | "en" | "ja";
 type ChatTheme = "neutralLight" | "neutralDark" | "brandLight" | "brandDark";
@@ -240,10 +243,11 @@ export function MessageBubbleWorkbench() {
   };
 
   return (
-    <section className="rounded-2xl border bg-background shadow-sm">
+    <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
+    <section className="min-w-0 rounded-2xl border bg-background shadow-sm">
       <div className={cn("preview-canvas rounded-2xl bg-oe-background-canvas-secondary p-4 text-oe-foreground-primary sm:p-6", theme === "dark" && "dark")} lang={locale}>
         <div className="mb-6">
-          <WorkbenchSection title="통합 채팅 예시" description="확정한 요소가 실제 대화 흐름에서 함께 작동하는지 확인합니다. 날짜는 Studio 검수용으로 눌러 예시를 변경할 수 있습니다.">
+          <WorkbenchSection id="integrated" title="통합 채팅 예시" description="확정한 요소가 실제 대화 흐름에서 함께 작동하는지 확인합니다. 날짜는 Studio 검수용으로 눌러 예시를 변경할 수 있습니다.">
             <div className="mb-4">
               <Control label="발신자">
                 <Toggle active={senderContext === "direct"} onClick={() => setSenderContext("direct")}>1:1</Toggle>
@@ -297,7 +301,7 @@ export function MessageBubbleWorkbench() {
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="space-y-6">
-            <WorkbenchSection title="Playground" description="방향, avatar, 콘텐츠 길이를 바꿔 기본 레이아웃을 검수합니다.">
+            <WorkbenchSection id="playground" title="Playground" description="방향, avatar, 콘텐츠 길이를 바꿔 기본 레이아웃을 검수합니다.">
               <div className="mb-5 flex flex-wrap gap-2">
                 <Choice active={direction === "incoming"} onClick={() => setDirection("incoming")}>Incoming</Choice>
                 <Choice active={direction === "outgoing"} onClick={() => setDirection("outgoing")}>Outgoing</Choice>
@@ -316,7 +320,7 @@ export function MessageBubbleWorkbench() {
               </MessageBubble>
             </WorkbenchSection>
 
-            <WorkbenchSection title="Conversation states" description="Typing indicator는 MessageBubble과 분리된 thread 상태입니다.">
+            <WorkbenchSection id="conversation-states" title="Conversation states" description="Typing indicator는 MessageBubble과 분리된 thread 상태입니다.">
               <div className="oe-conversation-stack space-y-4">
                 <MessageBubble direction="incoming" author={activeCopy.incomingAuthor} initials="PK" time="09:12" actions={messageActions}>{activeCopy.incoming}</MessageBubble>
                 <MessageBubble direction="outgoing" author={activeCopy.outgoingAuthor} initials="SM" time="09:20" actions={messageActions}>{activeCopy.outgoing}</MessageBubble>
@@ -327,7 +331,7 @@ export function MessageBubbleWorkbench() {
             </WorkbenchSection>
           </div>
 
-          <WorkbenchSection title="Delivery states" description="발신 메시지의 전송 상태를 한 번에 비교합니다.">
+          <WorkbenchSection id="delivery-states" title="Delivery states" description="발신 메시지의 전송 상태를 한 번에 비교합니다.">
             <div className="space-y-4">
               {states.map((state) => (
                 <div key={state} className="space-y-1.5">
@@ -353,7 +357,7 @@ export function MessageBubbleWorkbench() {
           </WorkbenchSection>
 
           <div className="xl:col-span-2">
-            <WorkbenchSection title={activeCopy.readHandling.title} description={activeCopy.readHandling.description}>
+            <WorkbenchSection id="read-handling" title={activeCopy.readHandling.title} description={activeCopy.readHandling.description}>
               <div className="mb-5 flex gap-2">
                 <Choice active={readMode === "automatic"} onClick={() => setHandlingMode("automatic")}>{activeCopy.readHandling.automatic}</Choice>
                 <Choice active={readMode === "manual"} onClick={() => setHandlingMode("manual")}>{activeCopy.readHandling.manual}</Choice>
@@ -446,7 +450,7 @@ export function MessageBubbleWorkbench() {
           </div>
 
           <div className="xl:col-span-2">
-            <WorkbenchSection title="채팅 테마" description="상위 화면 모드와 독립적으로 중립 및 브랜드 채팅방의 라이트·다크 조합을 검수합니다.">
+            <WorkbenchSection id="themes" title="채팅 테마" description="상위 화면 모드와 독립적으로 중립 및 브랜드 채팅방의 라이트·다크 조합을 검수합니다.">
               <div className="flex items-center gap-4 overflow-x-auto rounded-t-xl border border-b-0 border-oe-border-secondary bg-oe-background-secondary p-2" aria-label="채팅방 테마 설정">
                 <Control label="색상">
                   <Toggle active={chatTheme.startsWith("neutral")} onClick={() => setChatTheme(chatTheme.endsWith("Dark") ? "neutralDark" : "neutralLight")}>중립</Toggle>
@@ -498,7 +502,7 @@ export function MessageBubbleWorkbench() {
           </div>
 
           <div className="xl:col-span-2">
-            <WorkbenchSection title="파일 첨부" description="파일은 말풍선에 포함하지 않고 독립된 첨부 요소로 표시합니다. 이미지 사례는 현재 검수 범위에서 제외합니다.">
+            <WorkbenchSection id="file-attachment" title="파일 첨부" description="파일은 말풍선에 포함하지 않고 독립된 첨부 요소로 표시합니다. 이미지 사례는 현재 검수 범위에서 제외합니다.">
               <div className="rounded-xl border border-oe-border-secondary bg-oe-background-canvas-secondary p-4 sm:p-5">
                 <div className="flex justify-end">
                   <div className="flex max-w-[72%] flex-col items-end">
@@ -512,11 +516,13 @@ export function MessageBubbleWorkbench() {
         </div>
       </div>
     </section>
+    <OnThisPage items={sections} componentKey="message-bubble" />
+    </div>
   );
 }
 
-function WorkbenchSection({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
-  return <section className="rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-4 sm:p-5"><div className="mb-5"><h2 className="text-sm font-semibold">{title}</h2><p className="mt-1 text-xs text-oe-foreground-secondary">{description}</p></div>{children}</section>;
+function WorkbenchSection({ id, title, description, children }: { id: string; title: string; description: string; children: React.ReactNode }) {
+  return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-4 sm:p-5"><div className="mb-5"><h2 className="text-sm font-semibold">{title}</h2><p className="mt-1 text-xs text-oe-foreground-secondary">{description}</p></div>{children}</section>;
 }
 
 function DateDivider({ locale }: { locale: Locale }) {
