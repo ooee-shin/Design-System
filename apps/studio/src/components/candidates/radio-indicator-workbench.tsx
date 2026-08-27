@@ -2,7 +2,7 @@
 
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { RiNotification3Line } from "@remixicon/react";
-import { Badge, Radio, RadioContainer, RadioField, RadioGroup } from "@ooee/ui";
+import { Badge, Radio, RadioField, RadioGroup } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyStructureMap } from "@/components/component-anatomy";
@@ -50,7 +50,7 @@ export function RadioIndicatorWorkbench() {
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <PreviewLocaleScope className="min-h-44 rounded-xl bg-oe-background-primary p-5">
               <RadioGroup value={selected ? "option" : "none"} onValueChange={(value) => setSelected(value === "option")}>
-                <RadioField value="option" disabled={disabled} readOnly={readOnly} label={c.label} rightDescription={showRightDescription ? c.right : undefined} bottomDescription={showBottomDescription ? c.bottom : undefined} layout={layout} flipped={flipped} />
+                <RadioField value="option" disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} layout={layout} flipped={flipped} />
               </RadioGroup>
             </PreviewLocaleScope>
             <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
@@ -116,23 +116,18 @@ export function RadioIndicatorWorkbench() {
           </div>
         </Section>
 
-        <Section id="elements" title="Properties · Elements" description="기본 Label, Container와 교체 가능한 요소를 비교합니다.">
+        <Section id="elements" title="Properties · Elements" description="기본 Label과 교체 가능한 요소를 비교합니다.">
           <StateExample label="Default · Unchecked"><StaticField value="default-unchecked" label={c.label} /></StateExample>
           <StateExample label="Default · Checked"><StaticField value="default-checked" selected label={c.label} /></StateExample>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Radio container</p>
-            <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">Radio와 Label 전체를 하나의 선택 가능한 bordered surface로 묶습니다.</p>
-            <RadioGroup defaultValue="container-checked" className="mt-4 grid max-w-md gap-2"><RadioContainer value="container-unchecked" label="Unchecked" /><RadioContainer value="container-checked" label="Checked" /><RadioContainer value="container-flipped" flipped label="Flipped · Control right" /></RadioGroup>
-          </div>
-          <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
-            <RadioGroup className="mt-4 max-w-md"><RadioContainer value="leading" label={<span className="font-medium">{c.leadingLabel}</span>} bottomDescription={c.leadingBottom} leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} /></RadioGroup>
+            <RadioGroup className="mt-4 max-w-md"><RadioField value="leading" layout="block" label={<span className="font-medium">{c.leadingLabel}</span>} bottomDescription={c.leadingBottom} leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} /></RadioGroup>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
-            <RadioGroup className="mt-4 max-w-md"><RadioContainer value="trailing" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} /></RadioGroup>
+            <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="block" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} /></RadioGroup>
           </div>
         </Section>
 
@@ -144,13 +139,6 @@ export function RadioIndicatorWorkbench() {
             <StateExample label="Disabled · Unchecked"><StaticField value="disabled-unchecked" disabled label={c.label} /></StateExample>
             <StateExample label="Disabled · Checked"><StaticField value="disabled-checked" selected disabled label={c.label} /></StateExample>
             <StateExample label="Read only · Checked"><StaticField value="readonly" selected readOnly label={c.label} /></StateExample>
-          </StateGroup>
-          <StateGroup title="Radio Container" description="기본 Radio와 RadioField를 전체 선택 영역으로 감싼 구성입니다. 내부 Radio 상태를 그대로 사용합니다.">
-            <StateExample label="Unchecked"><StaticContainer value="c-unchecked" label={c.label} /></StateExample>
-            <StateExample label="Checked"><StaticContainer value="c-checked" selected label={c.label} /></StateExample>
-            <StateExample label="Focus visible"><StaticContainer value="c-focus" radioClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} /></StateExample>
-            <StateExample label="Disabled · Unchecked"><StaticContainer value="c-disabled-unchecked" disabled label={c.label} /></StateExample>
-            <StateExample label="Disabled · Checked"><StaticContainer value="c-disabled-checked" selected disabled label={c.label} /></StateExample>
           </StateGroup>
         </Section>
 
@@ -242,9 +230,9 @@ export function RadioIndicatorWorkbench() {
           </div>
         </Section>
 
-        <Section id="property-map" title="Property map" description="현재 구현된 Base UI Radio 속성과 ooee Field·Container 범위입니다.">
+        <Section id="property-map" title="Property map" description="현재 구현된 Base UI Radio 속성과 ooee Field 범위입니다.">
           <div className="col-span-full overflow-x-auto"><table className="w-full min-w-[38rem] text-left text-xs"><thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2">Property</th><th>Values</th><th>Default</th></tr></thead><tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
-            <MapRow property="value" values="string" defaultValue="required" /><MapRow property="disabled" values="false | true" defaultValue="false" /><MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="required" values="false | true" defaultValue="false" /><MapRow property="label" values="ReactNode (Field / Container)" defaultValue="required" /><MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="layout" values="inline | block (Field only)" defaultValue="inline" /><MapRow property="flipped" values="false | true" defaultValue="false" />
+            <MapRow property="value" values="string" defaultValue="required" /><MapRow property="disabled" values="false | true" defaultValue="false" /><MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="required" values="false | true" defaultValue="false" /><MapRow property="label" values="ReactNode (Field)" defaultValue="required" /><MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="layout" values="inline | block (Field only)" defaultValue="inline" /><MapRow property="flipped" values="false | true" defaultValue="false" />
           </tbody></table></div>
         </Section>
       </div>
@@ -255,10 +243,7 @@ export function RadioIndicatorWorkbench() {
 }
 
 type FieldExampleProps = Omit<ComponentProps<typeof RadioField>, "value"> & { value: string; selected?: boolean };
-type ContainerExampleProps = Omit<ComponentProps<typeof RadioContainer>, "value"> & { value: string; selected?: boolean };
-
 function StaticField({ value, selected = false, ...props }: FieldExampleProps) { return <RadioGroup value={selected ? value : "none"} onValueChange={() => undefined}><RadioField value={value} {...props} /></RadioGroup>; }
-function StaticContainer({ value, selected = false, ...props }: ContainerExampleProps) { return <RadioGroup value={selected ? value : "none"} onValueChange={() => undefined}><RadioContainer value={value} {...props} /></RadioGroup>; }
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function StateExample({ label, children }: { label: string; children: ReactNode }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) { return <div className="col-span-full mt-5 first:mt-0"><h4 className="text-xs font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>; }

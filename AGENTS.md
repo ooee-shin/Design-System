@@ -127,6 +127,7 @@ Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property�
 - `Indicator`는 Control 안에서 현재 값이나 상태를 보여 주는 비상호작용 시각 요소다. Radio의 중앙 원, Checkbox의 Check/Indeterminate 표시가 이에 해당한다. 상위 컴포넌트가 입력 동작을 소유해 별도 시각 base를 재사용하는 경우에도 값 변경과 Focus를 소유하지 않으면 Indicator로 부른다.
 - `Field`는 Control과 Label을 기본으로 결합하고 Description, Leading/Trailing element 같은 Content를 선택적으로 포함하는 전체 조작 영역이다.
 - `Container`는 Field 전체를 border, background 또는 다른 Surface로 감싼 선택 영역이다. 단순 Wrapper나 Popup을 Container로 부르지 않고 실제 시각 Surface 또는 명확한 구조 범위를 가질 때 사용한다.
+- Radio와 Checkbox에는 카드형 `RadioContainer`·`CheckboxContainer` 변형을 두지 않는다. 짧은 Label을 밀도 있게 나열하는 폼은 `RadioField`·`CheckboxField`를 사용하고, 설명이나 이미지가 포함된 선택지를 넓은 Surface에서 비교하는 단일·다중 선택은 `SelectBox`가 소유한다.
 - `Content container`는 Label, Description과 Leading/Trailing element를 묶는 내부 영역이다. Label 하나만 가리킬 때 Content라고 부르지 않는다.
 - 별도 Wrapper가 실제로 존재하지 않으면 `Control container`처럼 역할명 뒤에 Container를 덧붙이지 않는다. Anatomy에서는 `Control` 또는 컴포넌트가 분명해야 할 때 `Radio control`, `Checkbox control`처럼 쓴다.
 - 코드 export, Component 문서, Anatomy 범례, Property 제목과 Studio 예시에서 위 용어를 동일하게 사용한다. 원자 예시 제목은 실제 역할에 따라 `Control only`, `Indicator only`처럼 작성하고 임의의 동의어를 섞지 않는다.
@@ -135,7 +136,7 @@ Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property�
 ### Playground 종속 컨트롤 표시
 
 - 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
-- Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Optional String/ReactNode content는 기본적으로 빈 값 또는 `None`을 미전달 상태로 사용한다. 시각 검수상 Slot의 표시 여부를 별도로 확인해야 하면 `Show description` 같은 임의 문장 대신 실제 Property 이름인 `Description` Toggle을 두고, 활성화했을 때 실제 콘텐츠 값을 입력하는 종속 Text control을 반드시 함께 제공한다. 표시 Toggle만 있고 값을 바꿀 수 없는 형태는 사용하지 않는다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Description`, `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
+- Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Label·Description처럼 UI를 설명하는 정적 텍스트 요소의 문구는 구조 검수용 Playground에서 편집하지 않고 `Label`, `Description` 같은 고정 문구를 사용한다. 해당 텍스트 요소가 Optional이면 `Show label` 같은 임의 문장 대신 실제 Property 이름인 `Label`, `Description` Boolean Toggle만 제공한다. 실제 문구를 입력하는 Text control은 콘텐츠 길이, 줄바꿈이나 언어별 문구 검수가 목적일 때만 제공한다. Input의 Value·Placeholder처럼 사용자가 실제로 입력하거나 제출하는 데이터는 이 정적 텍스트 규칙에서 제외하고 public Property 타입에 맞는 값 Control을 유지한다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
 - 종속 그룹은 영역의 border를 사용하지 않는다. 왼쪽에 폭 2px의 곧은 `oe-border-primary` 막대를 별도 요소로 두고 `border-radius: 9999px`로 선의 위아래 끝만 둥글게 처리하며, 콘텐츠는 16px 들여쓴다.
 - 단순한 시각 구분에는 이 표시를 사용하지 않는다. 상위값에 실제로 종속된 control에만 적용한다.
 

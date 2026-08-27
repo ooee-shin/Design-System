@@ -154,8 +154,9 @@
 - `/components/select-box`
   - 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 Candidate 초안. `SelectBoxGroup`과 `SelectBox`를 공용 package가 소유하고 Studio는 이를 import해 검수
   - Single은 공용 Radio Control, Multiple은 공용 Checkbox Control을 재사용하며 Select Box 전체 Container가 하나의 선택 영역
+  - 카드형 전체 선택 Surface는 Select Box만 소유함. Radio와 Checkbox의 `*Container` 변형은 공용 API·Studio·문서에서 제거했으며, 짧고 밀도 높은 폼 항목은 RadioField/CheckboxField, 설명·이미지와 함께 비교하는 선택지는 Select Box로 구분
   - `selectionMode=single | multiple`, `columns=number`, Leading element·Description·Trailing element, Disabled·Read only를 지원. Studio는 Single column과 Multi column을 구분하고 Multi에서 2~6 컬럼 수를 입력
-  - 초기 선택값은 비어 있고 Selection mode 변경 시 항목을 자동 선택하지 않음. Label은 Text control, Description은 표시 Toggle과 종속된 실제 Text value를 함께 제공
+  - 초기 선택값은 비어 있고 Selection mode 변경 시 항목을 자동 선택하지 않음. 필수 Label은 구조용 문구로 고정하고 Optional Description은 표시 Toggle만 제공. 실제 문구 작성은 Examples/Usage와 언어별 콘텐츠 검수에서 다룸
   - Trailing element는 Single에서 `radio | none`, Multiple에서 `checkbox | none`으로 제한
   - Group gap은 8px, 항목은 고정 높이 없이 Content를 Hug하며 좌우 16px·상하 12px 여백을 사용. Leading/Trailing은 항목 전체에 수직 중앙 정렬하고 Title–Description 간격은 2px
   - 선택 상태는 액션 Button과 구분하기 위해 진한 Fill을 쓰지 않고 `brand-alpha-05` 배경과 `brand-alpha-40` 2px 수준 경계를 사용. 이 조합은 Candidate이며 semantic token 승격 전 독립 용례를 더 확인
@@ -175,29 +176,27 @@
   - State Workbench는 Focus visible까지 포함하며 Error/Invalid는 Unchecked Danger border와 Checked Brand/Danger 우선순위 결정 전까지 미정
   - Checkbox Focus visible은 본체에서 2px 떨어진 2px `oe-focus-ring` 사용
   - 원자적인 Checkbox control과 Label·선택적 Description을 결합하는 CheckboxField를 분리
-  - `CheckboxContainer`는 기본 Rounded CheckboxField를 전체 너비의 Neutral bordered surface로 묶는 공용 선택 Container이며 별도 Appearance를 제공하지 않음. `oe-border-secondary`, 최소 높이 64px, radius 12px, 좌우 padding 16px 사용
   - CheckboxField는 독립적으로 표시할 수 있는 `rightDescription`과 `bottomDescription` optional slot을 제공하며 Layout은 개발 API 기준 `inline | block`을 지원
   - Label·Right Description 첫 행은 20px 고정 높이, Right Description은 단일 행 truncate로 처리. Bottom Description은 상단 행 아래에서 Leading element와 같은 왼쪽 시작점을 사용
   - Light/Dark `oe-foreground-tertiary`는 `neutral-500`을 사용
   - `inline | block`은 display를 바꾸지 않고 너비만 fit-content/100%로 변경해 전환 시 위치를 유지
   - CheckboxField는 Regular form 36px 최소 행 높이에 정렬
-  - CheckboxField와 RadioField의 전체 조작 영역 배경은 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover 중에만 `oe-interaction-hover-subtle`(Light black 3%, Dark white 5%)로 표시. 기본·선택·Disabled·Read only 비Hover 상태는 투명하고 Disabled와 Read only는 Hover·Pressed 반응을 제공하지 않음. CheckboxContainer와 RadioContainer는 배경 Hover를 상속하지 않고 현재 Surface를 유지하며 값 변경이 가능한 Hover에만 `shadow-xs`를 표시. Disabled와 Read only Container에는 그림자가 없고 선택 Surface의 Brand alpha 위계는 유지
-  - Checkbox와 Radio의 Field 및 Container에는 현재 크기·위치가 변하는 Pressed motion을 적용하지 않음. Control 상태색과 Field Hover만 유지하며 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 일괄 검수 예정
+  - CheckboxField와 RadioField의 전체 조작 영역 배경은 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover 중에만 `oe-interaction-hover-subtle`(Light black 3%, Dark white 5%)로 표시. 기본·선택·Disabled·Read only 비Hover 상태는 투명하고 Disabled와 Read only는 Hover·Pressed 반응을 제공하지 않음
+  - Checkbox와 Radio의 Field에는 현재 크기·위치가 변하는 Pressed motion을 적용하지 않음. Control 상태색과 Field Hover만 유지하며 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 일괄 검수 예정
   - Radio Group의 보이는 질문·제목은 Field 조작 영역의 외곽이 아니라 실제 Radio Indicator의 왼쪽 시작점에 정렬. 화면·Surface의 20px 바깥 여백과 제목 위치는 유지하고 기본 RadioField의 8px 조작 여백은 Field를 왼쪽으로 보정해 바깥 방향으로 확보. 콘텐츠 결합 예시는 Radio 행의 불필요한 내부 들여쓰기를 제거
   - Checkbox Group도 같은 시각 정렬 규칙을 사용. Layout 예시 Surface는 20px 내부 여백을 사용하고 질문·제목 위치는 유지하며 묶인 CheckboxField 배열만 왼쪽으로 8px 보정해 실제 Indicator 시작점을 맞춤. 단독 CheckboxField에는 Group 보정을 적용하지 않음
   - 별도 Size property 없이 Appearance `rounded | ghost`를 지원하며 기본값은 Rounded. Square/Rounded는 시스템 Radius Foundation에서 하나를 정하는 방향이므로 Checkbox 인스턴스 Property의 Square는 제거
   - Ghost Indicator는 15px이며 Default · Unchecked에서도 placeholder foreground로 표시하고 Checked에서 Brand foreground로 강조. Rounded Indicator icon은 10px. Indeterminate와 Disabled 상태는 Rounded에만 제공하고 Ghost에는 제공하지 않음
   - Appearance별 선택 표현을 분리해 Rounded는 fill과 border를 사용하고 Ghost는 Check icon의 foreground만 변경. 두 Appearance 모두 4px root radius를 유지해 Focus ring이 각지지 않음
   - `Properties · Appearance`는 Rounded·Ghost를 직접 하위 카드로 배치하고 각 카드 안에 Unchecked·Checked를 별도 Surface 없이 수직 배열. Appearance·Elements·State는 각각 독립된 바깥 Section 카드로 구성
-  - Playground의 `Show label=false`는 Field 전용 속성을 숨기고 접근 가능한 이름을 가진 원자 Checkbox만 표시해 Control 단독 사용을 검수
-  - Playground에서는 `Show label`에 실제로 종속되는 Field 속성만 영역 border가 아닌, 위아래 끝이 둥근 Studio 공통 2px 수직선 그룹으로 표시. Rounded에서만 지원되는 Indeterminate·Disabled는 Ghost 선택 시 조건부로 숨김
-  - CheckboxContainer Checked 상태는 `brand-alpha-05` 배경과 `brand-alpha-30` border로 옅게 활성화하고 Disabled · Checked에는 적용하지 않음. 두 alpha 사용은 현재 Candidate이며 semantic 승격 전 다른 독립 용례와 함께 검토
-  - Checkbox State 문서는 Rounded와 Ghost를 분리해 표시하며 Ghost에는 Indeterminate와 Disabled가 없음을 명시. CheckboxContainer는 별도 상태 로직이 아니라 기본 Rounded Checkbox와 CheckboxField를 전체 선택 영역으로 감싼 구성으로 설명하고 동일 상태를 검수
+  - Playground의 Optional `Label=false`는 Field 전용 속성을 숨기고 접근 가능한 이름을 가진 원자 Checkbox만 표시해 Control 단독 사용을 검수
+  - Playground에서는 `Label`에 실제로 종속되는 Field 속성만 영역 border가 아닌, 위아래 끝이 둥근 Studio 공통 2px 수직선 그룹으로 표시. Rounded에서만 지원되는 Indeterminate·Disabled는 Ghost 선택 시 조건부로 숨김
+  - Checkbox State 문서는 Rounded와 Ghost를 분리해 표시하며 Ghost에는 Indeterminate와 Disabled가 없음을 명시
   - Checkbox Guidelines는 Switch와 공용 `component-guidelines` 구조를 사용해 Target area, 제출 지연 선택, 부모–자식 선택, Disabled 표현, 나열과 Indicator 재사용 원칙을 설명. Indicator 재사용은 흰색 Surface 중앙의 원자 Indicator와 Red PDF icon을 포함한 범용 선택 Content 예시를 2-grid로 비교하며 각각 실제 전환 가능. Content card가 클릭·선택 동작을 소유하고 Indicator는 카드 우측 상단에서 상태만 표시. Active Container는 `brand-alpha-30` border와 `brand-alpha-05` background를 사용하고 선택 여부와 관계없이 hover 시 `shadow-xs`를 표시
   - Guidelines 시각 예시의 바깥 Neutral 회색 Surface에는 border를 두지 않고, 실제 UI를 감싸는 내부 `background-primary` Surface에만 옅은 Neutral border를 사용
   - Brand palette와 semantic CSS 변수는 `ooee-brand-theme-css`에 캐시하고 Root Layout의 선행 script에서 첫 paint 전에 복원. 저장된 Brand 색과 초기 fallback 색의 전환을 방지하며 `<html suppressHydrationWarning>`으로 의도적인 선행 style 주입의 hydration 경고를 억제
-  - State의 Rounded·Ghost·CheckboxContainer처럼 제목과 설명이 바깥에 노출되는 그룹 사이는 32px 수준으로 분리하고, Elements의 카드만 이어지는 구조는 기본 간격을 유지
-  - CheckboxField와 CheckboxContainer는 `flipped=false | true`를 지원하며 기본 왼쪽 Indicator를 `true`에서 오른쪽으로 배치. Content 내부 정렬과 상태 규칙은 유지
+  - State의 Rounded·Ghost처럼 제목과 설명이 바깥에 노출되는 그룹 사이는 32px 수준으로 분리하고, Elements의 카드만 이어지는 구조는 기본 간격을 유지
+  - CheckboxField는 `flipped=false | true`를 지원하며 기본 왼쪽 Indicator를 `true`에서 오른쪽으로 배치. Content 내부 정렬과 상태 규칙은 유지
   - CheckboxField Content 앞뒤에 optional `leadingElement`·`trailingElement` Slot을 제공. Anatomy에서는 교체 가능한 영역을 Studio 전용 핑크색 점선과 작은 radius로 표시하며 실제 제품 스타일에는 포함하지 않음
   - `CheckboxIndicator`는 Checkbox의 16px 비상호작용 시각 base로 분리해 공용 export. Checkbox는 이를 내부에서 사용하고, Combobox처럼 자체 선택 동작을 가진 상위 컴포넌트는 Checkbox 전체를 중첩하지 않고 Indicator만 재사용
   - Studio Anatomy 공통 규칙: `leadingElement`, `trailingElement`, `swap` 교체 영역은 공용 `AnatomySwapSlot`으로 표시. 기본 1px Pink 점선·4px radius·옅은 Pink 배경이며 실제 제품 스타일에는 포함하지 않음
@@ -206,17 +205,15 @@
   - Text와 Icon은 실제 Hit area가 더 크더라도 번호선을 글자 또는 아이콘의 시각 중심에 맞춤. 클릭·터치 Block 전체는 구조도에서 설명하고 시각 Anatomy에서는 Container·Group·List만 평행선으로 영역을 표시
   - Checkbox 열린 결정: Error/Invalid의 Brand·Danger 우선순위, Hover 전용 표현, Leading/Trailing Slot의 인터랙티브 요소 허용 여부는 아직 정의하지 않음
   - Checkbox Studio 상세 화면은 현재 범위 검수를 완료. Layout·Flipped·Description은 별도 Property 카드를 추가하지 않고 Playground·Anatomy·Property map에서 확인
-  - CheckboxContainer와 Combobox가 사용하는 Brand alpha CSS 변수는 현재 Studio `BrandThemeProvider`가 주입함. Studio 밖 소비처를 위해 변수 초기화 책임을 공용 package와 소비 앱 theme bootstrap 중 어디에 둘지 결정 필요
 - `/components/radio`
-  - 확정한 16px Control과 8px 흰 원형 Indicator를 기준으로 Checkbox와 같은 Field·Container·Content 구조를 적용한 Candidate
+  - 확정한 16px Control과 8px 흰 원형 Indicator를 기준으로 Checkbox와 같은 Field·Content 구조를 적용한 Candidate
   - Checked는 Brand로 채운 원형 Control 안에 흰색 Indicator를 두며 Unchecked, Checked, Focus visible, Disabled · Unchecked/Checked와 Read only 상태를 지원. Read only는 Enabled 기본 시각과 Focus를 유지하지만 Hover·Pressed와 사용자 조작에 의한 값 변경은 차단
-  - Label·Right/Bottom Description·Leading/Trailing·Inline/Block·Flipped·RadioContainer를 지원하며 Parent item, Indeterminate와 Ghost는 제공하지 않음
+  - Label·Right/Bottom Description·Leading/Trailing·Inline/Block·Flipped를 지원하며 Parent item, Indeterminate와 Ghost는 제공하지 않음
   - Studio 상세 화면은 Checkbox 검수 구조와 같은 Playground, Basic/Extended Anatomy와 Structure map, Elements, State, Layout, Guidelines, Property map 순서를 사용함. Preview의 제품 사례 문구도 KO/EN 전환에 포함
   - Radio Guidelines는 공용 `component-guidelines` 구조로 36/48px Target area, 서로 배타적인 단일 선택, 보이는 Group 질문, Disabled 값 보존과 세로 기본·16px 가로 줄바꿈 배치를 설명함
   - 배타적 선택의 잘못된 예시는 `사용할 알림 기능` 아래 동시에 켤 수 있는 로그인·결제 알림을 Radio로 제한한 형태로 표시해 질문과 오류 이유를 함께 드러냄
-  - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. RadioContainer 변형이 아니라 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 Container border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
-  - RadioContainer Checked 상태는 CheckboxContainer와 같은 `brand-alpha-05` 배경과 `brand-alpha-30` border를 사용하며 Disabled · Checked에는 적용하지 않음
-  - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class, Flipped 배치와 RadioContainer alpha 위계를 보호함
+  - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
+  - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class와 Flipped 배치를 보호함
 - `/experiments/breadcrumb-page-header`
   - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation Experiment
   - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수

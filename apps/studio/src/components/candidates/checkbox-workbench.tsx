@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { RiFilePdf2Fill, RiNotification3Line } from "@remixicon/react";
-import { Badge, Checkbox, CheckboxContainer, CheckboxField, CheckboxIndicator, SwitchField } from "@ooee/ui";
+import { Badge, Checkbox, CheckboxField, CheckboxIndicator, SwitchField } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyStructureMap } from "@/components/component-anatomy";
@@ -62,7 +62,7 @@ export function CheckboxWorkbench() {
               <Control label="Appearance"><Choice active={appearance === "rounded"} onClick={() => setAppearance("rounded")}>Rounded</Choice><Choice active={appearance === "ghost"} onClick={() => { setAppearance("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
               {appearance !== "ghost" ? <><Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /><Toggle label="Disabled" value={disabled} onChange={setDisabled} /></> : null}
               <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
-              <Toggle label="Show label" value={showLabel} onChange={setShowLabel} />
+              <Toggle label="Label" value={showLabel} onChange={setShowLabel} />
               {showLabel ? <DependentControlGroup><Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} /><Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} /><Toggle label="Parent item" value={isParent} onChange={setIsParent} /><Toggle label="Flipped" value={flipped} onChange={setFlipped} /><Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control></DependentControlGroup> : null}
             </div>
           </div>
@@ -126,7 +126,7 @@ export function CheckboxWorkbench() {
           </div>
         </Section>
 
-        <Section id="elements" title="Properties · Elements" description="Label 위계, Container와 교체 가능한 Leading·Trailing element를 확인합니다.">
+        <Section id="elements" title="Properties · Elements" description="Label 위계와 교체 가능한 Leading·Trailing element를 확인합니다.">
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Parent item</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">여러 하위 선택 항목을 대표하거나 전체 선택을 제어하는 부모 항목에만 Semibold Label을 사용합니다. 일반 항목의 Label은 Regular입니다.</p>
@@ -136,26 +136,17 @@ export function CheckboxWorkbench() {
             </div>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Checkbox container</p>
-            <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">Checkbox와 Label 전체를 하나의 선택 가능한 bordered surface로 묶습니다.</p>
-            <div className="mt-4 grid max-w-md gap-2">
-              <CheckboxContainer label="Unchecked" />
-              <CheckboxContainer defaultChecked label="Checked" />
-              <CheckboxContainer flipped label="Flipped · Control right" />
-            </div>
-          </div>
-          <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
-              <CheckboxContainer label={<span className="font-medium">이벤트 알림 받기</span>} bottomDescription="새로운 이벤트와 혜택 소식을 받을 수 있습니다." leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} />
+              <CheckboxField layout="block" label={<span className="font-medium">이벤트 알림 받기</span>} bottomDescription="새로운 이벤트와 혜택 소식을 받을 수 있습니다." leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} />
             </div>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-[11px] font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
-              <CheckboxContainer label={<span className="font-medium">자동 분배</span>} bottomDescription="설정한 규칙과 조건에 따라 담당자 또는 팀에게 자동 분배됩니다." trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} />
+              <CheckboxField layout="block" label={<span className="font-medium">자동 분배</span>} bottomDescription="설정한 규칙과 조건에 따라 담당자 또는 팀에게 자동 분배됩니다." trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} />
             </div>
           </div>
         </Section>
@@ -177,14 +168,6 @@ export function CheckboxWorkbench() {
             <StateExample label="Focus visible"><CheckboxField checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} appearance="ghost" /></StateExample>
           </StateGroup>
 
-          <StateGroup title="Checkbox Container" description="별도의 Checkbox 동작을 만들지 않고 기본 Rounded Checkbox와 CheckboxField를 선택 가능한 전체 영역으로 감싼 구성입니다. 내부 Checkbox의 상태를 그대로 사용합니다.">
-            <StateExample label="Unchecked"><CheckboxContainer checked={false} onCheckedChange={() => undefined} label={c.label} /></StateExample>
-            <StateExample label="Checked"><CheckboxContainer checked onCheckedChange={() => undefined} label={c.label} /></StateExample>
-            <StateExample label="Focus visible"><CheckboxContainer checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} /></StateExample>
-            <StateExample label="Disabled · Unchecked"><CheckboxContainer disabled label={c.label} /></StateExample>
-            <StateExample label="Disabled · Checked"><CheckboxContainer disabled checked label={c.label} /></StateExample>
-            <StateExample label="Read only · Checked"><CheckboxContainer readOnly checked label={c.label} /></StateExample>
-          </StateGroup>
         </Section>
 
         <Section id="layout" title="Layout" description="여러 Checkbox를 함께 사용할 때의 가로 줄바꿈과 세로 배열을 비교합니다.">
@@ -274,7 +257,7 @@ export function CheckboxWorkbench() {
                 <MapRow property="indeterminate" values="false | true (Rounded)" defaultValue="false" />
                 <MapRow property="disabled" values="false | true (Rounded)" defaultValue="false" />
                 <MapRow property="appearance" values="rounded | ghost (Checkbox / Field)" defaultValue="rounded" />
-                <MapRow property="label" values="ReactNode (Field / Container)" defaultValue="required" />
+                <MapRow property="label" values="ReactNode (Field)" defaultValue="required" />
                 <MapRow property="isParent" values="false | true" defaultValue="false" />
                 <MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" />
                 <MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" />

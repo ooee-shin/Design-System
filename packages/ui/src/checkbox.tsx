@@ -61,8 +61,6 @@ type CheckboxFieldProps = CheckboxProps & {
   checkboxClassName?: string
 }
 
-type CheckboxContainerProps = Omit<CheckboxFieldProps, "layout" | "appearance">
-
 function CheckboxIndicator({ checked = false, indeterminate = false, disabled = false, appearance = "rounded", className, children }: CheckboxIndicatorProps) {
   return (
     <span
@@ -136,25 +134,4 @@ function CheckboxField(props: CheckboxFieldProps) {
   return <CheckboxFieldBase {...props} />
 }
 
-function CheckboxContainer({ className, checkboxClassName, readOnly, ...props }: CheckboxContainerProps) {
-  return (
-    <CheckboxFieldBase
-      layout="block"
-      appearance="rounded"
-      className={cn(
-        "min-h-[64px] items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3 transition-[background-color,border-color,box-shadow]",
-        !readOnly && "[&:not(:has([data-slot=checkbox][data-disabled])):hover]:bg-oe-background-primary",
-        !readOnly && "[&:not(:has([data-slot=checkbox][data-disabled])):hover]:shadow-xs",
-        "[&:has([data-slot=checkbox][data-checked]:not([data-disabled]))]:border-[var(--brand-alpha-30)]",
-        "[&:has([data-slot=checkbox][data-checked]:not([data-disabled]))]:bg-[var(--brand-alpha-05)]",
-        "[&:has([data-slot=checkbox][data-checked]:not([data-disabled])):hover]:bg-[var(--brand-alpha-05)]",
-        className,
-      )}
-      checkboxClassName={cn("mt-0", checkboxClassName)}
-      readOnly={readOnly}
-      {...props}
-    />
-  )
-}
-
-export { Checkbox, CheckboxContainer, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxContainerProps, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps }
+export { Checkbox, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps }

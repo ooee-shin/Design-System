@@ -29,7 +29,7 @@ Studio는 시각 Anatomy 아래의 `Structure map`에서 위 포함 관계를 �
 
 `CheckboxIndicator`는 Checkbox의 16px 비상호작용 시각 base다. Checked, Indeterminate와 Disabled 표현을 소유하고 `Checkbox`가 이를 내부에서 사용한다. Combobox Option처럼 상위 컴포넌트가 이미 선택 동작을 소유하는 경우에는 상호작용 가능한 Checkbox를 중첩하지 않고 `CheckboxIndicator`만 재사용한다. 값 변경, Focus와 키보드 동작은 이를 사용하는 상위 컴포넌트가 담당한다. 이 사용 가이드는 현재 첫 번째 초안이다.
 
-`CheckboxContainer`는 기본 Rounded `CheckboxField` 전체를 하나의 클릭 가능한 bordered surface로 묶는다. 별도의 Shape 속성을 제공하지 않으며 내부 상태와 콘텐츠 규칙은 `CheckboxField`를 그대로 사용한다. Layout은 항상 부모 너비를 채운다. Form container 공통 규칙에 따라 Control의 `oe-border-primary`보다 낮은 위계인 `oe-border-secondary`를 사용한다.
+Checkbox와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제공하지 않는다. 짧은 항목을 밀도 있게 나열할 때는 `CheckboxField`를 사용하고, 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때는 Multiple selection의 `SelectBox`를 사용한다.
 
 ## Properties
 
@@ -50,11 +50,11 @@ Studio는 시각 Anatomy 아래의 `Structure map`에서 위 포함 관계를 �
 - `layout`: `inline | block`, 기본값 `inline`. `inline`은 콘텐츠 너비, `block`은 부모 너비 전체를 사용
 - `flipped`: `boolean`, 기본값 `false`. `false`는 Control을 Label 왼쪽에, `true`는 오른쪽에 배치
 
-Studio Playground의 초기 상태는 Rounded · Unchecked · Label only의 Basic 구조다. `Show label=false`로 전환하면 접근 가능한 이름은 유지하면서 원자적인 `Checkbox` Control만 단독으로 검수할 수 있다. `Show label=true`에 실제로 종속되는 Field 속성만 위아래 끝이 둥근 2px 수직선 옆에 묶는다. Indeterminate와 Disabled는 Square와 Rounded에서 지원되어 조건부로 표시하지만 Shape의 하위 속성으로 묶지 않는다. `rightDescription`, `bottomDescription`, `leadingElement`, `trailingElement`는 모두 표시하지 않는 상태에서 시작한다. Playground와 Anatomy의 콘텐츠는 제품 사례 대신 `Label`, `Right Description`, `Bottom Description` 같은 구조 명칭을 사용한다.
+Studio Playground의 초기 상태는 Rounded · Unchecked · Label only의 Basic 구조다. Optional `Label=false`로 전환하면 접근 가능한 이름은 유지하면서 원자적인 `Checkbox` Control만 단독으로 검수할 수 있다. `Label=true`에 실제로 종속되는 Field 속성만 위아래 끝이 둥근 2px 수직선 옆에 묶는다. Indeterminate와 Disabled는 Rounded에서 지원되어 조건부로 표시하지만 Appearance의 하위 속성으로 묶지 않는다. `rightDescription`, `bottomDescription`, `leadingElement`, `trailingElement`는 모두 표시하지 않는 상태에서 시작한다. Playground와 Anatomy의 콘텐츠는 제품 사례 대신 `Label`, `Right Description`, `Bottom Description` 같은 구조 명칭을 사용한다.
 
 Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE Candidate로 대응한다. Control은 16px다. Square Indicator는 0px radius, Rounded Indicator는 4px radius이며 둘 다 10px icon을 사용한다. 박스 없이 Indicator 자체로 구분하는 Ghost icon은 15px다. Ghost는 Default · Unchecked에서도 체크 아이콘을 `oe-foreground-placeholder`로 표시하고, Checked에서 Brand foreground로 강조한다. Focus ring을 소유하는 Control은 세 Shape 모두 4px radius를 유지하므로 Square에서도 Focus ring은 각지지 않는다. CheckboxField 행은 OOEE Regular form control과 같은 최소 36px다. Control은 Label의 20px 첫 줄 안에서 수직 중앙에 오도록 2px 보정한다. 기본 Label은 Regular이며 하위 항목을 대표하는 부모 항목만 Semibold다. Indeterminate와 Disabled 상태는 Square와 Rounded에 제공하고 Ghost에는 제공하지 않는다.
 
-CheckboxField의 전체 조작 영역은 항상 투명하며 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover에만 옅은 `oe-interaction-hover-subtle`을 사용한다. 선택 상태는 Indicator의 Brand 표현으로 전달하고 Disabled와 Read only Field는 Hover 반응을 제공하지 않는다. CheckboxContainer는 Field의 배경 Hover를 사용하지 않고 현재 Surface 색을 유지한 채 값 변경이 가능한 상태의 Hover에서만 `shadow-xs`를 표시한다. Disabled와 Read only Container에는 그림자를 표시하지 않으며 선택된 전체 Surface의 Brand alpha 위계는 유지한다.
+CheckboxField의 전체 조작 영역은 항상 투명하며 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover에만 옅은 `oe-interaction-hover-subtle`을 사용한다. 선택 상태는 Indicator의 Brand 표현으로 전달하고 Disabled와 Read only Field는 Hover 반응을 제공하지 않는다.
 
 Studio의 `Properties · Shape`는 Square·Rounded·Ghost를 직접 하위 카드로 한 줄에 배치한다. 각 Shape 카드 안에는 Unchecked와 Checked Checkbox를 별도 상태 제목이나 Surface 없이 위아래로 바로 배치해 기본 미선택·선택 표현을 동시에 확인한다. 이 수직 배열에는 별도 gap을 추가하지 않고 CheckboxField의 36px 최소 행 높이로 항목 간 리듬과 타깃 영역을 확보한다. Shape, Elements와 State는 포괄적인 Appearance에 합치지 않고 각각 독립된 바깥 Section으로 구성한다.
 
@@ -66,11 +66,11 @@ Checkbox Group 위에 보이는 질문이나 제목은 Field의 전체 조작 �
 
 Leading과 Trailing element는 텍스트 Content의 앞뒤에 놓이는 교체 가능한 Slot이다. 두 Slot은 optional이며 제공되지 않으면 해당 영역을 렌더링하지 않는다. Anatomy의 핑크색 점선은 실제 제품 스타일이 아니라 교체 가능한 Slot 영역을 설명하는 Studio 전용 표시다.
 
-Workbench는 기존 CheckboxContainer 상태 예시와 별도로 Leading element와 Trailing element의 독립 카드를 제공한다. Leading에는 공용 `oe-icon-small`(16px)을 참조하는 Remix Icon, Trailing에는 공용 Badge를 넣고 두 카드 모두 실제 Label과 Bottom description을 함께 표시한다. 아이콘과 Badge는 Swap content에 들어갈 수 있는 구성 예시이며 CheckboxContainer의 고정 요소나 기본값이 아니다.
+Workbench는 Leading element와 Trailing element의 독립 카드를 제공한다. Leading에는 공용 `oe-icon-small`(16px)을 참조하는 Remix Icon, Trailing에는 공용 Badge를 넣고 두 카드 모두 실제 Label과 Bottom description을 함께 표시한다. 아이콘과 Badge는 Swap content에 들어갈 수 있는 구성 예시이며 고정 요소나 기본값이 아니다.
 
 Trailing element가 있으면 Label 또는 Right description 뒤에 바로 이어서 배치하며 남은 가로 공간의 끝으로 밀지 않는다. Trailing element는 20px Label 첫 행 안에서 수직 중앙 정렬한다. Workbench의 Leading·Trailing 사례는 Label을 Medium으로 강조하며, `자동 분배` Label 바로 뒤에 Red tonal XSmall `NEW` Badge를 표시한다.
 
-`flipped=true`이면 Control과 Content의 순서만 반전해 Control을 오른쪽에 둔다. Label, Right Description과 Bottom Description의 내부 정렬은 그대로 유지한다. CheckboxContainer도 같은 `flipped` 속성을 사용한다.
+`flipped=true`이면 Control과 Content의 순서만 반전해 Control을 오른쪽에 둔다. Label, Right Description과 Bottom Description의 내부 정렬은 그대로 유지한다.
 
 Right와 Bottom Description은 Label보다 낮은 위계인 `oe-foreground-tertiary`를 사용한다. 이 semantic token은 `neutral-500`에 연결된다.
 
@@ -78,7 +78,6 @@ Right와 Bottom Description은 Label보다 낮은 위계인 `oe-foreground-terti
 
 - Rounded: Unchecked, Checked, Indeterminate, Focus visible, Disabled · Unchecked, Disabled · Checked, Read only · Checked
 - Ghost: Unchecked, Checked, Focus visible. Indeterminate와 Disabled는 제공하지 않음
-- CheckboxContainer: 내부 기본 Rounded Checkbox의 Unchecked, Checked, Focus visible, Disabled와 Read only 상태를 그대로 사용
 
 Square는 Rounded와 같은 상태 동작과 색상 규칙을 사용하므로 Studio State 목록에서 반복하지 않고 `Properties · Shape`에서 형태만 비교한다.
 
@@ -86,16 +85,13 @@ Square는 Rounded와 같은 상태 동작과 색상 규칙을 사용하므로 St
 
 - Workbench에서 확인: Rounded의 Unchecked, Checked, Indeterminate, Focus visible, Disabled · Unchecked, Disabled · Checked
 - Workbench에서 확인: Ghost의 Unchecked, Checked, Focus visible. Ghost Indeterminate와 Disabled 조합은 없음
-- Workbench에서 확인: CheckboxContainer가 기본 Rounded Checkbox 상태를 그대로 사용하는 Unchecked, Checked, Focus visible, Disabled · Unchecked, Disabled · Checked
 - 실제 동작으로 지원하지만 별도 시각 차이가 없음: Required
-- Pressed: 현재 CheckboxField와 CheckboxContainer에는 크기 또는 위치가 변하는 Pressed motion을 적용하지 않는다. Control의 상태색과 Field의 Hover 등 기존 상호작용 피드백만 유지하며, 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 다시 검수한다.
+- Pressed: 현재 CheckboxField에는 크기 또는 위치가 변하는 Pressed motion을 적용하지 않는다. Control의 상태색과 Field의 Hover 등 기존 상호작용 피드백만 유지하며, 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 다시 검수한다.
 - 현재 정의 없음: Loading
 - 확인 필요: Error/Invalid. Unchecked error의 Danger border와 Checked error의 Brand/Danger 우선순위가 정해지지 않아 임의 구현하지 않음
 - 확인 필요: Leading/Trailing element에 버튼과 같은 인터랙티브 요소를 허용할지 정해지지 않음. 현재는 `ReactNode` Slot만 제공하며 사용 정책을 임의로 확정하지 않음
 
 Checked와 Indeterminate는 `oe-brand-background-bold-primary` fill과 `oe-foreground-inverse` Indicator를 사용한다. Unchecked는 `oe-background-primary`와 `oe-border-primary`를 사용한다. Disabled는 선택값을 변경하지 않고 조작만 제한한다. 비활성 미선택은 `oe-background-disabled`를 사용하되 형태가 사라지지 않도록 `oe-border-primary`를 유지한다. 비활성 선택 및 부분 선택은 `oe-background-disabled-selected` Neutral fill과 흰색 Indicator를 유지해 선택 여부를 구분한다. Focus visible은 본체와 2px 간격을 둔 2px `oe-focus-ring`을 사용한다.
-
-CheckboxContainer는 별도의 선택 control이나 상태 로직을 만들지 않는다. 기본 Rounded Checkbox와 CheckboxField를 전체 클릭 영역으로 감싸고, 내부 Checkbox의 Checked·Focus·Disabled 상태를 그대로 사용한다. Container의 Checked 상태에만 옅은 Brand 배경과 border가 추가된다.
 
 ## Guidelines
 
@@ -122,11 +118,6 @@ Studio의 Properties · State 예시는 Checked/Indeterminate 값을 controlled 
 - Radius: 현재 구현값 4px
 - Label weight: Regular 400 / Parent item Semibold 600
 - Shape: Square / Rounded / Ghost
-- CheckboxContainer: Full width, minimum height 64px, 12px radius, `oe-background-primary`, `oe-border-secondary`, horizontal padding 16px
-
-CheckboxContainer의 활성화된 Checked 상태는 Brand seed 기반 `brand-alpha-08` 배경과 `brand-alpha-20` border를 사용한다. Disabled · Checked에는 이 활성 표현을 적용하지 않는다. 두 alpha 값은 현재 Checkbox Container에서 검수 중인 primitive Candidate이며 공용 semantic token으로 확정하지 않았다.
-
-현재 Brand alpha CSS 변수는 Studio의 Brand theme 초기화에서 제공한다. CheckboxContainer를 Studio 밖의 앱에서 사용할 때도 같은 활성 표현을 보장하려면 Brand primitive와 semantic 변수 초기화 책임을 공용 package 또는 소비 앱의 theme bootstrap 중 어디에 둘지 결정해야 한다.
 
 현재 첫 공용 추출 단계이므로 Candidate다. 다른 폼과 목록에서 재검증하기 전 Stable로 승격하지 않는다.
 

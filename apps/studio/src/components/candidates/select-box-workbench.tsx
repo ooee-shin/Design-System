@@ -46,9 +46,7 @@ export function SelectBoxWorkbench() {
   const [columnCount, setColumnCount] = useState<SelectBoxColumns>(2);
   const [showTrailingElement, setShowTrailingElement] = useState(true);
   const [leadingElement, setLeadingElement] = useState<PlaygroundElementValue>({ kind: "none", icon: "global", image: "avatar" });
-  const [labelValue, setLabelValue] = useState("Label");
   const [description, setDescription] = useState(false);
-  const [descriptionValue, setDescriptionValue] = useState("Description");
   const [disabled, setDisabled] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
 
@@ -79,12 +77,12 @@ export function SelectBoxWorkbench() {
                 disabled={disabled}
                 readOnly={readOnly}
               >
-                {c.options.map((option, index) => (
+                {c.options.map((option) => (
                   <SelectBox
                     key={option.value}
                     value={option.value}
-                    title={`${labelValue} ${String.fromCharCode(65 + index)}`}
-                    description={description ? descriptionValue : undefined}
+                    title={option.title}
+                    description={description ? "Description" : undefined}
                     leadingElement={leadingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={leadingElement} className="size-8" />}
                   />
                 ))}
@@ -104,9 +102,7 @@ export function SelectBoxWorkbench() {
               <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
               <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
               <PlaygroundElementControl label="Leading element" value={leadingElement} onChange={setLeadingElement} showValueControl={false} />
-              <TextControl label="Label" value={labelValue} onChange={setLabelValue} />
               <Toggle label="Description" value={description} onChange={setDescription} />
-              {description ? <DependentControlGroup><TextControl label="Description text" value={descriptionValue} onChange={setDescriptionValue} /></DependentControlGroup> : null}
             </div>
           </div>
         </Section>
@@ -145,5 +141,4 @@ function Choice({ active, onClick, children }: { active: boolean; onClick: () =>
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) { return <div className="flex items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-5 w-9 shrink-0 rounded-full ${value ? "bg-oe-background-bold-primary" : "bg-oe-background-secondary ring-1 ring-inset ring-oe-border-primary"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-oe-background-primary shadow-sm transition-[left] ${value ? "left-[18px]" : "left-0.5"}`} /></button></div>; }
 function DependentControlGroup({ children }: { children: ReactNode }) { return <div className="relative space-y-4 pl-4 before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-full before:bg-oe-border-primary">{children}</div>; }
 function NumberControl({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (value: number) => void }) { return <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><input type="number" value={value} min={min} max={max} step={1} onChange={(event) => onChange(Math.min(max, Math.max(min, Number(event.target.value))))} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs tabular-nums text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-1 focus:ring-oe-focus-ring" /></label>; }
-function TextControl({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) { return <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><input type="text" value={value} onChange={(event) => onChange(event.target.value)} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-1 focus:ring-oe-focus-ring" /></label>; }
 function capitalize(value: string) { return value.charAt(0).toUpperCase() + value.slice(1); }

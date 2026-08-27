@@ -8,7 +8,9 @@
 
 - Select Box는 선택지를 계속 노출하고 각 항목의 설명이나 시각 정보를 비교해야 할 때 사용한다.
 - Single selection은 공용 Radio Control, Multiple selection은 공용 Checkbox Control을 내부에서 재사용한다.
+- 카드형 전체 선택 Surface는 Select Box가 소유한다. Radio와 Checkbox에는 별도 Container 변형을 두지 않는다.
 - Select처럼 Trigger와 Popup으로 접지 않으며 Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다.
+- 짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용한다. 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때 Select Box를 사용한다.
 - Field 안에서 Input, Number Input, Checkbox Group, Radio Group과 같은 입력 위계로 사용할 수 있다.
 - Label, Helper text, Error message와 선택 개수 안내는 Field가 소유한다.
 - Select Box 자체는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저장, 확인 또는 다음 단계는 별도 Button이 담당한다.
@@ -32,7 +34,7 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - Studio에는 Playground와 Anatomy만 표시한다.
 - Playground의 초기 선택값은 비어 있다. Selection mode를 바꿔도 임의 항목을 자동 선택하지 않고 Single과 Multiple의 현재 값은 각각 보존한다.
 - Playground에서 Single/Multiple selection, Single/Multi column, Multi column의 컬럼 수, `None | Icon | Image` Leading element, Trailing element와 Disabled·Read only 동작을 조합해 검수한다.
-- Label은 Text control로 직접 바꾼다. Description은 표시 여부를 `Description` Toggle로 제어하고, 활성화했을 때 종속된 `Description text` Text control에서 실제 문구를 바꾼다. 표시 여부만 제공하고 콘텐츠 값을 고정하지 않는다.
+- 필수 Label은 구조용 `Label A~C` 문구로 고정하고 별도 Text control을 두지 않는다. Optional Description은 표시 여부만 `Description` Toggle로 제어하며 Preview에는 구조용 `Description` 문구를 고정한다. 실제 문구 작성은 이후 Examples/Usage와 언어별 콘텐츠 검수에서 다룬다.
 - Properties, State 문서, Examples, Guidelines와 Property map은 Playground와 Anatomy가 확정된 뒤 추가한다.
 - 현재 API와 Brand alpha 선택 표현은 검수용 초안이며 아직 문서 규칙이나 Stable 자산으로 확정하지 않는다.
 

@@ -22,8 +22,6 @@ type RadioFieldProps = RadioProps & {
   radioClassName?: string
 }
 
-type RadioContainerProps = Omit<RadioFieldProps, "layout">
-
 type RadioGroupProps<Value = string> = RadioGroupPrimitive.Props<Value> & {
   className?: string
 }
@@ -93,25 +91,5 @@ function RadioField(props: RadioFieldProps) {
   return <RadioFieldBase {...props} />
 }
 
-function RadioContainer({ className, radioClassName, readOnly, ...props }: RadioContainerProps) {
-  return (
-    <RadioFieldBase
-      layout="block"
-      className={cn(
-        "min-h-[64px] items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3 transition-[background-color,border-color,box-shadow]",
-        !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:bg-oe-background-primary",
-        !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:shadow-xs",
-        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:border-[var(--brand-alpha-30)]",
-        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:bg-[var(--brand-alpha-05)]",
-        "[&:has([data-slot=radio][data-checked]:not([data-disabled])):hover]:bg-[var(--brand-alpha-05)]",
-        className,
-      )}
-      radioClassName={cn("mt-0", radioClassName)}
-      readOnly={readOnly}
-      {...props}
-    />
-  )
-}
-
-export { Radio, RadioContainer, RadioField, RadioGroup }
-export type { RadioContainerProps, RadioFieldProps, RadioGroupProps, RadioProps }
+export { Radio, RadioField, RadioGroup }
+export type { RadioFieldProps, RadioGroupProps, RadioProps }

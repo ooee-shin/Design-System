@@ -2,12 +2,12 @@ export { Badge, type BadgeAppearance, type BadgeColor, type BadgeProps, type Bad
 export { Button, buttonVariants } from "./button";
 export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTriggerVariants, type ComboboxOption, type ComboboxProps, type MultiComboboxProps } from "./combobox";
 export { Chip, type ChipProps } from "./chip";
-export { Checkbox, CheckboxContainer, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxContainerProps, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps } from "./checkbox";
+export { Checkbox, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps } from "./checkbox";
 export { Input, inputContainerVariants, type InputProps } from "./input";
 export { InputButton, type InputButtonProps } from "./input-button";
 export { NumberInput, type NumberInputProps } from "./number-input";
 export { PartialMaskedInput, type PartialMaskedInputProps } from "./partial-masked-input";
-export { Radio, RadioContainer, RadioField, RadioGroup, type RadioContainerProps, type RadioFieldProps, type RadioGroupProps, type RadioProps } from "./radio";
+export { Radio, RadioField, RadioGroup, type RadioFieldProps, type RadioGroupProps, type RadioProps } from "./radio";
 export { MultiSelect, Select, selectionTriggerVariants, type MultiSelectProps, type SelectOption, type SelectOptionGroup, type SelectProps } from "./select";
 export { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxGroupProps, type SelectBoxProps, type SelectBoxSelectionMode, type SelectBoxTrailingElement } from "./select-box";
 export { Switch, SwitchField, type SwitchFieldProps, type SwitchProps } from "./switch";
