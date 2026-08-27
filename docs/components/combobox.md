@@ -18,6 +18,8 @@
 10. Selected items: 다중 선택에서 선택적으로 표시하는 공용 Chip 목록
 11. Empty state
 
+Studio Anatomy는 번호선이 겹치지 않도록 Trigger와 Content를 별도 시각 영역으로 나눈다. Trigger는 Container, Value/Placeholder와 Trigger icon을 표시하고, Content는 Container, Search input, Option list와 Option을 표시한다. 그 아래 `Structure map`은 `Combobox root`에서 두 영역이 갈라지고 Option 안에서 Multiple의 Checkbox와 Single의 Selected indicator가 달라지는 실제 포함 관계를 보여준다.
+
 ## Properties
 
 - `variant`: `outline | filled`, 기본값 `outline`

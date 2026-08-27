@@ -10,6 +10,7 @@
 - Content container 내부 Search input을 제공하지 않는다.
 - 다중 선택 결과는 Trigger 한 줄에서 대표값과 나머지 개수 또는 전체 개수로 요약한다.
 - 선택값 전체를 별도 영역에 표시해 검색·삭제·편집하는 Container, 선택 Chip, 전체 선택과 2-depth 탐색은 Combobox가 담당한다.
+- 선택지를 화면에 펼쳐 놓고 설명이나 시각 정보를 계속 비교해야 하면 Select Box를 사용한다.
 - Label, Helper text와 Error message는 이후 별도 Field가 소유한다.
 
 ## Anatomy · Select structure
@@ -98,6 +99,7 @@ Studio Playground는 제품 의미를 부여하지 않은 `Option A~D` 가상 �
 - 대표값과 나머지 개수는 값마다 의미가 뚜렷해 첫 선택값이 단서가 되는 목록에 사용한다. 표시 개수에는 대표값을 제외한다.
 - 전체 개수는 값들이 서로 동등하거나 Trigger 너비가 좁아 대표값이 도움이 되지 않는 목록에 사용한다.
 - 선택값을 모두 펼쳐 보고 개별 삭제·검색·편집해야 하면 Combobox를 사용한다.
+- 선택 항목의 설명이나 시각 정보를 계속 노출해 비교해야 하면 Select Box를 사용한다. 짧은 키워드를 유연하게 나열해 선택하거나 필터링하면 Chip을 사용한다.
 - 다중 선택에서는 다른 Option의 선택 상태를 바꾸는 Option을 두지 않는다.
 - 나머지 선택을 모두 바꾸는 `전체 선택`이나 `없음` Option을 추가하지 않는다. 전체 선택이 자주 필요하면 Checkbox의 부모-자식 패턴을 사용한다.
 - Do: Leading element는 Group마다 다르게 구성할 수 있지만 같은 Group 안에서는 모든 Option에 동일한 Leading 영역을 유지한다.

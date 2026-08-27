@@ -17,9 +17,16 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
 export function StudioNavigation() {
   const pathname = usePathname();
   const { theme, locale, viewport, setTheme, setLocale, setViewport } = useStudioPreferences();
+  const isComponentDetail = /^\/components\/[^/]+$/.test(pathname);
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur" aria-label="Studio 화면 이동">
+    <>
+      {isComponentDetail ? (
+        <a href="#studio-preview" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-oe-background-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-oe-foreground-primary focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-oe-focus-ring">
+          Playground로 바로 이동
+        </a>
+      ) : null}
+      <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur" aria-label="Studio 화면 이동">
       <div className="mx-auto flex h-12 max-w-7xl items-center gap-4 px-4 sm:px-8">
         <Link href="/" className="shrink-0 py-3 text-sm font-semibold tracking-tight">
           ooee <span className="font-normal text-muted-foreground">Studio</span>
@@ -63,7 +70,8 @@ export function StudioNavigation() {
           </div>
         </div>
       </div>
-    </nav>
+      </nav>
+    </>
   );
 }
 

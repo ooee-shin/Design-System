@@ -17,6 +17,7 @@
     "./partial-masked-input": "./src/partial-masked-input.tsx",
     "./radio": "./src/radio.tsx",
     "./select": "./src/select.tsx",
+    "./select-box": "./src/select-box.tsx",
     "./switch": "./src/switch.tsx",
     "./textarea": "./src/textarea.tsx",
     "./message-bubble": "./src/message-bubble.tsx",

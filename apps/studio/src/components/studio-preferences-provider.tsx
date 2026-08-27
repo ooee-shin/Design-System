@@ -21,6 +21,7 @@ const LOCALE_KEY = "ooee-studio-locale";
 const VIEWPORT_KEY = "ooee-studio-viewport";
 const CHANGE_EVENT = "ooee-studio-preferences-change";
 const StudioPreferencesContext = createContext<StudioPreferences | null>(null);
+let themeChangeSequence = 0;
 
 export function StudioPreferencesProvider({ children }: { children: ReactNode }) {
   const theme = useSyncExternalStore(subscribe, getThemeSnapshot, () => "light" as const);
@@ -31,6 +32,7 @@ export function StudioPreferencesProvider({ children }: { children: ReactNode })
     locale,
     viewport,
     setTheme(nextTheme) {
+      suppressTransitionsDuringThemeChange();
       window.localStorage.setItem(THEME_KEY, nextTheme);
       window.dispatchEvent(new Event(CHANGE_EVENT));
     },
@@ -58,6 +60,17 @@ export function StudioPreferencesProvider({ children }: { children: ReactNode })
       </div>
     </StudioPreferencesContext.Provider>
   );
+}
+
+function suppressTransitionsDuringThemeChange() {
+  const root = document.documentElement;
+  const sequence = ++themeChangeSequence;
+  root.dataset.oeThemeChanging = "";
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (sequence === themeChangeSequence) delete root.dataset.oeThemeChanging;
+    });
+  });
 }
 
 function subscribe(onStoreChange: () => void) {

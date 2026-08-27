@@ -10,6 +10,7 @@ import {
 } from "@ooee/tokens";
 
 const STORAGE_KEY = "ooee-brand-seed";
+const THEME_CACHE_KEY = "ooee-brand-theme-css";
 const CHANGE_EVENT = "ooee-brand-seed-change";
 
 type BrandThemeContextValue = {
@@ -27,25 +28,29 @@ export function BrandThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    BRAND_STEPS.forEach((step) => root.style.setProperty(`--brand-${step}`, palette.solid[step]));
-    BRAND_ALPHA_STEPS.forEach((step) => root.style.setProperty(`--brand-alpha-${String(step).padStart(2, "0")}`, palette.alpha[step]));
-    root.style.setProperty("--brand-source", palette.source);
-    root.style.setProperty("--oe-brand-light-foreground-primary", light.foregroundPrimary.value);
-    root.style.setProperty("--oe-brand-light-foreground-secondary", light.foregroundSecondary.value);
-    root.style.setProperty("--oe-brand-light-background-primary", light.backgroundPrimary.value);
-    root.style.setProperty("--oe-brand-light-background-secondary", light.backgroundSecondary.value);
-    root.style.setProperty("--oe-brand-light-background-bold-primary", light.backgroundBoldPrimary.value);
-    root.style.setProperty("--oe-brand-light-border-primary", light.borderPrimary.value);
-    root.style.setProperty("--oe-brand-light-border-secondary", light.borderSecondary.value);
-    root.style.setProperty("--oe-brand-light-focus-ring", light.focusRing.value);
-    root.style.setProperty("--oe-brand-dark-foreground-primary", dark.foregroundPrimary.value);
-    root.style.setProperty("--oe-brand-dark-foreground-secondary", dark.foregroundSecondary.value);
-    root.style.setProperty("--oe-brand-dark-background-primary", dark.backgroundPrimary.value);
-    root.style.setProperty("--oe-brand-dark-background-secondary", dark.backgroundSecondary.value);
-    root.style.setProperty("--oe-brand-dark-background-bold-primary", dark.backgroundBoldPrimary.value);
-    root.style.setProperty("--oe-brand-dark-border-primary", dark.borderPrimary.value);
-    root.style.setProperty("--oe-brand-dark-border-secondary", dark.borderSecondary.value);
-    root.style.setProperty("--oe-brand-dark-focus-ring", dark.focusRing.value);
+    const variables: Record<string, string> = {
+      ...Object.fromEntries(BRAND_STEPS.map((step) => [`--brand-${step}`, palette.solid[step]])),
+      ...Object.fromEntries(BRAND_ALPHA_STEPS.map((step) => [`--brand-alpha-${String(step).padStart(2, "0")}`, palette.alpha[step]])),
+      "--brand-source": palette.source,
+      "--oe-brand-light-foreground-primary": light.foregroundPrimary.value,
+      "--oe-brand-light-foreground-secondary": light.foregroundSecondary.value,
+      "--oe-brand-light-background-primary": light.backgroundPrimary.value,
+      "--oe-brand-light-background-secondary": light.backgroundSecondary.value,
+      "--oe-brand-light-background-bold-primary": light.backgroundBoldPrimary.value,
+      "--oe-brand-light-border-primary": light.borderPrimary.value,
+      "--oe-brand-light-border-secondary": light.borderSecondary.value,
+      "--oe-brand-light-focus-ring": light.focusRing.value,
+      "--oe-brand-dark-foreground-primary": dark.foregroundPrimary.value,
+      "--oe-brand-dark-foreground-secondary": dark.foregroundSecondary.value,
+      "--oe-brand-dark-background-primary": dark.backgroundPrimary.value,
+      "--oe-brand-dark-background-secondary": dark.backgroundSecondary.value,
+      "--oe-brand-dark-background-bold-primary": dark.backgroundBoldPrimary.value,
+      "--oe-brand-dark-border-primary": dark.borderPrimary.value,
+      "--oe-brand-dark-border-secondary": dark.borderSecondary.value,
+      "--oe-brand-dark-focus-ring": dark.focusRing.value,
+    };
+    Object.entries(variables).forEach(([property, value]) => root.style.setProperty(property, value));
+    window.localStorage.setItem(THEME_CACHE_KEY, JSON.stringify(variables));
   }, [dark, light, palette]);
 
   const value = useMemo<BrandThemeContextValue>(() => ({

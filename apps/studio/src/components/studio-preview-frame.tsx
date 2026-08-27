@@ -22,7 +22,7 @@ export function StudioPreviewFrame({ children }: { children: ReactNode }) {
 
   return (
     <div className={cn("w-full pb-1", viewport === "desktop" ? "overflow-visible" : "overflow-x-auto")} data-studio-preview-viewport={viewport}>
-      <div className={cn("@container mx-auto min-w-0 transition-[width] duration-200", viewportWidths[viewport])} aria-label={viewportLabels[viewport]}>
+      <div id="studio-preview" tabIndex={-1} className={cn("@container mx-auto min-w-0 transition-[width] duration-200", viewportWidths[viewport])} aria-label={viewportLabels[viewport]}>
         {children}
       </div>
     </div>

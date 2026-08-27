@@ -2,7 +2,7 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 상세한 이유와 전체 철학은 루트 `README.md`, 강제 규칙은 루트 `AGENTS.md`, 색상 결정은 `docs/foundations/color.md`를 확인한다.
 
-마지막 내용 점검: `2026-08-26`
+마지막 내용 점검: `2026-08-27`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -31,7 +31,7 @@
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Badge, Chip, Select, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - `packages/ui`: Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Badge, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control
   - Candidate/Provisional도 실제 공용 자산이며 Stable은 package 이동이 아닌 검증 완료 상태
@@ -51,6 +51,8 @@
   - Component 상세 페이지의 기본 순서는 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`. Anatomy는 모든 Properties보다 앞에 두고 우측 목차도 본문 순서를 따름
   - 화면 확정 검수에서 주요 Property가 각각 독립 카드/섹션으로 설명되는지 확인. Property map이나 Playground에만 있고 설명 카드가 없으면 자동 생성하지 않고 사용자에게 필요 여부를 질문. native 연결용 기술 속성은 시각 카드 대상에서 제외 가능
   - Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용. Remix `RiBookOpenLine` 16px Tertiary 아이콘과 14px Semibold 제목을 8px 간격으로 배치하며 컴포넌트별로 중복 구현하지 않음
+  - Guidelines의 Target area 예시는 공용 `TargetArea` Studio 측정 표시를 사용. 실제 Control은 유지하고 최소 조작 높이 또는 Row 높이 옆에 1px 직선·양끝 캡과 숫자 Label만 표시하며 점선 외곽이나 색면은 사용하지 않음. 제품 컴포넌트 스타일에는 포함하지 않음
+  - Studio의 Violet 측정 Annotation은 width·height·min/max·Target area, padding·gap·inset, radius와 font-size·line-height·letter-spacing 등 수치 치수에 공통 사용. 숫자 Pill은 border 없이 Violet tonal 배경과 글자로 표시하며 semantic color·state·Anatomy·Swap에는 사용하지 않음
   - 상세 페이지의 연관 컴포넌트 영역은 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않음. Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 표시하고, 전체 Form 목록이 아니라 코드와 사용 사례로 확인된 관계만 연결
 
 - `/experiments/inbox-split-view`
@@ -149,6 +151,17 @@
   - MultiSelect의 Trigger는 선택값을 대표값과 나머지 개수 또는 전체 개수로만 요약하며, 선택값 전체를 별도 영역에서 검색·삭제·편집하는 Container와 Chip, 전체 선택은 Combobox 역할로 제외
   - 선택 행은 별도 배경과 Label 색상 변경 없이 Neutral Label의 Medium 굵기와 Brand Check indicator로 표시하며 선택 상태에는 Hover highlight를 중첩하지 않음
   - 열린 Content container는 Trigger와 같은 너비·좌우 시작점을 사용하며 Base UI의 기본 `alignItemWithTrigger`는 비활성화. Trigger와 Option의 Leading 열도 같은 x축에서 시작
+- `/components/select-box`
+  - 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 Candidate 초안. `SelectBoxGroup`과 `SelectBox`를 공용 package가 소유하고 Studio는 이를 import해 검수
+  - Single은 공용 Radio Control, Multiple은 공용 Checkbox Control을 재사용하며 Select Box 전체 Container가 하나의 선택 영역
+  - `selectionMode=single | multiple`, `columns=number`, Leading element·Description·Trailing element, Disabled·Read only를 지원. Studio는 Single column과 Multi column을 구분하고 Multi에서 2~6 컬럼 수를 입력
+  - 초기 선택값은 비어 있고 Selection mode 변경 시 항목을 자동 선택하지 않음. Label은 Text control, Description은 표시 Toggle과 종속된 실제 Text value를 함께 제공
+  - Trailing element는 Single에서 `radio | none`, Multiple에서 `checkbox | none`으로 제한
+  - Group gap은 8px, 항목은 고정 높이 없이 Content를 Hug하며 좌우 16px·상하 12px 여백을 사용. Leading/Trailing은 항목 전체에 수직 중앙 정렬하고 Title–Description 간격은 2px
+  - 선택 상태는 액션 Button과 구분하기 위해 진한 Fill을 쓰지 않고 `brand-alpha-05` 배경과 `brand-alpha-40` 2px 수준 경계를 사용. 이 조합은 Candidate이며 semantic token 승격 전 독립 용례를 더 확인
+  - Pointer 선택은 Focus 선을 만들지 않고 Keyboard `:focus-visible`에서 같은 2px 선택선의 색만 `oe-focus-ring`으로 교체. Disabled selected는 Neutral disabled 색으로 바꾸고 Read only는 Focus만 유지한 채 Hover·Pressed와 값 변경을 차단
+  - Select는 숨겨진 짧은 목록, Chip은 간결한 키워드 선택·필터, Select Box는 설명이나 시각 정보를 계속 노출하는 비교 선택으로 구분
+  - Field 결합 API, 최대 선택 개수와 피드백, 모바일 열 수와 Custom content motion은 아직 정의하지 않음
 - `/components/chip`
   - Border가 있는 `oe-chip-default` 높이 token 24px, `text-oe-label` token 13px/16px, Rounded 8px의 제거 가능한 Candidate
   - Label + 선택적 Leading icon 또는 접근 가능한 이름을 갖는 Icon-only 유형 지원
@@ -156,34 +169,54 @@
   - MultiCombobox Container 타입의 선택 결과에서 첫 실제 사용
 - `/components/checkbox`
   - Combobox 다중 선택에서 확인한 Checkbox 구조를 공용 Candidate로 추출하고 OOEE Brand 선택 표현과 상태 규칙으로 정리
-  - Seed Checkbox의 구조를 참고하되 16px 단일 control, 기본 Label Regular, 부모 항목 Label Semibold, Square·Ghost Candidate를 지원. Control은 20px Label 첫 줄에서 수직 중앙 정렬
+  - Seed Checkbox의 구조를 참고하되 16px 단일 control, 기본 Label Regular, 부모 항목 Label Semibold, Rounded·Ghost Appearance Candidate를 지원. Control은 20px Label 첫 줄에서 수직 중앙 정렬
   - Checked와 Indeterminate는 `oe-brand-background-bold-primary`와 inverse Indicator를 사용
   - Disabled Unchecked는 `oe-background-disabled`와 식별 가능한 Neutral border를 유지하고, Disabled Checked/Indeterminate는 Light·Dark 공통 `neutral-400` 매핑의 `oe-background-disabled-selected`와 흰색 Indicator를 사용
   - State Workbench는 Focus visible까지 포함하며 Error/Invalid는 Unchecked Danger border와 Checked Brand/Danger 우선순위 결정 전까지 미정
   - Checkbox Focus visible은 본체에서 2px 떨어진 2px `oe-focus-ring` 사용
   - 원자적인 Checkbox control과 Label·선택적 Description을 결합하는 CheckboxField를 분리
-  - `CheckboxContainer`는 기본 Square CheckboxField를 전체 너비의 Neutral bordered surface로 묶는 공용 선택 Container이며 별도 Shape을 제공하지 않음. `oe-border-secondary`, 최소 높이 64px, radius 12px, 좌우 padding 16px 사용
+  - `CheckboxContainer`는 기본 Rounded CheckboxField를 전체 너비의 Neutral bordered surface로 묶는 공용 선택 Container이며 별도 Appearance를 제공하지 않음. `oe-border-secondary`, 최소 높이 64px, radius 12px, 좌우 padding 16px 사용
   - CheckboxField는 독립적으로 표시할 수 있는 `rightDescription`과 `bottomDescription` optional slot을 제공하며 Layout은 개발 API 기준 `inline | block`을 지원
   - Label·Right Description 첫 행은 20px 고정 높이, Right Description은 단일 행 truncate로 처리. Bottom Description은 상단 행 아래에서 Leading element와 같은 왼쪽 시작점을 사용
   - Light/Dark `oe-foreground-tertiary`는 `neutral-500`을 사용
   - `inline | block`은 display를 바꾸지 않고 너비만 fit-content/100%로 변경해 전환 시 위치를 유지
   - CheckboxField는 Regular form 36px 최소 행 높이에 정렬
-  - 별도 Size property 없이 Shape `square | ghost`를 지원
-  - Ghost Indicator는 15px이며 Default · Unchecked에서도 placeholder foreground로 표시하고 Checked에서 Brand foreground로 강조. Square Indicator는 10px. Indeterminate와 Disabled 상태는 Square에만 제공하고 Ghost에는 제공하지 않음
-  - CheckboxContainer Checked 상태는 `brand-alpha-08` 배경과 `brand-alpha-20` border로 옅게 활성화하고 Disabled · Checked에는 적용하지 않음. 두 alpha 사용은 현재 Candidate이며 semantic 승격 전 다른 독립 용례와 함께 검토
-  - Checkbox State 문서는 Square와 Ghost를 분리해 표시하며 Ghost에는 Indeterminate와 Disabled가 없음을 명시. CheckboxContainer는 별도 상태 로직이 아니라 기본 Square Checkbox와 CheckboxField를 전체 선택 영역으로 감싼 구성으로 설명하고 동일 상태를 검수
+  - CheckboxField와 RadioField의 전체 조작 영역 배경은 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover 중에만 `oe-interaction-hover-subtle`(Light black 3%, Dark white 5%)로 표시. 기본·선택·Disabled·Read only 비Hover 상태는 투명하고 Disabled와 Read only는 Hover·Pressed 반응을 제공하지 않음. CheckboxContainer와 RadioContainer는 배경 Hover를 상속하지 않고 현재 Surface를 유지하며 값 변경이 가능한 Hover에만 `shadow-xs`를 표시. Disabled와 Read only Container에는 그림자가 없고 선택 Surface의 Brand alpha 위계는 유지
+  - Checkbox와 Radio의 Field 및 Container에는 현재 크기·위치가 변하는 Pressed motion을 적용하지 않음. Control 상태색과 Field Hover만 유지하며 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 일괄 검수 예정
+  - Radio Group의 보이는 질문·제목은 Field 조작 영역의 외곽이 아니라 실제 Radio Indicator의 왼쪽 시작점에 정렬. 화면·Surface의 20px 바깥 여백과 제목 위치는 유지하고 기본 RadioField의 8px 조작 여백은 Field를 왼쪽으로 보정해 바깥 방향으로 확보. 콘텐츠 결합 예시는 Radio 행의 불필요한 내부 들여쓰기를 제거
+  - Checkbox Group도 같은 시각 정렬 규칙을 사용. Layout 예시 Surface는 20px 내부 여백을 사용하고 질문·제목 위치는 유지하며 묶인 CheckboxField 배열만 왼쪽으로 8px 보정해 실제 Indicator 시작점을 맞춤. 단독 CheckboxField에는 Group 보정을 적용하지 않음
+  - 별도 Size property 없이 Appearance `rounded | ghost`를 지원하며 기본값은 Rounded. Square/Rounded는 시스템 Radius Foundation에서 하나를 정하는 방향이므로 Checkbox 인스턴스 Property의 Square는 제거
+  - Ghost Indicator는 15px이며 Default · Unchecked에서도 placeholder foreground로 표시하고 Checked에서 Brand foreground로 강조. Rounded Indicator icon은 10px. Indeterminate와 Disabled 상태는 Rounded에만 제공하고 Ghost에는 제공하지 않음
+  - Appearance별 선택 표현을 분리해 Rounded는 fill과 border를 사용하고 Ghost는 Check icon의 foreground만 변경. 두 Appearance 모두 4px root radius를 유지해 Focus ring이 각지지 않음
+  - `Properties · Appearance`는 Rounded·Ghost를 직접 하위 카드로 배치하고 각 카드 안에 Unchecked·Checked를 별도 Surface 없이 수직 배열. Appearance·Elements·State는 각각 독립된 바깥 Section 카드로 구성
+  - Playground의 `Show label=false`는 Field 전용 속성을 숨기고 접근 가능한 이름을 가진 원자 Checkbox만 표시해 Control 단독 사용을 검수
+  - Playground에서는 `Show label`에 실제로 종속되는 Field 속성만 영역 border가 아닌, 위아래 끝이 둥근 Studio 공통 2px 수직선 그룹으로 표시. Rounded에서만 지원되는 Indeterminate·Disabled는 Ghost 선택 시 조건부로 숨김
+  - CheckboxContainer Checked 상태는 `brand-alpha-05` 배경과 `brand-alpha-30` border로 옅게 활성화하고 Disabled · Checked에는 적용하지 않음. 두 alpha 사용은 현재 Candidate이며 semantic 승격 전 다른 독립 용례와 함께 검토
+  - Checkbox State 문서는 Rounded와 Ghost를 분리해 표시하며 Ghost에는 Indeterminate와 Disabled가 없음을 명시. CheckboxContainer는 별도 상태 로직이 아니라 기본 Rounded Checkbox와 CheckboxField를 전체 선택 영역으로 감싼 구성으로 설명하고 동일 상태를 검수
+  - Checkbox Guidelines는 Switch와 공용 `component-guidelines` 구조를 사용해 Target area, 제출 지연 선택, 부모–자식 선택, Disabled 표현, 나열과 Indicator 재사용 원칙을 설명. Indicator 재사용은 흰색 Surface 중앙의 원자 Indicator와 Red PDF icon을 포함한 범용 선택 Content 예시를 2-grid로 비교하며 각각 실제 전환 가능. Content card가 클릭·선택 동작을 소유하고 Indicator는 카드 우측 상단에서 상태만 표시. Active Container는 `brand-alpha-30` border와 `brand-alpha-05` background를 사용하고 선택 여부와 관계없이 hover 시 `shadow-xs`를 표시
+  - Guidelines 시각 예시의 바깥 Neutral 회색 Surface에는 border를 두지 않고, 실제 UI를 감싸는 내부 `background-primary` Surface에만 옅은 Neutral border를 사용
+  - Brand palette와 semantic CSS 변수는 `ooee-brand-theme-css`에 캐시하고 Root Layout의 선행 script에서 첫 paint 전에 복원. 저장된 Brand 색과 초기 fallback 색의 전환을 방지하며 `<html suppressHydrationWarning>`으로 의도적인 선행 style 주입의 hydration 경고를 억제
+  - State의 Rounded·Ghost·CheckboxContainer처럼 제목과 설명이 바깥에 노출되는 그룹 사이는 32px 수준으로 분리하고, Elements의 카드만 이어지는 구조는 기본 간격을 유지
   - CheckboxField와 CheckboxContainer는 `flipped=false | true`를 지원하며 기본 왼쪽 Indicator를 `true`에서 오른쪽으로 배치. Content 내부 정렬과 상태 규칙은 유지
   - CheckboxField Content 앞뒤에 optional `leadingElement`·`trailingElement` Slot을 제공. Anatomy에서는 교체 가능한 영역을 Studio 전용 핑크색 점선과 작은 radius로 표시하며 실제 제품 스타일에는 포함하지 않음
+  - `CheckboxIndicator`는 Checkbox의 16px 비상호작용 시각 base로 분리해 공용 export. Checkbox는 이를 내부에서 사용하고, Combobox처럼 자체 선택 동작을 가진 상위 컴포넌트는 Checkbox 전체를 중첩하지 않고 Indicator만 재사용
   - Studio Anatomy 공통 규칙: `leadingElement`, `trailingElement`, `swap` 교체 영역은 공용 `AnatomySwapSlot`으로 표시. 기본 1px Pink 점선·4px radius·옅은 Pink 배경이며 실제 제품 스타일에는 포함하지 않음
-  - Studio Anatomy의 Container 표시는 내부를 가리키지 않음. 실제 외곽과 간격을 둔 평행선을 배치하고 번호 연결선은 그 선에서 종료. 좌우 배치는 수직선, 상하 배치는 수평선을 사용하며 끝이 꺾인 bracket 형태는 사용하지 않음
+  - Studio Anatomy의 Container, Group, List처럼 하위 요소를 묶는 영역 표시는 내부를 가리키지 않음. 실제 외곽과 간격을 둔 평행선을 영역 높이 또는 너비만큼 배치하고 번호 연결선은 그 선에서 종료. 좌우 배치는 수직선, 상하 배치는 수평선을 사용하며 끝이 꺾인 bracket 형태는 사용하지 않음
   - Anatomy 안내선은 컴포넌트나 다른 구성요소를 길게 가로지르지 않음. 대상이 많으면 예시 행을 늘려 번호를 분산하고, 핵심 구조가 아닌 시각적 구분 요소에는 별도 번호를 부여하지 않음
+  - Text와 Icon은 실제 Hit area가 더 크더라도 번호선을 글자 또는 아이콘의 시각 중심에 맞춤. 클릭·터치 Block 전체는 구조도에서 설명하고 시각 Anatomy에서는 Container·Group·List만 평행선으로 영역을 표시
   - Checkbox 열린 결정: Error/Invalid의 Brand·Danger 우선순위, Hover 전용 표현, Leading/Trailing Slot의 인터랙티브 요소 허용 여부는 아직 정의하지 않음
   - Checkbox Studio 상세 화면은 현재 범위 검수를 완료. Layout·Flipped·Description은 별도 Property 카드를 추가하지 않고 Playground·Anatomy·Property map에서 확인
   - CheckboxContainer와 Combobox가 사용하는 Brand alpha CSS 변수는 현재 Studio `BrandThemeProvider`가 주입함. Studio 밖 소비처를 위해 변수 초기화 책임을 공용 package와 소비 앱 theme bootstrap 중 어디에 둘지 결정 필요
 - `/components/radio`
   - 확정한 16px Control과 8px 흰 원형 Indicator를 기준으로 Checkbox와 같은 Field·Container·Content 구조를 적용한 Candidate
-  - Checked는 Brand로 채운 원형 Control 안에 흰색 Indicator를 두며 Unchecked, Checked, Focus visible, Disabled · Unchecked/Checked 상태를 지원
+  - Checked는 Brand로 채운 원형 Control 안에 흰색 Indicator를 두며 Unchecked, Checked, Focus visible, Disabled · Unchecked/Checked와 Read only 상태를 지원. Read only는 Enabled 기본 시각과 Focus를 유지하지만 Hover·Pressed와 사용자 조작에 의한 값 변경은 차단
   - Label·Right/Bottom Description·Leading/Trailing·Inline/Block·Flipped·RadioContainer를 지원하며 Parent item, Indeterminate와 Ghost는 제공하지 않음
+  - Studio 상세 화면은 Checkbox 검수 구조와 같은 Playground, Basic/Extended Anatomy와 Structure map, Elements, State, Layout, Guidelines, Property map 순서를 사용함. Preview의 제품 사례 문구도 KO/EN 전환에 포함
+  - Radio Guidelines는 공용 `component-guidelines` 구조로 36/48px Target area, 서로 배타적인 단일 선택, 보이는 Group 질문, Disabled 값 보존과 세로 기본·16px 가로 줄바꿈 배치를 설명함
+  - 배타적 선택의 잘못된 예시는 `사용할 알림 기능` 아래 동시에 켤 수 있는 로그인·결제 알림을 Radio로 제한한 형태로 표시해 질문과 오류 이유를 함께 드러냄
+  - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. RadioContainer 변형이 아니라 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 Container border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
+  - RadioContainer Checked 상태는 CheckboxContainer와 같은 `brand-alpha-05` 배경과 `brand-alpha-30` border를 사용하며 Disabled · Checked에는 적용하지 않음
+  - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class, Flipped 배치와 RadioContainer alpha 위계를 보호함
 - `/experiments/breadcrumb-page-header`
   - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation Experiment
   - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수
@@ -243,13 +276,14 @@
 
 ## 바로 다음 작업
 
-1. Component 문서 1차 공통화 검수를 계속한다. Select와 Switch를 기준으로 나머지 상세 화면의 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`, 우측 목차, Similar/Works with와 Preview KO/EN 전환을 컴포넌트별로 확인한다.
-2. Anatomy 시각 검수를 마무리한다. Checkbox와 Radio는 Basic/Extended로 분리했고, Input·Input Button·Number Input·Textarea·Switch는 유형명·시각 예제·범례를 하나의 Neutral Surface로 맞춘 상태다. Badge·Chip·Combobox는 공용 Anatomy Surface를 사용하며 Container 평행선과 번호 정렬을 실제 화면에서 다시 확인해야 한다.
-3. Checkbox의 Neutral `Structure map`을 시험 검수한다. 구조 이해에 도움이 되는지 확인한 뒤 다른 컴포넌트에 공통 적용할지 결정하며, 확인 전에는 공통 템플릿으로 확대하지 않는다.
-4. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지 껍데기만 있으므로 컴포넌트 정의 전에는 Anatomy를 만들지 않는다.
-5. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
-6. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
-7. 문서 공통화 뒤 `docs/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
+1. Select Box는 현재 요청된 Playground와 Anatomy까지만 유지하고 실제 화면에서 구조와 Control을 먼저 확정한다. Properties, State, Examples/Usage, Guidelines와 Property map은 사용자가 다음 단계를 요청하기 전에는 추가하지 않는다.
+2. Component 문서 1차 공통화 검수를 계속한다. Select와 Switch를 기준으로 나머지 상세 화면의 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`, 우측 목차, Similar/Works with와 Preview KO/EN 전환을 컴포넌트별로 확인한다.
+3. Anatomy 시각 검수를 마무리한다. Checkbox와 Radio는 Basic/Extended로 분리했고, Input·Input Button·Number Input·Textarea·Switch는 유형명·시각 예제·범례를 하나의 Neutral Surface로 맞춘 상태다. Badge·Chip·Combobox는 공용 Anatomy Surface를 사용하며 Container 평행선과 번호 정렬을 실제 화면에서 다시 확인해야 한다.
+4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
+5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지 껍데기만 있으므로 컴포넌트 정의 전에는 Anatomy를 만들지 않는다.
+6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
+7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
+8. 문서 공통화 뒤 `docs/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
 
 현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 Stable로 승격하거나 다른 컴포넌트에 일괄 적용하지 않는다.
 

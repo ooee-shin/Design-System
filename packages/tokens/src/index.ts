@@ -64,6 +64,8 @@ export const CORE_SEMANTIC_TOKENS: readonly SemanticTokenDefinition[] = [
   semantic("neutral", "oe-border-bold-primary", "neutral-950", "neutral-50"),
   semantic("neutral", "oe-border-secondary", "neutral-200", "neutral-800"),
   semantic("neutral", "oe-border-disabled", "neutral-100", "neutral-900"),
+  semantic("neutral", "oe-border-visual", "black / 10%", "black / 10%"),
+  semantic("neutral", "oe-interaction-hover-subtle", "black / 3%", "white / 5%"),
   semantic("neutral", "oe-interaction-hover", "black / 5%", "white / 8%"),
   semantic("accent", "oe-accent-background-bold-primary", "red-600", "red-400"),
   ...statusFamily("warning", "amber"),

@@ -67,7 +67,9 @@
   --color-oe-border-bold-primary: var(--oe-border-bold-primary);
   --color-oe-border-secondary: var(--oe-border-secondary);
   --color-oe-border-disabled: var(--oe-border-disabled);
+  --color-oe-border-visual: var(--oe-border-visual);
   --color-oe-focus-ring: var(--oe-focus-ring);
+  --color-oe-interaction-hover-subtle: var(--oe-interaction-hover-subtle);
   --color-oe-interaction-hover: var(--oe-interaction-hover);
 }
 

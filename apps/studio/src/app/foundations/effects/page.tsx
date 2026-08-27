@@ -7,6 +7,7 @@ export default function EffectsFoundationPage() {
     { name: "oe-border-secondary", kind: "Token", value: "neutral-200", darkValue: "neutral-800", preview: <span className="block h-px w-20 bg-oe-border-secondary" /> },
     { name: "oe-border-disabled", kind: "Token", value: "neutral-100", darkValue: "neutral-900", preview: <span className="block h-px w-20 bg-oe-border-disabled" /> },
     { name: "oe-focus-ring", kind: "Token", value: "brand-600", darkValue: "brand-400", preview: <span className="block size-8 rounded-lg ring-2 ring-oe-focus-ring" /> },
+    { name: "oe-interaction-hover-subtle", kind: "Token", value: "black / 3%", darkValue: "white / 5%", preview: <span className="block rounded-lg border border-oe-border-secondary px-3 py-2 hover:bg-oe-interaction-hover-subtle">Subtle hover</span> },
     { name: "oe-interaction-hover", kind: "Token", value: "black / 5%", darkValue: "white / 8%", preview: <span className="oe-hover-layer block rounded-lg border border-oe-border-secondary px-3 py-2">Hover</span> },
   ]} /></FoundationSection><FoundationSection title="Shadow" description="현재 공용 semantic token은 없고 자산에서 사용하는 Tailwind shadow primitive입니다."><CatalogGrid>{[
     ["shadow-sm","Small surface","shadow-sm"],["shadow","Floating surface","shadow"],["shadow-lg","Popover layer","shadow-lg"],

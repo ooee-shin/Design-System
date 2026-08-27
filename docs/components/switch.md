@@ -19,6 +19,8 @@
 
 SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing element는 제공하지 않는다.
 
+Studio의 `Structure map`은 실제 포함 관계를 `Field container → Track → Thumb`과 Field container 아래의 `Label`로 표시한다.
+
 ## Properties
 
 ### Size

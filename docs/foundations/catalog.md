@@ -22,3 +22,7 @@ Foundation 화면의 1차 목적은 사용법 문서가 아니라 현재 reposit
 - `/foundations/motion`: 현재 duration과 transition 값
 
 Layout과 breakpoint는 PC/TB/MB 검수 control이 존재하지만 별도의 공용 layout token 정의가 없으므로 이번 카탈로그에는 토큰인 것처럼 추가하지 않았다.
+
+## Radius 적용 원칙
+
+Square와 Rounded 같은 모서리 방향은 한 시스템 안에서 컴포넌트 인스턴스마다 섞어 선택하는 Property가 아니다. Radius Foundation 또는 theme에서 시스템 기본값을 정하고 같은 계열의 컴포넌트가 이를 일관되게 따른다. Studio가 여러 시스템을 검수하더라도 컴포넌트별 Square/Rounded 옵션을 추가하지 않고 공용 Radius 설정을 전환한다. Ghost처럼 Container 자체를 제거하는 구조적 표현은 모서리 대안과 분리된 Appearance로 제공할 수 있다.

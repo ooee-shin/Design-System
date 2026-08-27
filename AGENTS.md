@@ -107,25 +107,67 @@ Outline 형태의 공용 Form control과 선택 요소는 Disabled 상태에서�
 
 컴포넌트 Anatomy의 연결선은 Light/Dark 모두 `oe-border-primary` 회색조를 사용한다. 연결선과 숫자 마커의 진한 배경은 서로 다른 역할로 분리하며, 연결선에 foreground 또는 black 직접값을 사용하지 않는다.
 
-Studio 문서 설명은 국문을 유지한다. 언어를 선택하면 컴포넌트 Preview 안의 Label, Value, Placeholder, 접근 가능한 이름과 해당 범위의 `lang`을 함께 바꾼다. 전체 문서 번역은 국문 문서가 완료된 뒤 별도 작업으로 다룬다.
+Studio 문서 설명은 국문을 유지한다. 언어를 선택하면 컴포넌트 Preview 안의 Label, Value, Placeholder, 제품 사례 문구, 접근 가능한 이름과 해당 범위의 `lang`을 함께 바꾼다. 구조 명칭이 아닌 실제 Component/Example 콘텐츠를 한 언어로 하드코딩하지 않는다. 전체 문서 번역은 국문 문서가 완료된 뒤 별도 작업으로 다룬다.
 
 Component catalog의 title, description, maturity, 수정일, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다.
 
 Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용한다. 제목 앞에는 Remix `RiBookOpenLine` 16px을 Tertiary foreground로 배치하고 제목은 14px Semibold, 아이콘과 제목 간격은 8px로 유지한다. 컴포넌트별 Workbench에서 같은 스타일을 다시 만들지 않는다.
 
+Guidelines의 Target area 예시, Do/Don’t 비교, 제출 지연 예시와 불릿 목록은 공용 `component-guidelines` 구성요소를 사용한다. Checkbox와 Switch처럼 같은 사용 원칙을 설명하는 컴포넌트는 시각 구조와 정보 위계를 공유하고, 실제 컴포넌트와 문구만 각 목적에 맞게 바꾼다.
+
+Target area를 설명할 때는 실제 컴포넌트를 바꾸지 않고 공용 `TargetArea` Studio 표시를 겹친다. 영역 전체를 점선이나 색면으로 둘러싸지 않고, 실제 최소 조작 높이 또는 Row 높이의 옆에 1px 직선과 양끝 캡을 둔 치수선 및 숫자 Label을 표시한다. 이 측정 표시는 실제 제품 컴포넌트 스타일에 포함하지 않는다.
+
+Studio의 수치 측정 Annotation은 Violet 계열을 공통으로 사용한다. 대상은 width·height·min/max·Target area 같은 크기, padding·gap·inset 같은 내부/외부 간격, radius, font-size·line-height·letter-spacing처럼 수치로 측정하는 Typography 스펙이다. 숫자가 token으로 표현되어도 역할이 치수이면 같은 Violet 표시를 사용한다. Font family·weight 명칭, semantic color 값, 상태, Anatomy 번호와 Swap 영역은 치수 Annotation이 아니므로 Violet 규칙을 적용하지 않는다. 치수 숫자 Pill은 border 없이 옅은 Violet 배경과 진한 Violet 글자만 사용한다.
+
+Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property로 혼합하지 않는다. 한 시스템의 Radius Foundation 또는 theme에서 기본 방향을 정하고 관련 컴포넌트가 이를 일관되게 따른다. Ghost처럼 Container를 제거하는 구조적 차이는 별도 Appearance로 제공할 수 있다.
+
+### Component 구조 용어
+
+- `Control`은 Focus, 키보드 입력과 값 변경을 직접 소유하는 상호작용 원자다. Checkbox 본체, Radio의 16px 원형과 Switch 본체가 이에 해당한다.
+- `Indicator`는 Control 안에서 현재 값이나 상태를 보여 주는 비상호작용 시각 요소다. Radio의 중앙 원, Checkbox의 Check/Indeterminate 표시가 이에 해당한다. 상위 컴포넌트가 입력 동작을 소유해 별도 시각 base를 재사용하는 경우에도 값 변경과 Focus를 소유하지 않으면 Indicator로 부른다.
+- `Field`는 Control과 Label을 기본으로 결합하고 Description, Leading/Trailing element 같은 Content를 선택적으로 포함하는 전체 조작 영역이다.
+- `Container`는 Field 전체를 border, background 또는 다른 Surface로 감싼 선택 영역이다. 단순 Wrapper나 Popup을 Container로 부르지 않고 실제 시각 Surface 또는 명확한 구조 범위를 가질 때 사용한다.
+- `Content container`는 Label, Description과 Leading/Trailing element를 묶는 내부 영역이다. Label 하나만 가리킬 때 Content라고 부르지 않는다.
+- 별도 Wrapper가 실제로 존재하지 않으면 `Control container`처럼 역할명 뒤에 Container를 덧붙이지 않는다. Anatomy에서는 `Control` 또는 컴포넌트가 분명해야 할 때 `Radio control`, `Checkbox control`처럼 쓴다.
+- 코드 export, Component 문서, Anatomy 범례, Property 제목과 Studio 예시에서 위 용어를 동일하게 사용한다. 원자 예시 제목은 실제 역할에 따라 `Control only`, `Indicator only`처럼 작성하고 임의의 동의어를 섞지 않는다.
+- 문서에 적는 `Properties · *` 이름은 실제 Studio Section 이름과 일치시킨다. 이전 이름이나 존재하지 않는 Property 범주를 남기지 않는다.
+
+### Playground 종속 컨트롤 표시
+
+- 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
+- Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Optional String/ReactNode content는 기본적으로 빈 값 또는 `None`을 미전달 상태로 사용한다. 시각 검수상 Slot의 표시 여부를 별도로 확인해야 하면 `Show description` 같은 임의 문장 대신 실제 Property 이름인 `Description` Toggle을 두고, 활성화했을 때 실제 콘텐츠 값을 입력하는 종속 Text control을 반드시 함께 제공한다. 표시 Toggle만 있고 값을 바꿀 수 없는 형태는 사용하지 않는다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Description`, `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
+- 종속 그룹은 영역의 border를 사용하지 않는다. 왼쪽에 폭 2px의 곧은 `oe-border-primary` 막대를 별도 요소로 두고 `border-radius: 9999px`로 선의 위아래 끝만 둥글게 처리하며, 콘텐츠는 16px 들여쓴다.
+- 단순한 시각 구분에는 이 표시를 사용하지 않는다. 상위값에 실제로 종속된 control에만 적용한다.
+
+### Focus 선과 Ring
+
+- Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Focus 시각 표시는 `:focus-visible`을 기준으로 한다. 마우스 클릭만으로 Focus 선이나 ring을 표시하지 않고, 키보드 탐색처럼 사용자가 Focus 위치를 시각적으로 확인해야 할 때 표시한다.
+- 기존 경계가 1px인 요소는 Focus에서 그 선을 `oe-focus-ring` 색으로 바꾸고, 경계 바로 바깥에 간격 없이 1px을 더해 총 2px 선으로 보이게 한다.
+- 선택선처럼 기존 경계가 이미 2px인 요소는 두께, 위치와 레이아웃을 바꾸지 않고 같은 2px 선의 색만 `oe-focus-ring`으로 교체한다. 선택선과 별도 Focus ring을 중첩하지 않는다.
+- 기존 경계와 분리된 Focus 표시가 필요한 요소는 기본 2px 간격을 두고 바깥에 2px ring을 그린다. 컴포넌트 구조상 별도 조정이 필요한 경우에만 간격을 2px보다 크게 할 수 있다.
+- Focus 표시 방식은 위 세 유형 중 하나를 선택하며, 같은 요소에서 인접선과 분리 ring을 동시에 사용하지 않는다.
+
 ### Component 상세 페이지 순서
 
 - 기본 정보 흐름은 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map` 순서다.
+- Component 상세 페이지의 첫 번째 Tab 진입점은 `Playground로 바로 이동` skip link다. 이 링크는 `#studio-preview`를 focus target으로 사용하고, 다음 Tab에서 Playground의 첫 실제 Control로 이동해야 한다. 전역 Studio 설정을 건너뛰기 위해 양수 `tabIndex`로 순서를 재작성하지 않는다.
+- 신규 컴포넌트의 첫 Studio 초안은 `Playground`만 만든다. Anatomy, Properties, Examples/Usage, Guidelines와 Property map은 Playground 검수 후 사용자가 명시적으로 다음 단계를 요청할 때 추가한다. 이 제한은 Studio 문서 범위에 대한 것이며 공용 package 구현, 접근성 및 자동 테스트는 처음부터 함께 검증한다.
 - Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
 - 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다.
 - 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
+- Appearance, State, Size, Elements처럼 확인된 Property 범주가 명확하면 각각을 `Properties · Appearance` 같은 독립된 바깥 Section 카드로 만든다. 구체적인 범주를 다시 더 큰 포괄 카드 하나에 묶지 않는다.
+- Property Section의 직접 하위 제목과 카드는 해당 Property 값으로 구성한다. 예를 들어 Checkbox의 `Properties · Appearance`에서는 Rounded·Ghost가 직접 하위가 되며, 비교를 위한 Unchecked·Checked 상태는 각 Appearance 카드 내부에 배치한다. 비교 상태를 상위 그룹으로 만들어 Property 계층을 뒤집지 않는다.
+- 같은 섹션 안에서 제목·설명·카드 묶음이 Surface 밖에 반복되는 StateGroup 같은 구조는 그룹 사이를 32px 수준으로 분리한다. 제목 없이 카드만 연속되는 Elements 구조에는 기본 카드 간격을 유지한다.
+- Anatomy는 유형명·시각 예제·범례 전체를 Neutral 회색 Surface로 묶는다. Guidelines의 시각 예시 카드는 Neutral 회색 배경만 사용하고 바깥 border는 두지 않는다. 그 안에서 실제 화면 또는 컴포넌트를 감싸는 Container는 흰색 `oe-background-primary` Surface와 옅은 Neutral border를 사용한다. Playground, Properties, Layout과 State의 일반 예시는 흰색 Surface와 Neutral border를 유지한다. 카드 구조 자체는 별도 화면 체계 재설계 전까지 임의로 제거하거나 다른 배경형으로 바꾸지 않는다.
 - Property map이나 Playground control에만 존재하고 별도 설명 카드가 없는 주요 Property를 발견하면 자동으로 카드를 만들지 말고 사용자에게 카드가 필요한지 묻는다.
 - `name`, `value`, `form`처럼 native 연결을 위한 기술 속성까지 모두 시각 카드로 만들지는 않는다. 시각·구조·동작을 이해하는 데 독립 설명이 필요한 상위 Property를 카드 점검 대상으로 삼는다.
 
 ### Component 화면 확정 검수
 
 - 사용자가 “스튜디오 화면 확정”, “페이지 확정” 또는 같은 의미로 요청하면 문서 구조, 실제 Props, Anatomy, Property별 설명 카드, State coverage, token, theme·locale·viewport, interaction, accessibility, 공용 package 소유 경계와 `pnpm check`를 함께 점검한다.
+- 컴포넌트를 반복 조정하는 동안에는 개별 시각 수정마다 `docs/components/{component}.md`를 갱신하지 않는다. 사용자가 “확정할게”, “완료” 또는 같은 의미로 말하면 실제 공용 컴포넌트와 Studio 화면을 대조한 뒤 해당 Component MD의 Anatomy, Properties, State, Layout, Guidelines, Specification과 미정 사항을 한 번에 정리한다.
+- 여러 컴포넌트에 즉시 적용되는 Studio 공통 규칙, Foundation 결정 또는 다음 작업자가 중간에 반드시 알아야 하는 충돌은 Component 확정 시점까지 미루지 않고 `AGENTS.md`, `docs/foundations/*` 또는 `docs/WORKING_CONTEXT.md`에 바로 기록한다.
 - 확인된 구현·문서 불일치는 수정할 수 있지만, 누락된 Property 카드의 필요성이나 새로운 사용 정책처럼 판단이 필요한 내용은 모아서 사용자에게 질문한다.
 - 화면 확정만으로 Candidate를 Stable로 승격하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청 또는 별도 승격 검토가 필요하다.
 
@@ -140,6 +182,7 @@ Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineT
 
 - Anatomy Preview에는 실제 컴포넌트만 표시하고 요소 이름을 컴포넌트 안에 넣지 않는다.
 - 번호 마커는 실제 요소를 밀지 않도록 컴포넌트 바깥에 배치하고 1px `oe-border-primary` 안내선으로 대상을 연결한다.
+- Text, Icon처럼 보이는 요소의 실제 클릭·터치 영역이 더 크더라도 번호선은 Hit area 중앙이 아니라 사용자가 화면에서 식별하는 글자 또는 아이콘의 시각 중심을 가리킨다. Container, Group, List 같은 묶음 영역만 별도 평행선으로 범위를 표시한다.
 - Anatomy 유형명, 시각 예제와 번호별 요소명 범례는 하나의 Neutral 회색 Surface 안에서 `유형명 → 시각 예제 → 범례` 순서로 구성한다. 범례를 같은 색의 별도 블록이나 회색 Anatomy 영역 밖의 흰 배경에 분리하지 않는다. Optional은 요소 이름 뒤에 옅은 위계로 표시한다.
 - 구조 설명이 더 필요하면 범례 아래 별도 텍스트 블록에 작성한다. 구조와 상태가 겹쳐 복잡해지면 Anatomy Preview를 둘 이상으로 분리한다.
 - 기본 요소와 Optional 요소가 한 Preview에서 같은 대상을 가리키는 것처럼 보이면 `Basic anatomy`와 `Extended anatomy`로 분리한다. Basic에는 최소 구조만 표시하고 Extended에는 Basic 번호를 반복하지 않는다. 여러 텍스트 요소를 감싸는 Content container처럼 단일 Label과 구분하기 어려운 그룹 요소는 Extended에서 Container 평행선으로 범위를 표시한다.
@@ -151,6 +194,7 @@ Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineT
 - 실제 외곽선과 일정한 간격을 둔 평행선으로 Container 범위를 표시한다. 번호에서 시작한 연결선은 이 평행선에서 끝난다.
 - 번호가 Container의 왼쪽이나 오른쪽에 있으면 외곽과 나란한 수직선을 사용하고, 위나 아래에 있으면 수평선을 사용한다.
 - 평행선은 실제 Container의 높이 또는 너비 범위에 맞추되 외곽선과 붙이거나 겹치지 않는다.
+- Group, List처럼 여러 하위 요소를 묶는 영역도 같은 규칙을 사용한다. 번호는 묶음 바깥에 두고, 연결선은 실제 콘텐츠로 들어가지 않은 채 영역 높이 또는 너비만큼 그린 평행선에서 끝낸다.
 - `[` 또는 `]`처럼 끝이 꺾인 bracket 형태는 사용하지 않는다.
 
 ## 변경 원칙
@@ -180,6 +224,8 @@ Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineT
 6. 상태 조합에서 색상이나 우선순위 판단이 필요한 경우 임의로 선택하지 않고 현재 확인된 내용과 충돌 지점을 사용자에게 보고한다.
 
 Studio의 `Properties · State` 예시는 비교 대상의 value/state를 controlled 상태로 고정하되 Hover, Pressed, Focus visible, Popup 열림과 키보드 피드백은 실제로 확인할 수 있어야 한다. `pointer-events: none`, 전체 key event 차단 또는 `tabIndex=-1`로 상호작용을 막지 않는다. Disabled는 실제 disabled 동작을 유지하고, 상태 변화 자체를 보여 주는 것이 목적이면 Playground에서 별도로 검수한다.
+
+선택 Control의 Read-only는 Enabled와 같은 색상과 키보드 Focus를 유지하지만 값 변경 가능성을 뜻하는 Hover 배경, Hover shadow와 Pressed 피드백은 제공하지 않는다. Disabled처럼 비활성 색상이나 `not-allowed` cursor를 사용하지 않으며 Pointer·Space·방향키로 값만 변경되지 않아야 한다.
 
 완료 보고에는 누락 상태가 없는지 점검한 결과와, 남아 있는 미정 상태가 있으면 그 목록을 포함한다.
 

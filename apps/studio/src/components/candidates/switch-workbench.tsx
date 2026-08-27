@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiCheckboxCircleFill, RiCloseCircleFill } from "@remixicon/react";
 
 import { CheckboxField, Switch, SwitchField } from "@ooee/ui";
+import { AnatomyStructureMap } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { DeferredChoice, GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -140,19 +141,28 @@ export function SwitchWorkbench() {
         </Section>
 
         <Section id="anatomy" title="Anatomy" description={c.anatomyDescription}>
-          <div className="col-span-full rounded-xl bg-oe-background-secondary p-5">
-            <p className="text-xs font-semibold text-oe-foreground-primary">Switch structure</p>
-            <div className="px-1 py-1">
-              <div className="relative mx-auto my-14 w-fit">
-                <SwitchField defaultChecked label="Label" />
-                <AnatomyMarker number="1" className="left-[9px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                <AnatomyMarker number="2" className="left-4 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                <AnatomyMarker number="3" className="right-[7px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+          <div className="col-span-full grid gap-8">
+            <div className="rounded-xl bg-oe-background-secondary p-5">
+              <p className="text-xs font-semibold text-oe-foreground-primary">Switch structure</p>
+              <div className="px-1 py-1">
+                <div className="relative mx-auto my-14 w-fit">
+                  <SwitchField defaultChecked label="Label" />
+                  <AnatomyMarker number="1" className="left-[9px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyMarker number="2" className="left-4 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                  <AnatomyMarker number="3" className="right-[7px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                </div>
               </div>
+              <ol className="flex flex-wrap gap-x-5 gap-y-2 px-1 text-xs text-oe-foreground-primary">
+                <li>1 · Track</li><li>2 · Thumb</li><li>3 · Label</li>
+              </ol>
             </div>
-            <ol className="flex flex-wrap gap-x-5 gap-y-2 px-1 text-xs text-oe-foreground-primary">
-              <li>1 · Track</li><li>2 · Thumb</li><li>3 · Label</li>
-            </ol>
+
+            <AnatomyStructureMap lines={[
+              { name: "Field container" },
+              { prefix: "├─ ", name: "Track" },
+              { prefix: "│  └─ ", name: "Thumb" },
+              { prefix: "└─ ", name: "Label" },
+            ]} />
           </div>
         </Section>
 
@@ -187,8 +197,8 @@ export function SwitchWorkbench() {
             <div>
               <GuidelineTitle>{c.targetTitle}</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="16px Control"><div className="flex min-h-6 items-center"><SwitchField label={preview.label} controlSize="small" /></div></GuideVisual>
-                <GuideVisual label="Row composition"><div className="flex min-h-12 w-full items-center rounded-lg bg-oe-background-primary px-3"><SwitchField label={preview.label} className="w-full justify-between" labelPosition="left" /></div></GuideVisual>
+                <GuideVisual label="16px Control"><TargetArea label="24px" className="min-h-6 min-w-48"><SwitchField label={preview.label} controlSize="small" /></TargetArea></GuideVisual>
+                <GuideVisual label="Row composition"><TargetArea label="48px" className="min-h-12 w-full"><SwitchField label={preview.label} className="w-full justify-between" labelPosition="left" /></TargetArea></GuideVisual>
               </div>
               <GuidelineList items={[...c.targetItems]} />
             </div>
@@ -239,47 +249,6 @@ function Section({ id, title, description, children }: { id: string; title: stri
 function Example({ label, children }: { label: string; children: ReactNode; isStatic?: boolean }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function Behavior({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{title}</p><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{children}</p></div>; }
 function AnatomyMarker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) { return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>; }
-function GuideVisual({ label, children }: { label: string; children: ReactNode }) { return <div className="rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{label}</p><div className="flex items-center rounded-lg border border-oe-border-secondary bg-oe-background-primary px-4 py-6">{children}</div></div>; }
-function GuidelineList({ items }: { items: ReactNode[] }) { return <ul className="mt-3 space-y-1 px-1 text-sm leading-6 text-oe-foreground-secondary">{items.map((item, index) => <li key={index} className="flex items-start gap-2"><span className="mt-[10px] size-[3px] shrink-0 rounded-full bg-oe-foreground-placeholder" aria-hidden="true" /><span>{item}</span></li>)}</ul>; }
-function DeferredChoice({ control, cancelLabel, submitLabel }: { control: ReactNode; cancelLabel: string; submitLabel: string }) {
-  return (
-    <div className="w-full">
-      {control}
-      <div className="mt-6 flex justify-end gap-2">
-        <button type="button" className="h-8 rounded-lg border border-oe-border-secondary px-3 text-xs font-medium text-oe-foreground-secondary">{cancelLabel}</button>
-        <button type="button" className="h-8 rounded-lg bg-oe-background-bold-primary px-3 text-xs font-medium text-oe-foreground-inverse">{submitLabel}</button>
-      </div>
-    </div>
-  );
-}
-function UsageComparison({ title, doText, dontText, description, doVisual, dontVisual, dontFirst = false }: { title: string; doText: ReactNode; dontText: ReactNode; description: ReactNode[]; doVisual: ReactNode; dontVisual: ReactNode; dontFirst?: boolean }) {
-  const firstVisual = dontFirst ? dontVisual : doVisual;
-  const secondVisual = dontFirst ? doVisual : dontVisual;
-  const firstFeedback = dontFirst
-    ? <Feedback tone="dont">{dontText}</Feedback>
-    : <Feedback tone="do">{doText}</Feedback>;
-  const secondFeedback = dontFirst
-    ? <Feedback tone="do">{doText}</Feedback>
-    : <Feedback tone="dont">{dontText}</Feedback>;
-
-  return (
-    <div>
-      <GuidelineTitle>{title}</GuidelineTitle>
-      <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-        <GuideSurface className="order-1 @min-[720px]:col-start-1 @min-[720px]:row-start-1">{firstVisual}</GuideSurface>
-        <GuideSurface className="order-3 @min-[720px]:col-start-2 @min-[720px]:row-start-1">{secondVisual}</GuideSurface>
-        <div className="order-2 @min-[720px]:col-start-1 @min-[720px]:row-start-2">{firstFeedback}</div>
-        <div className="order-4 @min-[720px]:col-start-2 @min-[720px]:row-start-2">{secondFeedback}</div>
-        <div className="order-5 @min-[720px]:col-span-2 @min-[720px]:row-start-3"><GuidelineList items={description} /></div>
-      </div>
-    </div>
-  );
-}
-function GuideSurface({ children, className = "" }: { children: ReactNode; className?: string }) { return <div className={`rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4 ${className}`}><div className="flex items-center rounded-lg border border-oe-border-secondary bg-oe-background-primary px-4 py-6">{children}</div></div>; }
-function Feedback({ tone, children }: { tone: "do" | "dont"; children: ReactNode }) {
-  const isDo = tone === "do";
-  return <div className={`flex h-full gap-2 rounded-xl p-3 ${isDo ? "bg-oe-success-background-primary text-oe-success-foreground-primary" : "bg-oe-danger-background-primary text-oe-danger-foreground-primary"}`}>{isDo ? <RiCheckboxCircleFill className="mt-0.5 size-oe-icon-small shrink-0 text-oe-success-foreground-secondary" aria-hidden="true" /> : <RiCloseCircleFill className="mt-0.5 size-oe-icon-small shrink-0 text-oe-danger-foreground-secondary" aria-hidden="true" />}<div><p className="text-xs font-semibold">{isDo ? "Do" : "Don’t"}</p><p className="mt-0.5 text-sm leading-6">{children}</p></div></div>;
-}
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) { return <div className="flex min-h-6 items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><Switch checked={value} onCheckedChange={onChange} aria-label={label} controlSize="small" /></div>; }
 function Control({ label, children }: { label: string; children: ReactNode }) { return <fieldset><legend className="mb-2 text-[11px] font-medium text-oe-foreground-tertiary">{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>; }
 function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) { return <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-lg border px-2.5 py-1.5 text-xs ${active ? "border-oe-foreground-primary bg-oe-background-bold-primary text-oe-foreground-inverse" : "border-oe-border-secondary text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}>{children}</button>; }

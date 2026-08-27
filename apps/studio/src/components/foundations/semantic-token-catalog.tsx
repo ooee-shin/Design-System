@@ -154,6 +154,7 @@ const primitiveClasses: Record<string, string> = {
   "white / 8%": "bg-white/8",
   "white / 60%": "bg-white/60",
   "black / 5%": "bg-black/5",
+  "black / 10%": "bg-black/10",
   "neutral-950 / 60%": "bg-neutral-950/60",
   "neutral-50": "bg-neutral-50",
   "neutral-100": "bg-neutral-100",

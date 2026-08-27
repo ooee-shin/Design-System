@@ -144,6 +144,13 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html[data-oe-theme-changing],
+  html[data-oe-theme-changing] *,
+  html[data-oe-theme-changing] *::before,
+  html[data-oe-theme-changing] *::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
   body {
     @apply bg-background text-foreground;
   }

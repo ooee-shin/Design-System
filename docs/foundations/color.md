@@ -121,6 +121,7 @@ oe-background-primary / secondary / disabled / disabled-selected / bold-primary
 oe-background-control-off / control-disabled
 oe-border-primary / secondary / disabled
 oe-focus-ring
+oe-interaction-hover-subtle
 oe-interaction-hover
 
 Accent
@@ -135,17 +136,19 @@ oe-{role}-border-primary / secondary
 - `primary/secondary`는 사용 빈도가 아니라 같은 role/property 안의 **시각적 위계**를 나타낸다.
 - Light Neutral background는 primary에서 secondary 순으로 어두워진다. Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다.
 - Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다.
+- Light와 Dark semantic token을 교체하는 동안에는 색상 transition을 일시 중지한다. 컴포넌트의 선택·Hover 같은 상태 transition은 유지하되, 서로 다른 테마 값 사이를 보간해 중간색이 노출되지 않게 한다.
 - `background-bold-primary`는 버튼, 배지, 강한 선택 상태처럼 채도가 높거나 어두운 solid fill의 후보 이름이다.
 - `bold`는 background 전용 modifier로 사용한다.
 - `interaction-hover`는 기존 background를 교체하지 않고 위에 합성하는 state layer다. 초기값은 Light `black / 5%`, Dark `white / 8%`이며 화면 검증 후 조율한다.
 - 클릭 가능한 아이콘은 공통적으로 hover 시 `interaction-hover` 회색조 state layer를 표시하고, keyboard focus 시 `oe-focus-ring`을 표시한다.
+- Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만 Focus 시각 표시는 `:focus-visible`을 기준으로 한다. 마우스 클릭만으로 Focus 선을 노출하지 않는다. Focus 경계는 기존 선 구조에 따라 세 방식 중 하나를 사용한다. 1px 경계는 기존 선의 색을 `oe-focus-ring`으로 바꾸고 바깥에 간격 없는 1px을 더해 총 2px로 표시한다. 기존 선택선이 2px이면 위치와 두께를 유지한 채 색만 바꾼다. 분리된 Focus 표시가 필요한 경우에는 기본 2px 간격 뒤에 바깥 2px ring을 사용한다. 한 요소에 선택선과 분리 ring을 중첩하지 않는다.
 - `foreground-inverse-secondary`는 bold fill 위의 약한 메타 정보에 사용한다.
 - `background-disabled-selected`는 선택값을 유지한 채 조작만 제한된 control의 Neutral fill이다. Light/Dark 모두 `neutral-400`을 사용한다.
 - `background-control-off`는 조작 가능한 Boolean control의 Off Track이며 Light `neutral-400`, Dark `neutral-500`을 사용한다.
 - `background-control-disabled`는 조작할 수 없는 Boolean control의 Track이다. 이전 Off 색상인 Light `neutral-300`, Dark `neutral-600`을 사용해 Enabled Off보다 한 단계 낮은 위계를 만든다.
 - `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
 - `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.
-- overlay token은 실제 반복 사용이 확인되기 전까지 Candidate로만 둔다. 현재 첫 실제 사례는 Color swatch의 내부 경계이며 Neutral border 대신 1px inset `black 10%`를 사용한다. 이미지와 색상 값에 같은 역할을 적용하는 방향은 확정했지만 정확한 alpha 강도와 semantic token 이름은 실제 이미지 사례에서 함께 재검수한다.
+- 이미지와 색상 값의 내부 경계는 일반 Neutral border 대신 공용 `oe-border-visual`을 사용한다. Light/Dark 모두 콘텐츠 자체 위에 중첩되는 1px inset `black 10%`이며, 테마 surface 색상으로 바꾸지 않는다.
 
 ### 다음 작업에서 먼저 답할 질문
 
@@ -205,4 +208,4 @@ Candidate에는 최소한 다음을 기록한다.
 - 외곽과 내부 divider: `oe-border-primary / secondary`
 - 키보드 focus: `oe-focus-ring`
 
-Hover는 `oe-interaction-hover` layer를 기존 background 위에 합성한다. Outgoing message metadata의 낮은 강조는 `oe-foreground-inverse-secondary`를 사용한다. 두 token은 Inbox에서 필요성이 확인되어 Provisional로 승격했으며, 다른 컴포넌트와 여러 배경에서 alpha 및 대비를 추가 검증한다.
+일반 Hover는 `oe-interaction-hover` layer를 기존 background 위에 합성한다. CheckboxField와 RadioField처럼 넓은 조작 영역에는 더 옅은 `oe-interaction-hover-subtle`(Light black 3%, Dark white 5%)을 사용하며 현재 Provisional이다. Outgoing message metadata의 낮은 강조는 `oe-foreground-inverse-secondary`를 사용한다. 이 token들은 다른 컴포넌트와 여러 배경에서 alpha 및 대비를 추가 검증한다.

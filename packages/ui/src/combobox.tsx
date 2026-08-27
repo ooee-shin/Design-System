@@ -6,6 +6,7 @@ import { RiArrowDownSLine, RiCheckLine, RiSearchLine } from "@remixicon/react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { Chip } from "./chip"
+import { CheckboxIndicator } from "./checkbox"
 import { Input } from "./input"
 import { selectionTriggerVariants } from "./selection-trigger"
 import { cn } from "./utils"
@@ -121,6 +122,7 @@ function MultiCombobox({
   }
   const enabledValues = options.filter((option) => !option.disabled).map((option) => option.value)
   const allSelected = enabledValues.length > 0 && enabledValues.every((optionValue) => resolvedValue.includes(optionValue))
+  const someSelected = !allSelected && enabledValues.some((optionValue) => resolvedValue.includes(optionValue))
 
   return (
     <ComboboxPrimitive.Root
@@ -154,12 +156,12 @@ function MultiCombobox({
           </ComboboxPrimitive.Value>
         ) : null}
       </div>
-      <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
+      <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} someSelected={someSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
     </ComboboxPrimitive.Root>
   )
 }
 
-function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, selectAllLabel, totalCount = 0, allSelected = false, onToggleAll }: { ariaLabel: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; onToggleAll?: () => void }) {
+function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, selectAllLabel, totalCount = 0, allSelected = false, someSelected = false, onToggleAll }: { ariaLabel: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; someSelected?: boolean; onToggleAll?: () => void }) {
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner align="start" sideOffset={4} className="z-50 w-[var(--anchor-width)] max-w-[var(--available-width)]">
@@ -171,9 +173,7 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
           <div className="mt-2 max-h-64 overflow-x-hidden overflow-y-auto [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
             {multiple ? (
               <button type="button" data-slot="combobox-select-all" aria-pressed={allSelected} onClick={onToggleAll} className={cn("flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 py-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-oe-focus-ring", allSelected ? "hover:bg-transparent" : "hover:bg-oe-interaction-hover")}>
-                <span className={cn("grid size-4 shrink-0 place-items-center rounded border border-oe-border-primary bg-oe-background-primary", allSelected && "border-oe-foreground-primary bg-oe-foreground-primary")}>
-                  <RiCheckLine className={cn("size-3 text-oe-foreground-inverse", !allSelected && "opacity-0")} aria-hidden="true" />
-                </span>
+                <CheckboxIndicator checked={allSelected} indeterminate={someSelected} />
                 <span className="flex items-baseline gap-1">
                   <span>{selectAllLabel}</span>
                   <span className="text-oe-foreground-tertiary tabular-nums">{totalCount}</span>
@@ -185,9 +185,9 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
               {(option: ComboboxOption) => (
                 <ComboboxPrimitive.Item key={option.value} value={option} disabled={option.disabled} className={cn("group/option relative flex min-h-9 w-full cursor-default items-center gap-2 rounded-md px-2.5 py-2 outline-none data-[disabled]:pointer-events-none data-[disabled]:text-oe-foreground-disabled data-[highlighted]:bg-oe-interaction-hover data-[selected]:data-[highlighted]:!bg-transparent", !multiple && "before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:right-[-0.75rem] before:rounded-md before:content-[''] data-[selected]:before:bg-[var(--brand-alpha-08)]")}>
                   {multiple ? (
-                    <span className="grid size-4 shrink-0 place-items-center rounded border border-oe-border-primary bg-oe-background-primary group-data-[selected]/option:border-oe-foreground-primary group-data-[selected]/option:bg-oe-foreground-primary">
-                      <RiCheckLine className="size-3 text-oe-foreground-inverse opacity-0 group-data-[selected]/option:opacity-100" aria-hidden="true" />
-                    </span>
+                    <CheckboxIndicator className="group-data-[selected]/option:border-oe-brand-background-bold-primary group-data-[selected]/option:bg-oe-brand-background-bold-primary">
+                      <ComboboxPrimitive.ItemIndicator className="grid place-items-center"><RiCheckLine className="size-2.5 text-oe-foreground-inverse" /></ComboboxPrimitive.ItemIndicator>
+                    </CheckboxIndicator>
                   ) : null}
                   <span className="relative min-w-0 flex-1 truncate">{option.label}</span>
                   {!multiple ? (

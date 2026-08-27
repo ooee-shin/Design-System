@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiArrowDownSLine, RiCheckLine, RiSearchLine, RiSubtractLine } from "@remixicon/react";
-import { Combobox, MultiCombobox, comboboxSearchContainerVariants, type ComboboxOption } from "@ooee/ui";
-import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { RiArrowDownSLine, RiSearchLine } from "@remixicon/react";
+import { CheckboxIndicator, Combobox, MultiCombobox, comboboxSearchContainerVariants, type ComboboxOption } from "@ooee/ui";
+import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -69,7 +69,68 @@ export function ComboboxWorkbench() {
           </div>
         </Section>
         <Section id="anatomy" title="Anatomy" description="닫힌 Trigger와 열린 Content container의 구조를 분리해 확인합니다.">
-          <div className="col-span-full"><AnatomySurface ariaLabel="Combobox anatomy" className="px-5 py-10"><div lang="en" className="relative mx-auto max-w-md space-y-2 py-8"><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm"><span className="flex-1 text-oe-foreground-secondary">Selected value / Placeholder</span><RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" /></div><div className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 shadow-lg"><div className={comboboxSearchContainerVariants()}><RiSearchLine className="size-4 text-oe-foreground-tertiary" /><span className="text-sm text-oe-foreground-placeholder">Search input</span></div><div className="mt-2"><div className="flex min-h-9 items-center gap-2 rounded-md px-2.5 text-sm"><span className="grid size-4 place-items-center rounded border border-oe-border-primary bg-oe-background-primary"><RiCheckLine className="size-3 text-transparent" /></span><span className="flex-1">Option</span></div></div></div><AnatomyNumber number={1} className="-left-4 top-0" lineClassName="left-5 top-2.5 h-px w-8" /><AnatomyNumber number={2} className="left-24 top-0" lineClassName="left-2.5 top-5 h-5 w-px" /><AnatomyNumber number={3} className="-right-4 top-16" lineClassName="right-5 top-2.5 h-px w-8" /><AnatomyNumber number={4} className="left-24 bottom-12" lineClassName="bottom-5 left-2.5 h-5 w-px" /><AnatomyNumber number={5} className="right-16 bottom-0" lineClassName="bottom-5 left-2.5 h-5 w-px" /></div></AnatomySurface><AnatomyLegend items={[{ name: "Trigger" }, { name: "Selected value / Placeholder" }, { name: "Content container" }, { name: "Search input" }, { name: "Option / Checkbox" }]} /><AnatomyDescription><p>Single과 Multiple은 같은 Trigger와 검색 구조를 사용합니다. Multiple Option은 선택 상태를 Checkbox로 표시합니다.</p></AnatomyDescription></div>
+          <div className="col-span-full grid gap-8">
+            <div>
+              <AnatomySurface ariaLabel="Combobox trigger anatomy" title="Trigger anatomy" className="px-5">
+                <div lang="en" className="relative mx-auto max-w-md px-8 py-14">
+                  <div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm">
+                    <span className="flex-1 text-oe-foreground-secondary">Selected value / Placeholder</span>
+                    <RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" />
+                  </div>
+                  <AnatomyNumber number={1} className="left-0 top-16" lineClassName="left-5 top-2.5 h-px w-2" />
+                  <span aria-hidden="true" className="absolute left-7 top-14 h-9 w-px bg-oe-border-primary" />
+                  <AnatomyNumber number={2} className="left-[42%] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
+                  <AnatomyNumber number={3} className="right-[42px] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
+                </div>
+              </AnatomySurface>
+              <AnatomyLegend items={[{ name: "Trigger container" }, { name: "Selected value / Placeholder" }, { name: "Trigger icon" }]} />
+            </div>
+
+            <div>
+              <AnatomySurface ariaLabel="Combobox content anatomy" title="Content anatomy" className="px-5">
+                <div lang="en" className="relative mx-auto max-w-md px-8 py-14">
+                  <div className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 shadow-lg">
+                    <div className={comboboxSearchContainerVariants()}>
+                      <RiSearchLine className="size-4 text-oe-foreground-tertiary" />
+                      <span className="text-sm text-oe-foreground-placeholder">Search input</span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="flex min-h-9 items-center gap-2 rounded-md px-2.5 text-sm">
+                        <CheckboxIndicator />
+                        <span className="flex-1">Option</span>
+                      </div>
+                      <div className="flex min-h-9 items-center gap-2 rounded-md px-2.5 text-sm text-oe-foreground-tertiary">
+                        <span className="grid size-4 place-items-center rounded border border-oe-border-primary bg-oe-background-primary" />
+                        <span className="flex-1">Option</span>
+                      </div>
+                    </div>
+                  </div>
+                  <AnatomyNumber number={4} className="left-0 top-16" lineClassName="left-5 top-2.5 h-px w-2" />
+                  <span aria-hidden="true" className="absolute bottom-14 left-7 top-14 w-px bg-oe-border-primary" />
+                  <AnatomyNumber number={5} className="left-[42%] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
+                  <AnatomyNumber number={6} className="right-0 top-[130px]" lineClassName="right-5 top-2.5 h-px w-2" />
+                  <span aria-hidden="true" className="absolute right-7 top-[104px] h-[72px] w-px bg-oe-border-primary" />
+                  <AnatomyNumber number={7} className="left-[32%] bottom-4" lineClassName="bottom-5 left-2.5 h-8 w-px" />
+                </div>
+              </AnatomySurface>
+              <AnatomyLegend start={4} items={[{ name: "Content container" }, { name: "Search input" }, { name: "Option list" }, { name: "Option / Checkbox" }]} />
+            </div>
+
+            <AnatomyStructureMap lines={[
+              { name: "Combobox root" },
+              { prefix: "├─ ", name: "Trigger container" },
+              { prefix: "│  ├─ ", name: "Selected value / Placeholder" },
+              { prefix: "│  └─ ", name: "Trigger icon" },
+              { prefix: "└─ ", name: "Content container" },
+              { prefix: "   ├─ ", name: "Search input" },
+              { prefix: "   └─ ", name: "Option list" },
+              { prefix: "      └─ ", name: "Option" },
+              { prefix: "         ├─ ", name: "Checkbox (Multiple)" },
+              { prefix: "         └─ ", name: "Selected indicator (Single)" },
+            ]} />
+
+            <AnatomyDescription><p>Single과 Multiple은 같은 Trigger와 검색 구조를 사용합니다. Multiple Option은 Checkbox를, Single Option은 선택된 항목에 Selected indicator를 표시합니다.</p></AnatomyDescription>
+          </div>
         </Section>
         <Section id="selection" title="Properties · Selection" description="단일 선택과 체크박스를 사용하는 다중 선택은 값과 완료 동작이 달라 별도 컴포넌트로 제공합니다."><Example label="Single"><Combobox {...common} defaultValue="seoul" /></Example><Example label="Multiple · Summary"><MultiCombobox {...common} defaultValue={["seoul", "gyeonggi"]} selectedSummaryLabel={(first, remaining) => remaining > 0 ? locale === "ko" ? `${first} 외 ${remaining}곳` : `${first} +${remaining}` : first} selectAllLabel={c.all} /></Example><Example label="Multiple · Container"><MultiCombobox {...common} defaultValue={["seoul", "gyeonggi"]} selectedSummaryLabel={(first, remaining) => remaining > 0 ? locale === "ko" ? `${first} 외 ${remaining}곳` : `${first} +${remaining}` : first} selectedDisplay="container" selectAllLabel={c.all} selectedSearchPlaceholder={c.selectedSearch} removeSelectedLabel={c.remove} /></Example><div className="col-span-full"><Example label="Multiple · 2-depth"><SubwayDepthExample /></Example></div></Section>
         <Section id="style" title="Properties · Style" description="Input과 같은 Outline과 Filled 시각 규칙을 사용합니다."><Example label="Outline"><Combobox {...common} defaultValue="seoul" /></Example><Example label="Filled"><Combobox {...common} defaultValue="seoul" variant="filled" /></Example></Section>
@@ -119,16 +180,14 @@ function SubwayDepthExample() {
         <div className="h-[270px] overflow-x-hidden overflow-y-auto p-2 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
           <p className="px-2.5 pb-1.5 pt-1 text-[11px] font-medium text-oe-foreground-tertiary">{currentDepth.label}</p>
           <button type="button" role="checkbox" aria-checked={someCurrentSelected ? "mixed" : allCurrentSelected} onClick={toggleAllCurrent} className="flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left text-oe-label hover:bg-oe-interaction-hover">
-            <span className={`grid size-4 shrink-0 place-items-center rounded border ${allCurrentSelected || someCurrentSelected ? "border-oe-foreground-primary bg-oe-foreground-primary" : "border-oe-border-primary bg-oe-background-primary"}`}>
-              {someCurrentSelected ? <RiSubtractLine className="size-3 text-oe-foreground-inverse" aria-hidden="true" /> : <RiCheckLine className={`size-3 text-oe-foreground-inverse ${allCurrentSelected ? "opacity-100" : "opacity-0"}`} aria-hidden="true" />}
-            </span>
+            <CheckboxIndicator checked={allCurrentSelected} indeterminate={someCurrentSelected} />
             <span>전체</span>
           </button>
           {visibleOptions.map((line) => {
             const selected = selectedStations.includes(line);
             return (
               <button key={line} type="button" aria-pressed={selected} onClick={() => setSelectedStations((current) => selected ? current.filter((value) => value !== line) : [...current, line])} className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left text-oe-label ${selected ? "" : "hover:bg-oe-interaction-hover"}`}>
-                <span className={`grid size-4 shrink-0 place-items-center rounded border ${selected ? "border-oe-foreground-primary bg-oe-foreground-primary" : "border-oe-border-primary bg-oe-background-primary"}`}><RiCheckLine className={`size-3 text-oe-foreground-inverse ${selected ? "opacity-100" : "opacity-0"}`} aria-hidden="true" /></span>
+                <CheckboxIndicator checked={selected} />
                 <span>{line}</span>
               </button>
             );

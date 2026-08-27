@@ -28,7 +28,7 @@ type RadioGroupProps<Value = string> = RadioGroupPrimitive.Props<Value> & {
   className?: string
 }
 
-function Radio({ className, indicatorClassName, ...props }: RadioProps) {
+function Radio({ className, indicatorClassName, disabled, readOnly, ...props }: RadioProps) {
   return (
     <RadioPrimitive.Root
       data-slot="radio"
@@ -36,11 +36,13 @@ function Radio({ className, indicatorClassName, ...props }: RadioProps) {
         "inline-grid size-4 shrink-0 place-items-center rounded-full border border-oe-border-primary bg-oe-background-primary outline-none transition-[background-color,border-color,box-shadow]",
         "data-[checked]:border-oe-brand-background-bold-primary data-[checked]:bg-oe-brand-background-bold-primary",
         "focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary",
-        "active:bg-oe-interaction-hover data-[checked]:active:bg-oe-brand-background-bold-primary",
+        !readOnly && "active:bg-oe-interaction-hover data-[checked]:active:bg-oe-brand-background-bold-primary",
         "data-[disabled]:cursor-not-allowed data-[disabled]:border-oe-border-primary data-[disabled]:bg-oe-background-disabled",
         "data-[disabled]:data-[checked]:border-oe-background-disabled-selected data-[disabled]:data-[checked]:bg-oe-background-disabled-selected",
         className,
       )}
+      disabled={disabled}
+      readOnly={readOnly}
       {...props}
     >
       <RadioPrimitive.Indicator
@@ -59,12 +61,19 @@ function RadioGroup<Value = string>({ className, ...props }: RadioGroupProps<Val
   return <RadioGroupPrimitive className={cn(className)} {...props} />
 }
 
-function RadioField({ label, rightDescription, bottomDescription, leadingElement, trailingElement, layout = "inline", flipped = false, radioClassName, className, disabled, ...props }: RadioFieldProps) {
+function RadioFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, layout = "inline", flipped = false, radioClassName, className, disabled, readOnly, ...props }: RadioFieldProps) {
   const labelId = React.useId()
 
   return (
-    <label className={cn("flex min-h-oe-control-regular items-start gap-2 py-2", layout === "block" ? "w-full" : "w-fit", flipped && "flex-row-reverse", disabled && "cursor-not-allowed", className)}>
-      <Radio aria-labelledby={labelId} className={cn("mt-0.5", radioClassName)} disabled={disabled} {...props} />
+    <label className={cn(
+      "flex min-h-oe-control-regular items-start gap-2 rounded-md bg-transparent px-2 py-2 transition-colors duration-[60ms]",
+      !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:bg-oe-interaction-hover-subtle",
+      layout === "block" ? "w-full" : "w-fit",
+      flipped && "flex-row-reverse",
+      disabled && "cursor-not-allowed",
+      className,
+    )}>
+      <Radio aria-labelledby={labelId} className={cn("mt-0.5", radioClassName)} disabled={disabled} readOnly={readOnly} {...props} />
       <span className={cn("flex min-w-0 flex-col", layout === "block" && "flex-1")}>
         <span className="flex min-w-0 items-start gap-2">
           {leadingElement ? <span data-slot="radio-leading" className="mt-0.5 shrink-0">{leadingElement}</span> : null}
@@ -80,17 +89,25 @@ function RadioField({ label, rightDescription, bottomDescription, leadingElement
   )
 }
 
-function RadioContainer({ className, radioClassName, ...props }: RadioContainerProps) {
+function RadioField(props: RadioFieldProps) {
+  return <RadioFieldBase {...props} />
+}
+
+function RadioContainer({ className, radioClassName, readOnly, ...props }: RadioContainerProps) {
   return (
-    <RadioField
+    <RadioFieldBase
       layout="block"
       className={cn(
-        "min-h-[64px] items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3 transition-[background-color,border-color]",
-        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:border-[var(--brand-alpha-20)]",
-        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:bg-[var(--brand-alpha-08)]",
+        "min-h-[64px] items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3 transition-[background-color,border-color,box-shadow]",
+        !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:bg-oe-background-primary",
+        !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:shadow-xs",
+        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:border-[var(--brand-alpha-30)]",
+        "[&:has([data-slot=radio][data-checked]:not([data-disabled]))]:bg-[var(--brand-alpha-05)]",
+        "[&:has([data-slot=radio][data-checked]:not([data-disabled])):hover]:bg-[var(--brand-alpha-05)]",
         className,
       )}
       radioClassName={cn("mt-0", radioClassName)}
+      readOnly={readOnly}
       {...props}
     />
   )
