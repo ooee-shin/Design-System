@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiArrowDownSLine, RiCheckboxCircleFill, RiCheckLine, RiCloseCircleFill, RiFileLine, RiFolderLine, RiGlobalLine, RiImageLine, RiLockLine, RiSettings3Line, RiTeamLine } from "@remixicon/react";
+import { RiArrowDownSLine, RiCheckLine, RiFileLine, RiFolderLine, RiGlobalLine, RiImageLine, RiLockLine, RiSettings3Line, RiTeamLine } from "@remixicon/react";
 import Link from "next/link";
 
 import { MultiSelect, Select, type SelectOption, type SelectOptionGroup } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
+import { GuidelineList as SharedGuidelineList, GuideVisual, UsageComparison as SharedUsageComparison } from "@/components/component-guidelines";
 import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -431,20 +432,20 @@ function AnatomyPanel({ title, parts, summary, notes, children }: { title: strin
   );
 }
 
-function UsageComparison({ title, doText, dontText, description, doVisual, dontVisual }: { title: string; doText: ReactNode; dontText: ReactNode; description: string[]; doVisual: ReactNode; dontVisual: ReactNode }) {
-  return <div><GuidelineTitle>{title}</GuidelineTitle><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2"><div className="order-1 rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4 @min-[720px]:col-start-1 @min-[720px]:row-start-1">{doVisual}</div><div className="order-3 rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4 @min-[720px]:col-start-2 @min-[720px]:row-start-1">{dontVisual}</div><div className="order-2 flex gap-2 rounded-xl bg-oe-success-background-primary p-3 text-oe-success-foreground-primary @min-[720px]:col-start-1 @min-[720px]:row-start-2"><RiCheckboxCircleFill className="mt-0.5 size-oe-icon-small shrink-0 text-oe-success-foreground-secondary" aria-hidden="true" /><div><p className="text-xs font-semibold">Do</p><p className="mt-0.5 text-sm leading-6">{doText}</p></div></div><div className="order-4 flex gap-2 rounded-xl bg-oe-danger-background-primary p-3 text-oe-danger-foreground-primary @min-[720px]:col-start-2 @min-[720px]:row-start-2"><RiCloseCircleFill className="mt-0.5 size-oe-icon-small shrink-0 text-oe-danger-foreground-secondary" aria-hidden="true" /><div><p className="text-xs font-semibold">Don’t</p><p className="mt-0.5 text-sm leading-6">{dontText}</p></div></div><GuidelineList className="order-5 @min-[720px]:col-span-2 @min-[720px]:row-start-3" items={description} /></div></div>;
+function UsageComparison({ description, ...props }: { title: string; doText: ReactNode; dontText: ReactNode; description: string[]; doVisual: ReactNode; dontVisual: ReactNode }) {
+  return <SharedUsageComparison {...props} description={description.map((item) => linkGuidelineReferences(item))} />;
 }
 
 function SelectionSummaryGuide({ title, intro, representativeTitle, representativeDescription, countTitle, countDescription, boundary, representativeVisual, countVisual }: { title: string; intro: string; representativeTitle: string; representativeDescription: string; countTitle: string; countDescription: string; boundary: string; representativeVisual: ReactNode; countVisual: ReactNode }) {
-  return <div><GuidelineTitle>{title}</GuidelineTitle><p className="mt-2 text-sm leading-6 text-oe-foreground-secondary">{intro}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2"><div className="rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{representativeTitle}</p>{representativeVisual}</div><div className="rounded-xl border border-oe-border-secondary bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{countTitle}</p>{countVisual}</div></div><GuidelineList className="mt-3" items={[<><span className="font-medium text-oe-foreground-primary">{representativeTitle}:</span> {representativeDescription}</>, <><span className="font-medium text-oe-foreground-primary">{countTitle}:</span> {countDescription}</>, boundary]} /></div>;
+  return <div><GuidelineTitle>{title}</GuidelineTitle><p className="mt-2 text-sm leading-6 text-oe-foreground-secondary">{intro}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2"><GuideVisual label={representativeTitle}>{representativeVisual}</GuideVisual><GuideVisual label={countTitle}>{countVisual}</GuideVisual></div><GuidelineList className="mt-3" items={[<><span className="font-medium text-oe-foreground-primary">{representativeTitle}:</span> {representativeDescription}</>, <><span className="font-medium text-oe-foreground-primary">{countTitle}:</span> {countDescription}</>, boundary]} /></div>;
 }
 
 function TextUsageGuide({ title, description }: { title: string; description: string[] }) {
   return <div><GuidelineTitle>{title}</GuidelineTitle><GuidelineList className="mt-2" items={description} /></div>;
 }
 
-function GuidelineList({ items, className = "" }: { items: ReactNode[]; className?: string }) {
-  return <ul className={`space-y-1 px-1 text-sm leading-6 text-oe-foreground-secondary ${className}`}>{items.map((item, index) => <li key={index} className="flex items-start gap-2"><span className="mt-[10px] size-[3px] shrink-0 rounded-full bg-oe-foreground-placeholder" aria-hidden="true" /><span className="min-w-0">{typeof item === "string" ? linkGuidelineReferences(item) : item}</span></li>)}</ul>;
+function GuidelineList({ items, className }: { items: ReactNode[]; className?: string }) {
+  return <SharedGuidelineList className={className} items={items.map((item) => (typeof item === "string" ? linkGuidelineReferences(item) : item))} />;
 }
 
 function OptionListUsagePreview({ labels }: { labels: [string, string, string] }) {

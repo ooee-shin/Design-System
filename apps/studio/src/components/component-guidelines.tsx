@@ -7,8 +7,8 @@ export function GuideVisual({ label, children, contentClassName }: { label: stri
   return <div className="flex h-full flex-col rounded-xl bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{label}</p><div className={`flex flex-1 items-center rounded-lg border border-oe-border-secondary bg-oe-background-primary ${contentClassName ?? "px-4 py-6"}`}>{children}</div></div>;
 }
 
-export function GuidelineList({ items }: { items: ReactNode[] }) {
-  return <ul className="mt-3 space-y-1 px-1 text-sm leading-6 text-oe-foreground-secondary">{items.map((item, index) => <li key={index} className="flex items-start gap-2"><span className="mt-[10px] size-[3px] shrink-0 rounded-full bg-oe-foreground-placeholder" aria-hidden="true" /><span>{item}</span></li>)}</ul>;
+export function GuidelineList({ items, className = "mt-3" }: { items: ReactNode[]; className?: string }) {
+  return <ul className={`space-y-1 px-1 text-sm leading-6 text-oe-foreground-secondary ${className}`}>{items.map((item, index) => <li key={index} className="flex items-start gap-2"><span className="mt-[10px] size-[3px] shrink-0 rounded-full bg-oe-foreground-placeholder" aria-hidden="true" /><span>{item}</span></li>)}</ul>;
 }
 
 export function TargetArea({ label, children, className = "" }: { label: string; children: ReactNode; className?: string }) {
