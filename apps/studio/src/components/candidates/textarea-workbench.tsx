@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { Textarea } from "@ooee/ui";
+import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -125,44 +126,24 @@ export function TextareaWorkbench() {
 function TextareaAnatomy() {
   return (
     <div className="col-span-full min-w-0">
-      <div className="rounded-xl bg-oe-background-secondary p-5">
-        <p className="text-xs font-semibold text-oe-foreground-primary">Textarea structure</p>
-        <div role="img" aria-label="Textarea anatomy" className="overflow-x-auto">
+      <AnatomySurface ariaLabel="Textarea anatomy" title="Textarea structure" className="px-5 pb-5 pt-12">
+        <div className="overflow-x-auto">
           <div className="relative mx-auto h-[18rem] w-[40rem] text-oe-foreground-secondary">
-          <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 640 288" fill="none" aria-hidden="true">
-            <path d="M96 112V92H544V112" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <path d="M320 48V92" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <TextareaAnatomyNumber x={320} y={32} number={1} />
+            <AnatomyBoundaryMarker number={1} side="top" connectorLength={50} boundaryLength={448} className="left-[310px] top-[22px]" />
+            <AnatomyNumber number={2} className="left-[310px] top-[244px]" lineClassName="left-2.5 bottom-[26px] h-[72px] w-px" />
 
-            <path d="M320 238V166" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <TextareaAnatomyNumber x={320} y={254} number={2} />
-
-          </svg>
-
-          <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-primary whitespace-pre-line">
-            Textarea field
-          </div>
+            <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 whitespace-pre-line text-oe-foreground-placeholder">
+              Textarea field
+            </div>
           </div>
         </div>
-        <ol className="flex flex-wrap gap-x-5 gap-y-2 text-left text-xs text-oe-foreground-primary">
-          <li className="flex items-baseline gap-1.5"><span className="font-semibold">1.</span><span>Container</span></li>
-          <li className="flex items-baseline gap-1.5"><span className="font-semibold">2.</span><span>Textarea field</span></li>
-        </ol>
-      </div>
-      <div className="mt-4 space-y-2 text-sm leading-6 text-oe-foreground-secondary">
+      </AnatomySurface>
+      <AnatomyLegend items={[{ name: "Container" }, { name: "Textarea field" }]} />
+      <AnatomyDescription>
         <p><span className="font-semibold text-oe-foreground-primary">Container:</span> 전체 입력 영역입니다. 최소 높이는 88px이며 약 3.5줄의 입력 공간을 확보합니다.</p>
         <p><span className="font-semibold text-oe-foreground-primary">Textarea field:</span> 실제 여러 줄 입력 영역입니다. Auto size가 true이면 내용에 따라 Container와 함께 높이가 증가합니다.</p>
-      </div>
+      </AnatomyDescription>
     </div>
-  );
-}
-
-function TextareaAnatomyNumber({ x, y, number }: { x: number; y: number; number: number }) {
-  return (
-    <g>
-      <circle cx={x} cy={y} r="9" fill="var(--oe-foreground-secondary)" />
-      <text x={x} y={y + 0.5} textAnchor="middle" dominantBaseline="middle" fill="var(--oe-foreground-inverse)" fontSize="10" fontWeight="600">{number}</text>
-    </g>
   );
 }
 

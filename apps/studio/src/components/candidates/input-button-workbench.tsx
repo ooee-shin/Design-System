@@ -5,6 +5,7 @@ import { RiArrowRightSLine, RiCalendarLine, RiMapPinLine, RiTimeLine } from "@re
 import { InputButton } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
+import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { ColorSwatch } from "@/components/color-swatch";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -140,28 +141,24 @@ export function InputButtonWorkbench() {
 }
 
 function InputButtonAnatomy() {
-  const parts = ["Container", "Leading element (Optional)", "Value / Placeholder", "Trailing element (Optional)"];
   return (
-    <div className="col-span-full min-w-0 rounded-xl bg-oe-background-secondary p-5">
-      <p className="text-xs font-semibold text-oe-foreground-primary">Input Button structure</p>
-      <div role="img" aria-label="Input Button anatomy" className="overflow-x-auto py-5">
-        <div className="relative mx-auto flex h-48 w-[30rem] items-center justify-center">
-          <div className="pointer-events-none w-72"><InputButton value="Value / Placeholder" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
-          <ContainerAnatomyMarker />
-          <AnatomyMarker number="2" className="left-[6.75rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
-          <AnatomyMarker number="3" className="left-[10.25rem] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
-          <AnatomyMarker number="4" className="right-[6.625rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+    <div className="col-span-full min-w-0">
+      <AnatomySurface ariaLabel="Input Button anatomy" title="Input Button structure" className="px-5 pb-5 pt-12">
+        <div className="overflow-x-auto">
+          <div className="relative mx-auto flex h-48 w-[30rem] items-center justify-center">
+            <div className="pointer-events-none w-72"><InputButton value="Value / Placeholder" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
+            <AnatomyBoundaryMarker number={1} side="left" connectorLength={48} boundaryLength={36} className="left-5 top-[5.4rem]" />
+            <AnatomyNumber number={2} className="left-[6.75rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+            <AnatomyNumber number={3} className="left-[10.25rem] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
+            <AnatomyNumber number={4} className="right-[6.625rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+          </div>
         </div>
-      </div>
-      <ol className="flex flex-wrap gap-x-5 gap-y-2 text-left text-xs text-oe-foreground-primary">
-        {parts.map((part, index) => { const optionalStart = part.indexOf(" ("); return <li key={part} className="flex items-baseline gap-1.5"><span className="font-semibold">{index + 1}.</span><span>{optionalStart > -1 ? part.slice(0, optionalStart) : part}</span>{optionalStart > -1 ? <span className="text-oe-foreground-placeholder">{part.slice(optionalStart)}</span> : null}</li>; })}
-      </ol>
+      </AnatomySurface>
+      <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Value / Placeholder" }, { name: "Trailing element", optional: true }]} />
     </div>
   );
 }
 
-function ContainerAnatomyMarker() { return <span className="absolute left-5 top-[5.4rem] grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse">1<span aria-hidden="true" className="absolute left-5 top-2.5 h-px w-12 bg-oe-border-primary" /><span aria-hidden="true" className="absolute -top-2 left-[4.25rem] h-9 w-px bg-oe-border-primary" /></span>; }
-function AnatomyMarker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) { return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>; }
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function Example({ label, description, children }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) { return <div className="flex min-h-32 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-xs font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }

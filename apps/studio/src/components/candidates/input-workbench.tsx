@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiCalendarLine, RiEyeLine, RiEyeOffLine, RiGlobalLine, RiLink, RiLockPasswordLine, RiSearchLine, RiUserLine } from "@remixicon/react";
+import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiGlobalLine, RiLink, RiLockPasswordLine, RiSearchLine, RiUserLine } from "@remixicon/react";
 
 import { Input } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
+import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -219,75 +220,32 @@ export function InputWorkbench() {
 }
 
 function InputAnatomy() {
-  const parts = [
-    [1, "Container", false],
-    [2, "Leading element", true],
-    [3, "Prefix", true],
-    [4, "Input field", false],
-    [5, "Clear button", true],
-    [6, "Suffix", true],
-    [7, "Trailing element", true],
-  ] as const;
-
   return (
-    <div className="col-span-full min-w-0 rounded-xl bg-oe-background-secondary p-5">
-      <p className="text-xs font-semibold text-oe-foreground-primary">Input structure</p>
-      <div role="img" aria-label="Input anatomy" className="overflow-x-auto">
-        <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
-          <svg className="pointer-events-none absolute inset-0 z-10 size-full" viewBox="0 0 768 352" fill="none" aria-hidden="true">
-            {/* Container is shown as a bracket around the whole control, not a single-point callout. */}
-            <path d="M116 151V132H652V151" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <path d="M384 88V132" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={384} y={72} number={1} />
+    <div className="col-span-full min-w-0">
+      <AnatomySurface ariaLabel="Input anatomy" title="Input structure" className="px-5 pb-5 pt-12">
+        <div className="overflow-x-auto">
+          <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
+            <AnatomyBoundaryMarker number={1} side="top" connectorLength={50} boundaryLength={536} className="left-[374px] top-[62px]" />
+            <AnatomyNumber number={2} className="left-[134px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
+            <AnatomyNumber number={3} className="left-[190px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
+            <AnatomyNumber number={4} className="left-[362px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
+            <AnatomyNumber number={5} className="left-[518px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
+            <AnatomyNumber number={6} className="left-[566px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
+            <AnatomyNumber number={7} className="left-[614px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
 
-            <path d="M144 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={144} y={76} number={2} />
-
-            <path d="M200 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={200} y={76} number={3} />
-
-            <path d="M372 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={372} y={263} number={4} />
-
-            <path d="M528 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={528} y={263} number={5} />
-
-            <path d="M576 94V172" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={576} y={76} number={6} />
-
-            <path d="M624 245V190" stroke="var(--oe-border-primary)" strokeWidth="1" />
-            <AnatomyNumber x={624} y={263} number={7} />
-          </svg>
-
-          <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
-            <RiSearchLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
-            <span className="text-oe-foreground-secondary">https://</span>
-            <span className="min-w-0 truncate text-oe-foreground-placeholder">Input field</span>
-            <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary" aria-hidden="true">×</span>
-            <span className="text-oe-foreground-secondary">.com</span>
-            <RiCalendarLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+            <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
+              <RiSearchLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+              <span className="text-oe-foreground-secondary">https://</span>
+              <span className="min-w-0 truncate text-oe-foreground-placeholder">Input field</span>
+              <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary"><RiCloseLine className="size-4" aria-hidden="true" /></span>
+              <span className="text-oe-foreground-secondary">.com</span>
+              <RiCalendarLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+            </div>
           </div>
         </div>
-      </div>
-      <ol className="flex flex-wrap justify-start gap-x-5 gap-y-2 text-left text-xs text-oe-foreground-primary">
-        {parts.map(([number, label, optional]) => (
-          <li key={label} className="flex items-baseline gap-1.5 whitespace-nowrap">
-            <span className="font-semibold">{number}.</span>
-            <span>{label}</span>
-            {optional ? <span className="text-oe-foreground-placeholder">(Optional)</span> : null}
-          </li>
-        ))}
-      </ol>
+      </AnatomySurface>
+      <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Prefix", optional: true }, { name: "Input field" }, { name: "Clear button", optional: true }, { name: "Suffix", optional: true }, { name: "Trailing element", optional: true }]} />
     </div>
-  );
-}
-
-function AnatomyNumber({ x, y, number }: { x: number; y: number; number: number }) {
-  return (
-    <g>
-      <circle cx={x} cy={y} r="9" fill="var(--oe-foreground-secondary)" />
-      <text x={x} y={y + 0.5} textAnchor="middle" dominantBaseline="middle" fill="var(--oe-foreground-inverse)" fontSize="10" fontWeight="600">{number}</text>
-    </g>
   );
 }
 
