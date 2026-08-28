@@ -35,6 +35,8 @@
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control
   - Candidate/Provisional도 실제 공용 자산이며 Stable은 package 이동이 아닌 검증 완료 상태
+  - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
+  - Combobox Anatomy의 범위 표시선 3개만 예외로 로컬에 남아 있다. 그중 하나가 Popup 콘텐츠 높이에 맞춰 늘어나야 해서 마커 기준 고정 길이만 표현하는 `AnatomyBoundaryMarker`로 옮길 수 없다
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
@@ -279,19 +281,24 @@
 
 ## 바로 다음 작업
 
-Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신(0)은 완료했으며 아래 1~9가 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
+Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신과 공용 부품 통합은 완료했으며 아래 1~8이 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
 
-1. 공용 부품 통합. Anatomy 마커·연결선·범례·Surface를 10개 페이지가 각자 복제한 것을 `component-anatomy`로 되돌리고, Select의 `UsageComparison`·`GuidelineList`·`GuideVisual` 복제본, 종속 표시 막대 복제본, 선택 버튼 복제본을 공용으로 통합한다. 마커 크기 18/20px 혼재와 회색 Surface 밖으로 빠진 범례가 함께 해소된다.
-2. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Input의 가짜 Clear 아이콘, Textarea의 글자 상자, Combobox의 미선택 체크박스 2개, Input·Textarea의 금지된 bracket, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳.
-3. Playground control 정합. `Preview state` 배타 선택을 독립 Boolean Toggle로 분리(Input·Input Button·Number Input·Select), 교체 Slot을 공용 `PlaygroundElementControl`로, Badge Playground 신설, 타입 불일치 5곳, 문장형 라벨 13종과 페이지 간 라벨 통일, 종속 표시 6곳.
-4. 섹션 구조와 타이포. Message Bubble의 예시 선행·2열 배치·`Properties ·` 카드 부재·Playground 배경, Chip의 Property map 순서, 목차 누락 7곳, 묶인 Property 카드 5곳, 뒤집힌 계층 3곳, 접두어 7곳, 제목 위계 통일.
-5. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
-6. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
-7. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
-8. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
-9. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
+1. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. Input·Textarea의 금지된 bracket과 Input의 가짜 Clear 아이콘, Textarea의 글자 상자는 공용 부품 통합에서 같은 코드를 고치며 함께 처리했다.
+2. Playground control 정합. `Preview state` 배타 선택을 독립 Boolean Toggle로 분리(Input·Input Button·Number Input·Select), 교체 Slot을 공용 `PlaygroundElementControl`로, Badge Playground 신설, 타입 불일치 5곳, 문장형 라벨 13종과 페이지 간 라벨 통일, 종속 표시 6곳.
+3. 섹션 구조와 타이포. Message Bubble의 예시 선행·2열 배치·`Properties ·` 카드 부재·Playground 배경, Chip의 Property map 순서, 목차 누락 7곳, 묶인 Property 카드 5곳, 뒤집힌 계층 3곳, 접두어 7곳, 제목 위계 통일.
+4. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
+5. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
+6. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
+7. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
+8. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
 
-1~7은 검수 수정, 8~9는 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
+1~6은 검수 수정, 7~8은 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
+
+사용자 확인을 기다리는 항목:
+
+- 공용 부품 통합 뒤 Anatomy 화면의 실제 좌표와 여백. 번호 마커가 18px에서 20px로 커져 Input·Textarea의 연결선 위치가 미세하게 달라졌을 수 있고, Checkbox·Radio는 제목 아래 설명 한 줄 때문에 Surface 상단 여백을 `pt-12`로 잡았다. 값이 적절한지 실제 화면에서 확인이 필요하다.
+- Combobox 범위 표시선을 공용으로 옮길지, 늘어나는 표시를 지원하도록 `AnatomyBoundaryMarker`를 확장할지. 아래 1번 작업에서 함께 판단한다.
+- 코드·Studio·문서 3중 대조 검수를 나머지 12개 컴포넌트로 확대할지. Checkbox 하나에서만 9곳의 불일치를 찾았고 그중 상당수가 문서가 맞고 코드가 틀린 경우였다.
 
 ## 이전부터 이어지는 작업
 
