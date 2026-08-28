@@ -1,22 +1,13 @@
+import "./test-setup"
+
 import assert from "node:assert/strict"
 import test, { afterEach } from "node:test"
-import { JSDOM } from "jsdom"
+
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-const dom = new JSDOM("<!doctype html><html><body></body></html>", { url: "http://localhost" })
-Object.assign(globalThis, {
-  window: dom.window, document: dom.window.document, HTMLElement: dom.window.HTMLElement,
-  HTMLInputElement: dom.window.HTMLInputElement, Element: dom.window.Element, Node: dom.window.Node,
-  Event: dom.window.Event, MouseEvent: dom.window.MouseEvent, KeyboardEvent: dom.window.KeyboardEvent,
-  MutationObserver: dom.window.MutationObserver, getComputedStyle: dom.window.getComputedStyle,
-  requestAnimationFrame: (callback: FrameRequestCallback) => setTimeout(() => callback(Date.now()), 0),
-  cancelAnimationFrame: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
-})
-Object.defineProperty(globalThis, "navigator", { configurable: true, value: dom.window.navigator })
-if (!("PointerEvent" in globalThis)) Object.assign(globalThis, { PointerEvent: dom.window.MouseEvent })
-const { SelectBox, SelectBoxGroup } = await import("./select-box")
+import { SelectBox, SelectBoxGroup } from "./select-box"
 
 afterEach(() => {
   cleanup()

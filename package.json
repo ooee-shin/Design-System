@@ -11,14 +11,11 @@
     "dev:studio": "pnpm --filter @ooee/studio dev",
     "build": "pnpm --filter @ooee/studio build",
     "lint": "pnpm --filter @ooee/studio lint",
+    "typecheck": "pnpm -r typecheck",
     "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts",
-    "check": "pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "devDependencies": {
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.6",
-    "jsdom": "^30.0.1",
-    "react-dom": "19.2.8",
     "tsx": "^4.23.12"
   }
 }

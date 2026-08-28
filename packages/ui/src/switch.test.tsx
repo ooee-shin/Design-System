@@ -1,36 +1,13 @@
+import "./test-setup"
+
 import assert from "node:assert/strict"
 import test, { afterEach } from "node:test"
 
-import { JSDOM } from "jsdom"
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Switch, SwitchField } from "./switch"
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", { url: "http://localhost" })
-
-Object.assign(globalThis, {
-  window: dom.window,
-  document: dom.window.document,
-  HTMLElement: dom.window.HTMLElement,
-  HTMLInputElement: dom.window.HTMLInputElement,
-  Element: dom.window.Element,
-  Node: dom.window.Node,
-  Event: dom.window.Event,
-  MouseEvent: dom.window.MouseEvent,
-  KeyboardEvent: dom.window.KeyboardEvent,
-  MutationObserver: dom.window.MutationObserver,
-  getComputedStyle: dom.window.getComputedStyle,
-  requestAnimationFrame: (callback: FrameRequestCallback) => setTimeout(() => callback(Date.now()), 0),
-  cancelAnimationFrame: (id: ReturnType<typeof setTimeout>) => clearTimeout(id),
-})
-
-Object.defineProperty(globalThis, "navigator", { configurable: true, value: dom.window.navigator })
-
-if (!("PointerEvent" in globalThis)) {
-  Object.assign(globalThis, { PointerEvent: dom.window.MouseEvent })
-}
 
 afterEach(() => cleanup())
 
@@ -46,7 +23,7 @@ test("SwitchField uses the medium control and right-side label by default", asyn
 })
 
 test("pointer and label clicks toggle the SwitchField", async () => {
-  const user = userEvent.setup({ document: dom.window.document })
+  const user = userEvent.setup({ document: globalThis.document })
   const view = render(<SwitchField label="Notifications" />)
   const control = await view.findByRole("switch", { name: "Notifications" })
 
@@ -58,7 +35,7 @@ test("pointer and label clicks toggle the SwitchField", async () => {
 })
 
 test("Space toggles a focused Switch", async () => {
-  const user = userEvent.setup({ document: dom.window.document })
+  const user = userEvent.setup({ document: globalThis.document })
   const view = render(<Switch aria-label="Notifications" />)
   const control = view.getByRole("switch", { name: "Notifications" })
 
@@ -68,7 +45,7 @@ test("Space toggles a focused Switch", async () => {
 })
 
 test("Disabled preserves the selected value and blocks interaction", async () => {
-  const user = userEvent.setup({ document: dom.window.document })
+  const user = userEvent.setup({ document: globalThis.document })
   const view = render(<SwitchField label="Notifications" defaultChecked disabled />)
   const control = await view.findByRole("switch", { name: "Notifications" })
 
