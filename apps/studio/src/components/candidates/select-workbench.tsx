@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { MultiSelect, Select, type SelectOption, type SelectOptionGroup } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
+import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { GuidelineTitle } from "@/components/guideline-title";
@@ -383,12 +384,12 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
           </div>
           <span aria-hidden="true" className="absolute left-[9.5rem] top-12 h-9 w-px bg-oe-border-primary" />
           <span aria-hidden="true" className="absolute left-[9.5rem] top-[6.25rem] h-[6rem] w-px bg-oe-border-primary" />
-          <Marker number="1" className="left-14 top-[3.5rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <Marker number="2" className="left-[13.375rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
-          <Marker number="3" className="right-[7.25rem] top-[3.5rem]" lineClassName="right-5 top-2.5 h-px w-8" />
-          <Marker number="4" className="left-14 top-[6.25rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <Marker number="5" className="left-14 top-[8.75rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <Marker number="6" className="left-14 top-[12.75rem]" lineClassName="left-5 top-2.5 h-px w-[5.5rem]" />
+          <AnatomyNumber number={1} className="left-14 top-[3.5rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
+          <AnatomyNumber number={2} className="left-[13.375rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
+          <AnatomyNumber number={3} className="right-[7.25rem] top-[3.5rem]" lineClassName="right-5 top-2.5 h-px w-8" />
+          <AnatomyNumber number={4} className="left-14 top-[6.25rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
+          <AnatomyNumber number={5} className="left-14 top-[8.75rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
+          <AnatomyNumber number={6} className="left-14 top-[12.75rem]" lineClassName="left-5 top-2.5 h-px w-[5.5rem]" />
         </div>
       </AnatomyPanel>
 
@@ -405,10 +406,10 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
         <div role="img" aria-label="Select option anatomy" className="relative mx-auto h-[9rem] w-[48rem]">
           <div className="absolute left-40 top-12 flex min-h-11 w-[28rem] items-start gap-2.5 rounded-md border border-oe-border-secondary bg-oe-background-primary px-2.5 py-1.5 text-sm"><AnatomySwapSlot className="self-center" /><span className="min-w-0 flex-1"><span className="block">{options[2].label}</span><span className="mt-0.5 block text-xs leading-4 text-oe-foreground-tertiary">{options[2].description}</span></span></div>
           <span aria-hidden="true" className="absolute left-[9.5rem] top-12 h-[3.15rem] w-px bg-oe-border-primary" />
-          <Marker number="1" className="left-14 top-[4rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <Marker number="2" className="left-[10.15rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
-          <Marker number="3" className="right-8 top-[3.375rem]" lineClassName="right-5 top-2.5 h-px w-[28rem]" />
-          <Marker number="4" className="right-8 top-[4.625rem]" lineClassName="right-5 top-2.5 h-px w-[24rem]" />
+          <AnatomyNumber number={1} className="left-14 top-[4rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
+          <AnatomyNumber number={2} className="left-[10.15rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
+          <AnatomyNumber number={3} className="right-8 top-[3.375rem]" lineClassName="right-5 top-2.5 h-px w-[28rem]" />
+          <AnatomyNumber number={4} className="right-8 top-[4.625rem]" lineClassName="right-5 top-2.5 h-px w-[24rem]" />
         </div>
       </AnatomyPanel>
     </div>
@@ -416,7 +417,18 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
 }
 
 function AnatomyPanel({ title, parts, summary, notes, children }: { title: string; parts: string[]; summary: string; notes: { term: string; description: string }[]; children: ReactNode }) {
-  return <div className="min-w-0"><div className="rounded-xl bg-oe-background-secondary px-5 py-5"><p className="text-xs font-semibold text-oe-foreground-primary">{title}</p><div className="mt-2 overflow-x-auto">{children}</div><ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 px-1 text-left text-xs text-oe-foreground-primary">{parts.map((part, index) => { const optionalAt = part.indexOf(" ("); return <li key={part} className="flex items-baseline gap-1.5"><span className="font-semibold">{index + 1}.</span><span>{optionalAt > -1 ? part.slice(0, optionalAt) : part}</span>{optionalAt > -1 ? <span className="text-oe-foreground-placeholder">{part.slice(optionalAt)}</span> : null}</li>; })}</ol></div><div className="px-1 pt-4"><p className="text-sm leading-6 text-oe-foreground-secondary">{summary}</p><dl className="mt-3 grid gap-2 text-sm leading-6">{notes.map((note) => <div key={note.term}><dt className="inline font-semibold text-oe-foreground-primary">{note.term}:</dt><dd className="ml-1.5 inline text-oe-foreground-tertiary">{note.description}</dd></div>)}</dl></div></div>;
+  return (
+    <div className="min-w-0">
+      <AnatomySurface ariaLabel={`${title} anatomy`} title={title} className="px-5 pb-5 pt-12">
+        <div className="overflow-x-auto">{children}</div>
+      </AnatomySurface>
+      <AnatomyLegend items={parts.map((part) => { const optionalAt = part.indexOf(" ("); return optionalAt > -1 ? { name: part.slice(0, optionalAt), optional: true } : { name: part }; })} />
+      <AnatomyDescription>
+        <p>{summary}</p>
+        <dl className="grid gap-2">{notes.map((note) => <div key={note.term}><dt className="inline font-semibold text-oe-foreground-primary">{note.term}:</dt><dd className="ml-1.5 inline text-oe-foreground-tertiary">{note.description}</dd></div>)}</dl>
+      </AnatomyDescription>
+    </div>
+  );
 }
 
 function UsageComparison({ title, doText, dontText, description, doVisual, dontVisual }: { title: string; doText: ReactNode; dontText: ReactNode; description: string[]; doVisual: ReactNode; dontVisual: ReactNode }) {
@@ -476,7 +488,6 @@ function makeGroups(options: SelectOption[], labels: readonly [string, string]):
   return [{ label: labels[0], options: options.slice(0, 2) }, { label: labels[1], options: options.slice(2) }];
 }
 
-function Marker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) { return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>; }
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function Example({ label, children }: { label: string; children: ReactNode; fixed?: boolean }) { return <div className="flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-xs font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
