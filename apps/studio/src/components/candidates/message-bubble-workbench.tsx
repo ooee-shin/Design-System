@@ -20,6 +20,7 @@ import { Badge } from "@ooee/ui";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 import { cn } from "@/lib/utils";
 import { createCoreSemanticCssVariables } from "@ooee/tokens";
+import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
 import { OnThisPage } from "@/components/component-detail-navigation";
 
 const sections = [{ id: "integrated", label: "Integrated example" }, { id: "playground", label: "Playground" }, { id: "conversation-states", label: "Conversation states" }, { id: "delivery-states", label: "Delivery states" }, { id: "read-handling", label: "Read handling" }, { id: "themes", label: "Themes" }, { id: "file-attachment", label: "File attachment" }];
@@ -591,6 +592,3 @@ function Toggle({ active, onClick, children }: { active: boolean; onClick: () =>
   return <button type="button" aria-pressed={active} onClick={onClick} className={cn("inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 text-xs text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring", active && "bg-background text-foreground shadow-xs")}>{children}</button>;
 }
 
-function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return <button type="button" aria-pressed={active} onClick={onClick} className={cn("oe-hover-layer rounded-lg border border-oe-border-secondary px-2.5 py-1.5 text-xs text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring", active && "bg-oe-background-secondary text-oe-foreground-primary")}>{children}</button>;
-}
