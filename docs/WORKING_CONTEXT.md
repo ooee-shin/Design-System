@@ -2,7 +2,7 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 상세한 이유와 전체 철학은 루트 `README.md`, 강제 규칙은 루트 `AGENTS.md`, 색상 결정은 `docs/foundations/color.md`를 확인한다.
 
-마지막 내용 점검: `2026-08-27`
+마지막 내용 점검: `2026-08-28`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -35,6 +35,7 @@
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control
   - Candidate/Provisional도 실제 공용 자산이며 Stable은 package 이동이 아닌 검증 완료 상태
+  - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
   - `Home`, `Foundations`, `Components`, `Patterns` 그룹 메뉴만 표시
@@ -47,7 +48,7 @@
   - Chat과 Inbox의 중복 모드·언어 control은 제거하고 Studio 공통 설정을 사용
   - 현재 언어 범위는 국문·영문이며 일문은 콘텐츠 검수 범위를 확장할 때 공통 설정에 추가
   - Studio 문서 설명은 국문을 유지하고 KO/EN 전환은 실제 Component Preview의 Label·Value·Placeholder·접근 가능한 이름과 `lang`에 적용. 전체 영문 문서는 국문 문서 완료 뒤 별도 검토
-  - Component catalog 메타데이터와 Similar/Works with 관계는 `component-registry`가 단일 원본이며 12개 상세 route는 공용 `ComponentDetailPage` shell을 사용
+  - Component catalog 메타데이터와 Similar/Works with 관계는 `component-registry`가 단일 원본이며 13개 상세 route는 공용 `ComponentDetailPage` shell을 사용
   - Component 상세 페이지의 기본 순서는 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`. Anatomy는 모든 Properties보다 앞에 두고 우측 목차도 본문 순서를 따름
   - 화면 확정 검수에서 주요 Property가 각각 독립 카드/섹션으로 설명되는지 확인. Property map이나 Playground에만 있고 설명 카드가 없으면 자동 생성하지 않고 사용자에게 필요 여부를 질문. native 연결용 기술 속성은 시각 카드 대상에서 제외 가능
   - Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용. Remix `RiBookOpenLine` 16px Tertiary 아이콘과 14px Semibold 제목을 8px 간격으로 배치하며 컴포넌트별로 중복 구현하지 않음
@@ -119,7 +120,7 @@
   - 현재 확인된 native 속성, 최소 높이 64px, content sizing과 기본 상태만 문서화
   - Focus/Error는 Input과 같은 단색 1px border + 외부 1px ring 구조를 사용
   - Input과 Textarea는 데스크톱 `On this page` rail 아래의 낮은 위계 Related 링크에서 서로 이동
-  - `/components/field`는 Input의 Related에서 이동할 수 있는 페이지 껍데기만 준비했으며 Field Anatomy, Properties와 실제 컴포넌트는 아직 정의하지 않음
+  - `/components/field`와 registry의 `Works with → Field` 관계는 제거한다. 아직 정의하지 않은 컴포넌트의 페이지를 미리 만들어 두지 않는다는 결정이며, 실제 컴포넌트인 `CheckboxField`·`RadioField`·`SwitchField`와 Field 구조 설명은 그대로 유지
   - 컴포넌트 상세 페이지는 데스크톱 우측의 sticky `On this page`에서 현재 섹션을 확인하고 바로 이동하며 좁은 검수 viewport에서는 숨김
   - 목차는 뎁스별 지그재그 경로 없이 단일 직선 rail을 사용하고, 화면의 활성 구간에 여러 섹션이 걸리면 모두 강조하며 활성 선의 위치와 높이를 300ms로 전환. rail과 항목 배경의 간격은 12px
 - `/components/number-input`
@@ -185,14 +186,14 @@
   - Checkbox와 Radio의 Field에는 현재 크기·위치가 변하는 Pressed motion을 적용하지 않음. Control 상태색과 Field Hover만 유지하며 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 일괄 검수 예정
   - Radio Group의 보이는 질문·제목은 Field 조작 영역의 외곽이 아니라 실제 Radio Indicator의 왼쪽 시작점에 정렬. 화면·Surface의 20px 바깥 여백과 제목 위치는 유지하고 기본 RadioField의 8px 조작 여백은 Field를 왼쪽으로 보정해 바깥 방향으로 확보. 콘텐츠 결합 예시는 Radio 행의 불필요한 내부 들여쓰기를 제거
   - Checkbox Group도 같은 시각 정렬 규칙을 사용. Layout 예시 Surface는 20px 내부 여백을 사용하고 질문·제목 위치는 유지하며 묶인 CheckboxField 배열만 왼쪽으로 8px 보정해 실제 Indicator 시작점을 맞춤. 단독 CheckboxField에는 Group 보정을 적용하지 않음
-  - 별도 Size property 없이 Appearance `rounded | ghost`를 지원하며 기본값은 Rounded. Square/Rounded는 시스템 Radius Foundation에서 하나를 정하는 방향이므로 Checkbox 인스턴스 Property의 Square는 제거
-  - Ghost Indicator는 15px이며 Default · Unchecked에서도 placeholder foreground로 표시하고 Checked에서 Brand foreground로 강조. Rounded Indicator icon은 10px. Indeterminate와 Disabled 상태는 Rounded에만 제공하고 Ghost에는 제공하지 않음
-  - Appearance별 선택 표현을 분리해 Rounded는 fill과 border를 사용하고 Ghost는 Check icon의 foreground만 변경. 두 Appearance 모두 4px root radius를 유지해 Focus ring이 각지지 않음
+  - 별도 Size property 없이 `shape` `square | rounded | ghost`를 지원하며 기본값은 Rounded. 모양은 시스템 단위가 아니라 서비스와 컴포넌트 조합 단위로 고르므로 컴포넌트가 `shape`를 소유한다. Ghost는 모서리 값이 아니라 Container를 제거하는 Checkbox 고유 값. 이전의 `appearance` Property와 Square 제거 결정을 대체함
+  - Ghost Indicator는 15px이며 Default · Unchecked에서도 placeholder foreground로 표시하고 Checked에서 Brand foreground로 강조. Rounded Indicator icon은 10px. Indeterminate와 Disabled 상태는 Square와 Rounded에 제공하고 Ghost에는 제공하지 않음
+  - shape별 선택 표현을 분리해 Square·Rounded는 fill과 border를 사용하고 Ghost는 Check icon의 foreground만 변경. Indicator radius는 Square 0px, Rounded 4px이며 Focus ring을 소유하는 Control은 세 shape 모두 4px를 유지해 Square에서도 각지지 않음
   - `Properties · Appearance`는 Rounded·Ghost를 직접 하위 카드로 배치하고 각 카드 안에 Unchecked·Checked를 별도 Surface 없이 수직 배열. Appearance·Elements·State는 각각 독립된 바깥 Section 카드로 구성
   - Playground의 Optional `Label=false`는 Field 전용 속성을 숨기고 접근 가능한 이름을 가진 원자 Checkbox만 표시해 Control 단독 사용을 검수
   - Playground에서는 `Label`에 실제로 종속되는 Field 속성만 영역 border가 아닌, 위아래 끝이 둥근 Studio 공통 2px 수직선 그룹으로 표시. Rounded에서만 지원되는 Indeterminate·Disabled는 Ghost 선택 시 조건부로 숨김
   - Checkbox State 문서는 Rounded와 Ghost를 분리해 표시하며 Ghost에는 Indeterminate와 Disabled가 없음을 명시
-  - Checkbox Guidelines는 Switch와 공용 `component-guidelines` 구조를 사용해 Target area, 제출 지연 선택, 부모–자식 선택, Disabled 표현, 나열과 Indicator 재사용 원칙을 설명. Indicator 재사용은 흰색 Surface 중앙의 원자 Indicator와 Red PDF icon을 포함한 범용 선택 Content 예시를 2-grid로 비교하며 각각 실제 전환 가능. Content card가 클릭·선택 동작을 소유하고 Indicator는 카드 우측 상단에서 상태만 표시. Active Container는 `brand-alpha-30` border와 `brand-alpha-05` background를 사용하고 선택 여부와 관계없이 hover 시 `shadow-xs`를 표시
+  - Checkbox Guidelines는 Switch와 공용 `component-guidelines` 구조를 사용해 Target area, 제출 지연 선택, 부모–자식 선택, Disabled 표현, 나열과 Indicator 재사용 원칙을 설명. Indicator 재사용은 흰색 Surface 중앙의 원자 Indicator와 Red PDF icon을 포함한 범용 선택 Content 예시를 2-grid로 비교하며 각각 실제 전환 가능. Content card가 클릭·선택 동작을 소유하고 Indicator는 카드 우측 상단에서 상태만 표시. Active Container는 `brand-alpha-40` border와 `brand-alpha-05` background를 사용하고 선택 여부와 관계없이 hover 시 `shadow-xs`를 표시
   - Guidelines 시각 예시의 바깥 Neutral 회색 Surface에는 border를 두지 않고, 실제 UI를 감싸는 내부 `background-primary` Surface에만 옅은 Neutral border를 사용
   - Brand palette와 semantic CSS 변수는 `ooee-brand-theme-css`에 캐시하고 Root Layout의 선행 script에서 첫 paint 전에 복원. 저장된 Brand 색과 초기 fallback 색의 전환을 방지하며 `<html suppressHydrationWarning>`으로 의도적인 선행 style 주입의 hydration 경고를 억제
   - State의 Rounded·Ghost처럼 제목과 설명이 바깥에 노출되는 그룹 사이는 32px 수준으로 분리하고, Elements의 카드만 이어지는 구조는 기본 간격을 유지
@@ -227,6 +228,11 @@
 
 ## 확정된 결정
 
+- 모양의 공통 어휘는 `Square`, `Rounded`, `Circle(Pill)`이며 각 컴포넌트가 `shape` Property로 소유한다. 선택 단위는 시스템 전체가 아니라 서비스와 컴포넌트의 조합이고, 같은 컴포넌트를 한 서비스 안에서 섞어 쓰지 않기를 권장하는 수준이다. 강제 규칙이 아니다.
+- Studio Playground는 검수용 테스트 환경임을 드러내는 Neutral 회색 Surface와 2px bold 외곽을 사용한다. 다른 예시 Surface 규칙의 예외다.
+- Anatomy Preview는 정적 도식으로 그려도 되며, 대신 실제 컴포넌트와 다르게 보이지 않아야 한다.
+- Radio와 Checkbox의 카드형 선택은 변형 컴포넌트로 만들지 않지만, base Control·Indicator만 재사용하는 조합은 활용 예시로 허용한다.
+- 컴포넌트 Anatomy 명칭은 업계 표준을 우선하고 역할은 대응표로 밝힌다. Switch는 Track/Thumb을 유지한다.
 - 일반 background/foreground/border는 Neutral이다.
 - 직접 조작하는 form control 보더는 `oe-border-primary`, 여러 폼 요소나 Label을 감싸는 form container 보더는 `oe-border-secondary`를 사용한다.
 - Neutral·Accent·Warning·Danger·Success·Info의 실행 가능한 단일 원본은 `packages/tokens/src/index.ts`이며 Color 표와 전역 스타일은 이를 함께 사용한다.
@@ -273,11 +279,27 @@
 
 ## 바로 다음 작업
 
+Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신(0)은 완료했으며 아래 1~9가 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
+
+1. 공용 부품 통합. Anatomy 마커·연결선·범례·Surface를 10개 페이지가 각자 복제한 것을 `component-anatomy`로 되돌리고, Select의 `UsageComparison`·`GuidelineList`·`GuideVisual` 복제본, 종속 표시 막대 복제본, 선택 버튼 복제본을 공용으로 통합한다. 마커 크기 18/20px 혼재와 회색 Surface 밖으로 빠진 범례가 함께 해소된다.
+2. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Input의 가짜 Clear 아이콘, Textarea의 글자 상자, Combobox의 미선택 체크박스 2개, Input·Textarea의 금지된 bracket, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳.
+3. Playground control 정합. `Preview state` 배타 선택을 독립 Boolean Toggle로 분리(Input·Input Button·Number Input·Select), 교체 Slot을 공용 `PlaygroundElementControl`로, Badge Playground 신설, 타입 불일치 5곳, 문장형 라벨 13종과 페이지 간 라벨 통일, 종속 표시 6곳.
+4. 섹션 구조와 타이포. Message Bubble의 예시 선행·2열 배치·`Properties ·` 카드 부재·Playground 배경, Chip의 Property map 순서, 목차 누락 7곳, 묶인 Property 카드 5곳, 뒤집힌 계층 3곳, 접두어 7곳, 제목 위계 통일.
+5. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
+6. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
+7. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
+8. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
+9. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
+
+1~7은 검수 수정, 8~9는 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
+
+## 이전부터 이어지는 작업
+
 1. Select Box는 현재 요청된 Playground와 Anatomy까지만 유지하고 실제 화면에서 구조와 Control을 먼저 확정한다. Properties, State, Examples/Usage, Guidelines와 Property map은 사용자가 다음 단계를 요청하기 전에는 추가하지 않는다.
 2. Component 문서 1차 공통화 검수를 계속한다. Select와 Switch를 기준으로 나머지 상세 화면의 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`, 우측 목차, Similar/Works with와 Preview KO/EN 전환을 컴포넌트별로 확인한다.
 3. Anatomy 시각 검수를 마무리한다. Checkbox와 Radio는 Basic/Extended로 분리했고, Input·Input Button·Number Input·Textarea·Switch는 유형명·시각 예제·범례를 하나의 Neutral Surface로 맞춘 상태다. Badge·Chip·Combobox는 공용 Anatomy Surface를 사용하며 Container 평행선과 번호 정렬을 실제 화면에서 다시 확인해야 한다.
 4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
-5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지 껍데기만 있으므로 컴포넌트 정의 전에는 Anatomy를 만들지 않는다.
+5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.

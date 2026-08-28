@@ -72,7 +72,7 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 
 새 판단이 필요한 내용은 Studio 페이지에 임시 정책으로 표시하지 않고 사용자에게 먼저 질문한 뒤 코드와 문서에 함께 반영한다.
 
-Studio의 Anatomy는 구조와 명칭만 설명하는 정적 도식이며 input이나 button으로 동작하지 않는다. State 비교 예시는 상태값을 온전히 비교할 수 있도록 pointer와 keyboard interaction을 차단한다. 실제 속성 조합과 입력 동작은 상단 Playground에서 검수한다.
+Studio의 Anatomy는 구조와 명칭만 설명하는 정적 도식이며 input이나 button으로 동작하지 않는다. State 비교 예시는 값과 상태를 controlled로 고정해 비교 대상이 사용자의 조작으로 풀리지 않게 한다. 다만 Hover, Pressed, Focus visible과 키보드 피드백은 실제로 확인할 수 있어야 하므로 `pointer-events: none`, 전체 key event 차단이나 `tabIndex=-1`로 상호작용 자체를 막지 않는다. 실제 속성 조합과 입력 동작은 상단 Playground에서 검수한다.
 
 Playground의 Optional element는 하나의 Elements 묶음으로 제어하지 않는다. Leading/Trailing/Clear는 각각 표시 여부를 독립적으로 제어하고, Prefix/Suffix는 표시 여부와 실제 text 값을 별도 Property로 제어한다.
 

@@ -119,7 +119,9 @@ Target area를 설명할 때는 실제 컴포넌트를 바꾸지 않고 공용 `
 
 Studio의 수치 측정 Annotation은 Violet 계열을 공통으로 사용한다. 대상은 width·height·min/max·Target area 같은 크기, padding·gap·inset 같은 내부/외부 간격, radius, font-size·line-height·letter-spacing처럼 수치로 측정하는 Typography 스펙이다. 숫자가 token으로 표현되어도 역할이 치수이면 같은 Violet 표시를 사용한다. Font family·weight 명칭, semantic color 값, 상태, Anatomy 번호와 Swap 영역은 치수 Annotation이 아니므로 Violet 규칙을 적용하지 않는다. 치수 숫자 Pill은 border 없이 옅은 Violet 배경과 진한 Violet 글자만 사용한다.
 
-Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property로 혼합하지 않는다. 한 시스템의 Radius Foundation 또는 theme에서 기본 방향을 정하고 관련 컴포넌트가 이를 일관되게 따른다. Ghost처럼 Container를 제거하는 구조적 차이는 별도 Appearance로 제공할 수 있다.
+모양은 `Square`, `Rounded`, `Circle(Pill)`을 공통 어휘로 사용하며 각 컴포넌트가 `shape` Property로 소유한다. 서비스는 컴포넌트별로 하나의 모양을 고르는 것을 권장한다. 서비스가 Rounded 방향을 택했더라도 모든 컴포넌트가 Rounded여야 하는 것은 아니며 컴포넌트마다 적합한 모양을 선택할 수 있다. 같은 컴포넌트를 한 서비스 안에서 인스턴스마다 섞어 쓰는 것은 권장하지 않는다. 강제 규칙이 아니므로 필요하면 예외를 둘 수 있다.
+
+공통 어휘로 설명되지 않는 값은 해당 컴포넌트의 고유 값으로 둔다. Container 자체를 제거하는 Checkbox의 `Ghost`와 Container 구조가 달라지는 Input의 밑줄형이 이에 해당하며, 모서리 대안과 같은 `shape` 안에 두되 모양 어휘의 예외임을 문서에 밝힌다.
 
 ### Component 구조 용어
 
@@ -127,11 +129,18 @@ Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property�
 - `Indicator`는 Control 안에서 현재 값이나 상태를 보여 주는 비상호작용 시각 요소다. Radio의 중앙 원, Checkbox의 Check/Indeterminate 표시가 이에 해당한다. 상위 컴포넌트가 입력 동작을 소유해 별도 시각 base를 재사용하는 경우에도 값 변경과 Focus를 소유하지 않으면 Indicator로 부른다.
 - `Field`는 Control과 Label을 기본으로 결합하고 Description, Leading/Trailing element 같은 Content를 선택적으로 포함하는 전체 조작 영역이다.
 - `Container`는 Field 전체를 border, background 또는 다른 Surface로 감싼 선택 영역이다. 단순 Wrapper나 Popup을 Container로 부르지 않고 실제 시각 Surface 또는 명확한 구조 범위를 가질 때 사용한다.
-- Radio와 Checkbox에는 카드형 `RadioContainer`·`CheckboxContainer` 변형을 두지 않는다. 짧은 Label을 밀도 있게 나열하는 폼은 `RadioField`·`CheckboxField`를 사용하고, 설명이나 이미지가 포함된 선택지를 넓은 Surface에서 비교하는 단일·다중 선택은 `SelectBox`가 소유한다.
+- Radio와 Checkbox에는 카드형 `RadioContainer`·`CheckboxContainer` 변형 컴포넌트를 두지 않는다. 짧은 Label을 밀도 있게 나열하는 폼은 `RadioField`·`CheckboxField`를 사용하고, 설명이나 이미지가 포함된 선택지를 넓은 Surface에서 비교하는 단일·다중 선택은 `SelectBox`가 소유한다. 다만 일반 콘텐츠가 선택 동작을 소유하고 base Control 또는 Indicator만 재사용하는 조합은 활용 예시로 허용한다. 이는 확장 가능성을 보여 주는 예시이며 새 변형 컴포넌트를 추가하는 것이 아니다.
 - `Content container`는 Label, Description과 Leading/Trailing element를 묶는 내부 영역이다. Label 하나만 가리킬 때 Content라고 부르지 않는다.
 - 별도 Wrapper가 실제로 존재하지 않으면 `Control container`처럼 역할명 뒤에 Container를 덧붙이지 않는다. Anatomy에서는 `Control` 또는 컴포넌트가 분명해야 할 때 `Radio control`, `Checkbox control`처럼 쓴다.
 - 코드 export, Component 문서, Anatomy 범례, Property 제목과 Studio 예시에서 위 용어를 동일하게 사용한다. 원자 예시 제목은 실제 역할에 따라 `Control only`, `Indicator only`처럼 작성하고 임의의 동의어를 섞지 않는다.
 - 문서에 적는 `Properties · *` 이름은 실제 Studio Section 이름과 일치시킨다. 이전 이름이나 존재하지 않는 Property 범주를 남기지 않는다.
+- 컴포넌트마다 업계에서 굳어진 Anatomy 명칭이 있으면 그 명칭을 쓰고 아래 대응표로 역할을 함께 밝힌다. 한 컴포넌트 안에서 두 이름을 섞어 쓰지 않는다.
+
+| 컴포넌트 | Anatomy 명칭 | 역할 |
+| --- | --- | --- |
+| Switch | Track / Thumb | Control / Indicator |
+| Checkbox | Checkbox control / Selection indicator | Control / Indicator |
+| Radio | Radio control / Selection indicator | Control / Indicator |
 
 ### Playground 종속 컨트롤 표시
 
@@ -156,11 +165,12 @@ Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property�
 - Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
 - 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다.
+- 제목 위계는 페이지 제목 `text-xl`, Section 제목 `text-lg`, Section 하위 카드와 그룹 제목 `text-sm`을 사용한다. Guidelines 하위 주제 제목은 크기가 아니라 공용 `GuidelineTitle`의 아이콘으로 구분하므로 `text-sm`을 유지한다.
 - 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
 - Appearance, State, Size, Elements처럼 확인된 Property 범주가 명확하면 각각을 `Properties · Appearance` 같은 독립된 바깥 Section 카드로 만든다. 구체적인 범주를 다시 더 큰 포괄 카드 하나에 묶지 않는다.
 - Property Section의 직접 하위 제목과 카드는 해당 Property 값으로 구성한다. 예를 들어 Checkbox의 `Properties · Appearance`에서는 Rounded·Ghost가 직접 하위가 되며, 비교를 위한 Unchecked·Checked 상태는 각 Appearance 카드 내부에 배치한다. 비교 상태를 상위 그룹으로 만들어 Property 계층을 뒤집지 않는다.
 - 같은 섹션 안에서 제목·설명·카드 묶음이 Surface 밖에 반복되는 StateGroup 같은 구조는 그룹 사이를 32px 수준으로 분리한다. 제목 없이 카드만 연속되는 Elements 구조에는 기본 카드 간격을 유지한다.
-- Anatomy는 유형명·시각 예제·범례 전체를 Neutral 회색 Surface로 묶는다. Guidelines의 시각 예시 카드는 Neutral 회색 배경만 사용하고 바깥 border는 두지 않는다. 그 안에서 실제 화면 또는 컴포넌트를 감싸는 Container는 흰색 `oe-background-primary` Surface와 옅은 Neutral border를 사용한다. Playground, Properties, Layout과 State의 일반 예시는 흰색 Surface와 Neutral border를 유지한다. 카드 구조 자체는 별도 화면 체계 재설계 전까지 임의로 제거하거나 다른 배경형으로 바꾸지 않는다.
+- Anatomy는 유형명·시각 예제·범례 전체를 Neutral 회색 Surface로 묶는다. Guidelines의 시각 예시 카드는 Neutral 회색 배경만 사용하고 바깥 border는 두지 않는다. 그 안에서 실제 화면 또는 컴포넌트를 감싸는 Container는 흰색 `oe-background-primary` Surface와 옅은 Neutral border를 사용한다. Properties, Layout과 State의 일반 예시는 흰색 Surface와 Neutral border를 유지한다. Playground는 검수용 테스트 환경임을 드러내기 위해 Neutral 회색 Surface와 2px `oe-border-bold-primary` 외곽을 사용하고, 그 안에서 실제 컴포넌트를 두는 영역만 흰색 `oe-background-primary`를 사용한다. 카드 구조 자체는 별도 화면 체계 재설계 전까지 임의로 제거하거나 다른 배경형으로 바꾸지 않는다.
 - Property map이나 Playground control에만 존재하고 별도 설명 카드가 없는 주요 Property를 발견하면 자동으로 카드를 만들지 말고 사용자에게 카드가 필요한지 묻는다.
 - `name`, `value`, `form`처럼 native 연결을 위한 기술 속성까지 모두 시각 카드로 만들지는 않는다. 시각·구조·동작을 이해하는 데 독립 설명이 필요한 상위 Property를 카드 점검 대상으로 삼는다.
 
@@ -181,7 +191,7 @@ Square와 Rounded 같은 모서리 방향은 컴포넌트 인스턴스 Property�
 
 ### Anatomy 번호와 범례
 
-- Anatomy Preview에는 실제 컴포넌트만 표시하고 요소 이름을 컴포넌트 안에 넣지 않는다.
+- Anatomy Preview는 실제 컴포넌트를 그대로 사용하거나 정적 도식으로 그릴 수 있다. 그리는 경우에도 실제 컴포넌트와 다르게 보이면 안 되며 아이콘, 값, 선택 상태, 간격과 radius가 실제 렌더링과 일치해야 한다. 요소 이름을 컴포넌트 안에 넣지 않는다.
 - 번호 마커는 실제 요소를 밀지 않도록 컴포넌트 바깥에 배치하고 1px `oe-border-primary` 안내선으로 대상을 연결한다.
 - Text, Icon처럼 보이는 요소의 실제 클릭·터치 영역이 더 크더라도 번호선은 Hit area 중앙이 아니라 사용자가 화면에서 식별하는 글자 또는 아이콘의 시각 중심을 가리킨다. Container, Group, List 같은 묶음 영역만 별도 평행선으로 범위를 표시한다.
 - Anatomy 유형명, 시각 예제와 번호별 요소명 범례는 하나의 Neutral 회색 Surface 안에서 `유형명 → 시각 예제 → 범례` 순서로 구성한다. 범례를 같은 색의 별도 블록이나 회색 Anatomy 영역 밖의 흰 배경에 분리하지 않는다. Optional은 요소 이름 뒤에 옅은 위계로 표시한다.
@@ -232,13 +242,21 @@ Studio의 `Properties · State` 예시는 비교 대상의 value/state를 contro
 
 ## 검증
 
-코드 변경 후 최소한 다음을 실행한다. 이 명령은 lint, 공용 자산 test와 production build를 모두 포함한다.
+코드 변경 후 최소한 다음을 실행한다. 이 명령은 lint, 공용 자산 typecheck·test와 production build를 모두 포함한다.
 
 ```bash
 pnpm check
 ```
 
 인터랙션이나 반응형을 변경했다면 Studio의 실제 화면에서도 해당 동작을 검수한다.
+
+공용 자산 회귀 검사는 검사 대상 소스와 같은 디렉터리에 두고 다음 규칙을 따른다.
+
+- 컴포넌트 하나의 동작은 `<component>.test.tsx`에 둔다. 둘 이상의 Control을 함께 렌더해야만 성립하는 계약만 `selection-controls.test.tsx`처럼 범주 파일에 두고, 단일 컴포넌트 동작을 범주 파일에 섞지 않는다.
+- `packages/ui`의 테스트는 첫 줄 `import "./test-setup"`으로 공용 JSDOM 환경을 불러온다. 파일마다 JSDOM을 다시 구성하지 않으며 `document`는 `globalThis.document`로 참조한다.
+- 테스트 실행기는 tsx의 기본 classic JSX 변환을 사용하므로 테스트 파일은 JSX를 쓸 때 `import React from "react"`를 유지한다. 컴포넌트 소스는 Studio와 같은 automatic runtime 기준을 따른다.
+- 테스트가 쓰는 의존성은 workspace 루트가 아니라 해당 package의 `devDependencies`에 선언해 package가 단독으로 성립하도록 유지한다.
+- `.tsx`를 소유한 package는 자체 `tsconfig.json`과 `typecheck` script를 둬서 테스트 파일까지 타입 검사 대상에 포함한다.
 
 ## 여러 환경에서 이어서 작업할 때
 
