@@ -8,7 +8,7 @@ Checkbox는 항목의 선택 여부를 표시하고 제어한다. Combobox의 �
 
 ### Basic anatomy
 
-1. Field container: Control과 Content를 포함하는 전체 클릭 영역
+1. Field: Control과 Content를 포함하는 전체 클릭 영역
 2. Checkbox control: 선택 상태, Border와 Focus를 표시하는 16px Checkbox 본체
 3. Selection indicator: Square와 Rounded의 Checked 상태에서는 Remix Check icon, Indeterminate에서는 Remix Minus icon을 표시한다. Ghost는 Check icon을 항상 표시하고 색상으로 선택 여부를 구분한다.
 4. Label: 선택 항목의 필수 텍스트

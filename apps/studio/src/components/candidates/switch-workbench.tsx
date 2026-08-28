@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { CheckboxField, Switch, SwitchField } from "@ooee/ui";
-import { AnatomyStructureMap } from "@/components/component-anatomy";
+import { AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { DeferredChoice, GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -142,23 +142,20 @@ export function SwitchWorkbench() {
 
         <Section id="anatomy" title="Anatomy" description={c.anatomyDescription}>
           <div className="col-span-full grid gap-8">
-            <div className="rounded-xl bg-oe-background-secondary p-5">
-              <p className="text-xs font-semibold text-oe-foreground-primary">Switch structure</p>
-              <div className="px-1 py-1">
+            <div>
+              <AnatomySurface ariaLabel="Switch anatomy" title="Switch structure" className="px-5">
                 <div className="relative mx-auto my-14 w-fit">
                   <SwitchField defaultChecked label="Label" />
-                  <AnatomyMarker number="1" className="left-[9px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyMarker number="2" className="left-4 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                  <AnatomyMarker number="3" className="right-[7px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyNumber number={1} className="left-[9px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                  <AnatomyNumber number={2} className="left-4 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                  <AnatomyNumber number={3} className="right-[7px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
                 </div>
-              </div>
-              <ol className="flex flex-wrap gap-x-5 gap-y-2 px-1 text-xs text-oe-foreground-primary">
-                <li>1 · Track</li><li>2 · Thumb</li><li>3 · Label</li>
-              </ol>
+              </AnatomySurface>
+              <AnatomyLegend items={[{ name: "Track" }, { name: "Thumb" }, { name: "Label" }]} />
             </div>
 
             <AnatomyStructureMap lines={[
-              { name: "Field container" },
+              { name: "Field" },
               { prefix: "├─ ", name: "Track" },
               { prefix: "│  └─ ", name: "Thumb" },
               { prefix: "└─ ", name: "Label" },
@@ -248,7 +245,6 @@ export function SwitchWorkbench() {
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function Example({ label, children }: { label: string; children: ReactNode; isStatic?: boolean }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function Behavior({ title, children }: { title: string; children: ReactNode }) { return <div className="rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{title}</p><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{children}</p></div>; }
-function AnatomyMarker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) { return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>; }
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) { return <div className="flex min-h-6 items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><Switch checked={value} onCheckedChange={onChange} aria-label={label} controlSize="small" /></div>; }
 function Control({ label, children }: { label: string; children: ReactNode }) { return <fieldset><legend className="mb-2 text-[11px] font-medium text-oe-foreground-tertiary">{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>; }
 function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) { return <button type="button" aria-pressed={active} onClick={onClick} className={`rounded-lg border px-2.5 py-1.5 text-xs ${active ? "border-oe-foreground-primary bg-oe-background-bold-primary text-oe-foreground-inverse" : "border-oe-border-secondary text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}>{children}</button>; }

@@ -5,7 +5,7 @@ import { RiFilePdf2Fill, RiNotification3Line } from "@remixicon/react";
 import { Badge, Checkbox, CheckboxField, CheckboxIndicator, SwitchField } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
-import { AnatomyStructureMap } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { DeferredChoice, GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
@@ -70,43 +70,41 @@ export function CheckboxWorkbench() {
 
         <Section id="anatomy" title="Anatomy" description="현재 Checkbox를 구성하는 실제 요소입니다.">
           <div className="col-span-full grid gap-8">
-            <div className="rounded-xl bg-oe-background-secondary p-5">
-              <h4 className="text-xs font-semibold text-oe-foreground-primary">Basic anatomy</h4>
-              <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">CheckboxField의 기본 구조만 표시합니다.</p>
-              <div lang="en" className="mt-3 px-1 py-6">
-                <div className="relative mx-auto my-14 w-fit">
-                  <CheckboxField defaultChecked label="Label" />
-                  <FieldContainerMarker />
-                  <AnatomyMarker number="2" className="left-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyMarker number="3" className="left-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                  <AnatomyMarker number="4" className="right-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+            <div>
+              <AnatomySurface ariaLabel="Checkbox basic anatomy" title="Basic anatomy" className="px-5 pb-5 pt-12">
+                <p className="text-xs leading-5 text-oe-foreground-tertiary">CheckboxField의 기본 구조만 표시합니다.</p>
+                <div lang="en" className="mt-3 px-1 py-6">
+                  <div className="relative mx-auto my-14 w-fit">
+                    <CheckboxField defaultChecked label="Label" />
+                    <AnatomyBoundaryMarker number={1} side="left" connectorLength={32} boundaryLength={36} className="-left-16 top-2" />
+                    <AnatomyNumber number={2} className="left-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                    <AnatomyNumber number={3} className="left-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                    <AnatomyNumber number={4} className="right-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                  </div>
                 </div>
-              </div>
-              <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-oe-foreground-primary">
-                <li>1 · Field container</li><li>2 · Checkbox control</li><li>3 · Selection indicator</li><li>4 · Label</li>
-              </ol>
+              </AnatomySurface>
+              <AnatomyLegend items={[{ name: "Field" }, { name: "Checkbox control" }, { name: "Selection indicator" }, { name: "Label" }]} />
             </div>
 
-            <div className="rounded-xl bg-oe-background-secondary p-5">
-              <h4 className="text-xs font-semibold text-oe-foreground-primary">Extended anatomy</h4>
-              <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">Basic 구조에 추가할 수 있는 Optional 요소만 번호로 표시합니다.</p>
-              <div lang="en" className="mt-3 px-1 py-6">
-                <div className="relative mx-auto my-14 w-fit">
-                  <CheckboxField defaultChecked label="Label" rightDescription="Right Description" bottomDescription="Bottom Description" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} />
-                  <ContentContainerMarker />
-                  <AnatomyMarker number="6" className="left-7 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyMarker number="7" className="right-[34px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyMarker number="8" className="right-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyMarker number="9" className="left-7 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+            <div>
+              <AnatomySurface ariaLabel="Checkbox extended anatomy" title="Extended anatomy" className="px-5 pb-5 pt-12">
+                <p className="text-xs leading-5 text-oe-foreground-tertiary">Basic 구조에 추가할 수 있는 Optional 요소만 번호로 표시합니다.</p>
+                <div lang="en" className="mt-3 px-1 py-6">
+                  <div className="relative mx-auto my-14 w-fit">
+                    <CheckboxField defaultChecked label="Label" rightDescription="Right Description" bottomDescription="Bottom Description" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} />
+                    <AnatomyBoundaryMarker number={5} side="right" connectorLength={32} boundaryLength={48} className="-right-16 top-2" />
+                    <AnatomyNumber number={6} className="left-7 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                    <AnatomyNumber number={7} className="right-[34px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                    <AnatomyNumber number={8} className="right-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
+                    <AnatomyNumber number={9} className="left-7 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
+                  </div>
                 </div>
-              </div>
-              <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-oe-foreground-primary">
-                <li>5 · Content container</li><li>6 · Leading element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>7 · Right Description <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>8 · Trailing element <span className="text-oe-foreground-placeholder">(Optional)</span></li><li>9 · Bottom Description <span className="text-oe-foreground-placeholder">(Optional)</span></li>
-              </ol>
+              </AnatomySurface>
+              <AnatomyLegend start={5} items={[{ name: "Content container" }, { name: "Leading element", optional: true }, { name: "Right Description", optional: true }, { name: "Trailing element", optional: true }, { name: "Bottom Description", optional: true }]} />
             </div>
 
             <AnatomyStructureMap lines={[
-              { name: "Field container" },
+              { name: "Field" },
               { prefix: "├─ ", name: "Checkbox control" },
               { prefix: "│  └─ ", name: "Selection indicator" },
               { prefix: "└─ ", name: "Content container" },
@@ -286,18 +284,6 @@ function Section({ id, title, description, children }: { id: string; title: stri
 
 function StateExample({ label, children }: { label: string; children: ReactNode }) {
   return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
-}
-
-function AnatomyMarker({ number, className, lineClassName }: { number: string; className: string; lineClassName: string }) {
-  return <span className={`absolute grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse ${className}`}>{number}<span aria-hidden="true" className={`absolute bg-oe-border-primary ${lineClassName}`} /></span>;
-}
-
-function FieldContainerMarker() {
-  return <span className="absolute -left-16 top-2 grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse">1<span aria-hidden="true" className="absolute left-5 top-2.5 h-px w-8 bg-oe-border-primary" /><span aria-hidden="true" className="absolute -top-2 left-13 h-9 w-px bg-oe-border-primary" /></span>;
-}
-
-function ContentContainerMarker() {
-  return <span className="absolute -right-16 top-2 grid size-5 place-items-center rounded-full bg-oe-foreground-secondary text-[11px] text-oe-foreground-inverse">5<span aria-hidden="true" className="absolute right-5 top-2.5 h-px w-8 bg-oe-border-primary" /><span aria-hidden="true" className="absolute -top-2 right-13 h-12 w-px bg-oe-border-primary" /></span>;
 }
 
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) {

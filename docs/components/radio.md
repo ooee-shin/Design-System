@@ -8,7 +8,7 @@ Radio는 목록이나 폼에서 여러 항목 중 하나를 선택한다. 확정
 
 ### Basic anatomy
 
-1. Field container
+1. Field
 2. Radio control: 16px 원형 외곽
 3. Selection indicator: Checked에서 표시되는 8px 흰 원
 4. Label
@@ -23,7 +23,7 @@ Basic 번호는 반복하지 않고 Content container와 Optional 요소만 표�
 8. Trailing element: 선택적 Slot
 9. Bottom Description: 선택적
 
-Studio의 `Structure map`은 위 포함 관계를 Checkbox와 같은 트리 형식으로 표시한다. Field container 아래에 Radio control과 Content container가 있고, Selection indicator는 Radio control에 포함된다. 공통 용어 규칙에 따라 값 변경과 Focus를 소유하는 16px 원형은 Control, 그 안의 8px 흰 원은 Indicator로 부른다.
+Studio의 `Structure map`은 위 포함 관계를 Checkbox와 같은 트리 형식으로 표시한다. Field 아래에 Radio control과 Content container가 있고, Selection indicator는 Radio control에 포함된다. 공통 용어 규칙에 따라 값 변경과 Focus를 소유하는 16px 원형은 Control, 그 안의 8px 흰 원은 Indicator로 부른다.
 
 `Radio`는 원자적인 Control, `RadioField`는 Label과 선택적 Content를 결합한다. Radio와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제공하지 않는다. 짧은 항목을 밀도 있게 나열할 때는 `RadioField`를 사용하고, 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때는 Single selection의 `SelectBox`를 사용한다.
 
