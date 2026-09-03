@@ -18,6 +18,8 @@
 | [`docs/process/`](docs/process/README.md) | 무엇을 근거로 어떤 순서와 규칙으로 만드는가 | 전달 시 제거 |
 | [`AGENTS.md`](AGENTS.md) | AI 작업자가 지켜야 하는 작업 운영 규칙 | 전달 시 제거 |
 
+`docs/process/`와 `AGENTS.md`가 전달 대상이 아닌 이유는 이렇다. `ㄱ`, `업무시작`, `퇴근백업` 같은 작업 신호와 외부 자료를 수입하는 절차는 **1차 컴포넌트를 완성하는 동안에만 필요한 규칙**이다. 시스템이 무엇인지 설명하지 않으므로 블루키 자산에 포함할 이유가 없고, 남겨두면 넘겨받는 쪽이 지킬 필요 없는 규칙을 규칙으로 오해한다.
+
 `docs/system/`의 문서는 바깥 문서를 참조하지 않는다. 그래서 `docs/process/`와 `AGENTS.md`를 제거해도 `docs/system/` + `packages/` + `apps/studio`만으로 시스템이 그대로 성립한다.
 
 전달 범위에는 `apps/studio`도 포함한다. Studio는 부품을 화면에서 확인하는 현재의 채널이자 Storybook의 기반이며, 최종적으로는 Storybook이 그 역할을 맡는다.
