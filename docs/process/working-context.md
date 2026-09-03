@@ -40,8 +40,8 @@
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - 메뉴 순서는 `Home → Foundations → Components → Docs → Examples`. 기반에서 부품으로 올라간 뒤 문서를 보고 마지막에 참고 사례를 본다. 앞으로 추가할 `Patterns`는 Components와 Docs 사이에 들어간다
-  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Examples·Presentation. 화면이 없는 `Patterns`와 `Presentation`은 링크가 아닌 카드로 두고 `준비 중`을 표시한다
+  - 메뉴 순서는 `Home → Foundations → Components → Docs → Examples → Presentation`. 기반에서 컴포넌트으로 올라간 뒤 문서를 보고 마지막에 참고 사례를 본다. 앞으로 추가할 `Patterns`는 Components와 Docs 사이에 들어간다
+  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Examples·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
   - 모든 화면이 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다. 밀도가 페이지 틀을 건드리면 화면을 옮길 때 본문이 위아래로 밀린다
   - 12px 글자 옆의 인라인 아이콘은 `oe-icon-xsmall`을 사용한다. `size-3.5`는 아이콘 Foundation의 크기 체계에 없는 값이라 쓰지 않는다. 내비게이션의 라이트·다크 토글만 예외로 남아 있다
   - 각 그룹 index에서 현재 접근 가능한 모든 자산을 확인하고 상세 화면으로 이동
@@ -285,7 +285,7 @@
 ## 확정된 이관 전제
 
 - 이 저장소의 목적은 개인 자산화가 아니라 블루키 제품에서 사용할 UI 시스템의 1차 컴포넌트 완성이다. 통합 방식(블루키 코드 직접 삽입 vs 별도 패키지 연동)은 개발 검토 후 결정하며 1차 작업에 영향을 주지 않는다.
-- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이며 Storybook의 기반이 된다. 최종적으로 부품을 찾아보는 표준 채널은 Storybook이 맡는다.
+- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이며 Storybook의 기반이 된다. 최종적으로 컴포넌트을 찾아보는 표준 채널은 Storybook이 맡는다.
 - `docs/process/`와 `AGENTS.md`는 전달 시 제거한다. 그래서 `docs/system/`의 문서는 이 둘을 참조하지 않는다.
 - 디자인 토큰은 변환 없이 그대로 사용하며 기존 개발 네이밍·스택과의 정합성은 1차 범위에서 고려하지 않는다.
 
@@ -330,9 +330,7 @@ Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구
 
 각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. 문서 구조 분리는 끝났지만 본문에는 아직 과정 성격의 문장이 남아 있다. 제거 대상은 자산의 유래(「Combobox 사례에서 추출한 뒤」), Studio 검수 도구 설명(「Studio는 Structure map에서 표시한다」), 진행 상태 서술(「현재 첫 번째 초안이다」)이다. `현재 정의 없음`은 시스템 정의이므로 남기고, `확인 필요` 항목은 `docs/process/open-questions.md`로 옮긴다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
-Studio에 `Presentation` 화면을 만든다. **무엇을, 왜, 어떻게 바꿨는지 전달하는 화면**이며 작은 단위의 변경 설명이 아니라 한 꼭지 단위로 정리한다. 우선 예시로 한 꼭지만 만들어 형식을 확정한 뒤 나머지를 채운다. 재료는 이미 있다 — PR #1~#5에 무엇을 왜 바꿨는지가 그대로 적혀 있다.
-
-`Presentation`은 오늘 나눈 두 갈래에 그대로 들어가지 않는다. 시스템 자산은 아니지만 넘겨받는 쪽이 알아야 하는 내용이므로, 화면을 만들 때 `docs/system`과 `docs/process` 중 어디에 둘지 함께 정한다.
+`Presentation` 화면을 만들었다. 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 두 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
 사용자 확인을 기다리는 항목:
 

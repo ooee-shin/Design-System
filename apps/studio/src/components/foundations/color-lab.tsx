@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent, type CSSProperties } from "react";
 import { RiCheckLine as Check, RiFileCopyLine as Copy } from "@remixicon/react";
 import {
   BRAND_ALPHA_STEPS,
@@ -15,9 +15,33 @@ import { SemanticTokenCatalog } from "@/components/foundations/semantic-token-ca
 import { TailwindColorCatalog } from "@/components/foundations/tailwind-color-catalog";
 import { useBrandTheme } from "@/components/brand-theme-provider";
 
+const COLOR_LAB_VIEWS = ["primitive", "semantic", "brand"] as const;
+type ColorLabView = (typeof COLOR_LAB_VIEWS)[number];
+
+function isColorLabView(value: string): value is ColorLabView {
+  return (COLOR_LAB_VIEWS as readonly string[]).includes(value);
+}
+
 export function ColorLab() {
   const { seed: appliedSeed, applySeed } = useBrandTheme();
-  const [view, setView] = useState<"primitive" | "semantic" | "brand">("primitive");
+  const [view, setView] = useState<ColorLabView>("primitive");
+
+  // 다른 화면에서 특정 탭을 바로 가리킬 수 있도록 주소의 해시와 맞춘다.
+  useEffect(() => {
+    const applyHash = () => {
+      const next = window.location.hash.replace("#", "");
+      if (isColorLabView(next)) setView(next);
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, []);
+
+  function selectView(next: ColorLabView) {
+    setView(next);
+    // 해시만 바꾸면 화면이 튀므로 이동 없이 주소만 갱신한다.
+    window.history.replaceState(null, "", `#${next}`);
+  }
   const [editor, setEditor] = useState({ draft: appliedSeed || DEFAULT_BRAND_SEED, appliedSeed });
   const draft = editor.appliedSeed === appliedSeed ? editor.draft : appliedSeed;
   const validDraft = /^#[0-9a-fA-F]{6}$/.test(draft);
@@ -42,7 +66,7 @@ export function ColorLab() {
       <div className="flex w-fit max-w-full overflow-x-auto rounded-lg border bg-background p-0.5 shadow-xs">
         <button
           type="button"
-          onClick={() => setView("primitive")}
+          onClick={() => selectView("primitive")}
           aria-pressed={view === "primitive"}
           className={view === "primitive" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
         >
@@ -50,7 +74,7 @@ export function ColorLab() {
         </button>
         <button
           type="button"
-          onClick={() => setView("semantic")}
+          onClick={() => selectView("semantic")}
           aria-pressed={view === "semantic"}
           className={view === "semantic" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
         >
@@ -58,7 +82,7 @@ export function ColorLab() {
         </button>
         <button
           type="button"
-          onClick={() => setView("brand")}
+          onClick={() => selectView("brand")}
           aria-pressed={view === "brand"}
           className={view === "brand" ? "rounded-md bg-muted px-3 py-1.5 text-xs font-medium" : "rounded-md px-3 py-1.5 text-xs text-muted-foreground"}
         >
