@@ -14,6 +14,7 @@ import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 import { componentRegistry } from "@/components/component-registry";
 import { listDocs } from "@/lib/docs";
+import { pendingTopics, presentationEntries } from "@/components/presentation-entries";
 
 type Destination = {
   title: string;
@@ -76,6 +77,8 @@ export default function Home() {
         {
           title: "Presentation",
           description: "무엇을, 왜, 어떻게 바꿨는지 전달합니다.",
+          status: `기록 ${presentationEntries.length}개 · 후보 ${pendingTopics.length}개`,
+          href: "/presentation",
           icon: Slideshow,
         },
       ],
