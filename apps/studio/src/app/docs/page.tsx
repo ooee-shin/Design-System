@@ -7,7 +7,7 @@ const groupDescription: Record<DocEntry["group"], string> = {
   시작: "시스템 전체를 이해하는 데 먼저 읽는 문서입니다.",
   Foundations: "색상, 아이콘처럼 모든 자산이 공유하는 기반 결정입니다.",
   Components: "각 컴포넌트의 구조, Property, 상태와 사용 규칙입니다.",
-  Examples: "공용 부품으로 다시 만든 실제 화면입니다.",
+  Examples: "공용 컴포넌트으로 다시 만든 실제 화면입니다.",
 };
 
 export default function DocsPage() {

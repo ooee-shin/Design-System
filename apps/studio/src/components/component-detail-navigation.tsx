@@ -37,7 +37,7 @@ export function OnThisPage({ items, componentKey, similarItems, worksWithItems }
   };
 
   return (
-    <nav aria-label="On this page" className="sticky top-20 hidden self-start pl-5 @min-[1120px]:block">
+    <nav aria-label="On this page" className="sticky top-20 hidden max-h-[calc(100vh-6rem)] self-start overflow-y-auto pl-5 @min-[1120px]:block">
       <h2 className="text-xs font-semibold text-oe-foreground-primary">On this page</h2>
       <ol className="relative mt-3 space-y-1 border-l border-oe-border-secondary">
         <span aria-hidden="true" style={activeRailStyle} className="pointer-events-none absolute -left-px top-0 w-0.5 bg-oe-border-bold-primary transition-[transform,height,opacity] duration-300 ease-out motion-reduce:transition-none" />

@@ -14,7 +14,7 @@ import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 import { componentRegistry } from "@/components/component-registry";
 import { listDocs } from "@/lib/docs";
-import { pendingTopics, presentationEntries } from "@/components/presentation-entries";
+import { presentationEntries } from "@/components/presentation-entries";
 
 type Destination = {
   title: string;
@@ -43,14 +43,14 @@ export default function Home() {
         },
         {
           title: "Components",
-          description: "독립적인 의미와 상태를 가진 재사용 가능한 UI 부품입니다.",
+          description: "독립적인 의미와 상태를 가진 재사용 가능한 UI 컴포넌트입니다.",
           status: `${componentRegistry.length}개 컴포넌트`,
           href: "/components",
           icon: Layers3,
         },
         {
           title: "Patterns",
-          description: "여러 부품이 특정 목적을 위해 결합된 반복 가능한 구조입니다.",
+          description: "여러 컴포넌트이 특정 목적을 위해 결합된 반복 가능한 구조입니다.",
           icon: Shapes,
         },
       ],
@@ -69,7 +69,7 @@ export default function Home() {
         },
         {
           title: "Examples",
-          description: "외부 화면을 공용 부품으로 다시 만든 사례입니다. 확정된 Pattern은 아닙니다.",
+          description: "외부 화면을 공용 컴포넌트으로 다시 만든 사례입니다. 확정된 Pattern은 아닙니다.",
           status: "Inbox · Page Header · Sidebar",
           href: "/examples",
           icon: Layout,
@@ -77,7 +77,7 @@ export default function Home() {
         {
           title: "Presentation",
           description: "무엇을, 왜, 어떻게 바꿨는지 전달합니다.",
-          status: `기록 ${presentationEntries.length}개 · 후보 ${pendingTopics.length}개`,
+          status: `${presentationEntries.length}개 기록`,
           href: "/presentation",
           icon: Slideshow,
         },
@@ -105,7 +105,7 @@ export default function Home() {
               화면 안에서 검수하고, oe 자산으로 남깁니다.
             </h1>
             <p className="max-w-2xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
-              블루키 제품에서 사용할 UI 시스템을 만드는 작업 공간입니다. 부품을 실제 화면 맥락에서
+              블루키 제품에서 사용할 UI 시스템을 만드는 작업 공간입니다. 컴포넌트을 실제 화면 맥락에서
               검수하고, 확정된 결정을 oe 토큰과 컴포넌트로 남깁니다.
             </p>
           </div>

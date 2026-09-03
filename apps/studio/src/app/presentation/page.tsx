@@ -1,7 +1,26 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
+import { RiArrowLeftLine } from "@remixicon/react";
 
-import { pendingTopics, presentationEntries } from "@/components/presentation-entries";
+import { OnThisPage } from "@/components/component-detail-navigation";
+import { presentationEntries } from "@/components/presentation-entries";
+
+/** 본문의 `[표시할 말](경로)`을 링크로 바꾼다. 링크는 문장 안에서만 나타나고 별도 목록을 만들지 않는다. */
+function withLinks(text: string): ReactNode[] {
+  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, index) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (!match) return part;
+    return (
+      <Link
+        key={`${match[2]}-${index}`}
+        href={match[2]}
+        className="text-foreground underline decoration-foreground/40 underline-offset-4 outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {match[1]}
+      </Link>
+    );
+  });
+}
 
 export default function PresentationPage() {
   return (
@@ -20,58 +39,34 @@ export default function PresentationPage() {
           </div>
         </header>
 
-        <ol className="flex flex-col gap-3" aria-label="변경 기록">
-          {presentationEntries.map((entry) => (
-            <li key={entry.id} className="rounded-2xl border bg-background p-6 sm:p-7">
-              <article aria-labelledby={`${entry.id}-title`} className="flex flex-col gap-4">
-                <h2 id={`${entry.id}-title`} className="text-lg font-semibold tracking-tight">
-                  {entry.title}
-                </h2>
-                <p className="max-w-3xl text-sm leading-7 text-muted-foreground">{entry.why}</p>
-                <p className="flex max-w-3xl gap-2.5 text-sm leading-7 text-foreground">
-                  <RiArrowRightLine className="mt-1.5 size-oe-icon-xsmall shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <span>{entry.how}</span>
-                </p>
-                {entry.links?.length ? (
-                  <div className="flex flex-wrap gap-2 border-t pt-4">
-                    {entry.links.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="inline-flex items-center rounded-lg border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        {link.label}
-                      </Link>
+        {/* 컨테이너 쿼리는 조상 컨테이너를 기준으로 하므로 @container 는 그리드보다 바깥에 둔다. */}
+        <div className="@container">
+          <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
+            <ol className="flex min-w-0 flex-col gap-3" aria-label="변경 기록">
+            {presentationEntries.map((entry) => (
+              <li key={entry.id} id={entry.id} className="scroll-mt-20 rounded-2xl border bg-background p-6 sm:p-8">
+                <article aria-labelledby={`${entry.id}-title`}>
+                  <h2 id={`${entry.id}-title`} className="text-2xl font-semibold tracking-tight">
+                    {entry.title}
+                  </h2>
+                  <div className="mt-6 flex flex-col gap-6">
+                    {entry.sections.map((section) => (
+                      <section key={section.heading}>
+                        <h3 className="max-w-3xl text-lg font-semibold leading-7 tracking-tight text-foreground">
+                          {section.heading}
+                        </h3>
+                        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{withLinks(section.body)}</p>
+                      </section>
                     ))}
                   </div>
-                ) : null}
-              </article>
-            </li>
-          ))}
-        </ol>
-
-        <section aria-labelledby="pending-title" className="space-y-3 border-t pt-7">
-          <div>
-            <h2 id="pending-title" className="text-sm font-medium">
-              기록할 것
-            </h2>
-            <p className="mt-0.5 max-w-2xl text-xs leading-5 text-muted-foreground">
-              아직 쓰지 않은 꼭지입니다. 이유는 결정을 내린 직후에 가장 잘 기억나고 시간이 지나면 결과만 남습니다.
-              성격이 다른 꼭지를 늘어놓고 봐야 무엇을·왜·어떻게 형식이 전부에 맞는지도 판단할 수 있습니다.
-            </p>
-          </div>
-          <ul className="flex flex-col rounded-2xl border bg-background">
-            {pendingTopics.map((topic) => (
-              <li
-                key={topic.title}
-                className="flex flex-col gap-1 border-b px-5 py-3.5 last:border-b-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
-              >
-                <span className="text-sm text-foreground">{topic.title}</span>
-                <span className="shrink-0 font-mono text-[11px] text-muted-foreground">{topic.source}</span>
+                </article>
               </li>
             ))}
-          </ul>
-        </section>
+          </ol>
+
+            <OnThisPage items={presentationEntries.map((entry) => ({ id: entry.id, label: entry.title }))} />
+          </div>
+        </div>
       </div>
     </main>
   );

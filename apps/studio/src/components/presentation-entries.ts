@@ -2,71 +2,74 @@
  * Presentation 화면이 표시하는 변경 기록이다.
  *
  * 이 파일이 원본이며 별도 문서로 옮겨두지 않는다. 블루키 자산화에 필요해지면
- * 그때 이 배열에서 필요한 형식으로 뽑아낸다. 그래서 구조를 단순하게 유지한다.
+ * 그때 이 배열에서 필요한 형식으로 뽑아낸다. 그래서 구조를 단순하게 유지하고
+ * 본문 안의 링크도 마크다운과 같은 `[표시할 말](경로)` 형태로 적는다.
  *
  * 한 항목은 한 꼭지다. 개별 수정 단위가 아니라 무엇을 왜 바꿨는지 설명할 수 있는
  * 단위로 묶는다.
+ *
+ * **최신 항목을 배열 맨 앞에 둔다.** 화면에 보이는 순서와 같게 유지해야 나중에 이 배열을
+ * 다른 형식으로 뽑아낼 때 순서가 어긋나지 않는다.
  */
+export type PresentationSection = {
+  /** 한 문장으로 끝나는 소제목. 왜 / 무엇을·어떻게 / 그래서 무엇을 얻었나 중 하나를 담는다. */
+  heading: string;
+  /** 소제목을 보충하는 설명. `[표시할 말](경로)`로 링크를 넣는다. */
+  body: string;
+};
+
 export type PresentationEntry = {
   id: string;
-  /** 무엇을 바꿨는가. 한 줄로 끝난다. */
   title: string;
-  /** 왜 바꿨는가. 이 항목의 본체다. */
-  why: string;
-  /** 어떻게 바꿨는가. 결과를 짧게. */
-  how: string;
-  /** 관련 화면이 있으면 연결한다. */
-  links?: Array<{ label: string; href: string }>;
+  /** 최소 두 개. 효과가 따로 설 만하면 세 번째를 둔다. */
+  sections: PresentationSection[];
 };
 
 export const presentationEntries: PresentationEntry[] = [
   {
-    id: "input-and-input-button",
-    title: "Input과 Input Button을 나눴다",
-    why: "기존 개발에서는 입력창 하나가 값을 타이핑하는 일과 달력·주소·시간 선택 화면을 여는 일을 함께 맡고 있었다. 겉모습은 같지만 하는 일이 다르다. 하나는 사용자가 직접 값을 넣고, 다른 하나는 다른 화면을 여는 트리거다. 한 컴포넌트로 두면 실제 HTML 요소와 키보드 동작을 한쪽에만 맞출 수 있어서 나머지 한쪽의 접근성이 무너진다.",
-    how: "외관과 Control Size, Layout은 그대로 공유하고 실제 HTML만 나눴다. Input은 `input`, Input Button은 `button`을 쓴다. Input Button은 현재 선택값이나 Placeholder를 표시하고, 실제 선택 화면은 소비자가 연결한다.",
-    links: [
-      { label: "Input", href: "/components/input" },
-      { label: "Input Button", href: "/components/input-button" },
-      { label: "명세 문서", href: "/docs/components/input-button" },
+    id: "radio-shape",
+    title: "라디오를 통용되는 모양으로 바꿨어요",
+    sections: [
+      {
+        heading: "라디오와 체크박스가 같은 아이콘을 쓰던 상태",
+        body: "라디오와 체크박스는 고를 수 있는 개수가 달라요. 하나만 고르는 것인지 여럿 고르는 것인지는 누르기 전에 알아야 해요. 그 신호를 모양이 맡고 있는데, 둘 다 같은 아이콘을 쓰면 신호가 사라져요.",
+      },
+      {
+        heading: "사람들이 이미 아는 형태 따르기",
+        body: "[라디오](/components/radio)는 원, [체크박스](/components/checkbox)는 사각형이에요. 우리가 고른 디자인이 아니라 다른 제품에서 이미 익힌 약속이에요. 이미 아는 것을 다시 배우게 만들지 않는 게 목적이라, 여기에는 우리 취향을 넣지 않았어요.",
+      },
     ],
   },
-];
-
-/**
- * 아직 쓰지 않았지만 남겨야 하는 꼭지다. 두 가지 목적이 있다.
- *
- * 하나는 잊지 않는 것이다. 결정은 내린 직후에 가장 잘 기억나고 시간이 지나면
- * 결과만 남고 이유가 사라진다.
- *
- * 다른 하나는 형식을 판단하는 것이다. 항목 하나로는 무엇을·왜·어떻게 구조가
- * 적절한지 알 수 없다. 성격이 다른 꼭지를 여럿 늘어놓고 봐야 이 틀에 다 담기는지,
- * 아니면 담기지 않는 종류가 있는지 드러난다.
- *
- * `source`는 내용을 채울 때 볼 자리다. 맨땅에서 쓰지 않기 위한 것이다.
- */
-export type PendingTopic = {
-  title: string;
-  source: string;
-};
-
-export const pendingTopics: PendingTopic[] = [
-  { title: "폼 컨트롤의 기본값을 outline과 fill로 통일했다", source: "docs/system/interaction.md · working-context 확정된 결정" },
-  { title: "Disabled에서도 외곽선을 남겼다", source: "docs/system/interaction.md" },
-  { title: "카드형 선택은 Select Box가 소유하고 Checkbox·Radio에는 변형을 만들지 않았다", source: "docs/system/vocabulary.md · checkbox.md" },
-  { title: "모양 어휘를 Square·Rounded·Circle로 통일하고 컴포넌트가 shape로 소유하게 했다", source: "docs/system/vocabulary.md" },
-  { title: "Anatomy 명칭은 업계 표준을 쓰고 역할은 대응표로 밝혔다", source: "docs/system/vocabulary.md 명칭 대응표" },
-  { title: "상태 색 이름을 warning·danger·success·info로 통일하고 Neutral은 이름에서 생략했다", source: "docs/system/tokens.md" },
-  { title: "폼 컨트롤 보더와 폼 컨테이너 보더를 나눴다", source: "docs/system/tokens.md 사용 규칙" },
-  { title: "Hover를 색 교체가 아니라 state layer 합성으로 처리했다", source: "docs/system/foundations/color.md" },
-  { title: "아이콘 공급원을 Remix Icon으로 정하고 Line variant를 기본으로 했다", source: "docs/system/foundations/icon.md" },
-  { title: "Placeholder 색을 실제 입력값과 분리했다", source: "docs/system/tokens.md · working-context 확정된 결정" },
-  { title: "Focus 표시를 :focus-visible 기준으로 하고 세 유형으로 정리했다", source: "docs/system/interaction.md" },
-  { title: "이미지 경계를 바깥 border가 아니라 내부 alpha layer로 만들었다", source: "docs/system/tokens.md 사용 규칙" },
-  { title: "Combobox 다중 선택에서 Checkbox Indicator만 재사용하게 했다", source: "docs/system/components/checkbox.md" },
-  { title: "토큰 값을 패키지가 직접 CSS로 전달하게 했다", source: "PR #2" },
-  { title: "문서를 전달할 것과 제거할 것으로 나눴다", source: "PR #1" },
-  { title: "컴포넌트 성숙도 등급을 없앴다", source: "PR #2" },
-  { title: "Patterns를 Examples로 바꾸고 Pattern 자리는 비워뒀다", source: "PR #4" },
-  { title: "Studio 안에서 저장소 문서를 읽게 했다", source: "PR #3" },
+  {
+    id: "brand-palette-and-semantic-tokens",
+    title: "브랜드 색을 그대로 쓰지 않고 팔레트로 만들어요",
+    sections: [
+      {
+        heading: "브랜드 색 하나를 텍스트에도 배경에도 그대로 쓰던 방식",
+        body: "같은 값이라 둘이 겹치면 글자가 배경에 묻혔어요. 어떤 색을 넣느냐에 따라 읽히기도 하고 안 읽히기도 해서, 브랜드가 바뀌면 화면이 어떻게 나올지 보장할 수 없었어요.",
+      },
+      {
+        heading: "명도 단계를 만들고 역할마다 쓸 단계 정하기",
+        body: "브랜드 색 하나를 받아 색상과 채도는 그대로 두고 [명도만 열한 단계로 나눠요](/foundations/color#brand). 텍스트는 진한 단계, 옅은 배경은 밝은 단계, 진한 배경은 중간 단계처럼 역할마다 쓸 자리를 미리 정해요. 컴포넌트는 색이 아니라 [semantic token](/docs/tokens) 이름을 쓰기 때문에, 브랜드 색이 바뀌어도 대비 관계는 그대로 유지돼요.",
+      },
+      {
+        heading: "다크 모드 대응과 앞으로 쌓을 자산의 기초",
+        body: "같은 팔레트에서 Light와 Dark가 쓸 단계를 각각 잡아두기 때문에 모드를 바꿔도 대비 관계가 유지돼요. 브랜드 색을 바꿔 넣으면 팔레트와 매핑이 다시 만들어져서 화면 전체가 어떻게 달라지는지 바로 확인할 수 있어요. 앞으로 컴포넌트와 화면이 늘어도 색을 매번 다시 고르지 않고 이미 정해진 역할 이름을 쓰면 돼요.",
+      },
+    ],
+  },
+  {
+    id: "input-and-input-button",
+    title: "Input과 Input Button을 나눴어요",
+    sections: [
+      {
+        heading: "입력창 하나가 타이핑과 화면 열기를 함께 맡던 구조",
+        body: "겉모습은 같지만 하는 일이 달라요. 하나는 사용자가 값을 직접 넣고, 다른 하나는 달력·주소·시간 선택 화면을 여는 트리거예요. 한 컴포넌트로 두면 실제 HTML 요소와 키보드 동작을 한쪽에만 맞출 수 있어서, 나머지 한쪽의 접근성이 무너져요.",
+      },
+      {
+        heading: "외관은 공유하고 역할에 따라 나누기",
+        body: "[Input](/components/input)은 값을 타이핑하는 input이고, [Input Button](/components/input-button)은 선택 화면을 여는 button이에요. Control Size와 Layout, 시각 외곽은 그대로 공유하기 때문에 한 줄 폼에서 나란히 놓아도 어긋나지 않아요. 실제로 어떤 선택 화면을 열지는 이 컴포넌트를 가져다 쓰는 화면에서 정해요.",
+      },
+    ],
+  },
 ];
