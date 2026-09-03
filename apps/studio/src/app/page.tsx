@@ -75,7 +75,7 @@ export default function Home() {
         },
         {
           title: "Presentation",
-          description: "무엇을 왜 바꿨는지 한 꼭지씩 정리해 전달합니다.",
+          description: "무엇을, 왜, 어떻게 바꿨는지 전달합니다.",
           icon: Slideshow,
         },
       ],
