@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
-import { createCoreSemanticCssVariables } from "@ooee/tokens";
 
 export type StudioTheme = "light" | "dark";
 export type StudioLocale = "ko" | "en";
@@ -50,7 +49,6 @@ export function StudioPreferencesProvider({ children }: { children: ReactNode })
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
     root.lang = "ko";
-    Object.entries(createCoreSemanticCssVariables(theme)).forEach(([property, value]) => root.style.setProperty(property, value));
   }, [locale, theme]);
 
   return (

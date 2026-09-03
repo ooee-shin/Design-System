@@ -1,6 +1,4 @@
-# Number Input Candidate
-
-상태: `Candidate`
+# Number Input
 
 정확한 숫자를 직접 입력하거나 증감 버튼으로 조절하는 공용 컴포넌트다. 기존 `ooee_bk` V1 UI Studio의 Number Input 구현을 기능 참고자료로 사용했으며, 현재 `ooee-ui`의 Input 구조와 oe semantic token으로 다시 구현했다. 예전 구현의 `auto` Size와 `round` Shape은 현재 공식 Property에 포함하지 않았다.
 

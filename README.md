@@ -36,7 +36,7 @@ packages/patterns    여러 Component가 결합된 Pattern
 apps/studio          공용 자산을 소비하는 검수 화면
 ```
 
-공용 자산의 실제 원본은 성숙도와 관계없이 `packages/*`가 소유한다. Studio는 이를 import해 검수·설명할 뿐 자체 복사본을 만들지 않는다.
+공용 자산의 실제 원본은 검증 정도와 관계없이 `packages/*`가 소유한다. Studio는 이를 import해 검수·설명할 뿐 자체 복사본을 만들지 않는다.
 
 ## 실행
 

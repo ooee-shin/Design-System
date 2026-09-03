@@ -1,6 +1,6 @@
 # Icon Foundation
 
-상태: `Stable source rule / Provisional usage details`
+상태: `공급원 규칙 확정 / 사용 세부는 Provisional`
 
 ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com/)이며 Secondary 공급원은 Google Material Symbols다. React 구현에서 Remix Icon은 repository에 버전이 고정된 `@remixicon/react`를 사용한다.
 
@@ -11,7 +11,7 @@ ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com
 3. 두 공급원으로 표현할 수 없는 제품 고유 아이콘
 4. 필요한 이유를 문서화한 다른 공급원 또는 자체 SVG
 
-같은 의미의 Remix Icon이 있으면 컴포넌트마다 Material Symbols나 다른 라이브러리의 유사 아이콘을 섞지 않는다. 외부 화면을 재현하는 초기 Experiment에서 원본 아이콘을 임시로 사용할 수 있지만 Candidate로 추출할 때 Remix Icon, Material Symbols 순서로 대응 여부를 검토한다. Secondary 및 예외 공급원의 패키지는 실제 사용처가 확인될 때만 추가한다.
+같은 의미의 Remix Icon이 있으면 컴포넌트마다 Material Symbols나 다른 라이브러리의 유사 아이콘을 섞지 않는다. 외부 화면을 재현하는 초기 화면 실험에서 원본 아이콘을 임시로 사용할 수 있지만 공용 자산으로 추출할 때 Remix Icon, Material Symbols 순서로 대응 여부를 검토한다. Secondary 및 예외 공급원의 패키지는 실제 사용처가 확인될 때만 추가한다.
 
 ## 스타일 규칙
 

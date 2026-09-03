@@ -1,15 +1,13 @@
 @import "@ooee/fonts/styles.css";
 @import "tailwindcss";
-@import "../../../../packages/tokens/src/styles.css";
-@import "../../../../packages/ui/src/styles.css";
+@import "@ooee/tokens/styles.css";
+@import "@ooee/ui/styles.css";
+@import "@ooee/patterns/styles.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@source "../../../../packages/ui/src";
-@source "../../../../packages/patterns/src";
+/* Foundations 카탈로그 화면이 Tailwind 전체 팔레트를 나열하므로 Studio에서만 생성한다. 공용 패키지는 이 클래스를 쓰지 않는다. */
 @source inline("bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{50,100,200,300,400,500,600,700,800,900,950}");
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);

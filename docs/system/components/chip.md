@@ -1,6 +1,4 @@
-# Chip Candidate
-
-상태: `Candidate`
+# Chip
 
 제거 가능한 선택값이나 필터 항목을 Border가 있는 작은 Container로 표시한다. 실제 구현은 `packages/ui/src/chip.tsx`, 검수 화면은 `/components/chip`이다.
 

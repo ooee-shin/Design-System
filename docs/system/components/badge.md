@@ -1,8 +1,6 @@
-# Badge Candidate
+# Badge
 
-상태: `Candidate`
-
-`Badge`, `Dot Badge`, `Number Badge`를 검수하는 공용 Candidate다. `/components/badge`에서 Light/Dark, KO/EN과 viewport 조합을 검수한다. 세 컴포넌트의 역할은 각 탭과 아래 확인된 구현 범위에서 따로 관리한다.
+`Badge`, `Dot Badge`, `Number Badge`를 검수하는 공용 컴포넌트다. `/components/badge`에서 Light/Dark, KO/EN과 viewport 조합을 검수한다. 세 컴포넌트의 역할은 각 탭과 아래 확인된 구현 범위에서 따로 관리한다.
 
 실제 구현 원본은 `packages/ui/src/badge.tsx`이며 Studio에는 Badge Workbench와 예시 콘텐츠만 둔다.
 
@@ -60,4 +58,4 @@
 - Inbox Split View: unread count
 - Message Bubble Workbench: unread boundary count
 
-Badge의 Size는 현재 화면 검수값이며 아직 Stable 규격이 아니다. 이후 실제 화면을 다듬으며 확정한다. 새로운 판단이 필요한 내용은 Studio 페이지에 임시 정책으로 표시하지 않고 사용자에게 먼저 질문한 뒤 코드와 문서에 함께 반영한다.
+Badge의 Size는 현재 화면 검수값이며 아직 확정 규격이 아니다. 이후 실제 화면을 다듬으며 확정한다. 새로운 판단이 필요한 내용은 Studio 페이지에 임시 정책으로 표시하지 않고 사용자에게 먼저 질문한 뒤 코드와 문서에 함께 반영한다.

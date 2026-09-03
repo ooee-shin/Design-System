@@ -1,6 +1,4 @@
-# MessageBubble Candidate
-
-상태: `Candidate`
+# MessageBubble
 
 `MessageBubble`은 VibePrompt Inbox split view Experiment에서 추출한 첫 컴포넌트 자산이다. `/components/message-bubble`은 현재 Chat Workbench로 확장되어 통합 대화, 레이아웃, 콘텐츠, 전달 상태, 날짜, 첨부, 입력, 언어와 테마를 함께 검수한다.
 
@@ -90,4 +88,4 @@ Workbench의 모드·언어는 전체 Studio 검수 콘텐츠에 영향을 주�
 - RTL 및 폭이 매우 좁은 화면
 - 브랜드 theme 확장
 
-Workbench의 상태는 실제 서버 전송 로직이 아니라 시각·API 검수를 위한 데모다. 두 번째 독립 화면에서 재사용하기 전에는 Provisional이나 Stable로 승격하지 않는다.
+Workbench의 상태는 실제 서버 전송 로직이 아니라 시각·API 검수를 위한 데모다. 두 번째 독립 화면에서 재사용하기 전까지 API가 바뀔 수 있다.

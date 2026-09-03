@@ -1,6 +1,4 @@
-# Select Box Candidate
-
-상태: `Candidate`
+# Select Box
 
 정의된 선택지를 화면에 펼쳐 놓고 제목, 설명과 시각 정보를 비교하며 하나 이상의 값을 선택하는 입력 컴포넌트다. 실제 구현 원본은 `packages/ui/src/select-box.tsx`, 검수 화면은 `/components/select-box`다. 구조와 사용 경계는 [Seed Design Select Box](https://seed-design.io/components/select-box)를 참고하되 ooee의 Radio·Checkbox Control, Field 경계와 Brand alpha 선택 표현으로 정규화했다.
 
@@ -36,7 +34,7 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - Playground에서 Single/Multiple selection, Single/Multi column, Multi column의 컬럼 수, `None | Icon | Image` Leading element, Trailing element와 Disabled·Read only 동작을 조합해 검수한다.
 - 필수 Label은 구조용 `Label A~C` 문구로 고정하고 별도 Text control을 두지 않는다. Optional Description은 표시 여부만 `Description` Toggle로 제어하며 Preview에는 구조용 `Description` 문구를 고정한다. 실제 문구 작성은 이후 Examples/Usage와 언어별 콘텐츠 검수에서 다룬다.
 - Properties, State 문서, Examples, Guidelines와 Property map은 Playground와 Anatomy가 확정된 뒤 추가한다.
-- 현재 API와 Brand alpha 선택 표현은 검수용 초안이며 아직 문서 규칙이나 Stable 자산으로 확정하지 않는다.
+- 현재 API와 Brand alpha 선택 표현은 검수용 초안이며 아직 문서 규칙으로 확정하지 않았다.
 
 ## 현재 구현 규칙
 
@@ -52,4 +50,4 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 ## 아직 정하지 않은 사항
 
 - Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수 정책은 아직 정하지 않았다.
-- 선택 표현의 Brand alpha 조합은 Candidate다. 다른 독립 컴포넌트에서 같은 의미가 반복되기 전에는 별도 semantic token으로 승격하지 않는다.
+- 선택 표현의 Brand alpha 조합은 token candidate다. 다른 독립 컴포넌트에서 같은 의미가 반복되기 전에는 별도 semantic token으로 승격하지 않는다.

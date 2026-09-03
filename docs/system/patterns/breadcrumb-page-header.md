@@ -5,7 +5,7 @@
 출처: [VibePrompt — Breadcrumb page header](https://vibeprompts.dev/nav/nav-breadcrumb-page-header/)
 확인일: `2026-08-24`
 
-레코드의 위치, 제목과 상태, metadata, 주요 action, section tab을 하나의 application page header에서 검수하기 위한 외부 화면 실험이다. 외부 Tailwind 마크업을 Stable 자산으로 취급하지 않으며 `/experiments/breadcrumb-page-header`에서 상호작용과 반응형을 먼저 검수한다.
+레코드의 위치, 제목과 상태, metadata, 주요 action, section tab을 하나의 application page header에서 검수하기 위한 외부 화면 실험이다. 외부 Tailwind 마크업을 확정된 자산으로 취급하지 않으며 `/experiments/breadcrumb-page-header`에서 상호작용과 반응형을 먼저 검수한다.
 
 사용자가 채택한 실제 패턴 원본은 `packages/patterns/src/breadcrumb-page-header.tsx`가 소유하며 Studio route는 공용 패턴을 불러와 검수한다.
 
@@ -21,7 +21,7 @@
 
 ## Badge 적용
 
-- `Draft`는 공용 Badge Candidate의 `chip + tonal + warning` 조합을 사용한다.
+- `Draft`는 공용 Badge의 `chip + tonal + warning` 조합을 사용한다.
 - Comments count는 `number + tonal + neutral` 조합을 사용한다.
 - 두 사례 모두 Color Foundation의 공용 semantic token 정의를 실제로 소비한다.
 
@@ -32,4 +32,4 @@
 - breadcrumb가 더 길어질 때 축약 기준
 - destructive action을 포함한 menu 구조
 - status pill의 warning token 승격 여부
-- 두 번째 화면 재사용 후 Candidate 추출 여부
+- 두 번째 화면 재사용 후 공용 자산 추출 여부

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
-import { createCoreSemanticCssVariables } from "@ooee/tokens";
 
 import { StudioNavigation } from "@/components/studio-navigation";
 import { BrandThemeProvider } from "@/components/brand-theme-provider";
@@ -17,7 +15,7 @@ const brandThemeBootstrap = `try{const cached=JSON.parse(localStorage.getItem("o
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className="h-full antialiased" style={createCoreSemanticCssVariables("light") as CSSProperties} suppressHydrationWarning>
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: brandThemeBootstrap }} /></head>
       <body className="min-h-full">
         <BrandThemeProvider>

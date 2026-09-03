@@ -29,21 +29,21 @@
 ## 현재 구현
 
 - 공용 자산 소유 구조
-  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일
+  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Badge, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control
-  - Candidate/Provisional도 실제 공용 자산이며 Stable은 package 이동이 아닌 검증 완료 상태
+  - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
   - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
   - Combobox Anatomy의 범위 표시선 3개만 예외로 로컬에 남아 있다. 그중 하나가 Popup 콘텐츠 높이에 맞춰 늘어나야 해서 마커 기준 고정 길이만 표현하는 `AnatomyBoundaryMarker`로 옮길 수 없다
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
   - `Home`, `Foundations`, `Components`, `Patterns` 그룹 메뉴만 표시
-  - 각 그룹 index에서 현재 접근 가능한 모든 자산과 성숙도를 확인하고 상세 화면으로 이동
+  - 각 그룹 index에서 현재 접근 가능한 모든 자산을 확인하고 상세 화면으로 이동
   - Components index는 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations·Patterns index는 기본 밀도를 유지
-  - 내부 제작 단계인 Experiment는 메뉴 그룹이 아니라 각 자산의 maturity badge로 표시
+  - 컴포넌트에는 등급 badge를 달지 않는다. 아직 확정되지 않은 Foundation 결정만 `Provisional` 표시를 단다
   - 공통 검수 설정인 `PC/TB/MB`, `라이트/다크`, `KO/EN`을 sticky Studio header에서 변경하며 route 이동과 새로고침 후에도 유지
   - viewport 설정은 Studio chrome이 아니라 상세 화면의 검수 콘텐츠만 fluid desktop, 768px tablet, 390px mobile 너비로 변경
   - 모드는 document root와 Studio canvas에 함께 적용해 outer page, navigation, Portal layer가 같은 Light/Dark token을 사용
@@ -59,7 +59,7 @@
   - 상세 페이지의 연관 컴포넌트 영역은 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않음. Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 표시하고, 전체 Form 목록이 아니라 코드와 사용 사례로 확인된 관계만 연결
 
 - `/experiments/inbox-split-view`
-  - VibePrompt의 Inbox split view를 React로 변환한 첫 Experiment
+  - VibePrompt의 Inbox split view를 React로 변환한 첫 화면 실험
   - 대화 검색, 읽지 않은 메시지 count, 답장, 모바일 전환
   - Light/Dark 및 국문/영문/일어 콘텐츠 검수
   - Neutral OE semantic mapping을 첫 실제 검증 대상으로 Provisional 적용
@@ -78,15 +78,15 @@
   - 공용 아이콘 크기는 `xsmall 12px`, `small 16px`, `medium 20px`, `large 24px`, `xlarge 32px`의 `oe-icon-*` 토큰으로 정의
   - Spacing·Radius·Effects·Motion은 현재 공용 UI와 패턴 코드에서 확인된 값만 표시
 - `/components/message-bubble`
-  - Inbox에서 추출한 첫 Candidate 컴포넌트 Workbench
+  - Inbox에서 추출한 첫 공용 컴포넌트 Workbench
   - incoming/outgoing, avatar, 긴 콘텐츠, 국문/영문/일어, Light/Dark 검수
   - sending/sent/read/failed 및 별도 TypingIndicator 비교
 - `/components/badge`
-  - chip, number, dot 유형과 tonal/fill 표현을 검수하는 공용 Candidate
+  - chip, number, dot 유형과 tonal/fill 표현을 검수하는 공용 컴포넌트
   - Badge Size는 현재 검수값 XSmall 16px, Small 20px, Medium 24px를 지원
   - Neutral·Accent·Warning·Danger·Success·Info를 지원하며 Navigation과 Chat의 실제 count 사례에 적용
 - `/components/input`
-  - shadcn과 Seed Design Text Input을 기준으로 정리한 공용 Candidate
+  - shadcn과 Seed Design Text Input을 기준으로 정리한 공용 컴포넌트
   - Input과 Field의 책임을 분리하며 현재 Input만 구현
   - Outline/Filled, Small/Regular/Large/XLarge, native state와 내부 선택 요소를 검수
   - Small 32px, Regular 36px, Large 40px, XLarge 48px를 Button과 한 줄 Form control이 공유할 Control Height로 확정
@@ -95,15 +95,15 @@
   - 반복되는 부분 입력·고정 마스킹 동작은 공용 `PartialMaskedInput`이 소유하고, 일반 4자리 사례와 주민등록번호 뒷자리 사례가 같은 간격·자간·입력 제한을 사용. 입력된 자리만 숫자 또는 입력 마스킹으로 치환하고, 입력 가능한 미입력 자리는 Placeholder 위계, 입력할 수 없는 고정 마스킹 자리는 Secondary 위계의 닷으로 구분. `maskInput`으로 실제 입력 숫자의 표시 여부를 구분하며 현재 일반 예시는 앞 2자리, 주민등록번호 예시는 뒷자리의 첫 1자리를 숫자로 표시. Custom input 검수 예시는 빈 값을 기본 상태로 사용
   - 전화번호·금액·분할 입력·주민등록번호의 예시 상태와 포맷 함수는 Studio 전용 `InputCustomExamples`에 두어 공용 UI 구현과 상세 문서 화면 코드를 분리
   - Input 상세 화면에서 `Color input`을 `Custom input`과 같은 바깥 섹션 위계로 분리. HEX 직접 입력과 16px Leading color swatch를 조합하며, 현재 Color Picker가 완성되지 않아 swatch는 비상호작용 표시 요소이고 팝업은 연결하지 않음
-  - 현재 Studio 상세 화면 검수 범위는 사용자 확인 완료. 다른 화면 재사용 전이므로 Candidate 유지
+  - 현재 Studio 상세 화면 검수 범위는 사용자 확인 완료. 다른 화면 재사용 전까지 API가 바뀔 수 있음
 - `/components/input-button`
-  - Input과 같은 Style, Control Size와 Layout을 사용하지만 실제 HTML은 Button인 별도 Candidate
+  - Input과 같은 Style, Control Size와 Layout을 사용하지만 실제 HTML은 Button인 별도 공용 컴포넌트
   - 직접 입력 대신 별도 선택 화면을 여는 Trigger이며 현재 Calendar, Address, Time, Color picker · Select only 사례를 검수
   - Value는 문자열만 지원하고 Clear button과 Chip value는 제공하지 않음
   - 후속 Picker, Dialog, 검색 화면과 선택 로직은 Input Button이 소유하지 않음
-  - 현재 Studio 상세 화면 검수 범위는 사용자 확인 완료. 실제 Picker 결합 재검증 전이므로 Candidate 유지
+  - 현재 Studio 상세 화면 검수 범위는 사용자 확인 완료. 실제 Picker 결합 재검증 전까지 API가 바뀔 수 있음
 - `/components/switch`
-  - 독립적인 설정이나 기능을 즉시 On/Off하는 공용 Candidate. 원자적인 Switch와 Label만 조합하는 SwitchField를 제공하며 Description·Leading/Trailing element는 지원하지 않음
+  - 독립적인 설정이나 기능을 즉시 On/Off하는 공용 컴포넌트. 원자적인 Switch와 Label만 조합하는 SwitchField를 제공하며 Description·Leading/Trailing element는 지원하지 않음
   - Small 26×16px, Medium 38×24px, Large 52×32px의 Switch Control과 크기별 Thumb을 지원하며 24px Medium이 기본값. 16/24/32px는 Track만이 아닌 Control 전체 높이이고 16px Control은 최소 24px target을 확보함. 별도 Block Layout 없이 Label 위치 `right | left`만 지원하고 SwitchContainer는 제공하지 않음
   - Switch Control과 Label, 결합된 List의 전체 Row를 target으로 사용. 즉시 반영되는 독립 기능에만 사용하며 저장·제출 또는 부모–자식 선택 관계에는 Checkbox를 사용
   - Disabled에서는 Control만 흐리게 만들지 않고 Label도 `foreground-disabled`로 함께 표현해 항목 전체가 조작 불가능함을 명확히 표시
@@ -118,7 +118,7 @@
   - `autoSize=false`일 때 초기 높이를 88px 이상으로 설정할 수 있음. 스크롤바 공간은 고정하고 thumb은 Hover에서만 표시해 텍스트 이동을 방지
   - Auto size와 Resize 모두 `viewport − reserved layout space`보다 낮은 Max height가 필요함. 고정 헤더·콘텐츠 패딩 등을 포함할 정확한 차감값은 아직 열려 있어 코드에는 임의 수치를 넣지 않음
   - Container와 Textarea field만으로 구성하며 Prefix/Clear/Suffix/Leading/Trailing element는 지원하지 않음. Character count는 Field에서 기본 제어하는 방향으로 보류했고, Textarea 내부 표시가 필요한 실제 사례가 확인될 때 재검토
-  - Input과 분리된 여러 줄 입력 Candidate와 별도 검수 페이지
+  - Input과 분리된 여러 줄 입력 컴포넌트와 별도 검수 페이지
   - 현재 확인된 native 속성, 최소 높이 64px, content sizing과 기본 상태만 문서화
   - Focus/Error는 Input과 같은 단색 1px border + 외부 1px ring 구조를 사용
   - Input과 Textarea는 데스크톱 `On this page` rail 아래의 낮은 위계 Related 링크에서 서로 이동
@@ -126,7 +126,7 @@
   - 컴포넌트 상세 페이지는 데스크톱 우측의 sticky `On this page`에서 현재 섹션을 확인하고 바로 이동하며 좁은 검수 viewport에서는 숨김
   - 목차는 뎁스별 지그재그 경로 없이 단일 직선 rail을 사용하고, 화면의 활성 구간에 여러 섹션이 걸리면 모두 강조하며 활성 선의 위치와 높이를 300ms로 전환. rail과 항목 배경의 간격은 12px
 - `/components/number-input`
-  - 기존 `ooee_bk` V1 UI Studio의 Number Input 동작을 참고하고 현재 공용 Input의 `outline | filled`, Control Size, Layout과 상태 구조로 다시 구현한 Candidate
+  - 기존 `ooee_bk` V1 UI Studio의 Number Input 동작을 참고하고 현재 공용 Input의 `outline | filled`, Control Size, Layout과 상태 구조로 다시 구현한 공용 컴포넌트
   - 숫자 직접 입력, Decrease/Increase, `min | max | step`, Controls 표시 여부, 음수 허용 여부와 범위 도달 동작을 지원. Controls는 오른쪽에 모으는 `trailing`과 좌우로 나누는 `split` 배치를 제공
   - XLarge는 버튼 터치 영역을 32px로 확대하고 Trailing 버튼 간격을 4px로 사용하며, 나머지 Size는 24px 버튼을 사용
   - Split 배치의 숫자는 중앙 정렬. 현재 값이 유효한 Min에 도달하면 Decrease button, Max에 도달하면 Increase button을 비활성화하며, Number Input 전체가 Disabled/Read only이면 두 Controls를 함께 비활성화
@@ -134,18 +134,18 @@
   - 예전 `auto` Size와 `round` Shape은 현재 공식 Property에서 제외하고, 공통 Small/Regular/Large/XLarge와 Fill/Fixed만 사용
   - Quantity, Percentage, Direct input과 Negative allowed 예시를 Studio에서 검수
 - `/components/combobox`
-  - Base UI 1.7.0의 Input-inside-popup 패턴을 기반으로 한 단일·다중 선택 Candidate
+  - Base UI 1.7.0의 Input-inside-popup 패턴을 기반으로 한 단일·다중 선택 컴포넌트
   - `Combobox`는 단일 값 선택 후 닫히고, `MultiCombobox`는 Checkbox로 여러 값을 선택하며 Popup을 유지
   - 닫힌 상태는 Select trigger이며 Popup을 열면 Single·Multiple·2-depth가 공유하는 투명 배경·Border 없음·Small 32px Search recipe로 미리 정의된 Option을 필터링
   - MultiCombobox의 선택 결과는 첫 항목과 `외 N곳`을 표시하는 `summary`, 별도 선택 영역 Container 안에 공용 Small Rounded Chip 전체를 표시하는 `container` 두 타입
   - Container 타입은 Border 없이 Neutral secondary background로 구분하며, Filled Input 기반 선택 Chip 내부 검색, Hover scrollbar와 Remix close trailing action을 통한 개별 삭제를 지원
   - MultiCombobox 목록 맨 위의 `전체 N` 행은 활성 Option 수를 레이블과 4px 간격의 Neutral tertiary foreground로 표시하고 전체 선택·해제를 수행
   - Option list scrollbar는 레이아웃 공간을 유지하고 목록 Hover에서만 thumb을 표시
-  - 단일 선택의 선택 Option은 Candidate인 `brand-alpha-08`, Check icon은 `oe-brand-foreground-primary`를 사용하며 선택 배경이 Hover highlight보다 우선. Search input과 선택 행 배경의 가로 범위를 맞추며 다중 선택 Checkbox는 Neutral 스타일 유지
+  - 단일 선택의 선택 Option은 token candidate인 `brand-alpha-08`, Check icon은 `oe-brand-foreground-primary`를 사용하며 선택 배경이 Hover highlight보다 우선. Search input과 선택 행 배경의 가로 범위를 맞추며 다중 선택 Checkbox는 Neutral 스타일 유지
   - Studio는 Single과 Multiple Playground를 위아래로 분리하고 각 control 상태를 독립적으로 유지
   - Properties · Selection에서 왼쪽 1~9호선과 오른쪽 실제 역 Checkbox 목록으로 구성한 서울 지하철 2-depth 다중 선택 예시를 검수 중이며 공용 API는 아직 정의하지 않음
 - `/components/select`
-  - 검색 없는 단일·다중 선택 Candidate. `Select`와 `MultiSelect`가 Base UI Select를 동작 기반으로 사용하고 Combobox와 공용 `selectionTriggerVariants` Trigger recipe를 공유
+  - 검색 없는 단일·다중 선택 컴포넌트. `Select`와 `MultiSelect`가 Base UI Select를 동작 기반으로 사용하고 Combobox와 공용 `selectionTriggerVariants` Trigger recipe를 공유
   - Outline/Filled, Small/Regular/Large/XLarge, Fill/Fixed와 Default/Focus/Invalid/Disabled/Read only 상태를 지원
   - 평면 Option 또는 Group label이 있는 Group 목록 중 하나를 전달. Group 사이 Divider를 자동 표시하고 Option별 optional `leadingElement`와 `description`을 지원
   - 선택 Option의 Leading element는 Trigger에도 표시하며, 한 목록에서 Leading을 사용하면 모든 Option에 같은 Leading 영역을 제공. Item description은 열린 Content에서만 표시. Playground는 `Option A~D` 가상 데이터로 Group·Leading·Description을 독립 제어
@@ -155,25 +155,25 @@
   - 선택 행은 별도 배경과 Label 색상 변경 없이 Neutral Label의 Medium 굵기와 Brand Check indicator로 표시하며 선택 상태에는 Hover highlight를 중첩하지 않음
   - 열린 Content container는 Trigger와 같은 너비·좌우 시작점을 사용하며 Base UI의 기본 `alignItemWithTrigger`는 비활성화. Trigger와 Option의 Leading 열도 같은 x축에서 시작
 - `/components/select-box`
-  - 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 Candidate 초안. `SelectBoxGroup`과 `SelectBox`를 공용 package가 소유하고 Studio는 이를 import해 검수
+  - 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 초안. `SelectBoxGroup`과 `SelectBox`를 공용 package가 소유하고 Studio는 이를 import해 검수
   - Single은 공용 Radio Control, Multiple은 공용 Checkbox Control을 재사용하며 Select Box 전체 Container가 하나의 선택 영역
   - 카드형 전체 선택 Surface는 Select Box만 소유함. Radio와 Checkbox의 `*Container` 변형은 공용 API·Studio·문서에서 제거했으며, 짧고 밀도 높은 폼 항목은 RadioField/CheckboxField, 설명·이미지와 함께 비교하는 선택지는 Select Box로 구분
   - `selectionMode=single | multiple`, `columns=number`, Leading element·Description·Trailing element, Disabled·Read only를 지원. Studio는 Single column과 Multi column을 구분하고 Multi에서 2~6 컬럼 수를 입력
   - 초기 선택값은 비어 있고 Selection mode 변경 시 항목을 자동 선택하지 않음. 필수 Label은 구조용 문구로 고정하고 Optional Description은 표시 Toggle만 제공. 실제 문구 작성은 Examples/Usage와 언어별 콘텐츠 검수에서 다룸
   - Trailing element는 Single에서 `radio | none`, Multiple에서 `checkbox | none`으로 제한
   - Group gap은 8px, 항목은 고정 높이 없이 Content를 Hug하며 좌우 16px·상하 12px 여백을 사용. Leading/Trailing은 항목 전체에 수직 중앙 정렬하고 Title–Description 간격은 2px
-  - 선택 상태는 액션 Button과 구분하기 위해 진한 Fill을 쓰지 않고 `brand-alpha-05` 배경과 `brand-alpha-40` 2px 수준 경계를 사용. 이 조합은 Candidate이며 semantic token 승격 전 독립 용례를 더 확인
+  - 선택 상태는 액션 Button과 구분하기 위해 진한 Fill을 쓰지 않고 `brand-alpha-05` 배경과 `brand-alpha-40` 2px 수준 경계를 사용. 이 조합은 token candidate이며 semantic token 승격 전 독립 용례를 더 확인
   - Pointer 선택은 Focus 선을 만들지 않고 Keyboard `:focus-visible`에서 같은 2px 선택선의 색만 `oe-focus-ring`으로 교체. Disabled selected는 Neutral disabled 색으로 바꾸고 Read only는 Focus만 유지한 채 Hover·Pressed와 값 변경을 차단
   - Select는 숨겨진 짧은 목록, Chip은 간결한 키워드 선택·필터, Select Box는 설명이나 시각 정보를 계속 노출하는 비교 선택으로 구분
   - Field 결합 API, 최대 선택 개수와 피드백, 모바일 열 수와 Custom content motion은 아직 정의하지 않음
 - `/components/chip`
-  - Border가 있는 `oe-chip-default` 높이 token 24px, `text-oe-label` token 13px/16px, Rounded 8px의 제거 가능한 Candidate
+  - Border가 있는 `oe-chip-default` 높이 token 24px, `text-oe-label` token 13px/16px, Rounded 8px의 제거 가능한 공용 컴포넌트
   - Label + 선택적 Leading icon 또는 접근 가능한 이름을 갖는 Icon-only 유형 지원
   - Close action은 Remix icon, `removeLabel`과 `onRemove`를 필수로 사용
   - MultiCombobox Container 타입의 선택 결과에서 첫 실제 사용
 - `/components/checkbox`
-  - Combobox 다중 선택에서 확인한 Checkbox 구조를 공용 Candidate로 추출하고 OOEE Brand 선택 표현과 상태 규칙으로 정리
-  - Seed Checkbox의 구조를 참고하되 16px 단일 control, 기본 Label Regular, 부모 항목 Label Semibold, Rounded·Ghost Appearance Candidate를 지원. Control은 20px Label 첫 줄에서 수직 중앙 정렬
+  - Combobox 다중 선택에서 확인한 Checkbox 구조를 공용 자산으로 추출하고 OOEE Brand 선택 표현과 상태 규칙으로 정리
+  - Seed Checkbox의 구조를 참고하되 16px 단일 control, 기본 Label Regular, 부모 항목 Label Semibold, Rounded·Ghost Appearance를 지원. Control은 20px Label 첫 줄에서 수직 중앙 정렬
   - Checked와 Indeterminate는 `oe-brand-background-bold-primary`와 inverse Indicator를 사용
   - Disabled Unchecked는 `oe-background-disabled`와 식별 가능한 Neutral border를 유지하고, Disabled Checked/Indeterminate는 Light·Dark 공통 `neutral-400` 매핑의 `oe-background-disabled-selected`와 흰색 Indicator를 사용
   - State Workbench는 Focus visible까지 포함하며 Error/Invalid는 Unchecked Danger border와 Checked Brand/Danger 우선순위 결정 전까지 미정
@@ -209,7 +209,7 @@
   - Checkbox 열린 결정: Error/Invalid의 Brand·Danger 우선순위, Hover 전용 표현, Leading/Trailing Slot의 인터랙티브 요소 허용 여부는 아직 정의하지 않음
   - Checkbox Studio 상세 화면은 현재 범위 검수를 완료. Layout·Flipped·Description은 별도 Property 카드를 추가하지 않고 Playground·Anatomy·Property map에서 확인
 - `/components/radio`
-  - 확정한 16px Control과 8px 흰 원형 Indicator를 기준으로 Checkbox와 같은 Field·Content 구조를 적용한 Candidate
+  - 확정한 16px Control과 8px 흰 원형 Indicator를 기준으로 Checkbox와 같은 Field·Content 구조를 적용한 공용 컴포넌트
   - Checked는 Brand로 채운 원형 Control 안에 흰색 Indicator를 두며 Unchecked, Checked, Focus visible, Disabled · Unchecked/Checked와 Read only 상태를 지원. Read only는 Enabled 기본 시각과 Focus를 유지하지만 Hover·Pressed와 사용자 조작에 의한 값 변경은 차단
   - Label·Right/Bottom Description·Leading/Trailing·Inline/Block·Flipped를 지원하며 Parent item, Indeterminate와 Ghost는 제공하지 않음
   - Studio 상세 화면은 Checkbox 검수 구조와 같은 Playground, Basic/Extended Anatomy와 Structure map, Elements, State, Layout, Guidelines, Property map 순서를 사용함. Preview의 제품 사례 문구도 KO/EN 전환에 포함
@@ -218,14 +218,14 @@
   - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
   - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class와 Flipped 배치를 보호함
 - `/experiments/breadcrumb-page-header`
-  - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation Experiment
+  - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation 화면 실험
   - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수
   - 실제 패턴 원본은 `@ooee/patterns`가 소유하고 Studio는 locale과 검수 context만 전달
   - 일반 surface는 oe Neutral semantic token을 사용하고 Draft는 공용 Badge의 warning tonal 조합을 사용
 - `/experiments/collapsible-sidebar-nav`
-  - VibePrompt의 collapsible sidebar navigation을 기반으로 한 Navigation Experiment
+  - VibePrompt의 collapsible sidebar navigation을 기반으로 한 Navigation 화면 실험
   - 260px/72px rail, group disclosure, active row, count badge, search와 user chip 검수
-  - navigation 패턴을 먼저 축적한 뒤 active state, row, badge와 trigger의 반복 규칙을 비교해 Candidate를 추출
+  - navigation 패턴을 먼저 축적한 뒤 active state, row, badge와 trigger의 반복 규칙을 비교해 공용 자산을 추출
   - 실제 패턴 원본은 `@ooee/patterns`가 소유하며 내부 navigation row는 비교 사례가 더 쌓일 때까지 패턴 내부에 유지
 
 ## 확정된 결정
@@ -251,8 +251,8 @@
 - `oe-focus-ring`은 적용된 brand seed에서 생성하며 Light는 `brand-600`, Dark는 `brand-400`을 사용한다.
 - 한 줄 Form control의 placeholder는 실제 입력값과 구분되는 `oe-foreground-placeholder`를 사용하며 현재 Light `neutral-400`, Dark `neutral-500`으로 매핑한다.
 - 외부 UI는 화면으로 먼저 구현하고 검수 후 자산을 추출한다.
-- 컴포넌트 작업 중 새 색상 패턴이 발견되면 알림과 근거를 남긴 Candidate로 등록하고, 반복 검증 후 token 또는 recipe로 승격한다.
-- 이미지와 Color swatch처럼 콘텐츠 자체가 배경색을 갖는 값의 경계는 Neutral border를 바깥에 두지 않고 내부 Black alpha layer를 중첩한다. Input Button의 Color picker 예시는 현재 1px inset `black 10%`를 Candidate 값으로 사용하며, 실제 이미지 사례와 함께 강도를 재검수한 뒤 semantic token 승격 여부를 결정한다.
+- 컴포넌트 작업 중 새 색상 패턴이 발견되면 알림과 근거를 남긴 token candidate로 등록하고, 반복 검증 후 token 또는 recipe로 승격한다.
+- 이미지와 Color swatch처럼 콘텐츠 자체가 배경색을 갖는 값의 경계는 Neutral border를 바깥에 두지 않고 내부 Black alpha layer를 중첩한다. Input Button의 Color picker 예시는 현재 1px inset `black 10%`를 token candidate 값으로 사용하며, 실제 이미지 사례와 함께 강도를 재검수한 뒤 semantic token 승격 여부를 결정한다.
 - Outline 형태의 Form control과 선택 요소는 Disabled에서도 기본 외곽선을 유지한다. Disabled 상태는 foreground·background 위계와 상호작용 제한으로 표현하며 Outline 구조를 배경에 섞이게 만들지 않는다. 현재 Input·Number Input·Textarea·Combobox·Checkbox·Radio에 적용한다.
 - `outline | filled` Style을 제공하는 모든 Form control은 `outline`을 기본값으로 사용한다. 공용 컴포넌트 API, Studio Playground 초기값과 Property 문서의 Default를 동일하게 유지한다.
 - `fill | fixed` 너비 Layout을 지원하는 한 줄 Form control은 공용 API와 Studio Playground 모두 `fill`을 기본값으로 사용한다. Input·Number Input은 Fill이 기본이고, Textarea·Combobox는 기본적으로 부모 너비를 채운다. Checkbox·Radio의 별도 `inline | block` 체계에는 적용하지 않는다.
@@ -308,6 +308,8 @@
 
 2026-09-14까지 아래 1번을 Studio에서 진행한다.
 
+구조 정리는 끝났다. 토큰 값이 패키지 CSS로 나오고, 다크 변형과 Tailwind 스캔 경로도 각 패키지가 소유하며, Studio는 패키지 export로만 참조한다. 컴포넌트 성숙도 등급은 제거했고 Foundation의 `Provisional` 표시만 남겼다. 남긴 구조 항목은 [open-questions.md](open-questions.md)의 「구조상 알려진 한계」와 [roadmap.md](roadmap.md)의 「이관 전 함께 정할 것」에 있다.
+
 Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구성 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신과 공용 부품 통합은 완료했으며 아래 1~8이 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
 
 1. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. Input·Textarea의 금지된 bracket과 Input의 가짜 Clear 아이콘, Textarea의 글자 상자는 공용 부품 통합에서 같은 코드를 고치며 함께 처리했다.
@@ -342,10 +344,10 @@ Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
 
-현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 Stable로 승격하거나 다른 컴포넌트에 일괄 적용하지 않는다.
+현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 확정하거나 다른 컴포넌트에 일괄 적용하지 않는다.
 
 ## 새 작업에서 사용할 시작 요청 예시
 
 ```text
-이 저장소의 AGENTS.md, docs/system/README.md, docs/process/working-context.md와 작업 관련 Foundation 문서를 먼저 읽어라. 현재 Provisional 결정을 Stable로 가정하지 말고, 문서화된 ooee 제작 흐름에 따라 작업하라.
+이 저장소의 AGENTS.md, docs/system/README.md, docs/process/working-context.md와 작업 관련 Foundation 문서를 먼저 읽어라. `Provisional`로 표시된 결정을 확정된 것으로 가정하지 말고, 문서화된 ooee 제작 흐름에 따라 작업하라.
 ```

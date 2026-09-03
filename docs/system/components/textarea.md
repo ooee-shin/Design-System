@@ -1,6 +1,4 @@
-# Textarea Candidate
-
-상태: `Candidate`
+# Textarea
 
 여러 줄 텍스트를 입력하는 공용 컴포넌트다. Input과 같은 시각적 스타일과 상태 규칙을 사용하지만 내부 선택 요소는 지원하지 않는다. 실제 구현 원본은 `packages/ui/src/textarea.tsx`, 검수 화면은 `/components/textarea`다.
 

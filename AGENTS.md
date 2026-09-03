@@ -19,11 +19,11 @@
 ## 작업을 시작할 때
 
 1. `git status -sb`로 현재 branch, upstream과 미커밋 변경을 확인한다. 다른 작업자의 변경을 덮어쓰지 않는다.
-2. `docs/system/README.md`에서 시스템 구성과 자산 성숙도를 확인한다.
+2. `docs/system/README.md`에서 시스템 구성과 현재 상태를 확인한다.
 3. `docs/process/working-context.md`에서 현재 구현, 열린 결정과 다음 작업을 확인한다.
 4. 작업 대상과 관련된 `docs/system/foundations/*` 또는 `docs/system/components/*` 문서를 읽는다.
 5. 문서와 코드가 다르면 사용자에게 차이를 알리고, 임의로 기준을 확정하지 않는다.
-6. `Provisional` 결정은 테스트할 수 있지만 `Stable`로 자동 승격하지 않는다.
+6. `상태: Provisional`로 표시된 Foundation 결정은 테스트할 수 있지만 확정된 것으로 다루지 않는다. 컴포넌트에는 등급을 매기지 않는다. 1차 컴포넌트는 전부 검증 중이며 이관 전까지 바뀔 수 있다.
 
 ## 지켜야 할 시스템 규칙
 
@@ -40,9 +40,9 @@
 
 ## 코드 소유 경계
 
-- `apps/studio`는 Workbench, 예시 콘텐츠, 출처, 성숙도, viewport·theme·locale 검수 control만 소유한다.
+- `apps/studio`는 Workbench, 예시 콘텐츠, 출처, viewport·theme·locale 검수 control만 소유한다.
 - 외부 원본을 그대로 검토하는 초기 Experiment는 Studio에 둘 수 있다.
-- 사용자가 수정하거나 ooee 자산으로 채택한 UI는 Candidate/Provisional이어도 `packages/ui`에 실제 원본을 둔다.
+- 사용자가 수정하거나 ooee 자산으로 채택한 UI는 검증이 끝나지 않았어도 `packages/ui`에 실제 원본을 둔다.
 - 채택된 조합 패턴은 내부를 성급하게 분해하지 않고 전체 단위로 `packages/patterns`에 실제 원본을 둔다.
 - Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
 
@@ -52,7 +52,7 @@
 - 사용자가 `업무시작` 또는 같은 의미로 말하면 코드를 건드리기 전에 먼저 브리핑한다. `docs/process/working-context.md`의 「바로 다음 작업」과 그 아래 사용자 확인을 기다리는 항목을 읽고, 사용자가 결정해야 하는 항목과 현재 진행 상황·다음 단계를 정리해 보고한다. 대화 기록이 아니라 이 파일이 원본이다.
 - 사용자가 `퇴근백업` 또는 같은 의미로 말하면 작업을 정리하고 `docs/process/working-context.md`의 현재 구현·다음 작업·확인 대기 항목을 갱신한 뒤 `pnpm check`를 통과시키고 commit·push까지 끝낸다. 다음 작업자와 다른 기기가 이어받을 수 있는 상태로 만드는 것이 목적이다.
 - 사용자의 명시적 디자인 판단을 문서와 코드에 함께 반영한다.
-- 컴포넌트 작업 중 기존 token으로 설명되지 않는 색상 패턴을 발견하면 사용자에게 알리고 Candidate로 기록한다. 승격 기준은 `docs/process/pipeline.md`를 따르며, 발견했다는 이유만으로 공용 semantic token에 즉시 추가하지 않는다.
+- 컴포넌트 작업 중 기존 token으로 설명되지 않는 색상 패턴을 발견하면 사용자에게 알리고 token candidate로 기록한다. 승격 기준은 `docs/process/pipeline.md`를 따르며, 발견했다는 이유만으로 공용 semantic token에 즉시 추가하지 않는다.
 - 접근성, theme 또는 시스템 경계에 필요한 token은 첫 사용에도 추가할 수 있다.
 - shadcn update를 oe에 자동 덮어쓰지 않는다. Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
 
@@ -62,7 +62,7 @@
 - 컴포넌트를 반복 조정하는 동안에는 개별 시각 수정마다 `docs/system/components/{component}.md`를 갱신하지 않는다. 사용자가 “확정할게”, “완료” 또는 같은 의미로 말하면 실제 공용 컴포넌트와 Studio 화면을 대조한 뒤 해당 Component MD의 Anatomy, Properties, State, Layout, Guidelines, Specification과 미정 사항을 한 번에 정리한다.
 - 여러 컴포넌트에 즉시 적용되는 Studio 공통 규칙, Foundation 결정 또는 다음 작업자가 중간에 반드시 알아야 하는 충돌은 Component 확정 시점까지 미루지 않고 `docs/system/*`, `docs/process/*` 또는 `docs/process/working-context.md`에 바로 기록한다.
 - 확인된 구현·문서 불일치는 수정할 수 있지만, 누락된 Property 카드의 필요성이나 새로운 사용 정책처럼 판단이 필요한 내용은 모아서 사용자에게 질문한다.
-- 화면 확정만으로 Candidate를 Stable로 승격하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청 또는 별도 승격 검토가 필요하다.
+- 화면 확정만으로 열린 결정을 확정하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청이 필요하다.
 
 ## 검증
 

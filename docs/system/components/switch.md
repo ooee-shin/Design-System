@@ -1,6 +1,4 @@
-# Switch Candidate
-
-상태: `Candidate`
+# Switch
 
 설정이나 기능을 즉시 켜고 끄는 Boolean control이다. 실제 구현 원본은 `packages/ui/src/switch.tsx`, 검수 화면은 `/components/switch`다. Base UI Switch를 동작 기반으로 사용하고 ooee semantic token으로 시각 상태를 정규화했다. 구조, Size와 touch target은 [Seed Design Switch](https://seed-design.io/components/switch)를 참고했다.
 

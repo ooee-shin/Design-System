@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -79,4 +80,28 @@ test("semantic mappings preserve the documented light and dark roles", () => {
   assert.equal(dark.backgroundBoldPrimary.primitive, "brand-400");
   assert.equal(light.focusRing.value, palette.solid[600]);
   assert.equal(dark.focusRing.value, palette.solid[400]);
+});
+
+test("styles.css ships the same token values the source of truth declares", () => {
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  const block = (selector: string) => {
+    const match = css.match(new RegExp(`\\${selector} \\{([^}]*)\\}`));
+    assert.ok(match, `${selector} block is missing from styles.css`);
+    return Object.fromEntries(
+      match[1]
+        .split("\n")
+        .map((line) => line.trim().replace(/;$/, ""))
+        .filter(Boolean)
+        .map((line) => {
+          const separator = line.indexOf(":");
+          return [line.slice(0, separator).trim(), line.slice(separator + 1).trim()];
+        }),
+    );
+  };
+
+  for (const mode of ["light", "dark"] as const) {
+    const expected = createCoreSemanticCssVariables(mode);
+    const actual = block(mode === "light" ? ":root" : ".dark");
+    assert.deepEqual(actual, expected, `styles.css ${mode} block drifted from CORE_SEMANTIC_TOKENS`);
+  }
 });

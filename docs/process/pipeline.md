@@ -1,37 +1,37 @@
 # 제작 파이프라인
 
-외부 참고 자료를 공용 자산으로 만드는 순서와 규칙이다. 자산 분류와 성숙도의 **정의**는 `docs/system/README.md`에 있고, 여기서는 그 사이를 어떻게 이동하는지를 다룬다.
+외부 참고 자료를 공용 자산으로 만드는 순서와 규칙이다. 자산 분류의 **정의**는 `docs/system/README.md`에 있고, 여기서는 그 사이를 어떻게 이동하는지를 다룬다.
 
 ## 자산 제작 순서
 
 ```text
 External reference
-→ Experiment
+→ 화면 실험
 → 화면 맥락에서 비주얼·상태·반응형·접근성 검수
-→ Candidate 추출
+→ 공용 자산 추출
 → oe token 정규화
 → 다른 화면에서 재검증
-→ Stable 승격
+→ 확정
 ```
 
 ## 외부 자료 수입 8단계
 
 1. **Source 기록** — URL, 출처, 확인일, 라이선스 상태와 참고 목적을 기록한다.
-2. **Experiment 구현** — 원본의 구조와 동작을 빠르게 확인한다. 이 단계에서는 raw Tailwind color와 shadcn token을 임시로 허용한다. 목적은 정규화가 아니라 전체 구조, 반응형 동작, 원본의 장단점, 유지할 부분과 변경할 부분을 파악하는 것이다.
+2. **화면 실험 구현** — 원본의 구조와 동작을 빠르게 확인한다. 이 단계에서는 raw Tailwind color와 shadcn token을 임시로 허용한다. 목적은 정규화가 아니라 전체 구조, 반응형 동작, 원본의 장단점, 유지할 부분과 변경할 부분을 파악하는 것이다.
 3. **Art direction** — 실제 화면 안에서 비율과 밀도, spacing과 radius, foreground 위계, surface와 border 관계, 상호작용 상태, 모바일·데스크톱, Light/Dark를 ooee 기준으로 수정한다.
 4. **Asset candidate 선정** — 재사용 가치가 있는 Component, Pattern, Block과 Template을 구분한다.
 5. **상태와 API 정의** — 기본 모양뿐 아니라 콘텐츠 변형, 상태, 상호작용과 접근성을 정의한다.
 6. **Token normalization** — 비주얼 방향이 안정된 뒤 primitive와 shadcn visual token을 `oe` semantic token으로 변환한다. 토큰 매핑은 색상 값 치환이 아니라 해당 색상이 어떤 property와 의미, 위계, surface 관계를 표현하는지 판단하는 과정이다.
 7. **추출과 검증** — 컴포넌트 또는 패턴으로 추출하고 원래 화면은 실제 사용 예제와 시각 회귀 기준으로 유지한다. 다른 화면에서 재사용하며 API가 과도하게 첫 화면에 맞춰지지 않았는지 확인한다.
-8. **Stable 승격과 배포** — 채택된 Candidate와 Provisional 자산도 공용 package에서 실제 구현으로 관리한다. Stable은 package 이동 시점이 아니라 API, 접근성, 토큰과 호환성의 검증 완료 상태다.
+8. **확정과 배포** — 검증이 끝나지 않은 자산도 공용 package에서 실제 구현으로 관리한다. 확정은 package 이동 시점이 아니라 API, 접근성, 토큰과 호환성의 검증 완료 상태다.
 
 ## 단계별 코드 규칙
 
-| 단계 | Tailwind primitive | shadcn visual token | `oe` token |
+| 시점 | Tailwind primitive | shadcn visual token | `oe` token |
 |---|---:|---:|---:|
-| Experiment | 허용 | 허용 | 선택 |
-| Candidate | 제한적으로 허용 | 제한적으로 허용 | 권장 |
-| Stable Asset | 금지 | 금지 | 필수 |
+| 화면 실험 | 허용 | 허용 | 선택 |
+| 공용 추출 직후 | 제한적으로 허용 | 제한적으로 허용 | 권장 |
+| 이관 전 정리 | 금지 | 금지 | 필수 |
 
 ## 토큰을 추가하는 기준
 
@@ -59,7 +59,7 @@ External reference
 
 좋은 token은 사용 방법을 한 문장으로 설명할 수 있어야 한다.
 
-기존 token으로 설명되지 않는 색상 패턴을 발견하면 Candidate로 기록한다. Candidate는 실제 사용 위치, 해결하려는 역할, 임시 primitive 값, 기존 token으로 해결할 수 없는 이유를 포함한다. 발견했다는 이유만으로 공용 semantic token이나 Stable token에 즉시 추가하지 않는다.
+기존 token으로 설명되지 않는 색상 패턴을 발견하면 **token candidate**로 기록한다. 컴포넌트에는 등급을 매기지 않으며 이 표현은 토큰 후보에만 쓴다. token candidate는 실제 사용 위치, 해결하려는 역할, 임시 primitive 값, 기존 token으로 해결할 수 없는 이유를 포함한다. 발견했다는 이유만으로 공용 semantic token이나 Stable token에 즉시 추가하지 않는다.
 
 ## 완료 전 상태 점검
 

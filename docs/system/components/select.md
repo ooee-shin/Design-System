@@ -1,6 +1,4 @@
-# Select Candidate
-
-상태: `Candidate`
+# Select
 
 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택하는 한 줄 Form control이다. 실제 구현 원본은 `packages/ui/src/select.tsx`, 검수 화면은 `/components/select`다. Base UI Select를 동작 기반으로 사용하고 Trigger 외관은 Combobox와 공용 `selectionTriggerVariants` recipe를 공유한다. 구조와 다중 선택 가이드 참고자료는 [Seed Design Select](https://seed-design.io/components/select)이며 ooee의 기존 토큰과 Combobox 경계로 정규화했다.
 
