@@ -33,7 +33,7 @@
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Badge, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
-  - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control
+  - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
   - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
   - Combobox Anatomy의 범위 표시선 3개만 예외로 로컬에 남아 있다. 그중 하나가 Popup 콘텐츠 높이에 맞춰 늘어나야 해서 마커 기준 고정 길이만 표현하는 `AnatomyBoundaryMarker`로 옮길 수 없다

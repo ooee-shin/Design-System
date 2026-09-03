@@ -27,6 +27,15 @@ Target area를 설명할 때는 실제 컴포넌트를 바꾸지 않고 공용 `
 Studio의 수치 측정 Annotation은 Violet 계열을 공통으로 사용한다. 대상은 width·height·min/max·Target area 같은 크기, padding·gap·inset 같은 내부/외부 간격, radius, font-size·line-height·letter-spacing처럼 수치로 측정하는 Typography 스펙이다. 숫자가 token으로 표현되어도 역할이 치수이면 같은 Violet 표시를 사용한다. Font family·weight 명칭, semantic color 값, 상태, Anatomy 번호와 Swap 영역은 치수 Annotation이 아니므로 Violet 규칙을 적용하지 않는다. 치수 숫자 Pill은 border 없이 옅은 Violet 배경과 진한 Violet 글자만 사용한다.
 
 
+## 문서 화면
+
+Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 있게 표시한다. 저장소가 문서 원본을 소유하고 Studio는 표시만 하며, 별도 사본을 만들지 않는다.
+
+- 컴포넌트 상세 페이지 하단에는 그 컴포넌트의 명세 문서를 함께 표시한다. 화면과 명세가 어긋나는지를 같은 화면에서 확인하는 것이 목적이다. 페이지 상단의 `명세 문서 보기`로 바로 이동한다.
+- 문서 안의 상대 링크는 Studio route로 바꿔 표시한다. 문서끼리의 참조가 화면 밖으로 새지 않는다.
+- 표는 본문을 가로로 밀지 않도록 표 안에서만 스크롤한다.
+- 문서 본문 스타일은 Studio chrome이며 제품 컴포넌트 스타일에 포함하지 않는다.
+
 ## Playground 종속 컨트롤 표시
 
 - 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
