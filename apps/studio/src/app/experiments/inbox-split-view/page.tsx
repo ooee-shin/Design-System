@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { RiArrowLeftLine as ArrowLeft, RiExternalLinkLine as ExternalLink } from "@remixicon/react";
 
 import { ExperimentPreview } from "@/components/experiments/experiment-preview";
-import { buttonVariants } from "@/components/ui/button";
+import { StudioPreviewFrame } from "@/components/studio-preview-frame";
+import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 
 export default function InboxSplitViewPage() {
@@ -12,11 +13,11 @@ export default function InboxSplitViewPage() {
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
             <Link
-              href="/"
+              href="/patterns"
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="size-3.5" aria-hidden="true" />
-              Experiments
+              Patterns
             </Link>
             <div>
               <div className="flex items-center gap-2">
@@ -41,7 +42,7 @@ export default function InboxSplitViewPage() {
           </a>
         </header>
 
-        <ExperimentPreview />
+        <StudioPreviewFrame><ExperimentPreview /></StudioPreviewFrame>
 
         <footer className="flex flex-wrap gap-x-5 gap-y-2 border-t pt-4 text-xs text-muted-foreground">
           <span>Source · VibePrompt</span>

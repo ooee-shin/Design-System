@@ -1,6 +1,6 @@
 # @ooee/studio
 
-ooee UI 자산을 화면 맥락에서 구현하고 검수하는 Next.js App Router 애플리케이션이다. 프로젝트 목적과 전체 작업 규칙은 루트 `README.md`, `AGENTS.md`, `docs/WORKING_CONTEXT.md`를 기준으로 한다.
+ooee UI 자산을 화면 맥락에서 구현하고 검수하는 Next.js App Router 애플리케이션이다. 프로젝트 목적과 전체 작업 규칙은 루트 `README.md`, `AGENTS.md`, `docs/process/working-context.md`를 기준으로 한다.
 
 명령은 repository root에서 실행한다.
 

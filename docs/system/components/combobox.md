@@ -1,0 +1,81 @@
+# Combobox Candidate
+
+상태: `Candidate`
+
+미리 정의된 옵션을 검색하고 선택하는 컴포넌트다. `Combobox`는 단일 선택, `MultiCombobox`는 체크박스를 사용하는 다중 선택을 담당한다. 닫힌 상태는 Select trigger로 표시하고, 열면 Popup 내부의 투명한 Search input에서 옵션을 필터링한다. 구현 기반은 Base UI 1.7.0 Combobox의 `Input inside popup` 패턴이며 실제 원본은 `packages/ui/src/combobox.tsx`, 검수 화면은 `/components/combobox`다.
+
+## Anatomy
+
+1. Select trigger container
+2. Selected value / Placeholder
+3. Trigger icon: Remix `RiArrowDownSLine`
+4. Popup
+5. Search input: Popup이 열렸을 때만 표시
+6. Option list
+7. Option: 다중 선택에서는 Checkbox를 포함
+8. Select all: 다중 선택 목록 맨 위에서 전체 Option 수와 전체 선택·해제를 제공
+9. Selected indicator: Remix `RiCheckLine`
+10. Selected items: 다중 선택에서 선택적으로 표시하는 공용 Chip 목록
+11. Empty state
+
+Studio Anatomy는 번호선이 겹치지 않도록 Trigger와 Content를 별도 시각 영역으로 나눈다. Trigger는 Container, Value/Placeholder와 Trigger icon을 표시하고, Content는 Container, Search input, Option list와 Option을 표시한다. 그 아래 `Structure map`은 `Combobox root`에서 두 영역이 갈라지고 Option 안에서 Multiple의 Checkbox와 Single의 Selected indicator가 달라지는 실제 포함 관계를 보여준다.
+
+## Properties
+
+- `variant`: `outline | filled`, 기본값 `outline`
+- `controlSize`: `small | regular | large | xlarge`, 기본값 `regular`
+- `value`: 단일 option value 또는 `null`
+- `MultiCombobox.value`: option value 배열
+- `MultiCombobox.selectedDisplay`: `summary | container`, 기본값 `summary`
+- `MultiCombobox.selectedSummaryLabel`: 첫 선택 label과 나머지 개수로 생략 문구를 구성
+- `MultiCombobox.selectedSearchPlaceholder`: Container 타입 내부 검색의 접근 가능한 이름과 placeholder
+- `MultiCombobox.removeSelectedLabel`: 선택 결과 Chip 삭제 버튼의 접근 가능한 이름 생성
+- `MultiCombobox.selectAllLabel`: 전체 선택 행의 locale별 label이며 기본값은 `All`
+- `disabled`: 기본값 `false`
+- `invalid`: 기본값 `false`
+
+Control height는 Input과 Button의 공통 높이인 Small 32px, Regular 36px, Large 40px, XLarge 48px를 사용한다.
+Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.
+Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContainerVariants` recipe를 사용한다. 배경과 Border는 없으며 높이는 Small 32px로 고정한다.
+
+## Behavior
+
+- Trigger를 누르면 Popup을 열고 Search input에 focus한다.
+- Search input 입력으로 미리 정의된 옵션을 필터링한다.
+- `Combobox`에서 Option을 선택하면 단일 값이 변경되고 Popup이 닫힌다.
+- `MultiCombobox`에서 Option을 선택하면 배열 값이 변경되며 추가 선택을 위해 Popup을 유지한다.
+- 다중 선택 목록 맨 위의 `전체 N`은 disabled가 아닌 전체 Option 수를 표시한다. `N`은 레이블과 4px 간격을 두고 `oe-foreground-tertiary`로 낮춰 표시하며, 행을 누르면 전체 선택 또는 전체 해제한다.
+- 선택된 Option은 check indicator로 표시한다.
+- 선택·활성 상태의 Option, 전체 선택 행과 2-depth Checkbox 행에는 별도의 Hover 배경을 중첩하지 않는다.
+- 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 선택 배경은 pointer/keyboard Hover highlight보다 우선한다. 이 alpha 사용은 Combobox에서 검수 중인 Candidate이며 반복 용례가 확인되기 전에는 공용 semantic token으로 승격하지 않는다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
+- Popup Option 행의 배경은 scrollbar 폭까지 확장해 Search input과 가로 범위를 맞춘다.
+- 다중 선택의 `summary`는 첫 번째 선택 label과 나머지 개수를 `서울특별시 외 2곳`처럼 Trigger에 표시한다.
+- 다중 선택의 `container`는 같은 Summary를 Trigger에 유지하고, 아래의 별도 선택 영역 Container 안에 공용 Chip을 전부 표시한다.
+- Container는 외곽 Border 없이 Neutral secondary background로만 구분한다.
+- Container 상단의 내부 검색은 공용 Input의 Filled 타입을 사용하고 선택된 Chip만 필터링하며 실제 선택값을 바꾸지 않는다.
+- 각 Chip의 Remix close trailing action은 해당 선택값을 즉시 제거한다.
+- 선택 Chip 목록은 최대 높이 안에서 스크롤하며 scrollbar thumb은 목록 Hover에서만 표시한다.
+- Option list의 스크롤 공간은 유지하되 scrollbar thumb은 평소 숨기고 목록 Hover에서만 표시해 콘텐츠의 가로 이동을 방지한다.
+- 일치하는 Option이 없으면 Empty state를 표시한다.
+- 자유 입력과 새 항목 생성은 현재 지원하지 않는다.
+
+## Examples
+
+Studio는 대한민국 17개 시·도를 미리 정의한 단일 선택 예시를 사용한다. 한국어와 영어 콘텐츠는 같은 option value를 공유하고 표시 label만 locale에 따라 바뀐다. 이 지역 데이터는 Combobox의 기능을 검수하기 위한 예시이며 공용 Combobox가 특정 지역 목록을 내장하지는 않는다.
+
+같은 지역 데이터로 단일 선택과 다중 선택을 비교한다. 다중 선택 결과는 첫 항목과 나머지 개수를 표시하는 Summary와 별도 Container에 전체 Chip을 표시하는 두 타입으로 검수한다. Popup 내부의 Search input과 Option list 구조는 이후 Filter/Depth Checkbox 패턴에서도 재사용할 수 있지만, 카테고리 탐색과 적용 정책은 Combobox가 아니라 해당 패턴이 소유한다.
+
+다중 선택의 2-depth 검수 예시는 왼쪽의 `neutral-50` primitive 배경에 서울 지하철 `1호선~9호선`을 표시하고 오른쪽 흰 배경에 선택한 호선의 실제 역을 Checkbox 목록으로 표시한다. `neutral-50` 사용은 현재 검수 예시에 한정하며 별도 oe semantic token은 추가하지 않는다. 기본 예시는 2호선의 `신림`, `강남`을 선택한다. 검색 Input 자체는 Single·Multiple Popup과 같은 투명 배경·Border 없음·32px recipe를 사용하고, 검색 영역과 2-depth 목록 영역 사이는 별도 Divider로 구분한다. 왼쪽 1-depth의 모든 행은 외부 여백 없이 전체 너비의 옅은 하단선으로 구분한다. 콘텐츠는 왼쪽 18px 여백을 유지하고, 화살표가 있는 오른쪽 여백은 8px로 줄인다. 활성 행만 흰 배경과 글자 위계로 구분한다. 왼쪽과 오른쪽 목록 사이의 세로 구분선은 Scroll 영역과 분리된 고정 레이어로 유지하고 활성 행만 그 위를 덮는다. 좌우 목록은 각각 270px 높이의 독립 Scroll 영역이며 왼쪽에는 36px 행 7.5개가 보인다. 왼쪽은 Scroll 동작을 유지하면서 Scrollbar를 항상 숨기고, 오른쪽 Scrollbar만 평소 투명하게 유지한 뒤 Hover했을 때 표시한다. 오른쪽 2-depth 목록 맨 위에는 현재 1-depth에 속한 항목을 모두 선택하거나 해제하는 `전체` Checkbox를 표시하며 일부 선택 시 mixed 상태를 표시한다. 현재는 Studio에서 구조와 선택 흐름을 검수하는 예시이며, 공용 2-depth API와 Filter 적용 정책은 아직 정의하지 않았다.
+
+Studio 상단에는 Single과 Multiple Playground를 위아래로 분리한다. 전환 control로 한 Preview를 교체하지 않으며 각 Playground가 Style, Size와 State를 독립적으로 제어한다. 선택 결과 Chip과 전체 선택은 Multiple Playground에서만 검수한다.
+
+## 현재 정의하지 않은 항목
+
+- Clear button
+- Leading element와 Option image
+- Option group과 description
+- Async search
+- 선택 결과가 없는 Container의 별도 Empty state
+- Creatable option
+- Popup 최대 높이의 제품별 기준
+- Label, Helper text, Error message를 소유할 Field API

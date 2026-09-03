@@ -1,0 +1,19 @@
+.oe-message-bubble-incoming {
+  background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
+  color: var(--oe-message-incoming-foreground, var(--oe-foreground-primary));
+  box-shadow: inset 0 0 0 1px var(--oe-message-incoming-border, transparent);
+}
+
+.oe-message-bubble-outgoing {
+  background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary));
+  color: var(--oe-message-outgoing-foreground, var(--oe-foreground-inverse));
+  box-shadow: inset 0 0 0 1px var(--oe-message-outgoing-border, transparent);
+}
+
+.oe-message-bubble-outgoing-strong {
+  color: var(--oe-message-outgoing-foreground, var(--oe-foreground-inverse));
+}
+
+.oe-conversation-stack > [data-direction="outgoing"]:not(:last-child) {
+  margin-block-end: 1.25rem;
+}

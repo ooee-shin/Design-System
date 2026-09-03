@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { createBrandSemanticMapping } from "@ooee/tokens";
+import { CORE_SEMANTIC_TOKENS, createBrandSemanticMapping, type SemanticFamily } from "@ooee/tokens";
 
 type SemanticMapping = ReturnType<typeof createBrandSemanticMapping>;
 
@@ -9,35 +9,16 @@ type TokenRow = {
   dark: { primitive: string; value?: string };
 };
 
-const neutralTokens: TokenRow[] = [
-  token("oe-foreground-primary", "neutral-950", "neutral-50"),
-  token("oe-foreground-secondary", "neutral-700", "neutral-300"),
-  token("oe-foreground-tertiary", "neutral-500", "neutral-500"),
-  token("oe-foreground-disabled", "neutral-400", "neutral-600"),
-  token("oe-foreground-inverse", "white", "neutral-950"),
-  token("oe-foreground-inverse-secondary", "white / 60%", "neutral-950 / 60%"),
-  token("oe-background-canvas-primary", "white", "neutral-950"),
-  token("oe-background-canvas-secondary", "neutral-50", "neutral-900"),
-  token("oe-background-primary", "white", "neutral-900"),
-  token("oe-background-secondary", "neutral-100", "neutral-800"),
-  token("oe-background-bold-primary", "neutral-950", "neutral-50"),
-  token("oe-background-disabled", "neutral-100", "neutral-800"),
-  token("oe-border-primary", "neutral-300", "neutral-700"),
-  token("oe-border-secondary", "neutral-200", "neutral-800"),
-  token("oe-border-disabled", "neutral-100", "neutral-900"),
-  token("oe-interaction-hover", "black / 5%", "white / 8%"),
-];
+const neutralTokens = coreRows("neutral");
 
 const statusFamilies = [
-  statusFamily("Warning", "warning", "amber"),
-  statusFamily("Danger", "danger", "red"),
-  statusFamily("Success", "success", "green"),
-  statusFamily("Info", "info", "blue"),
+  { title: "Warning", description: "amber primitive 기반 상태 역할", rows: coreRows("warning") },
+  { title: "Danger", description: "red primitive 기반 상태 역할", rows: coreRows("danger") },
+  { title: "Success", description: "green primitive 기반 상태 역할", rows: coreRows("success") },
+  { title: "Info", description: "blue primitive 기반 상태 역할", rows: coreRows("info") },
 ];
 
-const accentTokens: TokenRow[] = [
-  token("oe-accent-background-bold-primary", "red-600", "red-400"),
-];
+const accentTokens = coreRows("accent");
 
 export function SemanticTokenCatalog({
   brandLight,
@@ -145,20 +126,8 @@ function token(name: string, light: string, dark: string): TokenRow {
   return { token: name, light: { primitive: light }, dark: { primitive: dark } };
 }
 
-function statusFamily(title: string, role: string, palette: string) {
-  return {
-    title,
-    description: `${palette} primitive 기반 상태 역할`,
-    rows: [
-      token(`oe-${role}-foreground-primary`, `${palette}-800`, `${palette}-200`),
-      token(`oe-${role}-foreground-secondary`, `${palette}-600`, `${palette}-400`),
-      token(`oe-${role}-background-primary`, `${palette}-50`, `${palette}-950`),
-      token(`oe-${role}-background-secondary`, `${palette}-100`, `${palette}-900`),
-      token(`oe-${role}-background-bold-primary`, `${palette}-700`, `${palette}-400`),
-      token(`oe-${role}-border-primary`, `${palette}-500`, `${palette}-500`),
-      token(`oe-${role}-border-secondary`, `${palette}-200`, `${palette}-800`),
-    ],
-  };
+function coreRows(family: SemanticFamily): TokenRow[] {
+  return CORE_SEMANTIC_TOKENS.filter((definition) => definition.family === family).map((definition) => token(definition.name, definition.light, definition.dark));
 }
 
 function brandRows(light: SemanticMapping, dark: SemanticMapping): TokenRow[] {
@@ -185,6 +154,7 @@ const primitiveClasses: Record<string, string> = {
   "white / 8%": "bg-white/8",
   "white / 60%": "bg-white/60",
   "black / 5%": "bg-black/5",
+  "black / 10%": "bg-black/10",
   "neutral-950 / 60%": "bg-neutral-950/60",
   "neutral-50": "bg-neutral-50",
   "neutral-100": "bg-neutral-100",

@@ -11,7 +11,11 @@
     "dev:studio": "pnpm --filter @ooee/studio dev",
     "build": "pnpm --filter @ooee/studio build",
     "lint": "pnpm --filter @ooee/studio lint",
-    "test": "node --experimental-strip-types --test packages/*/src/*.test.ts",
-    "check": "pnpm lint && pnpm test && pnpm build"
+    "typecheck": "pnpm -r typecheck",
+    "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.12"
   }
 }

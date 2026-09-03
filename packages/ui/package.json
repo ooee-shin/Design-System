@@ -1,0 +1,51 @@
+{
+  "name": "@ooee/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css",
+    "./badge": "./src/badge.tsx",
+    "./button": "./src/button.tsx",
+    "./combobox": "./src/combobox.tsx",
+    "./chip": "./src/chip.tsx",
+    "./checkbox": "./src/checkbox.tsx",
+    "./input": "./src/input.tsx",
+    "./input-button": "./src/input-button.tsx",
+    "./number-input": "./src/number-input.tsx",
+    "./partial-masked-input": "./src/partial-masked-input.tsx",
+    "./radio": "./src/radio.tsx",
+    "./select": "./src/select.tsx",
+    "./select-box": "./src/select-box.tsx",
+    "./switch": "./src/switch.tsx",
+    "./textarea": "./src/textarea.tsx",
+    "./message-bubble": "./src/message-bubble.tsx",
+    "./message-composer": "./src/message-composer.tsx",
+    "./message-attachment": "./src/message-attachment.tsx"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "@remixicon/react": "^4.9.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "jsdom": "^30.0.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "^5"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}
