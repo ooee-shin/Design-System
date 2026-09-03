@@ -50,7 +50,7 @@ export default function Home() {
         },
         {
           title: "Patterns",
-          description: "여러 컴포넌트이 특정 목적을 위해 결합된 반복 가능한 구조입니다.",
+          description: "여러 컴포넌트가 특정 목적을 위해 결합된 반복 가능한 구조입니다.",
           icon: Shapes,
         },
       ],
@@ -69,7 +69,7 @@ export default function Home() {
         },
         {
           title: "Examples",
-          description: "외부 화면을 공용 컴포넌트으로 다시 만든 사례입니다. 확정된 Pattern은 아닙니다.",
+          description: "외부 화면을 공용 컴포넌트로 다시 만든 사례입니다. 확정된 Pattern은 아닙니다.",
           status: "Inbox · Page Header · Sidebar",
           href: "/examples",
           icon: Layout,
@@ -105,7 +105,7 @@ export default function Home() {
               화면 안에서 검수하고, oe 자산으로 남깁니다.
             </h1>
             <p className="max-w-2xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
-              블루키 제품에서 사용할 UI 시스템을 만드는 작업 공간입니다. 컴포넌트을 실제 화면 맥락에서
+              블루키 제품에서 사용할 UI 시스템을 만드는 작업 공간입니다. 컴포넌트를 실제 화면 맥락에서
               검수하고, 확정된 결정을 oe 토큰과 컴포넌트로 남깁니다.
             </p>
           </div>

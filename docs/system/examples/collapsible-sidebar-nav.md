@@ -5,7 +5,7 @@
 출처: [VibePrompt — Collapsible sidebar nav](https://vibeprompts.dev/nav/nav-collapsible-sidebar-nav/)
 확인일: `2026-08-24`
 
-그룹 메뉴, active navigation, 검색, 사용자 계정 영역과 축소 rail을 담은 application sidebar 화면이다. 외부 화면을 공용 컴포넌트으로 다시 만든 예시이며 확정된 자산으로 취급하지 않는다. `/examples/collapsible-sidebar-nav`에서 상호작용과 반응형을 검수한다.
+그룹 메뉴, active navigation, 검색, 사용자 계정 영역과 축소 rail을 담은 application sidebar 화면이다. 외부 화면을 공용 컴포넌트로 다시 만든 예시이며 확정된 자산으로 취급하지 않는다. `/examples/collapsible-sidebar-nav`에서 상호작용과 반응형을 검수한다.
 
 구현 원본은 `packages/patterns/src/collapsible-sidebar-nav.tsx`가 소유하며 Studio는 이를 불러와 표시한다.
 
