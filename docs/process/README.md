@@ -6,6 +6,7 @@
 
 | 문서 | 내용 |
 | --- | --- |
+| [roadmap.md](roadmap.md) | AX 전환 5단계, 부품 참고 채널, A/B 비교 검증과 스택 이슈 |
 | [sources.md](sources.md) | shadcn·Obra·VibePrompt 등 입력 자료의 역할과 취급 규칙 |
 | [pipeline.md](pipeline.md) | 자산 제작 순서, 외부 자료 수입 8단계, 단계별 코드 규칙, 토큰 승격 기준 |
 | [tooling.md](tooling.md) | 작업 환경과 검증 명령 |
