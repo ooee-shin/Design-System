@@ -1,0 +1,75 @@
+# 제작 파이프라인
+
+외부 참고 자료를 공용 자산으로 만드는 순서와 규칙이다. 자산 분류와 성숙도의 **정의**는 `docs/system/README.md`에 있고, 여기서는 그 사이를 어떻게 이동하는지를 다룬다.
+
+## 자산 제작 순서
+
+```text
+External reference
+→ Experiment
+→ 화면 맥락에서 비주얼·상태·반응형·접근성 검수
+→ Candidate 추출
+→ oe token 정규화
+→ 다른 화면에서 재검증
+→ Stable 승격
+```
+
+## 외부 자료 수입 8단계
+
+1. **Source 기록** — URL, 출처, 확인일, 라이선스 상태와 참고 목적을 기록한다.
+2. **Experiment 구현** — 원본의 구조와 동작을 빠르게 확인한다. 이 단계에서는 raw Tailwind color와 shadcn token을 임시로 허용한다. 목적은 정규화가 아니라 전체 구조, 반응형 동작, 원본의 장단점, 유지할 부분과 변경할 부분을 파악하는 것이다.
+3. **Art direction** — 실제 화면 안에서 비율과 밀도, spacing과 radius, foreground 위계, surface와 border 관계, 상호작용 상태, 모바일·데스크톱, Light/Dark를 ooee 기준으로 수정한다.
+4. **Asset candidate 선정** — 재사용 가치가 있는 Component, Pattern, Block과 Template을 구분한다.
+5. **상태와 API 정의** — 기본 모양뿐 아니라 콘텐츠 변형, 상태, 상호작용과 접근성을 정의한다.
+6. **Token normalization** — 비주얼 방향이 안정된 뒤 primitive와 shadcn visual token을 `oe` semantic token으로 변환한다. 토큰 매핑은 색상 값 치환이 아니라 해당 색상이 어떤 property와 의미, 위계, surface 관계를 표현하는지 판단하는 과정이다.
+7. **추출과 검증** — 컴포넌트 또는 패턴으로 추출하고 원래 화면은 실제 사용 예제와 시각 회귀 기준으로 유지한다. 다른 화면에서 재사용하며 API가 과도하게 첫 화면에 맞춰지지 않았는지 확인한다.
+8. **Stable 승격과 배포** — 채택된 Candidate와 Provisional 자산도 공용 package에서 실제 구현으로 관리한다. Stable은 package 이동 시점이 아니라 API, 접근성, 토큰과 호환성의 검증 완료 상태다.
+
+## 단계별 코드 규칙
+
+| 단계 | Tailwind primitive | shadcn visual token | `oe` token |
+|---|---:|---:|---:|
+| Experiment | 허용 | 허용 | 선택 |
+| Candidate | 제한적으로 허용 | 제한적으로 허용 | 권장 |
+| Stable Asset | 금지 | 금지 | 필수 |
+
+## 토큰을 추가하는 기준
+
+토큰은 가능한 모든 조합을 미리 만드는 것이 아니라 실제 화면에서 발견하고 승격한다.
+
+```text
+첫 번째 사용
+→ 로컬 값으로 유지
+
+두 번째 동일 의미
+→ token candidate로 기록
+
+세 번째 동일 의미
+→ semantic token 승격
+```
+
+서로 다른 독립 컴포넌트 두 곳에서 같은 의미로 필요성이 명확하다면 세 번째 사례를 기다리지 않고 승격할 수 있다. 횟수보다 중요한 것은 같은 색상인지가 아니라 같은 의미와 역할인지다. `white/20`이 이미지 border, backdrop, hover background에 사용되었다고 해서 하나의 토큰으로 합치지 않는다. 값은 같아도 역할이 다르기 때문이다.
+
+다음은 첫 사용부터 토큰화할 수 있다.
+
+- Light/Dark에서 서로 다른 값이 필요한 결정
+- focus와 같이 접근성에 직접 영향을 주는 값
+- 여러 컴포넌트가 공유할 것이 명확한 전역 상태
+- 한 번에 변경해야 할 시스템 수준의 결정
+
+좋은 token은 사용 방법을 한 문장으로 설명할 수 있어야 한다.
+
+기존 token으로 설명되지 않는 색상 패턴을 발견하면 Candidate로 기록한다. Candidate는 실제 사용 위치, 해결하려는 역할, 임시 primitive 값, 기존 token으로 해결할 수 없는 이유를 포함한다. 발견했다는 이유만으로 공용 semantic token이나 Stable token에 즉시 추가하지 않는다.
+
+## 완료 전 상태 점검
+
+컴포넌트 구현이나 상세 문서를 마무리하기 전에 다음을 대조한다.
+
+1. 실제 Props와 기반 라이브러리에서 지원하는 상태를 전부 나열한다.
+2. Default, 선택 상태, Hover, Pressed, Focus visible, Disabled, Read-only, Required, Invalid/Error, Loading과 조합 상태 중 실제 존재하는 항목을 확인한다.
+3. 코드 구현, Studio 검수 예시, Component 문서 세 곳에 같은 상태가 반영됐는지 비교한다.
+4. 구현됐지만 검수 화면에서 누락된 상태는 추가한다.
+5. 일반적으로 있을 법하지만 현재 구현이나 정책에 없는 상태는 만들지 않고 `현재 정의 없음`으로 기록한다.
+6. 상태 조합에서 색상이나 우선순위 판단이 필요한 경우 임의로 선택하지 않고 현재 확인된 내용과 충돌 지점을 사용자에게 보고한다.
+
+완료 보고에는 누락 상태가 없는지 점검한 결과와, 남아 있는 미정 상태가 있으면 그 목록을 포함한다.

@@ -1,0 +1,54 @@
+# 입력 자료
+
+외부 자료는 화면과 패턴을 발견하는 입력이며, 최종 결과물은 `oe` semantic token과 ooee 컴포넌트 규칙으로 정규화한다. 외부 코드를 그대로 Stable 자산으로 취급하지 않는다.
+
+## 고정된 역할
+
+- **shadcn/ui** — 구현 기반이자 공급망
+- **Obra shadcn/ui Pro Kit** — 필요할 때 사용하는 품질 및 Figma 참고자료
+- **VibePrompt와 기타 외부 UI** — 화면과 제품 패턴을 발견하는 입력
+- **oe** — 검수 후 확정한 semantic token과 컴포넌트 규칙
+
+## shadcn/ui
+
+구현 기반으로 다음을 활용한다.
+
+- React 및 TypeScript 컴포넌트 구조
+- Radix UI 또는 Base UI 기반 동작
+- 접근성 구현의 출발점
+- CLI와 `components.json`, registry 규격, 코드 소유 방식
+- 외부 컴포넌트 생태계
+
+정식 ooee 자산에서 유지할 수 있는 것은 primitive 동작, 접근성 구조, event 처리, component composition, CVA variant 구조와 ref 처리다. 반면 shadcn color token, raw Tailwind color, 시각적 variant, spacing과 radius, 컴포넌트 API는 ooee 기준으로 변환한다.
+
+shadcn token과 `oe` token을 영구적으로 함께 사용하는 것이 목표가 아니다. shadcn token의 의미와 사용처를 분석한 뒤 정식 자산에서는 `oe`로 정규화한다. shadcn update를 oe에 자동 덮어쓰지 않으며 Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
+
+## Obra shadcn/ui Pro Kit
+
+품질 참고자료다.
+
+- Figma component property와 slot 구성
+- Light/Dark 및 multi-brand variable 구성
+- shadcn 컴포넌트의 크기, 간격, 상태와 variant
+- semantic token과 Figma 변수의 대응
+- Application, Marketing, Commerce Block 구성
+- Figma와 React 사이의 연결 방식
+
+Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구조를 판단할 때 필요한 범위에서 참고한다. Obra Pro 자료는 실행 필수 의존성이 아니며 repository에 포함하지 않는다.
+
+## VibePrompt 및 기타 외부 UI 자료
+
+화면과 제품 패턴을 발견하는 입력이다. 정보 구조, 레이아웃과 반응형 동작, 콘텐츠 조합, 제품 시나리오와 시각적 아이디어를 본다.
+
+외부 프롬프트 자체를 축적하는 것이 핵심은 아니다. 화면을 구현하고 수정한 뒤 그 안에서 재사용 가능한 컴포넌트, 패턴과 템플릿을 추출하는 것이 핵심이다.
+
+외부 자료는 출처, 확인일과 사용 목적을 기록한다. 라이선스가 불명확한 자료는 복제·재배포 대상이 아니라 참고자료로 취급하고, 최종 구현은 ooee의 구조와 규칙으로 작성한다.
+
+## 참고 링크
+
+- [pxd: shadcn과 함께 UI 컴포넌트를 AI 에이전트와 더 잘 쓰는 방법](https://tech.pxd.co.kr/post/shadcn%EA%B3%BC-%ED%95%A8%EA%BB%98-UI-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%EB%A5%BC-AI-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%99%80-%EB%8D%94-%EC%9E%98%EC%93%B0%EB%8A%94-%EB%B0%A9%EB%B2%95-340)
+- [VibePrompt](https://vibeprompts.dev/)
+- [Obra shadcn/ui Pro](https://shadcn.obra.studio/products/obra-shadcn-ui-pro)
+- [Obra license](https://shadcn.obra.studio/license)
+- [Atlassian Design Tokens](https://atlassian.design/foundations/tokens/design-tokens/)
+- [GitHub Primer Color Usage](https://www.primer.style/product/getting-started/foundations/color-usage/)

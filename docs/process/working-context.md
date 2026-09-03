@@ -1,8 +1,8 @@
 # Working context
 
-새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 상세한 이유와 전체 철학은 루트 `README.md`, 강제 규칙은 루트 `AGENTS.md`, 색상 결정은 `docs/foundations/color.md`를 확인한다.
+새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 시스템 정의는 `docs/system/`, 제작 절차와 근거는 `docs/process/`, 작업 운영 규칙은 루트 `AGENTS.md`를 확인한다.
 
-마지막 내용 점검: `2026-08-28`
+마지막 내용 점검: `2026-09-03`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -279,9 +279,18 @@
 - Obra Pro 자료는 실행 필수 의존성이 아니며 repository에 포함하지 않는다. 참고가 필요하면 각 계정과 기기에서 적법한 구매 권한으로 접근해야 한다.
 - 로컬 개발 포트와 브라우저 탭 상태는 공유되지 않는다. 기본 포트는 3000이며 필요하면 명령에서 3002처럼 지정한다.
 
+## 확정된 이관 전제
+
+- 이 저장소의 목적은 개인 자산화가 아니라 블루키 제품에서 사용할 UI 시스템의 1차 컴포넌트 완성이다. 통합 방식(블루키 코드 직접 삽입 vs 별도 패키지 연동)은 개발 검토 후 결정하며 1차 작업에 영향을 주지 않는다.
+- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이며 Storybook의 기반이 된다. 최종적으로 부품을 찾아보는 표준 채널은 Storybook이 맡는다.
+- `docs/process/`와 `AGENTS.md`는 전달 시 제거한다. 그래서 `docs/system/`의 문서는 이 둘을 참조하지 않는다.
+- 디자인 토큰은 변환 없이 그대로 사용하며 기존 개발 네이밍·스택과의 정합성은 1차 범위에서 고려하지 않는다.
+
 ## 바로 다음 작업
 
-Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신과 공용 부품 통합은 완료했으며 아래 1~8이 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
+2026-09-14까지 아래 1번을 Studio에서 진행한다.
+
+Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구성 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신과 공용 부품 통합은 완료했으며 아래 1~8이 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
 
 1. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. Input·Textarea의 금지된 bracket과 Input의 가짜 Clear 아이콘, Textarea의 글자 상자는 공용 부품 통합에서 같은 코드를 고치며 함께 처리했다.
 2. Playground control 정합. `Preview state` 배타 선택을 독립 Boolean Toggle로 분리(Input·Input Button·Number Input·Select), 교체 Slot을 공용 `PlaygroundElementControl`로, Badge Playground 신설, 타입 불일치 5곳, 문장형 라벨 13종과 페이지 간 라벨 통일, 종속 표시 6곳.
@@ -289,10 +298,14 @@ Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준�
 4. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
 5. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
 6. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
-7. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
+7. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/system/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
 8. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
 
 1~6은 검수 수정, 7~8은 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
+
+7번은 기존 public API를 바꾸는 breaking change다. `appearance`를 `shape`로 바꾸면 그 이름을 쓰던 소비자 코드가 전부 깨지므로 블루키 이관 전에 끝낸다. 8번은 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
+
+각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. 문서 구조 분리는 끝났지만 본문에는 아직 과정 성격의 문장이 남아 있다. 제거 대상은 자산의 유래(「Combobox 사례에서 추출한 뒤」), Studio 검수 도구 설명(「Studio는 Structure map에서 표시한다」), 진행 상태 서술(「현재 첫 번째 초안이다」)이다. `현재 정의 없음`은 시스템 정의이므로 남기고, `확인 필요` 항목은 `docs/process/open-questions.md`로 옮긴다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
 사용자 확인을 기다리는 항목:
 
@@ -309,12 +322,12 @@ Studio 13개 컴포넌트 상세 페이지를 `AGENTS.md` Studio 검수 기준�
 5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
-8. 문서 공통화 뒤 `docs/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
+8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
 
 현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 Stable로 승격하거나 다른 컴포넌트에 일괄 적용하지 않는다.
 
 ## 새 작업에서 사용할 시작 요청 예시
 
 ```text
-이 저장소의 AGENTS.md, README.md, docs/WORKING_CONTEXT.md와 작업 관련 Foundation 문서를 먼저 읽어라. 현재 Provisional 결정을 Stable로 가정하지 말고, 문서화된 ooee 제작 흐름에 따라 작업하라.
+이 저장소의 AGENTS.md, docs/system/README.md, docs/process/working-context.md와 작업 관련 Foundation 문서를 먼저 읽어라. 현재 Provisional 결정을 Stable로 가정하지 말고, 문서화된 ooee 제작 흐름에 따라 작업하라.
 ```

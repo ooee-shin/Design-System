@@ -25,6 +25,4 @@ Layout과 breakpoint는 PC/TB/MB 검수 control이 존재하지만 별도의 공
 
 ## Radius 적용 원칙
 
-모양의 공통 어휘는 `Square`, `Rounded`, `Circle(Pill)`이며 각 컴포넌트가 `shape` Property로 소유한다. 선택 단위는 시스템 전체가 아니라 서비스와 컴포넌트의 조합이다. 한 서비스는 컴포넌트마다 하나의 모양을 고르는 것을 권장하며, 서비스가 Rounded 방향이어도 모든 컴포넌트가 Rounded일 필요는 없다.
-
-같은 컴포넌트를 한 서비스 안에서 인스턴스마다 섞어 쓰는 것은 권장하지 않는다. 강제 규칙이 아니므로 필요하면 예외를 둘 수 있다. 공통 어휘로 설명되지 않는 값은 Checkbox의 `Ghost`나 Input의 밑줄형처럼 컴포넌트 고유 값으로 두고, 모양 어휘의 예외임을 해당 Component 문서에 밝힌다.
+모양의 공통 어휘와 예외 규칙은 [`../vocabulary.md`](../vocabulary.md)의 「모양 어휘」가 단일 원본이다. Foundation 화면은 그 어휘를 따르며 theme radius primitive의 현재 값만 표시한다.
