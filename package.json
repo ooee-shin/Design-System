@@ -12,7 +12,7 @@
     "build": "pnpm --filter @ooee/studio build",
     "lint": "pnpm --filter @ooee/studio lint",
     "typecheck": "pnpm -r typecheck",
-    "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts",
+    "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts apps/studio/src/lib/*.test.ts",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "devDependencies": {

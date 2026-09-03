@@ -182,3 +182,106 @@
     font-family: var(--oe-font-family-ja);
   }
 }
+
+/* 저장소 문서를 Studio 화면에서 읽기 위한 본문 스타일. 제품 컴포넌트가 아니라 Studio chrome이다. */
+@layer components {
+  .studio-markdown {
+    color: var(--oe-foreground-secondary);
+    font-size: 0.875rem;
+    line-height: 1.75;
+  }
+  .studio-markdown > * + * {
+    margin-top: 1rem;
+  }
+  .studio-markdown h1,
+  .studio-markdown h2,
+  .studio-markdown h3,
+  .studio-markdown h4 {
+    color: var(--oe-foreground-primary);
+    font-weight: 600;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+  .studio-markdown h1 { font-size: 1.25rem; }
+  .studio-markdown h2 { font-size: 1.0625rem; }
+  .studio-markdown h3 { font-size: 0.9375rem; }
+  .studio-markdown h4 { font-size: 0.875rem; }
+  .studio-markdown > h2 { margin-top: 2.5rem; }
+  .studio-markdown > h3 { margin-top: 1.75rem; }
+  .studio-markdown > h1 + *,
+  .studio-markdown > h2 + *,
+  .studio-markdown > h3 + *,
+  .studio-markdown > h4 + * {
+    margin-top: 0.625rem;
+  }
+  .studio-markdown strong { color: var(--oe-foreground-primary); font-weight: 600; }
+  .studio-markdown a {
+    color: var(--oe-brand-foreground-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .studio-markdown a:focus-visible {
+    outline: 2px solid var(--oe-focus-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .studio-markdown ul,
+  .studio-markdown ol {
+    padding-left: 1.125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+  .studio-markdown ul { list-style: disc; }
+  .studio-markdown ol { list-style: decimal; }
+  .studio-markdown li::marker { color: var(--oe-foreground-tertiary); }
+  .studio-markdown code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    background: var(--oe-background-secondary);
+    color: var(--oe-foreground-primary);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+  .studio-markdown pre {
+    background: var(--oe-background-secondary);
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    overflow-x: auto;
+  }
+  .studio-markdown pre code {
+    background: none;
+    padding: 0;
+    color: var(--oe-foreground-secondary);
+    white-space: pre;
+  }
+  .studio-markdown blockquote {
+    border-left: 2px solid var(--oe-border-primary);
+    padding-left: 1rem;
+    color: var(--oe-foreground-tertiary);
+  }
+  .studio-markdown hr {
+    border: none;
+    border-top: 1px solid var(--oe-border-secondary);
+    margin-block: 2rem;
+  }
+  .studio-markdown-table { overflow-x: auto; }
+  .studio-markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .studio-markdown th,
+  .studio-markdown td {
+    border-bottom: 1px solid var(--oe-border-secondary);
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    text-align: left;
+    vertical-align: top;
+  }
+  .studio-markdown th {
+    color: var(--oe-foreground-primary);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
