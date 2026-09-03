@@ -31,20 +31,21 @@ export default function Home() {
       icon: Layers3,
     },
     {
-      title: "Examples",
-      description: "공용 부품으로 다시 만든 실제 화면입니다. 부품이 화면에서 어떻게 조합되는지 보여줍니다.",
-      status: "Inbox · Page Header · Sidebar",
-      href: "/examples",
-      icon: Layout,
-    },
-    {
       title: "Docs",
       description: "구조 용어, 토큰 체계와 컴포넌트별 명세를 저장소 문서 그대로 읽습니다.",
       status: `${docCount}개 문서`,
       href: "/docs",
       icon: BookOpen,
     },
+    {
+      title: "Examples",
+      description: "공용 부품으로 다시 만든 실제 화면입니다. 부품이 화면에서 어떻게 조합되는지 보여줍니다.",
+      status: "Inbox · Page Header · Sidebar",
+      href: "/examples",
+      icon: Layout,
+    },
   ];
+
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">

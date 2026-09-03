@@ -11,8 +11,8 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
   { href: "/", label: "Home" },
   { href: "/foundations", label: "Foundations" },
   { href: "/components", label: "Components" },
-  { href: "/examples", label: "Examples" },
   { href: "/docs", label: "Docs" },
+  { href: "/examples", label: "Examples" },
 ];
 
 export function StudioNavigation() {
