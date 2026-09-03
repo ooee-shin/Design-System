@@ -10,15 +10,19 @@ export type AssetGroupItem = {
   updatedAt?: string;
 };
 
+/**
+ * `density`는 카드 그리드에만 적용한다. 페이지 여백과 헤더 간격은 밀도와 무관하게 다른 화면과 같게 유지해야
+ * 화면을 옮길 때 위아래로 밀리지 않는다.
+ */
 export function AssetGroupPage({ title, description, items, density = "default" }: { title: string; description: string; items: AssetGroupItem[]; density?: "default" | "compact" }) {
   const compact = density === "compact";
 
   return (
-    <main className={`min-h-screen bg-muted/40 px-4 py-5 sm:px-8 ${compact ? "sm:py-6" : "sm:py-8"}`}>
-      <div className={`mx-auto flex flex-col ${compact ? "max-w-7xl gap-5" : "max-w-6xl gap-7"}`}>
-        <header className={compact ? "space-y-2" : "space-y-3"}>
+    <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
+      <div className="mx-auto flex max-w-6xl flex-col gap-7">
+        <header className="space-y-3">
           <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-            <RiArrowLeftLine className="size-3.5" aria-hidden="true" />
+            <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
             Home
           </Link>
           <div>
@@ -40,7 +44,7 @@ export function AssetGroupPage({ title, description, items, density = "default" 
                 {item.updatedAt ? <time dateTime={item.updatedAt.replaceAll(".", "-")} className="text-[11px] text-muted-foreground">마지막 수정 {item.updatedAt}</time> : <span />}
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                   열기
-                  <RiArrowRightLine className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <RiArrowRightLine className="size-oe-icon-xsmall transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </div>
             </Link>

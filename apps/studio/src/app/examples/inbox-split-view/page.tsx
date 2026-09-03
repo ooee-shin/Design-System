@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 export default function InboxSplitViewPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
             <Link
               href="/examples"
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              <ArrowLeft className="size-oe-icon-xsmall" aria-hidden="true" />
               Examples
             </Link>
             <div>

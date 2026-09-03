@@ -7,10 +7,10 @@ import { StudioPreviewFrame } from "@/components/studio-preview-frame";
 export default function CollapsibleSidebarNavPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="space-y-2">
           <Link href="/examples" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-            <RiArrowLeftLine className="size-3.5" aria-hidden="true" />
+            <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
             Examples
           </Link>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -23,7 +23,7 @@ export default function CollapsibleSidebarNavPage() {
             </div>
             <Link href="https://vibeprompts.dev/nav/nav-collapsible-sidebar-nav/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
               VibePrompt source
-              <RiExternalLinkLine className="size-3.5" aria-hidden="true" />
+              <RiExternalLinkLine className="size-oe-icon-xsmall" aria-hidden="true" />
             </Link>
           </div>
         </header>

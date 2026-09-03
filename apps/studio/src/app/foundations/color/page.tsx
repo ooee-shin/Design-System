@@ -9,11 +9,11 @@ import { cn } from "@/lib/utils";
 export default function ColorFoundationPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
           <Link href="/foundations" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              <ArrowLeft className="size-oe-icon-xsmall" aria-hidden="true" />
               Foundations
             </Link>
             <div>

@@ -4,10 +4,10 @@ import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 export default function FieldPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="space-y-2">
           <Link href="/components" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
-            <RiArrowLeftLine className="size-3.5" aria-hidden="true" />
+            <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
             Components
           </Link>
           <div>
@@ -25,11 +25,11 @@ export default function FieldPage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <Link href="/components/input" className="inline-flex items-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted/50">
               Input 확인
-              <RiArrowRightLine className="size-3.5" aria-hidden="true" />
+              <RiArrowRightLine className="size-oe-icon-xsmall" aria-hidden="true" />
             </Link>
             <Link href="/components/textarea" className="inline-flex items-center gap-1.5 rounded-lg border bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-muted/50">
               Textarea 확인
-              <RiArrowRightLine className="size-3.5" aria-hidden="true" />
+              <RiArrowRightLine className="size-oe-icon-xsmall" aria-hidden="true" />
             </Link>
           </div>
         </section>

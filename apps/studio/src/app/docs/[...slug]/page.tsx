@@ -18,7 +18,7 @@ export default async function DocPage({ params }: PageProps<"/docs/[...slug]">) 
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-3xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="space-y-2">
           <Link href="/docs" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
             <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
@@ -26,7 +26,7 @@ export default async function DocPage({ params }: PageProps<"/docs/[...slug]">) 
           </Link>
           <p className="font-mono text-xs text-muted-foreground">docs/system/{slug}.md</p>
         </header>
-        <article aria-label={title} className="rounded-2xl border bg-background p-6 sm:p-8">
+        <article aria-label={title} className="w-full max-w-3xl rounded-2xl border bg-background p-6 sm:p-8">
           <MarkdownView html={html} />
         </article>
       </div>
