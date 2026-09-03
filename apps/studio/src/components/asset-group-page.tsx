@@ -10,13 +10,17 @@ export type AssetGroupItem = {
   updatedAt?: string;
 };
 
+/**
+ * `density`는 카드 그리드에만 적용한다. 페이지 여백과 헤더 간격은 밀도와 무관하게 다른 화면과 같게 유지해야
+ * 화면을 옮길 때 위아래로 밀리지 않는다.
+ */
 export function AssetGroupPage({ title, description, items, density = "default" }: { title: string; description: string; items: AssetGroupItem[]; density?: "default" | "compact" }) {
   const compact = density === "compact";
 
   return (
-    <main className={`min-h-screen bg-muted/40 px-4 py-5 sm:px-8 ${compact ? "sm:py-6" : "sm:py-8"}`}>
-      <div className={`mx-auto flex max-w-7xl flex-col ${compact ? "gap-5" : "gap-7"}`}>
-        <header className={compact ? "space-y-2" : "space-y-3"}>
+    <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
+      <div className="mx-auto flex max-w-6xl flex-col gap-7">
+        <header className="space-y-3">
           <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
             <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
             Home

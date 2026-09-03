@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export default function InboxSplitViewPage() {
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
             <Link

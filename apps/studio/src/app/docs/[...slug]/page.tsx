@@ -18,7 +18,7 @@ export default async function DocPage({ params }: PageProps<"/docs/[...slug]">) 
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <header className="space-y-2">
           <Link href="/docs" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
             <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />

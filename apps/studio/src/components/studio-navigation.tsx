@@ -28,7 +28,7 @@ export function StudioNavigation() {
         </a>
       ) : null}
       <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur" aria-label="Studio 화면 이동">
-      <div className="mx-auto flex h-12 max-w-7xl items-center gap-4 px-4 sm:px-8">
+      <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4 sm:px-8">
         <Link href="/" className="shrink-0 py-3 text-sm font-semibold tracking-tight">
           ooee <span className="font-normal text-muted-foreground">Studio</span>
         </Link>

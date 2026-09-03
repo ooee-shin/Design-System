@@ -48,7 +48,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-12">
         <header className="flex items-center justify-between border-b pb-5">
           <div className="flex items-baseline gap-3">
             <span className="text-base font-semibold tracking-tight">ooee</span>
