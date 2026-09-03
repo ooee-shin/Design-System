@@ -16,7 +16,7 @@ export default function InboxSplitViewPage() {
               href="/examples"
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              <ArrowLeft className="size-oe-icon-xsmall" aria-hidden="true" />
               Examples
             </Link>
             <div>

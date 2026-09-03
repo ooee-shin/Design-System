@@ -47,8 +47,8 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-muted/40 px-5 py-6 sm:px-8 lg:px-12">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12">
+    <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-8 sm:py-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-12">
         <header className="flex items-center justify-between border-b pb-5">
           <div className="flex items-baseline gap-3">
             <span className="text-base font-semibold tracking-tight">ooee</span>
@@ -103,7 +103,7 @@ export default function Home() {
                 </div>
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                   {status}
-                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <ArrowRight className="size-oe-icon-xsmall transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </Link>
             ))}
