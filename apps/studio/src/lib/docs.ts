@@ -8,7 +8,7 @@ export type DocEntry = {
   slug: string;
   title: string;
   summary: string;
-  group: "시작" | "Foundations" | "Components" | "Patterns";
+  group: "시작" | "Foundations" | "Components" | "Examples";
 };
 
 /** `docs/system`은 저장소 루트에 있고 Studio는 apps/studio 에서 실행되므로 두 위치를 모두 확인한다. */
@@ -30,7 +30,7 @@ function walk(directory: string, prefix = ""): string[] {
 function groupOf(slug: string): DocEntry["group"] {
   if (slug.startsWith("foundations/")) return "Foundations";
   if (slug.startsWith("components/")) return "Components";
-  if (slug.startsWith("patterns/")) return "Patterns";
+  if (slug.startsWith("examples/")) return "Examples";
   return "시작";
 }
 
@@ -39,7 +39,7 @@ function readDoc(slug: string) {
 }
 
 export function listDocs(): DocEntry[] {
-  const order: DocEntry["group"][] = ["시작", "Foundations", "Components", "Patterns"];
+  const order: DocEntry["group"][] = ["시작", "Foundations", "Components", "Examples"];
   return walk(docsRoot())
     .map((slug) => {
       const source = readDoc(slug);

@@ -32,7 +32,7 @@
 packages/tokens      Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결
 packages/fonts       언어별 공용 font
 packages/ui          공용 Component
-packages/patterns    여러 Component가 결합된 Pattern
+packages/patterns    화면 예시 구현. 확정된 Pattern은 아직 없다
 apps/studio          공용 자산을 소비하는 검수 화면
 ```
 

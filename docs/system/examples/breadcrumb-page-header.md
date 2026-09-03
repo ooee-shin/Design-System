@@ -1,13 +1,13 @@
-# Breadcrumb Page Header Experiment
+# Breadcrumb Page Header
 
-상태: `Experiment`
+상태: `화면 예시` — 시스템이 확정한 Pattern이 아니다
 
 출처: [VibePrompt — Breadcrumb page header](https://vibeprompts.dev/nav/nav-breadcrumb-page-header/)
 확인일: `2026-08-24`
 
-레코드의 위치, 제목과 상태, metadata, 주요 action, section tab을 하나의 application page header에서 검수하기 위한 외부 화면 실험이다. 외부 Tailwind 마크업을 확정된 자산으로 취급하지 않으며 `/experiments/breadcrumb-page-header`에서 상호작용과 반응형을 먼저 검수한다.
+레코드의 위치, 제목과 상태, metadata, 주요 action, section tab을 하나의 application page header에 담은 화면이다. 외부 화면을 공용 부품으로 다시 만든 예시이며 확정된 자산으로 취급하지 않는다. `/examples/breadcrumb-page-header`에서 상호작용과 반응형을 검수한다.
 
-사용자가 채택한 실제 패턴 원본은 `packages/patterns/src/breadcrumb-page-header.tsx`가 소유하며 Studio route는 공용 패턴을 불러와 검수한다.
+구현 원본은 `packages/patterns/src/breadcrumb-page-header.tsx`가 소유하며 Studio는 이를 불러와 표시한다.
 
 ## 현재 구현
 

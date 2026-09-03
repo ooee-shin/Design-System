@@ -4,7 +4,7 @@ import { InboxSplitView } from "@ooee/patterns";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 import { cn } from "@/lib/utils";
 
-export function ExperimentPreview() {
+export function ExamplePreview() {
   const { theme, locale } = useStudioPreferences();
 
   return (

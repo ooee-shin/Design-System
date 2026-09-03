@@ -4,7 +4,7 @@
 
 구조 용어는 [vocabulary.md](vocabulary.md), Focus 표시 규칙은 [interaction.md](interaction.md)를 따른다.
 
-화면 Experiment에는 가능한 경우 다음 검수 컨트롤을 제공한다.
+화면 예시에는 가능한 경우 다음 검수 컨트롤을 제공한다.
 
 - Light/Dark
 - 국문/영문/일어 콘텐츠와 typography
