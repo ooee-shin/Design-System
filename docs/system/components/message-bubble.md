@@ -1,6 +1,6 @@
 # MessageBubble
 
-`MessageBubble`은 VibePrompt Inbox split view Experiment에서 추출한 첫 컴포넌트 자산이다. `/components/message-bubble`은 현재 Chat Workbench로 확장되어 통합 대화, 레이아웃, 콘텐츠, 전달 상태, 날짜, 첨부, 입력, 언어와 테마를 함께 검수한다.
+`MessageBubble`은 VibePrompt Inbox split view 화면에서 추출한 첫 컴포넌트 자산이다. `/components/message-bubble`은 현재 Chat Workbench로 확장되어 통합 대화, 레이아웃, 콘텐츠, 전달 상태, 날짜, 첨부, 입력, 언어와 테마를 함께 검수한다.
 
 실제 MessageBubble, MessageComposer와 MessageFileAttachment 구현은 `packages/ui`가 소유한다. Studio의 Chat Workbench는 예시 흐름과 검수 control만 소유한다.
 

@@ -40,7 +40,7 @@
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - `Home`, `Foundations`, `Components`, `Patterns` 그룹 메뉴만 표시
+  - `Home`, `Foundations`, `Components`, `Examples`, `Docs` 메뉴를 표시
   - 각 그룹 index에서 현재 접근 가능한 모든 자산을 확인하고 상세 화면으로 이동
   - Components index는 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations·Patterns index는 기본 밀도를 유지
   - 컴포넌트에는 등급 badge를 달지 않는다. 아직 확정되지 않은 Foundation 결정만 `Provisional` 표시를 단다
@@ -58,7 +58,7 @@
   - Studio의 Violet 측정 Annotation은 width·height·min/max·Target area, padding·gap·inset, radius와 font-size·line-height·letter-spacing 등 수치 치수에 공통 사용. 숫자 Pill은 border 없이 Violet tonal 배경과 글자로 표시하며 semantic color·state·Anatomy·Swap에는 사용하지 않음
   - 상세 페이지의 연관 컴포넌트 영역은 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않음. Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 표시하고, 전체 Form 목록이 아니라 코드와 사용 사례로 확인된 관계만 연결
 
-- `/experiments/inbox-split-view`
+- `/examples/inbox-split-view`
   - VibePrompt의 Inbox split view를 React로 변환한 첫 화면 실험
   - 대화 검색, 읽지 않은 메시지 count, 답장, 모바일 전환
   - Light/Dark 및 국문/영문/일어 콘텐츠 검수
@@ -217,16 +217,16 @@
   - 배타적 선택의 잘못된 예시는 `사용할 알림 기능` 아래 동시에 켤 수 있는 로그인·결제 알림을 Radio로 제한한 형태로 표시해 질문과 오류 이유를 함께 드러냄
   - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
   - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class와 Flipped 배치를 보호함
-- `/experiments/breadcrumb-page-header`
+- `/examples/breadcrumb-page-header`
   - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation 화면 실험
   - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수
-  - 실제 패턴 원본은 `@ooee/patterns`가 소유하고 Studio는 locale과 검수 context만 전달
+  - 구현 원본은 `@ooee/patterns`가 소유하고 Studio는 locale과 검수 context만 전달
   - 일반 surface는 oe Neutral semantic token을 사용하고 Draft는 공용 Badge의 warning tonal 조합을 사용
-- `/experiments/collapsible-sidebar-nav`
+- `/examples/collapsible-sidebar-nav`
   - VibePrompt의 collapsible sidebar navigation을 기반으로 한 Navigation 화면 실험
   - 260px/72px rail, group disclosure, active row, count badge, search와 user chip 검수
   - navigation 패턴을 먼저 축적한 뒤 active state, row, badge와 trigger의 반복 규칙을 비교해 공용 자산을 추출
-  - 실제 패턴 원본은 `@ooee/patterns`가 소유하며 내부 navigation row는 비교 사례가 더 쌓일 때까지 패턴 내부에 유지
+  - 구현 원본은 `@ooee/patterns`가 소유하며 내부 navigation row는 비교 사례가 더 쌓일 때까지 예시 내부에 유지
 
 ## 확정된 결정
 

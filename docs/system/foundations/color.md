@@ -56,7 +56,7 @@ brand-alpha-80
 brand-alpha-90
 ```
 
-Alpha primitive는 Experiment에서 직접 사용할 수 있지만 컴포넌트에 임의로 반복 사용하지 않는다. 같은 의미와 맥락에서 반복되면 semantic token으로 승격할 필요가 있는지 검토한다.
+Alpha primitive는 화면 예시에서 직접 사용할 수 있지만 컴포넌트에 임의로 반복 사용하지 않는다. 같은 의미와 맥락에서 반복되면 semantic token으로 승격할 필요가 있는지 검토한다.
 
 ## Semantic mapping v0
 
@@ -108,7 +108,7 @@ oe-focus-ring                        → brand-400
 
 ## 다음 검토 체크포인트
 
-현재 Studio의 OE Semantic 표와 위 `Semantic mapping v0`은 구조를 눈으로 확인하기 위한 임시안이다. 아래 질문에 답하기 전에는 실제 컴포넌트의 확정 계약이나 최종 매핑으로 간주하지 않는다.
+현재 Studio의 OE Semantic 표와 위 `Semantic mapping v0`은 구조를 눈으로 확인하기 위한 임시안이다. 아래 질문에 답하기 전에는 실제 컴포넌트의 확정 기준이나 최종 매핑으로 간주하지 않는다.
 
 ### 제안하는 최소 역할
 
@@ -196,7 +196,7 @@ token candidate에는 최소한 다음을 기록한다.
 
 ## 첫 적용: Inbox split view
 
-`/experiments/inbox-split-view`는 Color v0의 첫 실제 검증 화면이다. 다음 역할을 Provisional로 연결한다.
+`/examples/inbox-split-view`는 Color v0의 첫 실제 검증 화면이다. 다음 역할을 Provisional로 연결한다.
 
 - Preview 바탕: `oe-background-canvas-secondary`
 - Inbox와 reading pane surface: `oe-background-primary`

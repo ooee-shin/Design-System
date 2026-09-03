@@ -23,7 +23,7 @@
 | [vocabulary.md](vocabulary.md) | Control·Indicator·Field·Container 구조 용어와 모양 어휘. 모든 컴포넌트 문서가 이 어휘로 쓰여 있다 |
 | [tokens.md](tokens.md) | `oe` 토큰 문법과 Neutral·status·Overlay 체계 |
 | [interaction.md](interaction.md) | Focus, Disabled, Read-only와 Layout 기본값 |
-| [quality.md](quality.md) | 자산이 충족해야 하는 상태·접근성·반응형 조건 |
+| [quality.md](quality.md) | 자산이 충족해야 하는 상태·접근성·반응형 기준 |
 | [studio.md](studio.md) | Studio 화면 구성 기준. Storybook으로 옮길 때의 표기 근거 |
 
 ## 패키지 구조
@@ -33,7 +33,7 @@
 | `packages/tokens` | Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일 |
 | `packages/fonts` | 언어별 공용 font (국문 Pretendard, 영문 Inter, 일문 Noto Sans JP) |
 | `packages/ui` | 공용 Component |
-| `packages/patterns` | 여러 Component가 결합된 Pattern |
+| `packages/patterns` | 화면 예시 구현. 확정된 Pattern이 생기면 같은 자리에 둔다 |
 | `apps/studio` | 공용 자산을 소비하는 검수 화면. 자산의 원본을 소유하지 않으며, 그 자체가 전달 대상 자산이다 |
 
 채택한 UI는 검증 정도와 관계없이 `packages/*`가 실제 원본을 소유한다. Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
@@ -43,7 +43,7 @@ Studio는 부품을 화면에서 확인하는 현재의 채널이자 Storybook�
 ## 자산 분류
 
 - **Component** — 독립적인 의미와 상태를 가진 비교적 작은 UI 요소. 예: `Button`, `Input`, `MessageBubble`
-- **Pattern** — 여러 컴포넌트가 특정 목적을 위해 결합된 반복 가능한 구조. 예: `InboxSplitView`, `BreadcrumbPageHeader`
+- **Pattern** — 여러 컴포넌트가 특정 목적을 위해 결합된 반복 가능한 구조. 예: `MessageGroup`, `SearchFilterBar`. **현재 확정된 Pattern은 없다**
 - **Block** — 독립적인 화면 섹션으로 사용할 수 있는 비교적 큰 조합. 예: `PricingSection`, `SettingsNavigation`
 - **Template** — 페이지 또는 업무 흐름 전체. 예: `DirectMessageScreen`, `SettingsPage`
 
@@ -85,10 +85,12 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 `packages/ui`는 위 외에 `Button`, `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공하며 아직 상세 문서가 없다.
 
-## Pattern
+## Example
 
-| 패턴 | 문서 | 용도 |
+외부 화면을 공용 부품으로 다시 만든 사례다. **부품이 실제 화면에서 어떻게 조합되는지 보여주는 참고 자료이며, 시스템이 확정한 Pattern이 아니다.** 여기서 반복되는 조합이 확인되면 그때 Pattern으로 추출한다.
+
+| 예시 | 문서 | 화면 |
 | --- | --- | --- |
-| Breadcrumb Page Header | [breadcrumb-page-header.md](patterns/breadcrumb-page-header.md) | 경로와 페이지 제목을 함께 표시하는 화면 상단 |
-| Collapsible Sidebar Nav | [collapsible-sidebar-nav.md](patterns/collapsible-sidebar-nav.md) | 접을 수 있는 좌측 내비게이션 |
+| Breadcrumb Page Header | [breadcrumb-page-header.md](examples/breadcrumb-page-header.md) | 경로와 페이지 제목을 함께 표시하는 화면 상단 |
+| Collapsible Sidebar Nav | [collapsible-sidebar-nav.md](examples/collapsible-sidebar-nav.md) | 접을 수 있는 좌측 내비게이션 |
 | Inbox Split View | 없음 | 목록과 상세를 좌우로 나눈 화면. 문서 작성 예정 |

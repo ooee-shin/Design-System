@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { RiArrowLeftLine as ArrowLeft, RiExternalLinkLine as ExternalLink } from "@remixicon/react";
 
-import { ExperimentPreview } from "@/components/experiments/experiment-preview";
+import { ExamplePreview } from "@/components/examples/example-preview";
 import { StudioPreviewFrame } from "@/components/studio-preview-frame";
 import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
@@ -13,17 +13,17 @@ export default function InboxSplitViewPage() {
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
             <Link
-              href="/patterns"
+              href="/examples"
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="size-3.5" aria-hidden="true" />
-              Patterns
+              Examples
             </Link>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-semibold tracking-tight">Inbox split view</h1>
                 <span className="rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
-                  Experiment
+                  화면 예시
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -42,12 +42,12 @@ export default function InboxSplitViewPage() {
           </a>
         </header>
 
-        <StudioPreviewFrame><ExperimentPreview /></StudioPreviewFrame>
+        <StudioPreviewFrame><ExamplePreview /></StudioPreviewFrame>
 
         <footer className="flex flex-wrap gap-x-5 gap-y-2 border-t pt-4 text-xs text-muted-foreground">
           <span>Source · VibePrompt</span>
           <span>Base · shadcn Base UI / Nova</span>
-          <span>Stage · 화면 실험</span>
+          <span>Stage · 화면 예시</span>
           <span>oe token mapping · Provisional applied</span>
           <Link href="/components/message-bubble" className="font-medium text-foreground underline-offset-4 hover:underline">
             MessageBubble

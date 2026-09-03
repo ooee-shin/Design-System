@@ -32,7 +32,7 @@
 - 구조 용어와 모양 어휘 — `docs/system/vocabulary.md`
 - 토큰 문법과 사용 규칙 — `docs/system/tokens.md`
 - Focus, Disabled, Read-only와 Layout 기본값 — `docs/system/interaction.md`
-- 상태·접근성·반응형 조건 — `docs/system/quality.md`
+- 상태·접근성·반응형 기준 — `docs/system/quality.md`
 - Studio 화면 구성 기준 — `docs/system/studio.md`
 - 아이콘 공급원과 사용 규칙 — `docs/system/foundations/icon.md`
 
@@ -41,9 +41,9 @@
 ## 코드 소유 경계
 
 - `apps/studio`는 Workbench, 예시 콘텐츠, 출처, viewport·theme·locale 검수 control만 소유한다.
-- 외부 원본을 그대로 검토하는 초기 Experiment는 Studio에 둘 수 있다.
+- 외부 원본을 그대로 검토하는 초기 화면 실험은 Studio에 둘 수 있다.
 - 사용자가 수정하거나 ooee 자산으로 채택한 UI는 검증이 끝나지 않았어도 `packages/ui`에 실제 원본을 둔다.
-- 채택된 조합 패턴은 내부를 성급하게 분해하지 않고 전체 단위로 `packages/patterns`에 실제 원본을 둔다.
+- 채택된 화면 예시와 조합은 내부를 성급하게 분해하지 않고 전체 단위로 `packages/patterns`에 실제 원본을 둔다. 확정된 Pattern이 생기기 전에는 예시를 Pattern이라고 부르지 않는다.
 - Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
 
 ## 변경 원칙
@@ -54,7 +54,7 @@
 - 사용자의 명시적 디자인 판단을 문서와 코드에 함께 반영한다.
 - 컴포넌트 작업 중 기존 token으로 설명되지 않는 색상 패턴을 발견하면 사용자에게 알리고 token candidate로 기록한다. 승격 기준은 `docs/process/pipeline.md`를 따르며, 발견했다는 이유만으로 공용 semantic token에 즉시 추가하지 않는다.
 - 접근성, theme 또는 시스템 경계에 필요한 token은 첫 사용에도 추가할 수 있다.
-- shadcn update를 oe에 자동 덮어쓰지 않는다. Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
+- shadcn update를 oe에 자동 덮어쓰지 않는다. 화면 실험에서 차이를 검수한 뒤 선별적으로 반영한다.
 
 ## 화면 확정 검수
 

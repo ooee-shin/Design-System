@@ -21,7 +21,7 @@
 
 정식 ooee 자산에서 유지할 수 있는 것은 primitive 동작, 접근성 구조, event 처리, component composition, CVA variant 구조와 ref 처리다. 반면 shadcn color token, raw Tailwind color, 시각적 variant, spacing과 radius, 컴포넌트 API는 ooee 기준으로 변환한다.
 
-shadcn token과 `oe` token을 영구적으로 함께 사용하는 것이 목표가 아니다. shadcn token의 의미와 사용처를 분석한 뒤 정식 자산에서는 `oe`로 정규화한다. shadcn update를 oe에 자동 덮어쓰지 않으며 Experiment에서 차이를 검수한 뒤 선별적으로 반영한다.
+shadcn token과 `oe` token을 영구적으로 함께 사용하는 것이 목표가 아니다. shadcn token의 의미와 사용처를 분석한 뒤 정식 자산에서는 `oe`로 정규화한다. shadcn update를 oe에 자동 덮어쓰지 않으며 화면 실험에서 차이를 검수한 뒤 선별적으로 반영한다.
 
 ## Obra shadcn/ui Pro Kit
 
