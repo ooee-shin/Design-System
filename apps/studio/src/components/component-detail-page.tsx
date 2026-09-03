@@ -17,10 +17,7 @@ export function ComponentDetailPage({ componentKey, children }: { componentKey: 
             Components
           </Link>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold tracking-tight">{component.title}</h1>
-              <span className="rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">{component.maturity}</span>
-            </div>
+            <h1 className="text-xl font-semibold tracking-tight">{component.title}</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{component.description}</p>
           </div>
         </header>

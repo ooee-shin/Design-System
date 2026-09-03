@@ -47,10 +47,10 @@ export default function InboxSplitViewPage() {
         <footer className="flex flex-wrap gap-x-5 gap-y-2 border-t pt-4 text-xs text-muted-foreground">
           <span>Source · VibePrompt</span>
           <span>Base · shadcn Base UI / Nova</span>
-          <span>Stage · Experiment</span>
+          <span>Stage · 화면 실험</span>
           <span>oe token mapping · Provisional applied</span>
           <Link href="/components/message-bubble" className="font-medium text-foreground underline-offset-4 hover:underline">
-            MessageBubble Candidate
+            MessageBubble
           </Link>
         </footer>
       </div>

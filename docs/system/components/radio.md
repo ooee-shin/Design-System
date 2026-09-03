@@ -1,7 +1,5 @@
 # Radio
 
-성숙도: Candidate
-
 Radio는 목록이나 폼에서 여러 항목 중 하나를 선택한다. 확정한 16px Radio Control을 기준으로 Checkbox와 같은 Field·Content 구조를 적용한다.
 
 ## Anatomy
@@ -68,4 +66,4 @@ Radio는 Checkbox와 마찬가지로 Label 외에 선택을 이해하는 데 필
 - RadioField minimum height: 36px (`oe-control-regular`)
 - Label: 14px / 20px, Regular
 
-현재 Candidate이며 다른 Radio 사용 화면에서 재검증하기 전 Stable로 승격하지 않는다.
+다른 Radio 사용 화면에서 재검증하기 전까지 API가 바뀔 수 있다.

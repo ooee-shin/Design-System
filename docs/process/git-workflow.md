@@ -19,7 +19,7 @@ git status -sb
 pnpm check
 ```
 
-- 사용자 결정이 필요한 Provisional 항목을 임의로 Stable로 확정하지 않는다.
+- 사용자 결정이 필요한 `Provisional` 항목을 임의로 확정하지 않는다.
 - secret, 계정 정보와 기기별 절대경로를 commit하지 않는다.
 - 다른 기기에서 같은 branch를 동시에 수정하지 않는다.
 

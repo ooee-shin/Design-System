@@ -1,7 +1,5 @@
 # Checkbox
 
-성숙도: Candidate
-
 Checkbox는 항목의 선택 여부를 표시하고 제어한다. Combobox의 다중 선택 사례에서 확인한 구조를 공용 UI로 추출한 뒤 OOEE의 Brand 선택 표현과 상태 규칙으로 정리했다.
 
 ## Anatomy
@@ -52,7 +50,7 @@ Checkbox와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제�
 
 Studio Playground의 초기 상태는 Rounded · Unchecked · Label only의 Basic 구조다. Optional `Label=false`로 전환하면 접근 가능한 이름은 유지하면서 원자적인 `Checkbox` Control만 단독으로 검수할 수 있다. `Label=true`에 실제로 종속되는 Field 속성만 위아래 끝이 둥근 2px 수직선 옆에 묶는다. Indeterminate와 Disabled는 Rounded에서 지원되어 조건부로 표시하지만 Appearance의 하위 속성으로 묶지 않는다. `rightDescription`, `bottomDescription`, `leadingElement`, `trailingElement`는 모두 표시하지 않는 상태에서 시작한다. Playground와 Anatomy의 콘텐츠는 제품 사례 대신 `Label`, `Right Description`, `Bottom Description` 같은 구조 명칭을 사용한다.
 
-Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE Candidate로 대응한다. Control은 16px다. Square Indicator는 0px radius, Rounded Indicator는 4px radius이며 둘 다 10px icon을 사용한다. 박스 없이 Indicator 자체로 구분하는 Ghost icon은 15px다. Ghost는 Default · Unchecked에서도 체크 아이콘을 `oe-foreground-placeholder`로 표시하고, Checked에서 Brand foreground로 강조한다. Focus ring을 소유하는 Control은 세 Shape 모두 4px radius를 유지하므로 Square에서도 Focus ring은 각지지 않는다. CheckboxField 행은 OOEE Regular form control과 같은 최소 36px다. Control은 Label의 20px 첫 줄 안에서 수직 중앙에 오도록 2px 보정한다. 기본 Label은 Regular이며 하위 항목을 대표하는 부모 항목만 Semibold다. Indeterminate와 Disabled 상태는 Square와 Rounded에 제공하고 Ghost에는 제공하지 않는다.
+Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE 컴포넌트로 대응한다. Control은 16px다. Square Indicator는 0px radius, Rounded Indicator는 4px radius이며 둘 다 10px icon을 사용한다. 박스 없이 Indicator 자체로 구분하는 Ghost icon은 15px다. Ghost는 Default · Unchecked에서도 체크 아이콘을 `oe-foreground-placeholder`로 표시하고, Checked에서 Brand foreground로 강조한다. Focus ring을 소유하는 Control은 세 Shape 모두 4px radius를 유지하므로 Square에서도 Focus ring은 각지지 않는다. CheckboxField 행은 OOEE Regular form control과 같은 최소 36px다. Control은 Label의 20px 첫 줄 안에서 수직 중앙에 오도록 2px 보정한다. 기본 Label은 Regular이며 하위 항목을 대표하는 부모 항목만 Semibold다. Indeterminate와 Disabled 상태는 Square와 Rounded에 제공하고 Ghost에는 제공하지 않는다.
 
 CheckboxField의 전체 조작 영역은 항상 투명하며 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover에만 옅은 `oe-interaction-hover-subtle`을 사용한다. 선택 상태는 Indicator의 Brand 표현으로 전달하고 Disabled와 Read only Field는 Hover 반응을 제공하지 않는다.
 
@@ -119,6 +117,6 @@ Studio의 Properties · State 예시는 Checked/Indeterminate 값을 controlled 
 - Label weight: Regular 400 / Parent item Semibold 600
 - Shape: Square / Rounded / Ghost
 
-현재 첫 공용 추출 단계이므로 Candidate다. 다른 폼과 목록에서 재검증하기 전 Stable로 승격하지 않는다.
+첫 공용 추출 단계이므로 다른 폼과 목록에서 재검증하기 전까지 API가 바뀔 수 있다.
 
-현재 Studio 상세 화면은 검수를 완료했다. `Layout`, `Flipped`, `Description`은 별도 Property 카드를 추가하지 않고 Playground, Anatomy와 Property map에서 확인한다. Error/Invalid, Hover 전용 표현과 Brand alpha 초기화 책임처럼 문서에 명시된 열린 결정은 Candidate 후속 검토로 유지하며 현재 화면 완료 범위에 포함하지 않는다.
+현재 Studio 상세 화면은 검수를 완료했다. `Layout`, `Flipped`, `Description`은 별도 Property 카드를 추가하지 않고 Playground, Anatomy와 Property map에서 확인한다. Error/Invalid, Hover 전용 표현과 Brand alpha 초기화 책임처럼 문서에 명시된 열린 결정은 후속 검토로 유지하며 현재 화면 완료 범위에 포함하지 않는다.

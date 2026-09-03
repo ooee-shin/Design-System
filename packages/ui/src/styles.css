@@ -1,3 +1,6 @@
+/* 이 패키지의 컴포넌트가 쓰는 Tailwind 클래스를 소비자 빌드가 찾도록 스캔 경로를 함께 선언한다. */
+@source "./";
+
 .oe-message-bubble-incoming {
   background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
   color: var(--oe-message-incoming-foreground, var(--oe-foreground-primary));

@@ -29,7 +29,7 @@
 → oe token으로 정규화
 → Component/Pattern으로 추출
 → 다른 화면에서 재검증
-→ Stable Asset으로 승격
+→ 확정
 ```
 
 예를 들어 채팅 화면을 자산화한다면 다음 순서로 진행한다.
@@ -53,6 +53,6 @@ VibePrompt 채팅 화면 구현
 1. **환경** — React/TypeScript/Tailwind/shadcn 프로젝트, Skill·MCP·diff 워크플로우, 문서와 preview 환경, 접근성 및 시각 검증 기반
 2. **최소 token v0** — token 문법과 분류 원칙 확정, 최소 neutral/status token을 임시 값으로 정의
 3. **대표 화면** — 채팅·인증, 데이터, 설정처럼 성격이 다른 화면을 전체로 먼저 완성
-4. **자산 추출** — Candidate 추출과 상태·API·접근성 정의, 두 번째 사용에서 재검증
+4. **자산 추출** — 공용 자산 추출과 상태·API·접근성 정의, 두 번째 사용에서 재검증
 5. **token v1과 변환 규칙** — 검증된 token만 v1으로 확정, shadcn token의 자동·문맥·수동 변환 구분
 6. **반복 자동화** — raw color 검사, token candidate 기록, Story와 상태 preview 생성, 접근성 검사, viewport별 screenshot, visual regression, registry item 생성

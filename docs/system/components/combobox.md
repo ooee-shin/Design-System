@@ -1,6 +1,4 @@
-# Combobox Candidate
-
-상태: `Candidate`
+# Combobox
 
 미리 정의된 옵션을 검색하고 선택하는 컴포넌트다. `Combobox`는 단일 선택, `MultiCombobox`는 체크박스를 사용하는 다중 선택을 담당한다. 닫힌 상태는 Select trigger로 표시하고, 열면 Popup 내부의 투명한 Search input에서 옵션을 필터링한다. 구현 기반은 Base UI 1.7.0 Combobox의 `Input inside popup` 패턴이며 실제 원본은 `packages/ui/src/combobox.tsx`, 검수 화면은 `/components/combobox`다.
 
@@ -47,7 +45,7 @@ Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContain
 - 다중 선택 목록 맨 위의 `전체 N`은 disabled가 아닌 전체 Option 수를 표시한다. `N`은 레이블과 4px 간격을 두고 `oe-foreground-tertiary`로 낮춰 표시하며, 행을 누르면 전체 선택 또는 전체 해제한다.
 - 선택된 Option은 check indicator로 표시한다.
 - 선택·활성 상태의 Option, 전체 선택 행과 2-depth Checkbox 행에는 별도의 Hover 배경을 중첩하지 않는다.
-- 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 선택 배경은 pointer/keyboard Hover highlight보다 우선한다. 이 alpha 사용은 Combobox에서 검수 중인 Candidate이며 반복 용례가 확인되기 전에는 공용 semantic token으로 승격하지 않는다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
+- 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 선택 배경은 pointer/keyboard Hover highlight보다 우선한다. 이 alpha 사용은 Combobox에서 검수 중인 token candidate이며 반복 용례가 확인되기 전에는 공용 semantic token으로 승격하지 않는다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
 - Popup Option 행의 배경은 scrollbar 폭까지 확장해 Search input과 가로 범위를 맞춘다.
 - 다중 선택의 `summary`는 첫 번째 선택 label과 나머지 개수를 `서울특별시 외 2곳`처럼 Trigger에 표시한다.
 - 다중 선택의 `container`는 같은 Summary를 Trigger에 유지하고, 아래의 별도 선택 영역 Container 안에 공용 Chip을 전부 표시한다.

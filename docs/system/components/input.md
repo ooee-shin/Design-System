@@ -1,8 +1,6 @@
-# Input Candidate
+# Input
 
-상태: `Candidate`
-
-현재 Studio 상세 화면의 구성과 검수 범위는 사용자 확인을 완료했다. 다른 화면에서 재사용해 API를 검증하기 전까지 성숙도는 Candidate를 유지한다.
+현재 Studio 상세 화면의 구성과 검수 범위는 사용자 확인을 완료했다. 다른 화면에서 재사용해 API를 검증하기 전까지 API가 바뀔 수 있다.
 
 한 줄 텍스트 입력을 위한 공용 컴포넌트다. 구현 기반은 shadcn Input과 Base UI이며, 구조와 문서 정보 흐름은 Seed Design의 Text Input을 함께 참고했다. KT Text Field는 현재 기준에서 제외했다. ooee_bk V1은 기능 후보를 확인하는 참고자료이며 공식 규칙의 출처가 아니다.
 

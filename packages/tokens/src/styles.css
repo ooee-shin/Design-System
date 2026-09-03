@@ -1,3 +1,126 @@
+/*
+ * oe semantic token
+ *
+ * 이 파일 하나를 import하면 컴포넌트가 색을 갖는다. 값의 단일 원본은 `index.ts`의
+ * `CORE_SEMANTIC_TOKENS`이며, 아래 :root 와 .dark 블록이 그 값과 일치하는지
+ * `index.test.ts`가 검사한다. 값을 바꿀 때는 index.ts를 먼저 고친다.
+ *
+ * 이 파일은 Tailwind의 기본 색상 primitive(--color-neutral-500 등)를 참조하므로
+ * 소비자는 `@import "tailwindcss"`를 먼저 선언해야 한다.
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --oe-foreground-primary: var(--color-neutral-950);
+  --oe-foreground-secondary: var(--color-neutral-700);
+  --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-placeholder: var(--color-neutral-400);
+  --oe-foreground-disabled: var(--color-neutral-400);
+  --oe-foreground-inverse: var(--color-white);
+  --oe-foreground-inverse-secondary: rgb(255 255 255 / 60%);
+  --oe-background-canvas-primary: var(--color-white);
+  --oe-background-canvas-secondary: var(--color-white);
+  --oe-background-primary: var(--color-white);
+  --oe-background-secondary: var(--color-neutral-100);
+  --oe-background-bold-primary: var(--color-neutral-950);
+  --oe-background-control-off: var(--color-neutral-400);
+  --oe-background-control-disabled: var(--color-neutral-300);
+  --oe-background-disabled: var(--color-neutral-100);
+  --oe-background-disabled-selected: var(--color-neutral-400);
+  --oe-border-primary: var(--color-neutral-300);
+  --oe-border-bold-primary: var(--color-neutral-950);
+  --oe-border-secondary: var(--color-neutral-200);
+  --oe-border-disabled: var(--color-neutral-100);
+  --oe-border-visual: rgb(0 0 0 / 10%);
+  --oe-interaction-hover-subtle: rgb(0 0 0 / 3%);
+  --oe-interaction-hover: rgb(0 0 0 / 5%);
+  --oe-accent-background-bold-primary: var(--color-red-600);
+  --oe-warning-foreground-primary: var(--color-amber-800);
+  --oe-warning-foreground-secondary: var(--color-amber-600);
+  --oe-warning-background-primary: var(--color-amber-50);
+  --oe-warning-background-secondary: var(--color-amber-100);
+  --oe-warning-background-bold-primary: var(--color-amber-700);
+  --oe-warning-border-primary: var(--color-amber-500);
+  --oe-warning-border-secondary: var(--color-amber-200);
+  --oe-danger-foreground-primary: var(--color-red-800);
+  --oe-danger-foreground-secondary: var(--color-red-600);
+  --oe-danger-background-primary: var(--color-red-50);
+  --oe-danger-background-secondary: var(--color-red-100);
+  --oe-danger-background-bold-primary: var(--color-red-700);
+  --oe-danger-border-primary: var(--color-red-500);
+  --oe-danger-border-secondary: var(--color-red-200);
+  --oe-success-foreground-primary: var(--color-green-800);
+  --oe-success-foreground-secondary: var(--color-green-600);
+  --oe-success-background-primary: var(--color-green-50);
+  --oe-success-background-secondary: var(--color-green-100);
+  --oe-success-background-bold-primary: var(--color-green-700);
+  --oe-success-border-primary: var(--color-green-500);
+  --oe-success-border-secondary: var(--color-green-200);
+  --oe-info-foreground-primary: var(--color-blue-800);
+  --oe-info-foreground-secondary: var(--color-blue-600);
+  --oe-info-background-primary: var(--color-blue-50);
+  --oe-info-background-secondary: var(--color-blue-100);
+  --oe-info-background-bold-primary: var(--color-blue-700);
+  --oe-info-border-primary: var(--color-blue-500);
+  --oe-info-border-secondary: var(--color-blue-200);
+}
+
+.dark {
+  --oe-foreground-primary: var(--color-neutral-50);
+  --oe-foreground-secondary: var(--color-neutral-300);
+  --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-placeholder: var(--color-neutral-500);
+  --oe-foreground-disabled: var(--color-neutral-600);
+  --oe-foreground-inverse: var(--color-neutral-950);
+  --oe-foreground-inverse-secondary: rgb(10 10 10 / 60%);
+  --oe-background-canvas-primary: var(--color-neutral-950);
+  --oe-background-canvas-secondary: var(--color-neutral-900);
+  --oe-background-primary: var(--color-neutral-900);
+  --oe-background-secondary: var(--color-neutral-800);
+  --oe-background-bold-primary: var(--color-neutral-50);
+  --oe-background-control-off: var(--color-neutral-500);
+  --oe-background-control-disabled: var(--color-neutral-600);
+  --oe-background-disabled: var(--color-neutral-800);
+  --oe-background-disabled-selected: var(--color-neutral-400);
+  --oe-border-primary: var(--color-neutral-700);
+  --oe-border-bold-primary: var(--color-neutral-50);
+  --oe-border-secondary: var(--color-neutral-800);
+  --oe-border-disabled: var(--color-neutral-900);
+  --oe-border-visual: rgb(0 0 0 / 10%);
+  --oe-interaction-hover-subtle: rgb(255 255 255 / 5%);
+  --oe-interaction-hover: rgb(255 255 255 / 8%);
+  --oe-accent-background-bold-primary: var(--color-red-400);
+  --oe-warning-foreground-primary: var(--color-amber-200);
+  --oe-warning-foreground-secondary: var(--color-amber-400);
+  --oe-warning-background-primary: var(--color-amber-950);
+  --oe-warning-background-secondary: var(--color-amber-900);
+  --oe-warning-background-bold-primary: var(--color-amber-400);
+  --oe-warning-border-primary: var(--color-amber-500);
+  --oe-warning-border-secondary: var(--color-amber-800);
+  --oe-danger-foreground-primary: var(--color-red-200);
+  --oe-danger-foreground-secondary: var(--color-red-400);
+  --oe-danger-background-primary: var(--color-red-950);
+  --oe-danger-background-secondary: var(--color-red-900);
+  --oe-danger-background-bold-primary: var(--color-red-400);
+  --oe-danger-border-primary: var(--color-red-500);
+  --oe-danger-border-secondary: var(--color-red-800);
+  --oe-success-foreground-primary: var(--color-green-200);
+  --oe-success-foreground-secondary: var(--color-green-400);
+  --oe-success-background-primary: var(--color-green-950);
+  --oe-success-background-secondary: var(--color-green-900);
+  --oe-success-background-bold-primary: var(--color-green-400);
+  --oe-success-border-primary: var(--color-green-500);
+  --oe-success-border-secondary: var(--color-green-800);
+  --oe-info-foreground-primary: var(--color-blue-200);
+  --oe-info-foreground-secondary: var(--color-blue-400);
+  --oe-info-background-primary: var(--color-blue-950);
+  --oe-info-background-secondary: var(--color-blue-900);
+  --oe-info-background-bold-primary: var(--color-blue-400);
+  --oe-info-border-primary: var(--color-blue-500);
+  --oe-info-border-secondary: var(--color-blue-800);
+}
+
 @theme inline {
   --spacing-oe-control-small: 2rem;
   --spacing-oe-control-regular: 2.25rem;

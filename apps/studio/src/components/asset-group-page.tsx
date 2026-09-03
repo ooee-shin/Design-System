@@ -5,7 +5,8 @@ export type AssetGroupItem = {
   title: string;
   description: string;
   href: string;
-  maturity: "Experiment" | "Candidate" | "Provisional" | "Stable";
+  /** 결정이 아직 확정되지 않은 자산에만 표시한다. 컴포넌트 등급이 아니라 결정의 확정 여부다. */
+  status?: "Provisional";
   updatedAt?: string;
 };
 
@@ -31,7 +32,7 @@ export function AssetGroupPage({ title, description, items, density = "default" 
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="font-semibold tracking-tight">{item.title}</h2>
-                  <span className="shrink-0 rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">{item.maturity}</span>
+                  {item.status ? <span className="shrink-0 rounded-full border bg-background px-2 py-0.5 text-[11px] text-muted-foreground">{item.status}</span> : null}
                 </div>
                 {!compact ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p> : null}
               </div>

@@ -73,7 +73,7 @@ export default function Home() {
             <h2 id="workspace-title" className="text-sm font-medium">
               Asset pipeline
             </h2>
-            <span className="text-xs text-muted-foreground">Experiment → Candidate → Stable</span>
+            <span className="text-xs text-muted-foreground">화면 실험 → 공용 자산 추출 → 확정</span>
           </div>
           <div className="grid overflow-hidden rounded-xl border bg-background md:grid-cols-3">
             {workspaces.map(({ title, description, status, href, icon: Icon }, index) => (

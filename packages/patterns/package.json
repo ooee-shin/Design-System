@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css",
     "./breadcrumb-page-header": "./src/breadcrumb-page-header.tsx",
     "./collapsible-sidebar-nav": "./src/collapsible-sidebar-nav.tsx",
     "./inbox-split-view": "./src/inbox-split-view.tsx"

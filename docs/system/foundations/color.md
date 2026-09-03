@@ -95,7 +95,7 @@ oe-focus-ring                        → brand-400
 - 상태색은 `oe-danger-*`, `oe-warning-*`, `oe-success-*`, `oe-info-*`로 분리한다.
 - 어두운 solid 배경 위의 텍스트와 아이콘은 공통 `oe-foreground-inverse`를 우선 검토한다.
 - 밝은 브랜드 배경에서는 `oe-foreground-primary`처럼 대비가 확보되는 중립 foreground를 사용한다.
-- Primitive 숫자는 컴포넌트 의미가 아니다. Stable 컴포넌트는 가능한 semantic token을 사용한다.
+- Primitive 숫자는 컴포넌트 의미가 아니다. 공용 컴포넌트는 가능한 semantic token을 사용한다.
 - Alpha 결과는 합성되는 배경에 따라 달라지므로 Light, Dark, 이미지 배경에서 각각 검수한다.
 - `oe-focus-ring`은 적용된 brand seed를 기반으로 Light `brand-600`, Dark `brand-400`에 연결한다. 브랜드 기반이어도 식별 가능성과 대비 검증을 우선한다.
 
@@ -108,7 +108,7 @@ oe-focus-ring                        → brand-400
 
 ## 다음 검토 체크포인트
 
-현재 Studio의 OE Semantic 표와 위 `Semantic mapping v0`은 구조를 눈으로 확인하기 위한 임시안이다. 아래 질문에 답하기 전에는 실제 컴포넌트의 Stable 계약이나 최종 매핑으로 간주하지 않는다.
+현재 Studio의 OE Semantic 표와 위 `Semantic mapping v0`은 구조를 눈으로 확인하기 위한 임시안이다. 아래 질문에 답하기 전에는 실제 컴포넌트의 확정 계약이나 최종 매핑으로 간주하지 않는다.
 
 ### 제안하는 최소 역할
 
@@ -165,7 +165,7 @@ oe-{role}-border-primary / secondary
 - Studio의 OE Semantic catalog
 - 필요한 경우 전역 CSS 변수와 shadcn compatibility mapping
 
-현재 매핑은 전체 Color catalog에서 컨펌하기 위한 Provisional 후보이며, 접근성 대비와 실제 컴포넌트 검증 후 Stable로 승격한다.
+현재 매핑은 전체 Color catalog에서 컨펌하기 위한 Provisional 후보이며, 접근성 대비와 실제 컴포넌트 검증 후 확정한다.
 
 MessageBubble의 삭제 action hover에서 `oe-danger-background-primary`가 첫 실제 용례로 확인되었다. 초기 매핑은 Light `red-50`, Dark `red-950`이며 다른 danger surface와 함께 대비를 추가 검증한다.
 
@@ -177,13 +177,13 @@ MessageBubble의 삭제 action hover에서 `oe-danger-background-primary`가 첫
 새 색상 패턴 발견
 → 기존 semantic token이나 component recipe로 해결 가능한지 확인
 → 해결되지 않으면 사용자에게 알림
-→ Candidate 등록
+→ token candidate 등록
 → 다른 상태·모드·컴포넌트에서 재검증
 → 공용 semantic token / component token / 일회성 recipe 중 하나로 분류
-→ 승인 후 Provisional 또는 Stable에 반영
+→ 승인 후 Provisional 또는 확정 값에 반영
 ```
 
-Candidate에는 최소한 다음을 기록한다.
+token candidate에는 최소한 다음을 기록한다.
 
 - 발견한 화면과 컴포넌트
 - 상태와 사용 맥락
