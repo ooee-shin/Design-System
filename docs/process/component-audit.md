@@ -31,6 +31,10 @@ Switch의 터치 영역은 Small에만 넓힌 target을 두는 것이 맞다는 
 
 Anatomy의 Slot 표시는 문제가 없었다. `studio.md:66-68`이 핑크 점선 `AnatomySwapSlot`을 정하고 있고 폼 요소 워크벤치가 이미 그것을 쓴다. Playground는 같은 문서 42줄이 `None / Icon / Image` 유형 선택으로 따로 정하고 있어 두 자리의 규칙이 다르다.
 
+공통 F는 폼 요소에서 끝냈다. Select와 Input Button과 Input이 공용 `PlaygroundElementControl`을 쓴다. Input은 자체 `ElementControl`과 `PlaygroundIconGraphic`을 갖고 있어 함께 걷어냈다. Switch·Radio·Checkbox·Combobox·Number Input·Textarea는 Playground에 교체 Slot control이 없어 해당하지 않는다. Chip은 후순위다.
+
+공통 D와 E도 끝냈다. Select의 `fixedWidth`와 Textarea의 Auto size 종속 control이 공용 `DependentControlGroup`을 쓰고, Input과 Number Input에 `Properties · Layout` 섹션을 넣었다. Switch의 `Elements`는 `label`이 필수라 비교할 값이 없어 남겨 두었다.
+
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.
 3. **동작 불일치 4건.** Focus 기준, Switch 터치 영역, MultiSelect Leading element, `tabIndex=-1`. Focus는 `input.tsx`의 공유 스타일을 바꿔 Input과 Input Button에 동시에 영향을 주므로 시각 회귀를 화면에서 확인해야 한다.

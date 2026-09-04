@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiGlobalLine, RiLink, RiLockPasswordLine, RiSearchLine, RiUserLine } from "@remixicon/react";
+import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiLink, RiSearchLine } from "@remixicon/react";
 
 import { Input } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
-type PlaygroundIcon = "placeholder" | "search" | "password" | "user" | "global" | "calendar";
 type PlaygroundState = "default" | "focus" | "invalid" | "disabled" | "readOnly";
 
 const copy = {
@@ -66,14 +66,12 @@ export function InputWorkbench() {
   const [playgroundPlaceholder, setPlaygroundPlaceholder] = useState<string>(c.placeholder);
   const [playgroundState, setPlaygroundState] = useState<PlaygroundState>("default");
   const [playgroundElements, setPlaygroundElements] = useState({
-    showLeading: false,
-    leadingIcon: "placeholder" as PlaygroundIcon,
+    leading: { kind: "none", icon: "search", image: "avatar" } as PlaygroundElementValue,
     showPrefix: false,
     prefixText: "https://",
     showSuffix: false,
     suffixText: ".com",
-    showTrailing: false,
-    trailingIcon: "placeholder" as PlaygroundIcon,
+    trailing: { kind: "none", icon: "search", image: "avatar" } as PlaygroundElementValue,
     showClear: true,
   });
   const [playgroundValue, setPlaygroundValue] = useState("");
@@ -99,10 +97,10 @@ export function InputWorkbench() {
               disabled={playgroundState === "disabled"}
               readOnly={playgroundState === "readOnly"}
               containerClassName={playgroundState === "focus" ? "border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" : undefined}
-              leadingElement={playgroundElements.showLeading ? <PlaygroundIconGraphic icon={playgroundElements.leadingIcon} /> : undefined}
+              leadingElement={playgroundElements.leading.kind === "none" ? undefined : <PlaygroundElementGraphic value={playgroundElements.leading} />}
               prefix={playgroundElements.showPrefix ? playgroundElements.prefixText : undefined}
               suffix={playgroundElements.showSuffix ? playgroundElements.suffixText : undefined}
-              trailingElement={playgroundElements.showTrailing ? <PlaygroundIconGraphic icon={playgroundElements.trailingIcon} /> : undefined}
+              trailingElement={playgroundElements.trailing.kind === "none" ? undefined : <PlaygroundElementGraphic value={playgroundElements.trailing} />}
               clearable={playgroundElements.showClear && playgroundValue.length > 0}
               clearLabel={c.clear}
               onClear={() => setPlaygroundValue("")}
@@ -119,11 +117,11 @@ export function InputWorkbench() {
               <ControlSection title="Content"><TextControl label="Value" value={playgroundValue} onChange={setPlaygroundValue} /><TextControl label="Placeholder" value={playgroundPlaceholder} onChange={setPlaygroundPlaceholder} /></ControlSection>
               <ControlSection title="Elements">
                 <div className="divide-y divide-oe-border-secondary">
-                  <div className="pb-3"><ElementControl label="Leading element" visible={playgroundElements.showLeading} icon={playgroundElements.leadingIcon} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showLeading: value }))} onIconChange={(value) => setPlaygroundElements((current) => ({ ...current, leadingIcon: value }))} /></div>
+                  <div className="pb-3"><PlaygroundElementControl label="Leading element" value={playgroundElements.leading} onChange={(value) => setPlaygroundElements((current) => ({ ...current, leading: value }))} /></div>
                   <div className="py-3"><TextElementControl label="Prefix" visible={playgroundElements.showPrefix} text={playgroundElements.prefixText} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showPrefix: value }))} onTextChange={(value) => setPlaygroundElements((current) => ({ ...current, prefixText: value }))} /></div>
                   <div className="py-3"><BooleanControl label="Show clear button" value={playgroundElements.showClear} onChange={(value) => setPlaygroundElements((current) => ({ ...current, showClear: value }))} /></div>
                   <div className="py-3"><TextElementControl label="Suffix" visible={playgroundElements.showSuffix} text={playgroundElements.suffixText} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showSuffix: value }))} onTextChange={(value) => setPlaygroundElements((current) => ({ ...current, suffixText: value }))} /></div>
-                  <div className="pt-3"><ElementControl label="Trailing element" visible={playgroundElements.showTrailing} icon={playgroundElements.trailingIcon} onVisibleChange={(value) => setPlaygroundElements((current) => ({ ...current, showTrailing: value }))} onIconChange={(value) => setPlaygroundElements((current) => ({ ...current, trailingIcon: value }))} /></div>
+                  <div className="pt-3"><PlaygroundElementControl label="Trailing element" value={playgroundElements.trailing} onChange={(value) => setPlaygroundElements((current) => ({ ...current, trailing: value }))} /></div>
                 </div>
               </ControlSection>
             </div>
@@ -279,23 +277,12 @@ function BooleanControl({ label, value, onChange }: { label: string; value: bool
   return <div className="flex items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-5 w-9 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring/40 ${value ? "bg-oe-background-bold-primary" : "bg-oe-background-secondary ring-1 ring-inset ring-oe-border-primary"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-oe-background-primary shadow-sm transition-[left] ${value ? "left-[18px]" : "left-0.5"}`} /></button></div>;
 }
 
-function ElementControl({ label, visible, icon, onVisibleChange, onIconChange }: { label: string; visible: boolean; icon: PlaygroundIcon; onVisibleChange: (value: boolean) => void; onIconChange: (value: PlaygroundIcon) => void }) {
-  const icons: Array<[PlaygroundIcon, string]> = [["placeholder", "Position"], ["search", "Search"], ["password", "Password lock"], ["user", "User"], ["global", "Global"], ["calendar", "Calendar"]];
-  return <div className="space-y-2"><BooleanControl label={`Show ${label.toLowerCase()}`} value={visible} onChange={onVisibleChange} />{visible ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">Icon</span><div className="flex h-8 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 focus-within:border-oe-focus-ring focus-within:ring-2 focus-within:ring-oe-focus-ring/30"><PlaygroundIconGraphic icon={icon} /><select value={icon} onChange={(event) => onIconChange(event.target.value as PlaygroundIcon)} className="h-full min-w-0 flex-1 bg-transparent text-xs text-oe-foreground-primary outline-none">{icons.map(([value, name]) => <option key={value} value={value}>{name}</option>)}</select></div></label> : null}</div>;
-}
-
 function TextElementControl({ label, visible, text, onVisibleChange, onTextChange }: { label: string; visible: boolean; text: string; onVisibleChange: (value: boolean) => void; onTextChange: (value: string) => void }) {
   return <div className="space-y-2"><BooleanControl label={`Show ${label.toLowerCase()}`} value={visible} onChange={onVisibleChange} />{visible ? <label className="block"><span className="mb-1.5 block text-[11px] font-medium text-oe-foreground-tertiary">{label} text</span><input value={text} onChange={(event) => onTextChange(event.target.value)} className="h-8 w-full rounded-lg border border-oe-border-primary bg-oe-background-primary px-2.5 text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring focus:ring-2 focus:ring-oe-focus-ring/30" /></label> : null}</div>;
 }
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function PlaygroundIconGraphic({ icon }: { icon: PlaygroundIcon }) {
-  if (icon === "placeholder") return <span className="block size-4 rounded-[2px] border border-dashed border-oe-border-primary" aria-hidden="true" />;
-  const Icon = icon === "search" ? RiSearchLine : icon === "password" ? RiLockPasswordLine : icon === "user" ? RiUserLine : icon === "global" ? RiGlobalLine : RiCalendarLine;
-  return <Icon className="size-4" aria-hidden="true" />;
 }
 
 function MapRow({ property, values, defaultValue, note = "Confirmed" }: { property: string; values: string; defaultValue: string; note?: string }) {
