@@ -149,7 +149,7 @@ function Section({ id, title, description, children }: { id: string; title: stri
 }
 
 function Example({ label, description, children }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
-  return <div className="flex min-h-40 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
+  return <div className="flex min-h-40 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-xs font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
 }
 
 function Control({ label, children }: { label: string; children: ReactNode }) {

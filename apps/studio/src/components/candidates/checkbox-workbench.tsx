@@ -123,7 +123,7 @@ export function CheckboxWorkbench() {
 
         <Section id="elements" title="Properties · Elements" description="Label 위계와 교체 가능한 Leading·Trailing element를 확인합니다.">
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Parent item</p>
+            <p className="text-xs font-medium text-oe-foreground-primary">Parent item</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">여러 하위 선택 항목을 대표하거나 전체 선택을 제어하는 부모 항목에만 Semibold Label을 사용합니다. 일반 항목의 Label은 Regular입니다.</p>
             <div className="mt-4 grid gap-1">
               <div className="px-1 py-1"><CheckboxField indeterminate isParent label="부모 항목" /></div>
@@ -131,14 +131,14 @@ export function CheckboxWorkbench() {
             </div>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Leading element</p>
+            <p className="text-xs font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
               <CheckboxField layout="block" label={<span className="font-medium">이벤트 알림 받기</span>} bottomDescription="새로운 이벤트와 혜택 소식을 받을 수 있습니다." leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} />
             </div>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Trailing element</p>
+            <p className="text-xs font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
               <CheckboxField layout="block" label={<span className="font-medium">자동 분배</span>} bottomDescription="설정한 규칙과 조건에 따라 담당자 또는 팀에게 자동 분배됩니다." trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} />
@@ -280,7 +280,7 @@ function Section({ id, title, description, children }: { id: string; title: stri
 }
 
 function StateExample({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
+  return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-xs font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>;
 }
 
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) {

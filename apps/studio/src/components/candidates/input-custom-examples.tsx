@@ -149,7 +149,7 @@ export function InputColorExample() {
 }
 
 function CustomInputCard({ label, description, children }: { label: string; description: string; children: ReactNode }) {
-  return <div className="flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p></div><div className="mt-auto">{children}</div></div>;
+  return <div className="flex min-h-28 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-xs font-medium text-oe-foreground-primary">{label}</p><p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p></div><div className="mt-auto">{children}</div></div>;
 }
 
 function formatMobilePhone(value: string) {

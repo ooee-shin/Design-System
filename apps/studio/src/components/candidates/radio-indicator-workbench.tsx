@@ -115,12 +115,12 @@ export function RadioIndicatorWorkbench() {
           <StateExample label="Default · Unchecked"><StaticField value="default-unchecked" label={c.label} /></StateExample>
           <StateExample label="Default · Checked"><StaticField value="default-checked" selected label={c.label} /></StateExample>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Leading element</p>
+            <p className="text-xs font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <RadioGroup className="mt-4 max-w-md"><RadioField value="leading" layout="block" label={<span className="font-medium">{c.leadingLabel}</span>} bottomDescription={c.leadingBottom} leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} /></RadioGroup>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
-            <p className="text-[11px] font-medium text-oe-foreground-primary">Trailing element</p>
+            <p className="text-xs font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="block" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} /></RadioGroup>
           </div>
@@ -240,7 +240,7 @@ export function RadioIndicatorWorkbench() {
 type FieldExampleProps = Omit<ComponentProps<typeof RadioField>, "value"> & { value: string; selected?: boolean };
 function StaticField({ value, selected = false, ...props }: FieldExampleProps) { return <RadioGroup value={selected ? value : "none"} onValueChange={() => undefined}><RadioField value={value} {...props} /></RadioGroup>; }
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
-function StateExample({ label, children }: { label: string; children: ReactNode }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-[11px] font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
+function StateExample({ label, children }: { label: string; children: ReactNode }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-xs font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) { return <div className="col-span-full mt-5 first:mt-0"><h4 className="text-sm font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>; }
 function ThemeOptionCard({ value, label, theme }: { value: string; label: string; theme: "system" | "light" | "dark" }) {
   const labelId = `theme-option-${theme}`;

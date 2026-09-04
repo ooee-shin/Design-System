@@ -13,6 +13,7 @@
 - 상태별 overlay token의 실제 필요성
 - component-specific token 도입 기준
 - shadcn token별 자동·문맥·수동 변환 규칙
+- **typography Foundation 문서가 없다.** `docs/system/foundations/`에 `color.md`와 `icon.md`는 있는데 글자 크기와 줄 높이의 원본이 없다. `/foundations/typography` 화면이 코드에서 읽어 표시할 뿐이라 어떤 크기가 체계 안의 값인지 판단할 근거가 없다.
 
 색상의 세부 미결 항목은 `docs/system/foundations/color.md`의 「아직 확정하지 않은 항목」과 「다음 검토 체크포인트」를 함께 본다.
 
