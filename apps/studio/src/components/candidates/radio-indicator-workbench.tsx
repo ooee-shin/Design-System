@@ -249,7 +249,7 @@ function ThemeOptionCard({ value, label, theme }: { value: string; label: string
       <span className="theme-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
         <ThemePreview theme={theme} />
       </span>
-      <span className="flex min-h-7 items-center gap-2">
+      <span className="flex min-h-7 items-center gap-2 pl-1">
         <Radio value={value} aria-labelledby={labelId} className="focus-visible:ring-0 focus-visible:ring-offset-0" />
         <span id={labelId} className="whitespace-nowrap text-sm font-medium leading-5 text-oe-foreground-primary">{label}</span>
       </span>

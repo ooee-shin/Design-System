@@ -129,7 +129,7 @@ function TextareaAnatomy() {
             <AnatomyNumber number={2} className="left-[310px] top-[244px]" lineClassName="left-2.5 bottom-[26px] h-[72px] w-px" />
 
             <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 whitespace-pre-line text-oe-foreground-placeholder">
-              Textarea field
+              여러 줄 값을 입력하는 영역입니다.
             </div>
           </div>
         </div>

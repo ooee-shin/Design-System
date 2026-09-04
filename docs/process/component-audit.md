@@ -191,6 +191,7 @@ Anatomy는 불일치가 없었다.
 1. 명세는 Property를 `Style`·`Size`로 적고 구현은 `variant`·`controlSize`다 — `input-button.md:30-31` 대 `input-button.tsx:23-24`
 2. 명세 Anatomy 순서에 있는 Prefix·Suffix가 화면 도식과 범례에 없다 — `input-button.md:24` 대 `input-button-workbench.tsx:158`
 3. `prefix`·`suffix`가 독립 카드 없이 Property map 텍스트로만 있다 — `input-button.md:34` 대 `input-button-workbench.tsx:134`
+   범례에 두 항목만 더하면 도식의 번호 마커가 넷인데 범례가 여섯이 되어 더 어긋난다. 도식이 Prefix와 Suffix를 그리지 않으므로 절대 좌표를 다시 잡는 작업이 함께 필요하다.
 4. Focus 표시가 `focus-within`이다. `docs/system/interaction.md:7`은 `:focus-visible`을 기준으로 정했다 — `input.tsx:9`를 공유(`input-button.tsx:52`). 같은 저장소의 `selection-trigger.ts:4`는 `focus-visible` 기반 변형을 별도로 갖고 있다.
 5. Color swatch 경계 서술이 실제 값 표기와 다르다 — `input-button.md:50` 대 `apps/studio/src/components/color-swatch.tsx:6`
 6. 진행 상태 — `input-button.md:3`
