@@ -25,7 +25,7 @@ Select는 Trigger와 Content container로 구성된다. Content 안의 관련 Op
 ## Anatomy · Option
 
 1. Option
-2. Leading element: Trigger와 Option에 표시할 수 있는 선택 요소이며 현재 Icon으로 검수
+2. Leading element: Trigger와 Option에 표시할 수 있는 선택 요소
 3. Item label
 4. Item description: 열린 Content에서만 표시하는 선택 요소
 
@@ -77,6 +77,7 @@ Control height는 Input과 Button이 공유하는 Small 32px, Regular 36px, Larg
 
 - Group을 사용하면 Group label과 Option 묶음을 표시하고 Group 사이에 Divider를 자동 배치한다.
 - Content container는 Trigger와 같은 너비와 좌우 시작점을 사용한다. Base UI의 선택 Item 중심 정렬은 사용하지 않는다.
+- Leading element에는 Icon, Badge, Avatar처럼 Option을 식별하는 요소를 둔다. 한 줄 Control의 높이를 바꾸지 않는 크기를 유지하고, 같은 목록에서는 종류를 섞지 않는다.
 - Leading element를 사용하면 Trigger와 Content container의 Leading 열 시작점을 동일하게 맞춘다.
 - 선택한 Option에 Leading element가 있으면 Trigger에도 같은 요소를 표시한다. 선택 Option에 없으면 Select의 fallback `leadingElement`를 표시한다.
 - 같은 Group에서 Leading element를 사용하면 모든 Option에 같은 Leading 영역을 제공한다. Group마다 다른 요소를 사용할 수 있지만 같은 Group 안의 일부 Option만 Leading element를 생략하지 않는다.
@@ -113,7 +114,7 @@ Studio Playground는 제품 의미를 부여하지 않은 `Option A~D` 가상 �
 
 ## 현재 정의하지 않은 항목
 
-- Leading element에 Icon 이외 콘텐츠를 허용하는 사용 정책
+- Option 안에서 따로 조작되는 요소를 Leading element로 허용하는 정책
 - Trailing element와 Option image
 - Clear button
 - 검색과 자유 입력
