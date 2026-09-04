@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "./utils"
 
 const textareaContainerVariants = cva(
-  "group/textarea flex min-h-[5.5rem] w-full min-w-0 flex-col overflow-hidden rounded-lg border text-sm text-oe-foreground-primary transition-[border-color,box-shadow,background-color] focus-within:border-oe-focus-ring focus-within:ring-1 focus-within:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
+  "group/textarea flex min-h-[5.5rem] w-full min-w-0 flex-col overflow-hidden rounded-lg border text-sm text-oe-foreground-primary transition-[border-color,box-shadow,background-color] has-[:focus-visible]:border-oe-focus-ring has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
   {
     variants: {
       variant: {

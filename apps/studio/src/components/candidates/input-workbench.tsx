@@ -156,8 +156,8 @@ export function InputWorkbench() {
         <PropertyGroup label="Default · With value"><Input value={locale === "ko" ? "입력된 값" : "Entered value"} onChange={() => undefined} /></PropertyGroup>
         <PropertyGroup label="Focus"><Input value={locale === "ko" ? "포커스 상태" : "Focused"} onChange={() => undefined} containerClassName="border-oe-focus-ring ring-1 ring-oe-focus-ring" /></PropertyGroup>
         <PropertyGroup label="Invalid"><Input aria-invalid="true" value={locale === "ko" ? "올바르지 않은 값" : "Invalid value"} onChange={() => undefined} /></PropertyGroup>
-        <PropertyGroup label="Disabled" fixed><Input disabled tabIndex={-1} defaultValue={locale === "ko" ? "비활성화" : "Disabled"} /></PropertyGroup>
-        <PropertyGroup label="Read only" fixed><Input readOnly tabIndex={-1} defaultValue={locale === "ko" ? "읽기 전용" : "Read only"} /></PropertyGroup>
+        <PropertyGroup label="Disabled" fixed><Input disabled defaultValue={locale === "ko" ? "비활성화" : "Disabled"} /></PropertyGroup>
+        <PropertyGroup label="Read only" fixed><Input readOnly defaultValue={locale === "ko" ? "읽기 전용" : "Read only"} /></PropertyGroup>
       </Section>
 
       <Section id="elements" title="Properties · Elements" description="실제 input field를 제외한 요소는 모두 선택 사항이며 전달한 요소만 표시합니다.">

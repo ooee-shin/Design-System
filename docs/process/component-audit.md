@@ -23,6 +23,10 @@
 
 2단계 중 두 가지를 끝냈다. `className` 계열은 `docs/system/README.md`의 공통 규칙으로 한 번 적고, 이름이 예측되지 않는 `containerClassName`·`indicatorClassName`·`radioClassName`·`checkboxClassName`·`switchClassName`·`thumbClassName`만 해당 명세에 한 줄로 남겼다. Property 이름은 `variant`와 `controlSize`로 통일하고 범주는 괄호로 붙였으며, 명세에 없던 Property 열여덟 개를 더했다. Anatomy 명칭 통일은 `Popup`과 `Content container`를 `vocabulary.md`에 어떻게 정의할지 정해야 해서 남겨 두었다.
 
+3단계 중 둘을 끝냈다. Input과 Textarea의 Focus 선과 ring을 `focus-within`에서 `has-[:focus-visible]`로 바꿨다. Select Box가 이미 같은 방식을 쓰고 회귀 검사까지 갖고 있어 그 선례를 따랐으며, `packages/ui/src/input.test.tsx`에 같은 검사를 더했다. Input Button은 Input의 컨테이너 스타일을 공유하므로 함께 고쳐졌다. Filled의 배경 전환은 선이나 ring이 아니라 이번 범위에서 제외했다. Studio의 State 예시에서 `tabIndex=-1`도 걷어냈다.
+
+Switch의 터치 영역과 MultiSelect의 Leading element는 값과 의도를 정해야 해서 남겨 두었다.
+
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.
 3. **동작 불일치 4건.** Focus 기준, Switch 터치 영역, MultiSelect Leading element, `tabIndex=-1`. Focus는 `input.tsx`의 공유 스타일을 바꿔 Input과 Input Button에 동시에 영향을 주므로 시각 회귀를 화면에서 확인해야 한다.
