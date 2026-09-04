@@ -27,7 +27,7 @@ Select Box Group
    └─ Trailing element (Optional)
 ```
 
-Select Box 전체 Container가 하나의 선택 영역이다. Content container는 Title과 선택적인 Description을 묶는다. Leading element에는 아이콘이나 이미지를 둘 수 있다. Trailing element는 Single에서 Radio 또는 None, Multiple에서 Checkbox 또는 None을 사용한다.
+Select Box 전체 Container가 하나의 선택 영역이다. Content container는 Title과 선택적인 Description을 묶는다. Leading element에는 아이콘이나 이미지를 둘 수 있다. Trailing element는 `radio | checkbox | none` 중 하나를 받고, `none`이 아니면 `selectionMode`에 맞는 Control로 대체하므로 Single에서는 Radio, Multiple에서는 Checkbox가 표시된다.
 
 ## 현재 구현 규칙
 

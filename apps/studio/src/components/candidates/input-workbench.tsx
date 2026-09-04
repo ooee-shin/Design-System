@@ -45,6 +45,7 @@ const inputSections = [
   { id: "anatomy", label: "Anatomy" },
   { id: "style", label: "Style" },
   { id: "size", label: "Size" },
+  { id: "layout", label: "Layout" },
   { id: "alignment", label: "Text alignment" },
   { id: "state", label: "State" },
   { id: "elements", label: "Elements" },
@@ -144,6 +145,11 @@ export function InputWorkbench() {
         <PropertyGroup label="Regular · 36px · Default"><Input controlSize="regular" placeholder={c.placeholder} /></PropertyGroup>
         <PropertyGroup label="Large · 40px"><Input controlSize="large" placeholder={c.placeholder} /></PropertyGroup>
         <PropertyGroup label="XLarge · 48px"><Input controlSize="xlarge" placeholder={c.placeholder} /></PropertyGroup>
+      </Section>
+
+      <Section id="layout" title="Properties · Layout" description="Fill은 부모 너비를 채우고, Fixed는 지정한 너비를 유지하되 부모보다 넓어지지 않습니다.">
+        <PropertyGroup label="Fill · Default"><Input placeholder={c.placeholder} /></PropertyGroup>
+        <PropertyGroup label="Fixed · 200px"><Input layout="fixed" fixedWidth={200} placeholder={c.placeholder} /></PropertyGroup>
       </Section>
 
       <Section id="alignment" title="Properties · Text alignment" description="입력값과 Placeholder를 왼쪽 또는 오른쪽에 정렬합니다. 기본값은 Left입니다.">

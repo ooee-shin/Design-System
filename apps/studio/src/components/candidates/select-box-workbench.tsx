@@ -107,7 +107,7 @@ export function SelectBoxWorkbench() {
           <div>
             <AnatomySurface ariaLabel="Select Box anatomy" title="Select Box structure" className="min-h-[290px]">
               <div className="absolute left-1/2 top-1/2 w-[min(72%,36rem)] -translate-x-1/2 -translate-y-1/2">
-                <div className="relative flex min-h-24 items-center gap-3 rounded-xl border border-oe-border-primary bg-oe-background-primary p-4">
+                <div className="relative flex items-center gap-3 rounded-xl border border-oe-border-secondary bg-transparent px-4 py-3">
                   <AnatomySwapSlot className="shrink-0" />
                   <span className="min-w-0 flex-1"><span className="block text-sm font-medium">Title</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">Description</span></span>
                   <AnatomySwapSlot className="shrink-0" />

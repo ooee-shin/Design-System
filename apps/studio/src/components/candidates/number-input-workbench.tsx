@@ -32,6 +32,7 @@ const sections = [
   { id: "anatomy", label: "Anatomy" },
   { id: "style", label: "Style" },
   { id: "size", label: "Size" },
+  { id: "layout", label: "Layout" },
   { id: "alignment", label: "Text alignment" },
   { id: "affix", label: "Prefix / Suffix" },
   { id: "behavior", label: "Behavior" },
@@ -115,6 +116,11 @@ export function NumberInputWorkbench() {
           <Example label="Regular · 36px · Default"><StudioNumberInput locale={locale} controlSize="regular" defaultValue={10} /></Example>
           <Example label="Large · 40px"><StudioNumberInput locale={locale} controlSize="large" defaultValue={10} /></Example>
           <Example label="XLarge · 48px"><StudioNumberInput locale={locale} controlSize="xlarge" defaultValue={10} /></Example>
+        </Section>
+
+        <Section id="layout" title="Properties · Layout" description="Fill은 부모 너비를 채우고, Fixed는 지정한 너비를 유지하되 부모보다 넓어지지 않습니다.">
+          <Example label="Fill · Default"><StudioNumberInput locale={locale} defaultValue={10} /></Example>
+          <Example label="Fixed · 200px"><StudioNumberInput locale={locale} layout="fixed" fixedWidth={200} defaultValue={10} /></Example>
         </Section>
 
         <Section id="alignment" title="Properties · Text alignment" description="숫자를 왼쪽 또는 오른쪽에 정렬합니다. 기본값은 Left이며 Split controls에서는 Center가 우선합니다.">
