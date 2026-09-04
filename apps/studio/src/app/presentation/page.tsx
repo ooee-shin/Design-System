@@ -42,7 +42,9 @@ export default function PresentationPage() {
         {/* 컨테이너 쿼리는 조상 컨테이너를 기준으로 하므로 @container 는 그리드보다 바깥에 둔다. */}
         <div className="@container">
           <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
-            <ol className="flex min-w-0 flex-col gap-3" aria-label="변경 기록">
+            {/* 하단 여백은 OnThisPage 의 rootMargin 아래쪽 값과 같은 55vh 다. 이만큼 더 스크롤할 수 있어야
+                마지막 꼭지가 활성 판정 구간까지 올라온다. 관찰 범위를 바꾸면 이 값도 함께 바꾼다. */}
+            <ol className="flex min-w-0 flex-col gap-3 pb-[55vh]" aria-label="변경 기록">
             {presentationEntries.map((entry) => (
               <li key={entry.id} id={entry.id} className="scroll-mt-20 rounded-2xl border bg-background p-6 sm:p-8">
                 <article aria-labelledby={`${entry.id}-title`}>

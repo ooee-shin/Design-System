@@ -350,6 +350,7 @@ Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
+9. Presentation 꼭지와 컴포넌트 상세를 잇는 역방향 링크를 만든다. 지금은 꼭지에서 컴포넌트로 가는 한 방향만 있어서, 컴포넌트 상세에서 「왜 이렇게 되어 있지」를 물었을 때 갈 곳이 없다. 꼭지 데이터에 관련 컴포넌트 key를 두고 registry와 연결해 `Similar`·`Works with` 옆에 표시한다. Presentation 화면 자체의 검색 기능은 넣지 않는다. 목차가 한 화면에 들어가지 않을 만큼, 대략 꼭지가 스무 개를 넘을 때 다시 검토한다.
 
 현재 `/foundations/color`의 OE Semantic catalog와 코드의 mapping은 검토용 Provisional 구현이다. 화면에 표시된 값을 사용자 결정 없이 확정하거나 다른 컴포넌트에 일괄 적용하지 않는다.
 
