@@ -111,9 +111,7 @@ export function RadioIndicatorWorkbench() {
           </div>
         </Section>
 
-        <Section id="elements" title="Properties · Elements" description="기본 Label과 교체 가능한 요소를 비교합니다.">
-          <StateExample label="Default · Unchecked"><StaticField value="default-unchecked" label={c.label} /></StateExample>
-          <StateExample label="Default · Checked"><StaticField value="default-checked" selected label={c.label} /></StateExample>
+        <Section id="elements" title="Properties · Elements" description="텍스트 Content 앞뒤에 놓이는 교체 가능한 요소를 비교합니다. 두 예시는 실제로 선택할 수 있습니다.">
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-xs font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
