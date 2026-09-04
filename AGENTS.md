@@ -72,9 +72,9 @@
 ## 여러 환경에서 이어서 작업할 때
 
 - Git remote의 push된 commit만 다른 기기와 계정이 공유할 수 있는 상태로 간주한다. 대화 기록과 로컬 미커밋 변경에 의존하지 않는다.
-- `main`은 항상 검사를 통과한 공식 원본으로 유지한다. 코드 변경, 여러 날에 걸친 작업과 다른 사람이 합치기 전에 봐야 하는 변경은 별도 branch와 pull request를 거치며 GitHub `Quality` 검사가 성공한 뒤 합친다. 문서 문구 보강이나 오타 수정처럼 코드에 영향이 없고 되돌리기 쉬운 변경은 예외로 `main`에 직접 커밋할 수 있다. `main` push에서도 같은 자동 검사가 돌며, 실패하면 즉시 되돌린다.
-- 작업 branch를 오래 끌지 않는다. 목적 하나가 끝나면 합치고 지운다. 여러 목적을 한 branch에 쌓으면 합칠 때 무엇이 바뀌었는지 읽기 어려워진다.
-- 작업 시작 시 working tree가 깨끗한지 확인하고, 깨끗할 때만 현재 작업 branch를 `git pull --ff-only`로 최신화한다.
+- `main`은 항상 검사를 통과한 공식 원본으로 유지한다. 커밋하는 사람이 한 명이라 합치기 전에 다른 사람이 읽는 단계가 없으므로 작업은 `main`에서 바로 진행한다. `main` push에서도 GitHub `Quality` 검사가 돌며, 실패하면 즉시 되돌린다.
+- 공개된 이름이나 동작을 바꿔 소비자 코드가 깨지는 변경만 별도 branch와 pull request를 거친다. 이때도 branch를 오래 끌지 않고 목적 하나가 끝나면 합치고 지운다. 자세한 절차는 `docs/process/git-workflow.md`를 따른다.
+- 작업 시작 시 working tree가 깨끗한지 확인하고, 깨끗할 때만 `git pull --ff-only`로 최신화한다.
 - 두 기기에서 같은 branch를 동시에 수정하지 않는다. 동시에 작업해야 하면 기기별 branch를 사용하고 한쪽에서 merge한 뒤 다른 쪽이 다시 pull한다.
 - 의미 있는 구현·규칙·다음 작업이 바뀌면 관련 문서와 `docs/process/working-context.md`를 최소한으로 갱신한다.
 - `docs/process/working-context.md`는 changelog가 아니라 현재 상태 snapshot으로 유지한다. 더 이상 현재 이해에 필요 없는 완료·과거 과정은 제거하고, 현재 구현·진행 중인 사항·바로 다음 작업·유효한 주의사항만 남긴다. 장기 설계 결정은 해당 `docs/system/` 문서로 옮긴다.

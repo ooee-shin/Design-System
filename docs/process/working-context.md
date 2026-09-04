@@ -13,8 +13,8 @@
 - 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
 - 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
 - 현재 repository에는 필수 환경변수가 없다.
-- `main`을 항상 정상 작동하는 공식 원본으로 사용한다. 상시 branch는 `main` 하나이며 작업 branch는 목적 하나가 끝나면 합치고 지운다. 문서 문구 보강처럼 되돌리기 쉬운 변경은 `main`에 직접 커밋할 수 있다.
-- GitHub의 `Quality` 자동 검사가 성공한 변경만 `main`에 합친다.
+- `main`을 항상 정상 작동하는 공식 원본으로 사용한다. 커밋하는 사람이 한 명이므로 작업은 `main`에서 바로 진행하고, 공개된 이름이나 동작을 바꾸는 변경만 작업 branch와 pull request를 사용한다.
+- `main` push에서도 GitHub `Quality` 자동 검사가 돈다. 실패하면 즉시 되돌린다.
 
 ## 현재 기술 환경
 

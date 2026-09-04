@@ -52,7 +52,7 @@ pnpm dev:studio
 pnpm check
 ```
 
-`pnpm check`는 lint, 공용 자산 typecheck·test와 production build를 차례로 실행한다. GitHub도 pull request와 `main` push에서 같은 검사를 자동 실행한다. 안전한 branch 작업 방법은 [`docs/process/git-workflow.md`](docs/process/git-workflow.md)를 따른다.
+`pnpm check`는 lint, 공용 자산 typecheck·test와 production build를 차례로 실행한다. GitHub도 pull request와 `main` push에서 같은 검사를 자동 실행한다. 안전한 Git 작업 방법은 [`docs/process/git-workflow.md`](docs/process/git-workflow.md)를 따른다.
 
 ## 현재 환경
 
