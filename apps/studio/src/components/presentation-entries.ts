@@ -31,6 +31,24 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "select-custom-list",
+    title: "Select 목록을 원하는 형태로 그릴 수 있게 바꿨어요",
+    sections: [
+      {
+        heading: "목록의 생김새를 브라우저가 정하던 상태",
+        body: "예전에는 눌러서 여는 부분만 우리가 만들고, 펼쳐지는 목록은 브라우저가 그렸어요. 같은 코드인데도 어디서 보느냐에 따라 목록이 다르게 보였고, 우리가 손댈 수 있는 부분이 아니었어요. 목록에 넣을 수 있는 것도 글자로 정해져 있었어요.",
+      },
+      {
+        heading: "글자만이 아니라 필요한 요소를 넣는 목록",
+        body: "[Select](/components/select)의 펼쳐지는 목록을 브라우저에 맡기지 않고 직접 그려요. 목록의 항목에는 아이콘과 설명, 뱃지 같은 요소를 글자와 함께 놓을 수 있고, 선택한 값이 보이는 자리에도 같은 요소가 따라와요. 어떤 브라우저에서 열어도 같은 모양이 나와요.",
+      },
+      {
+        heading: "브라우저별 확인 부담이 줄어든 검수",
+        body: "화면을 검수할 때 브라우저마다 목록을 따로 열어 보지 않아도 돼요. 모양을 우리가 정하기 때문에 한 곳에서 확인한 결과가 나머지에서도 같아요.",
+      },
+    ],
+  },
+  {
     id: "radio-shape",
     title: "Radio를 통용되는 모양으로 바꿨어요",
     sections: [
