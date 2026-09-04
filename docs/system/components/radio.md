@@ -1,6 +1,8 @@
 # Radio
 
-Radio는 목록이나 폼에서 여러 항목 중 하나를 선택한다. 확정한 16px Radio Control을 기준으로 Checkbox와 같은 Field·Content 구조를 적용한다.
+`packages/ui/src/radio.tsx`
+
+목록이나 폼에서 여러 항목 중 하나를 선택한다. 16px Radio Control을 기준으로 Checkbox와 같은 Field·Content 구조를 사용한다.
 
 ## Anatomy
 
@@ -21,8 +23,6 @@ Basic 번호는 반복하지 않고 Content container와 Optional 요소만 표�
 8. Trailing element: 선택적 Slot
 9. Bottom Description: 선택적
 
-Studio의 `Structure map`은 위 포함 관계를 Checkbox와 같은 트리 형식으로 표시한다. Field 아래에 Radio control과 Content container가 있고, Selection indicator는 Radio control에 포함된다. 공통 용어 규칙에 따라 값 변경과 Focus를 소유하는 16px 원형은 Control, 그 안의 8px 흰 원은 Indicator로 부른다.
-
 `Radio`는 원자적인 Control, `RadioField`는 Label과 선택적 Content를 결합한다. Radio와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제공하지 않는다. 짧은 항목을 밀도 있게 나열할 때는 `RadioField`를 사용하고, 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때는 Single selection의 `SelectBox`를 사용한다.
 
 ## Properties
@@ -35,9 +35,7 @@ Studio의 `Structure map`은 위 포함 관계를 Checkbox와 같은 트리 형�
 - `layout`: `inline | block`, 기본값 `inline`
 - `flipped`: Control을 Label의 왼쪽 또는 오른쪽에 배치
 
-Layout, Label, Description, Leading/Trailing 배치와 Flipped 규칙은 CheckboxField와 동일하다. Leading/Trailing Anatomy는 Studio 전용 핑크 점선 Swap slot으로 표시한다. Trailing은 Label 뒤에 바로 배치하고 20px 첫 행 안에서 중앙 정렬한다.
-
-Studio Playground의 필수 Label은 `Label`, 선택적 설명은 `Right Description`과 `Bottom Description` 구조 문구로 고정한다. 정적 문구를 편집하는 Text control은 두지 않고 Optional Description은 표시 여부만 Boolean control로 검수한다.
+Layout, Label, Description, Leading/Trailing 배치와 Flipped 규칙은 CheckboxField와 동일하다. Trailing은 Label 뒤에 바로 배치하고 20px 첫 행 안에서 중앙 정렬한다.
 
 ## State
 
@@ -53,7 +51,7 @@ Radio Group 위에 보이는 질문이나 제목은 Field의 전체 조작 영�
 
 Read only는 Enabled와 같은 기본 시각과 Focus를 유지하지만 Pointer 또는 키보드 조작으로 선택값을 변경하지 않는다. 값 변경 가능성을 암시하는 Hover 배경·Hover shadow와 Pressed 피드백은 제거한다. Disabled와 달리 비활성 색상이나 `not-allowed` cursor는 사용하지 않는다.
 
-RadioField의 보이는 Label은 `aria-labelledby`로 Radio Control의 접근 가능한 이름에 연결한다. Studio의 Playground와 Properties · Elements 예시는 직접 선택할 수 있다. Properties · State는 선택값을 controlled 상태로 고정하지만 Pointer, Focus visible과 키보드 피드백은 차단하지 않는다. Disabled는 실제 조작 불가 상태를 유지하고 Read only는 Focus만 유지한 채 Hover·Pressed와 값 변경을 차단한다.
+RadioField의 보이는 Label은 `aria-labelledby`로 Radio Control의 접근 가능한 이름에 연결한다. 선택값을 고정해 비교하는 경우에도 Pointer, Focus visible과 키보드 피드백은 차단하지 않는다. Disabled는 실제 조작 불가 상태를 유지하고 Read only는 Focus만 유지한 채 Hover·Pressed와 값 변경을 차단한다.
 
 RadioField의 전체 조작 영역은 항상 투명하며 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover에만 옅은 `oe-interaction-hover-subtle`을 사용한다. 선택 상태는 Indicator의 Brand 표현으로 전달하고 Disabled와 Read only Field는 Hover 반응을 제공하지 않는다.
 
@@ -66,4 +64,3 @@ Radio는 Checkbox와 마찬가지로 Label 외에 선택을 이해하는 데 필
 - RadioField minimum height: 36px (`oe-control-regular`)
 - Label: 14px / 20px, Regular
 
-다른 Radio 사용 화면에서 재검증하기 전까지 API가 바뀔 수 있다.

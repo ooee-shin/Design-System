@@ -1,6 +1,8 @@
 # Textarea
 
-여러 줄 텍스트를 입력하는 공용 컴포넌트다. Input과 같은 시각적 스타일과 상태 규칙을 사용하지만 내부 선택 요소는 지원하지 않는다. 실제 구현 원본은 `packages/ui/src/textarea.tsx`, 검수 화면은 `/components/textarea`다.
+`packages/ui/src/textarea.tsx`
+
+여러 줄 텍스트를 입력하는 공용 컴포넌트다. Input과 같은 시각적 스타일과 상태 규칙을 사용하지만 내부 선택 요소는 지원하지 않는다.
 
 ## Anatomy
 
@@ -82,6 +84,6 @@ Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한�
 - Character count의 기본 소유자는 이후 Field에서 정의한다. Textarea 내부 표시가 필요한 실제 사례가 확인되면 별도 배치 방식을 다시 검토한다.
 - Label, Helper text, Error message를 소유할 Field API
 
-확인되지 않은 항목은 Studio에 공식 Property처럼 표시하지 않는다. Label, Helper text, Error message 조합은 이후 별도 Field 컴포넌트에서 결정한다.
+Label, Helper text, Error message 조합은 별도 Field 컴포넌트가 소유한다.
 
 상세 페이지 우측의 `On this page`에서 현재 섹션을 확인하고 이동할 수 있다. Field와 Input은 rail 아래의 낮은 위계 Related 링크로 제공한다.

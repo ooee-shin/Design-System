@@ -1,6 +1,8 @@
 # Switch
 
-설정이나 기능을 즉시 켜고 끄는 Boolean control이다. 실제 구현 원본은 `packages/ui/src/switch.tsx`, 검수 화면은 `/components/switch`다. Base UI Switch를 동작 기반으로 사용하고 ooee semantic token으로 시각 상태를 정규화했다. 구조, Size와 touch target은 [Seed Design Switch](https://seed-design.io/components/switch)를 참고했다.
+`packages/ui/src/switch.tsx`
+
+설정이나 기능을 즉시 켜고 끄는 Boolean control이다. 동작은 Base UI Switch를 기반으로 하며 시각 상태는 oe semantic token을 사용한다.
 
 ## 역할과 경계
 
@@ -16,8 +18,6 @@
 3. Label: `SwitchField`에서 필수
 
 SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing element는 제공하지 않는다.
-
-Studio의 `Structure map`은 실제 포함 관계를 `Field → Track → Thumb`과 Field 아래의 `Label`로 표시한다.
 
 ## Properties
 

@@ -1,6 +1,8 @@
 # Select
 
-검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택하는 한 줄 Form control이다. 실제 구현 원본은 `packages/ui/src/select.tsx`, 검수 화면은 `/components/select`다. Base UI Select를 동작 기반으로 사용하고 Trigger 외관은 Combobox와 공용 `selectionTriggerVariants` recipe를 공유한다. 구조와 다중 선택 가이드 참고자료는 [Seed Design Select](https://seed-design.io/components/select)이며 ooee의 기존 토큰과 Combobox 경계로 정규화했다.
+`packages/ui/src/select.tsx`
+
+검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택하는 한 줄 Form control이다. 동작은 Base UI Select를 기반으로 하고 Trigger 외관은 Combobox와 공용 `selectionTriggerVariants` recipe를 공유한다.
 
 ## 역할과 경계
 
@@ -86,10 +88,6 @@ Control height는 Input과 Button이 공유하는 Small 32px, Regular 36px, Larg
 ### Content height
 
 - Popup은 주변에 남은 공간과 320px 중 작은 높이로 제한된다. Option 목록이 248px보다 짧으면 Option을 담는 높이만큼만 열리고, 이를 넘으면 최대 248px에서 Content 안쪽 세로 스크롤을 사용한다. 마지막 Option의 글자를 일부 읽을 수 있을 만큼 Content container의 하단 경계에서 노출해 스크롤 가능성을 알린다. 이 경계에는 별도 하단 내부 여백을 두지 않는다. Scrollbar 공간은 유지하고 thumb은 Hover에서 표시한다.
-
-## Examples
-
-Studio Playground는 제품 의미를 부여하지 않은 `Option A~D` 가상 데이터를 사용한다. 평면/Group, Leading element와 Description 표시를 독립적으로 전환하며 마지막 Option은 Disabled 상태 검수를 위해 비활성화한다. Properties · Selection에서는 사람 이름으로 Single, 대표값과 나머지 개수, 전체 개수 표시를 비교한다. Usage에서는 공개 범위와 `부서 · 팀` 형식의 실제 제품형 가상 콘텐츠를 사용한다. 이 데이터들은 Select에 내장된 제품 데이터가 아니다.
 
 ## Guidelines
 

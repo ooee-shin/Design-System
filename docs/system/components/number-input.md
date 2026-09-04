@@ -1,8 +1,8 @@
 # Number Input
 
-정확한 숫자를 직접 입력하거나 증감 버튼으로 조절하는 공용 컴포넌트다. 기존 `ooee_bk` V1 UI Studio의 Number Input 구현을 기능 참고자료로 사용했으며, 현재 `ooee-ui`의 Input 구조와 oe semantic token으로 다시 구현했다. 예전 구현의 `auto` Size와 `round` Shape은 현재 공식 Property에 포함하지 않았다.
+`packages/ui/src/number-input.tsx`
 
-실제 구현 원본은 `packages/ui/src/number-input.tsx`, 검수 화면은 `/components/number-input`이다.
+정확한 숫자를 직접 입력하거나 증감 버튼으로 조절하는 공용 컴포넌트다. Input의 구조와 oe semantic token을 사용한다.
 
 ## Anatomy
 
@@ -39,7 +39,7 @@ Number Input의 숫자는 항상 `tabular-nums`를 사용한다. 증감 Controls
 
 Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.
 
-`allowNegative=false`일 때 유효한 최소값은 `min`과 `0` 중 큰 값이다. 직접 입력과 증감 버튼 모두 이 최소값과 `max` 범위 안으로 제한한다. Studio Playground에서 Allow negative를 켜면 Min이 음수 범위로 전환되어 0 아래로 감소할 수 있다. 증감 시도값이 범위를 넘으면 경계값을 유지하고 `onLimitReached`에 `min | max`를 전달한다.
+`allowNegative=false`일 때 유효한 최소값은 `min`과 `0` 중 큰 값이다. 직접 입력과 증감 버튼 모두 이 최소값과 `max` 범위 안으로 제한한다. 증감 시도값이 범위를 넘으면 경계값을 유지하고 `onLimitReached`에 `min | max`를 전달한다.
 
 `prefix`와 `suffix`는 공용 Input의 동일한 Slot을 재사용하며 숫자의 앞뒤에 통화 기호, 비율, 단위처럼 값의 의미를 보완하는 짧은 요소를 표시한다. `prefixTone`과 `suffixTone`은 서로 독립적으로 Secondary 또는 Tertiary foreground 위계를 선택하며 기본값은 Secondary다. Percentage 예시는 `%` Suffix를 사용한다.
 
@@ -54,4 +54,3 @@ Small, Regular와 Large에서 버튼 터치 영역은 24px이다. XLarge에서�
 - Direct input: Controls 숨김
 - Negative allowed: 음수 범위와 감소 동작 허용
 
-연속적인 넓은 범위를 탐색하는 Slider 사용 정책은 아직 Number Input의 공식 Usage 규칙으로 확정하지 않았다.

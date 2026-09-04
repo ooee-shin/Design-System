@@ -1,10 +1,8 @@
 # Input Button
 
-현재 Studio 상세 화면의 구성과 검수 범위는 사용자 확인을 완료했다. 실제 Picker와 결합해 Trigger API를 재검증하기 전까지 API가 바뀔 수 있다.
+`packages/ui/src/input-button.tsx`
 
 직접 입력하는 대신 별도의 선택 화면을 여는 한 줄 Form control이다. Input과 같은 외관을 사용하지만 실제 구현은 `button`이며, 사용자가 값을 타이핑하는 Input과 역할을 구분한다.
-
-실제 구현 원본은 `packages/ui/src/input-button.tsx`, 검수 화면은 `/components/input-button`이다. 구조 참고자료는 Seed Design Input Button이며 ooee의 현재 Input 토큰과 규칙으로 구현했다.
 
 ## 역할과 경계
 
@@ -47,6 +45,6 @@ Size는 Input과 Button이 공유하는 공통 Control Height인 32px, 36px, 40p
 - Calendar: 달력에서 날짜를 선택하는 화면을 여는 Trigger
 - Address: 주소 검색 또는 선택 화면을 여는 Trigger
 - Time: 시간 선택 화면을 여는 Trigger
-- Color picker · Select only: 사각형 Color swatch와 색상명을 표시하고 직접 입력 없이 Color Picker를 여는 Trigger. Swatch 경계는 Neutral border가 아니라 안쪽에 합성한 Black alpha 10%의 1px inset을 현재 token candidate 값으로 사용한다.
+- Color picker · Select only: 사각형 Color swatch와 색상명을 표시하고 직접 입력 없이 Color Picker를 여는 Trigger. Swatch 경계는 Neutral border가 아니라 안쪽에 합성한 Black alpha 10%의 1px inset을 사용한다.
 
 예시에는 후속 선택 화면 자체를 포함하지 않는다. 해당 Picker나 검색 UI가 실제 자산으로 구현되면 `Works with` 관계로 별도 연결한다.

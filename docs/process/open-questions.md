@@ -37,4 +37,18 @@
 
 ## 컴포넌트
 
-컴포넌트별 미결 항목은 각 `docs/system/components/*.md`의 `현재 정의 없음`과 `확인 필요` 항목에 있다. 진행 중인 작업과 우선순위는 [working-context.md](working-context.md)를 본다.
+명세에서 걷어낸 미결 항목을 여기에 모은다. 확정되면 해당 `docs/system/components/*.md`로 옮긴다. 각 명세의 `현재 정의 없음` 항목과 함께 보며, 진행 중인 작업과 우선순위는 [working-context.md](working-context.md)를 본다.
+
+- **Combobox의 2-depth** — 공용 API와 Filter 적용 정책을 정하지 않았다. 현재 Studio 예시는 구조와 선택 흐름만 검수한다.
+- **Select Box의 API와 선택 표현** — 검수용 초안이며 문서 규칙으로 확정하지 않았다.
+- **Select Box의 남은 정책** — Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수를 정하지 않았다.
+- **Number Input과 Slider의 경계** — 넓은 범위를 탐색하는 Slider 사용 정책을 공식 Usage 규칙으로 확정하지 않았다.
+- **Input의 Color input** — Color Picker 팝업이 완성되지 않아 예시 swatch에 클릭과 팝업 상호작용을 연결하지 않았다. 구현되면 직접 입력값과 팝업 선택값을 동기화하는 조합으로 검수한다.
+
+## Token candidate
+
+반복 용례가 확인되면 공용 semantic token으로 승격한다. 승격 기준은 [pipeline.md](pipeline.md)를 따르며, 발견했다는 이유만으로 추가하지 않는다.
+
+- **Combobox 단일 선택 행 배경** — Brand alpha primitive `brand-alpha-08`
+- **Select Box 선택 표현** — Brand alpha 조합
+- **Color swatch 경계** — 안쪽에 합성한 Black alpha 10%의 1px inset. Input Button의 선택 전용 Color picker와 Input의 Color input이 함께 쓴다

@@ -1,18 +1,16 @@
 # Input
 
-현재 Studio 상세 화면의 구성과 검수 범위는 사용자 확인을 완료했다. 다른 화면에서 재사용해 API를 검증하기 전까지 API가 바뀔 수 있다.
+`packages/ui/src/input.tsx`
 
-한 줄 텍스트 입력을 위한 공용 컴포넌트다. 구현 기반은 shadcn Input과 Base UI이며, 구조와 문서 정보 흐름은 Seed Design의 Text Input을 함께 참고했다. KT Text Field는 현재 기준에서 제외했다. ooee_bk V1은 기능 후보를 확인하는 참고자료이며 공식 규칙의 출처가 아니다.
+한 줄 텍스트 입력을 위한 공용 컴포넌트다. 동작은 Base UI를 기반으로 한다.
 
-실제 구현 원본은 `packages/ui/src/input.tsx`, 검수 화면은 `/components/input`이다.
-
-반복 사용되는 부분 입력·고정 마스킹 동작의 실제 구현은 `packages/ui/src/partial-masked-input.tsx`가 소유한다. 전화번호·금액·분할 입력·주민등록번호의 검수 상태와 포맷 예시는 Studio 전용 `input-custom-examples.tsx`에 두며, 한 번의 예시만으로 공용 API를 추가하지 않는다.
+반복 사용되는 부분 입력·고정 마스킹 동작의 실제 구현은 `packages/ui/src/partial-masked-input.tsx`가 소유한다.
 
 ## 역할과 경계
 
 - `Input`은 Container, 실제 input field와 내부 선택 요소를 소유한다.
 - Label, Helper text와 Error message는 별도 `Field`가 소유한다.
-- `Field`는 아직 구현하지 않았으며 Input 문서에서 임의 API를 정의하지 않는다.
+- Label, 도움말과 오류 문구는 별도 `Field`가 소유하며 Input 문서에서 그 API를 정의하지 않는다.
 
 ## Anatomy
 
@@ -40,7 +38,7 @@
 - State: native 속성과 focus에서 확인되는 Empty / Placeholder, Default with value, Focus, Invalid, Disabled, Read only
 - Optional elements: `leadingElement`, `prefix`, `clearable`, `suffix`, `trailingElement`
 
-Focus는 테두리와 바깥 ring에 동일한 `oe-focus-ring` 색을 사용한다. 기본 1px border 바깥에 1px ring을 겹쳐 하나의 진한 2px 선처럼 보이게 하며, 실제 box size를 변경하지 않아 인접 요소나 중첩 배치가 흔들리지 않는다. 실제 focus와 Studio의 고정 Focus 예시는 같은 규칙을 사용한다.
+Focus는 테두리와 바깥 ring에 동일한 `oe-focus-ring` 색을 사용한다. 기본 1px border 바깥에 1px ring을 겹쳐 하나의 진한 2px 선처럼 보이게 하며, 실제 box size를 변경하지 않아 인접 요소나 중첩 배치가 흔들리지 않는다.
 
 Invalid/Error도 같은 1px border + 외부 1px ring 구조를 사용하며 두 영역 모두 `oe-danger-border-primary`를 적용한다. Focus와 외곽 두께 및 레이아웃 동작은 같고 의미 색상만 구분한다.
 
@@ -68,17 +66,13 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 - Prefix/Suffix 콘텐츠 제한 정책
 - Input별 권장 Size 정책
 
-새 판단이 필요한 내용은 Studio 페이지에 임시 정책으로 표시하지 않고 사용자에게 먼저 질문한 뒤 코드와 문서에 함께 반영한다.
-
-Studio의 Anatomy는 구조와 명칭만 설명하는 정적 도식이며 input이나 button으로 동작하지 않는다. State 비교 예시는 값과 상태를 controlled로 고정해 비교 대상이 사용자의 조작으로 풀리지 않게 한다. 다만 Hover, Pressed, Focus visible과 키보드 피드백은 실제로 확인할 수 있어야 하므로 `pointer-events: none`, 전체 key event 차단이나 `tabIndex=-1`로 상호작용 자체를 막지 않는다. 실제 속성 조합과 입력 동작은 상단 Playground에서 검수한다.
-
 Playground의 Optional element는 하나의 Elements 묶음으로 제어하지 않는다. Leading/Trailing/Clear는 각각 표시 여부를 독립적으로 제어하고, Prefix/Suffix는 표시 여부와 실제 text 값을 별도 Property로 제어한다.
 
 Properties · Elements의 Trailing element 예시는 `Password input → Clear button → Visibility trailing action` 순서로 현재 확정된 요소를 조합한다. 비밀번호용 Leading icon은 사용하지 않는다. Visibility action은 실제 input type을 `password/text`로 전환하고 Clear button은 값이 있을 때 입력값을 제거한다. 이는 Trailing element의 실제 조합 예시이며 새로운 Input Property를 추가하지 않는다.
 
 Custom input 섹션은 카드 제목의 첫 줄에 유형을, 둘째 줄에 실제 구조와 동작을 설명한다. 반복되는 `Custom input` 접두어는 사용하지 않는다.
 
-`Color input`은 `Custom input`과 같은 상세 페이지 섹션 위계로 분리한다. HEX 값을 직접 입력하는 Input과 현재 색상을 보여주는 Leading color swatch를 조합하며, swatch는 Input Button의 선택 전용 Color picker 예시와 같은 16px 사각형 및 안쪽 Black alpha 10% 경계를 사용한다. Color Picker 팝업이 아직 완성되지 않았으므로 현재 예시의 swatch에는 클릭이나 팝업 상호작용을 연결하지 않는다. 추후 실제 Color Picker가 구현되면 직접 입력값과 팝업 선택값을 동기화하는 조합으로 검수한다.
+`Color input`은 `Custom input`과 같은 상세 페이지 섹션 위계로 분리한다. HEX 값을 직접 입력하는 Input과 현재 색상을 보여주는 Leading color swatch를 조합하며, swatch는 Input Button의 선택 전용 Color picker 예시와 같은 16px 사각형 및 안쪽 Black alpha 10% 경계를 사용한다.
 
 `Formatted number`는 전화번호, 사업자등록번호처럼 정해진 숫자 형식이 필요한 경우 포맷과 동작을 직접 정의하는 사례다. 현재 화면은 하나의 `tel` Input에서 숫자만 받아 `010-1234-5678` 형식으로 자동 포맷한다. `inputMode="numeric"`, `autoComplete="tel"`과 Clear button을 조합하며 Leading icon은 사용하지 않고 전화번호를 여러 필드로 분리하지 않는다. 사업자등록번호는 적용 가능한 용례이며 현재 화면에 별도 포맷 예시는 구현하지 않았다.
 
