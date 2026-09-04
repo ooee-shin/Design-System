@@ -50,17 +50,27 @@ export default function PresentationPage() {
                     {entry.title}
                   </h2>
                   {/* 제목에서 첫 칸까지를 칸 사이보다 벌린다. 같은 간격이면 제목이 소제목과 나란히 놓인 것처럼 읽힌다. */}
-                  <div className="mt-8 flex flex-col gap-6">
+                  <div className="relative mt-8 flex flex-col gap-6 pl-6">
+                    {/* border 로는 끝을 둥글릴 수 없어 실제 막대를 그린다. absolute 라 flex 흐름과 gap 에 끼어들지 않는다. */}
+                    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] rounded-full bg-oe-border-secondary/60" />
                     {entry.sections.map((section) => (
                       <section key={section.heading}>
                         {/* 꼭지 제목과 본문 사이의 중간 위계다. 소제목이 제목과 같은 검정이면 카드 하나에 제목이 여럿 있는 것처럼 읽힌다. */}
                         <h3 className="max-w-3xl text-lg font-semibold leading-7 tracking-tight text-oe-foreground-secondary">
                           {section.heading}
                         </h3>
-                        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{withLinks(section.body)}</p>
+                        <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{withLinks(section.body)}</p>
                       </section>
                     ))}
                   </div>
+                  {/* 소제목 없이 카드 전체에 붙는 주석이다. 좌측 선 안에 두면 네 번째 칸처럼 읽히므로 바깥에 둔다. */}
+                  {entry.caption ? (
+                    <p className="mt-6 flex max-w-3xl gap-0.5 pl-6 text-xs leading-5 text-oe-foreground-tertiary">
+                      {/* 칸 묶음과 같은 24px 을 들여써서 별표가 소제목·본문과 같은 지점에서 시작한다. */}
+                      <span aria-hidden="true">*</span>
+                      <span>{withLinks(entry.caption)}</span>
+                    </p>
+                  ) : null}
                 </article>
               </li>
             ))}
