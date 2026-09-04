@@ -9,7 +9,7 @@ import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { GuidelineList as SharedGuidelineList, GuideVisual, UsageComparison as SharedUsageComparison } from "@/components/component-guidelines";
 import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
+import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -170,9 +170,9 @@ export function SelectWorkbench() {
   const [fixedWidth, setFixedWidth] = useState(280);
   const [previewState, setPreviewState] = useState<PreviewState>("default");
   const [grouped, setGrouped] = useState(false);
-  const [showLeading, setShowLeading] = useState(false);
+  const [leadingElement, setLeadingElement] = useState<PlaygroundElementValue>({ kind: "none", icon: "search", image: "avatar" });
   const [showDescription, setShowDescription] = useState(false);
-  const playgroundOptions = decorateOptions(c.options, c.descriptions, showLeading, showDescription);
+  const playgroundOptions = decoratePlaygroundOptions(c.options, c.descriptions, leadingElement, showDescription);
   const playgroundGroups = makeGroups(playgroundOptions, c.groupLabels);
   const personOptions = usage.people.map((label, index) => ({ value: `person-${index + 1}`, label }));
   const scrollOptions: SelectOption[] = Array.from({ length: 14 }, (_, index) => ({ value: `scroll-option-${index + 1}`, label: locale === "ko" ? `옵션 ${index + 1}` : `Option ${index + 1}` }));
@@ -219,13 +219,13 @@ export function SelectWorkbench() {
               <div className="space-y-4">
                 <ControlSection title="Appearance"><ControlGroup label="Style">{(["outline", "filled"] as const).map((item) => <Choice key={item} active={variant === item} onClick={() => setVariant(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
                 <ControlSection title="Size"><ControlGroup label="Control size">{(["small", "regular", "large", "xlarge"] as const).map((item) => <Choice key={item} active={controlSize === item} onClick={() => setControlSize(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
-                <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((item) => <Choice key={item} active={layout === item} onClick={() => setLayout(item)}>{capitalize(item)}</Choice>)}</ControlGroup>{layout === "fixed" ? <NumberControl label="Width · px" value={fixedWidth} onChange={setFixedWidth} /> : null}</ControlSection>
+                <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((item) => <Choice key={item} active={layout === item} onClick={() => setLayout(item)}>{capitalize(item)}</Choice>)}</ControlGroup>{layout === "fixed" ? <DependentControlGroup className="mt-3"><NumberControl label="Width · px" value={fixedWidth} onChange={setFixedWidth} /></DependentControlGroup> : null}</ControlSection>
                 <ControlSection title="State"><ControlGroup label="Preview state">{(["default", "focus", "invalid", "disabled", "readOnly"] as const).map((item) => <Choice key={item} active={previewState === item} onClick={() => setPreviewState(item)}>{item === "readOnly" ? "Read only" : capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
               </div>
               <div className="space-y-4">
                 <ControlSection title="Content"><Toggle label="Show selected value" value={selectionMode === "single" ? value !== null : multipleValue.length > 0} onChange={(show) => selectionMode === "single" ? setValue(show ? c.options.find((option) => !option.disabled)?.value ?? null : null) : setMultipleValue(show ? c.options.filter((option) => !option.disabled).slice(0, 2).map((option) => option.value) : [])} /><p className="text-[11px] leading-4 text-oe-foreground-placeholder">Off에서는 Placeholder를 표시합니다. 실제 Option은 열린 Content에서 선택합니다.</p></ControlSection>
                 <ControlSection title="Options"><ControlGroup label="Selection mode">{(["single", "multiple"] as const).map((item) => <Choice key={item} active={selectionMode === item} onClick={() => setSelectionMode(item)}>{capitalize(item)}</Choice>)}</ControlGroup><Toggle label="Group options" value={grouped} onChange={setGrouped} /><Toggle label="Description" value={showDescription} onChange={setShowDescription} /></ControlSection>
-                <ControlSection title="Elements"><Toggle label="Show leading element" value={showLeading} onChange={setShowLeading} /></ControlSection>
+                <ControlSection title="Elements"><PlaygroundElementControl label="Leading element" value={leadingElement} onChange={setLeadingElement} /></ControlSection>
                 <ControlSection title="Behavior"><p className="text-[11px] leading-5 text-oe-foreground-tertiary">Trigger를 열고 방향키로 Option을 이동한 뒤 선택합니다. 검색어 입력과 다중 선택은 제공하지 않습니다.</p></ControlSection>
               </div>
             </div>
@@ -472,6 +472,14 @@ function LeadingUsagePreview({ groupLabel, labels, mixed }: { groupLabel: string
 
 function FieldLabelUsagePreview({ fieldLabel, value, showLabel = false }: { fieldLabel: string; value: string; showLabel?: boolean }) {
   return <div className="flex min-h-20 flex-col justify-center"><div className="space-y-1.5"><p aria-hidden={!showLabel || undefined} className={`px-0.5 text-xs font-medium text-oe-foreground-primary ${showLabel ? "" : "invisible"}`}>{fieldLabel}</p><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><span className="min-w-0 flex-1 truncate">{value}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div></div></div>;
+}
+
+function decoratePlaygroundOptions(options: SelectOption[], descriptions: readonly string[], leading: PlaygroundElementValue, description: boolean): SelectOption[] {
+  return options.map((option, index) => ({
+    ...option,
+    leadingElement: leading.kind === "none" ? undefined : <PlaygroundElementGraphic value={leading} />,
+    description: description ? descriptions[index] : undefined,
+  }));
 }
 
 function decorateOptions(options: SelectOption[], descriptions: readonly string[], leading: boolean, description: boolean): SelectOption[] {

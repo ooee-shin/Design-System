@@ -25,7 +25,11 @@
 
 3단계 중 둘을 끝냈다. Input과 Textarea의 Focus 선과 ring을 `focus-within`에서 `has-[:focus-visible]`로 바꿨다. Select Box가 이미 같은 방식을 쓰고 회귀 검사까지 갖고 있어 그 선례를 따랐으며, `packages/ui/src/input.test.tsx`에 같은 검사를 더했다. Input Button은 Input의 컨테이너 스타일을 공유하므로 함께 고쳐졌다. Filled의 배경 전환은 선이나 ring이 아니라 이번 범위에서 제외했다. Studio의 State 예시에서 `tabIndex=-1`도 걷어냈다.
 
-Switch의 터치 영역과 MultiSelect의 Leading element는 값과 의도를 정해야 해서 남겨 두었다.
+Switch의 터치 영역은 Small에만 넓힌 target을 두는 것이 맞다는 판단이라 코드가 아니라 `switch.md`를 고쳤다. MultiSelect의 Leading element는 아직 정하지 않았다.
+
+공통 F를 처리했다. `Show leading element` Boolean Toggle을 쓰던 곳이 검수 보고의 두 곳이 아니라 세 곳이었다. Select와 Input Button을 공용 `PlaygroundElementControl`로 바꿨고 Chip은 후순위로 남겼다. Select의 `fixedWidth` 종속 표시도 공용 `DependentControlGroup`으로 바꿔 공통 D의 절반을 처리했다. Textarea의 종속 표시가 남아 있다.
+
+Anatomy의 Slot 표시는 문제가 없었다. `studio.md:66-68`이 핑크 점선 `AnatomySwapSlot`을 정하고 있고 폼 요소 워크벤치가 이미 그것을 쓴다. Playground는 같은 문서 42줄이 `None / Icon / Image` 유형 선택으로 따로 정하고 있어 두 자리의 규칙이 다르다.
 
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.

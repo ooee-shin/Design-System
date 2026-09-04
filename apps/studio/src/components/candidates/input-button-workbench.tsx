@@ -8,7 +8,7 @@ import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { ColorSwatch } from "@/components/color-swatch";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
+import { PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
@@ -48,8 +48,8 @@ export function InputButtonWorkbench() {
   const [layout, setLayout] = useState<"fill" | "fixed">("fill");
   const [fixedWidth, setFixedWidth] = useState(280);
   const [showValue, setShowValue] = useState(true);
-  const [showLeading, setShowLeading] = useState(true);
-  const [showTrailing, setShowTrailing] = useState(false);
+  const [leadingElement, setLeadingElement] = useState<PlaygroundElementValue>({ kind: "icon", icon: "calendar", image: "avatar" });
+  const [trailingElement, setTrailingElement] = useState<PlaygroundElementValue>({ kind: "none", icon: "search", image: "avatar" });
   const [previewState, setPreviewState] = useState<PreviewState>("default");
 
   return (
@@ -63,8 +63,8 @@ export function InputButtonWorkbench() {
                 variant={variant} controlSize={controlSize}
                 {...(layout === "fixed" ? { layout: "fixed" as const, fixedWidth } : { layout: "fill" as const })}
                 value={showValue ? c.value : undefined} placeholder={c.placeholder}
-                leadingElement={showLeading ? <RiCalendarLine aria-hidden="true" /> : undefined}
-                trailingElement={showTrailing ? <RiArrowRightSLine aria-hidden="true" /> : undefined}
+                leadingElement={leadingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={leadingElement} />}
+                trailingElement={trailingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={trailingElement} />}
                 disabled={previewState === "disabled"} aria-invalid={previewState === "invalid" ? "true" : undefined}
                 className={previewState === "focus" ? "border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" : undefined}
                 aria-haspopup="dialog"
@@ -79,7 +79,7 @@ export function InputButtonWorkbench() {
               </div>
               <div className="space-y-4">
                 <ControlSection title="Content"><Toggle label="Show value" value={showValue} onChange={setShowValue} /><p className="text-[11px] leading-4 text-oe-foreground-placeholder">Off에서는 Placeholder를 표시합니다.</p></ControlSection>
-                <ControlSection title="Elements"><Toggle label="Show leading element" value={showLeading} onChange={setShowLeading} /><Toggle label="Show trailing element" value={showTrailing} onChange={setShowTrailing} /></ControlSection>
+                <ControlSection title="Elements"><PlaygroundElementControl label="Leading element" value={leadingElement} onChange={setLeadingElement} /><PlaygroundElementControl label="Trailing element" value={trailingElement} onChange={setTrailingElement} /></ControlSection>
                 <ControlSection title="Behavior"><p className="text-[11px] leading-5 text-oe-foreground-tertiary">Click은 소비자가 연결한 선택 화면을 엽니다. Input Button은 후속 화면의 종류와 선택 로직을 소유하지 않습니다.</p></ControlSection>
               </div>
             </div>
