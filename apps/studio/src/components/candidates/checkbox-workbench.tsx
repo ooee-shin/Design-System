@@ -9,7 +9,7 @@ import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMa
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { DeferredChoice, GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
-import { DependentControlGroup, PlaygroundChoice as Choice } from "@/components/playground-element-control";
+import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
@@ -36,7 +36,6 @@ export function CheckboxWorkbench() {
   const [indeterminate, setIndeterminate] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
-  const [showLabel, setShowLabel] = useState(true);
   const [showRightDescription, setShowRightDescription] = useState(false);
   const [showBottomDescription, setShowBottomDescription] = useState(false);
   const [isParent, setIsParent] = useState(false);
@@ -52,13 +51,13 @@ export function CheckboxWorkbench() {
         <Section id="playground" title="🚩 Playground" description="현재 구현된 선택, 부분 선택과 비활성 상태를 조합해 확인합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <div lang="en" className="min-h-44 rounded-xl bg-oe-background-primary p-5">
-              {showLabel ? <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} shape={shape} /> : <Checkbox aria-label="Checkbox" checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} shape={shape} />}
+              <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} shape={shape} />
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
                 <Control label="Shape"><Choice active={shape === "square"} onClick={() => setShape("square")}>Square</Choice><Choice active={shape === "rounded"} onClick={() => setShape("rounded")}>Rounded</Choice><Choice active={shape === "ghost"} onClick={() => { setShape("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
                 <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
-                <div className={showLabel ? undefined : "pointer-events-none opacity-40"} aria-disabled={!showLabel}><Toggle label="Flipped" value={flipped} onChange={setFlipped} /></div>
+                <Toggle label="Flipped" value={flipped} onChange={setFlipped} />
               </ControlSection>
               <ControlSection title="State">
                 {shape !== "ghost" ? <Toggle label="Disabled" value={disabled} onChange={setDisabled} /> : null}
@@ -69,8 +68,9 @@ export function CheckboxWorkbench() {
                 {shape !== "ghost" ? <Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /> : null}
               </ControlSection>
               <ControlSection title="Elements">
-              <Toggle label="Label" value={showLabel} onChange={setShowLabel} />
-              {showLabel ? <DependentControlGroup><Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} /><Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} /><Toggle label="Parent item" value={isParent} onChange={setIsParent} /></DependentControlGroup> : null}
+                <Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} />
+                <Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} />
+                <Toggle label="Parent item" value={isParent} onChange={setIsParent} />
               </ControlSection>
             </div>
           </div>
