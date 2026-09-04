@@ -39,6 +39,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 ## Playground 종속 컨트롤 표시
 
 - 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
+- Playground control은 `Appearance → State → Content → Elements → Behavior` 순서의 그룹으로 묶고 각 그룹에 제목을 둔다. Appearance는 Style·Size·Shape·Layout처럼 시각을 결정하는 Property, State는 Disabled·Read only·Invalid처럼 조작 가능성과 유효성, Content는 값과 문구, Elements는 교체하거나 표시 여부를 정하는 요소, Behavior는 범위·단계·선택 방식처럼 동작을 정하는 Property다. 성격이 다른 Property를 사이에 끼우지 않는다. 값 Property 사이에 시각 Property가 들어가면 무엇을 조절하는 중인지 알기 어려워진다.
 - Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Label·Description처럼 UI를 설명하는 정적 텍스트 요소의 문구는 구조 검수용 Playground에서 편집하지 않고 `Label`, `Description` 같은 고정 문구를 사용한다. 해당 텍스트 요소가 Optional이면 `Show label` 같은 임의 문장 대신 실제 Property 이름인 `Label`, `Description` Boolean Toggle만 제공한다. 실제 문구를 입력하는 Text control은 콘텐츠 길이, 줄바꿈이나 언어별 문구 검수가 목적일 때만 제공한다. Input의 Value·Placeholder처럼 사용자가 실제로 입력하거나 제출하는 데이터는 이 정적 텍스트 규칙에서 제외하고 public Property 타입에 맞는 값 Control을 유지한다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
 - 종속 그룹은 영역의 border를 사용하지 않는다. 왼쪽에 폭 2px의 곧은 `oe-border-primary` 막대를 별도 요소로 두고 `border-radius: 9999px`로 선의 위아래 끝만 둥글게 처리하며, 콘텐츠는 16px 들여쓴다.
 - 단순한 시각 구분에는 이 표시를 사용하지 않는다. 상위값에 실제로 종속된 control에만 적용한다.

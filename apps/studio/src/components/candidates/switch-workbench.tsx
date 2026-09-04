@@ -128,11 +128,17 @@ export function SwitchWorkbench() {
             <div className="min-h-44 rounded-xl bg-oe-background-primary p-5">
               <SwitchField checked={checked} onCheckedChange={setChecked} disabled={disabled} label={preview.label} labelPosition={labelPosition} controlSize={controlSize} />
             </div>
-            <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
-              <Toggle label="On" value={checked} onChange={setChecked} />
-              <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
-              <Control label="Size">{(["small", "medium", "large"] as const).map((size) => <Choice key={size} active={controlSize === size} onClick={() => setControlSize(size)}>{capitalize(size)}</Choice>)}</Control>
-              <Control label="Label position"><Choice active={labelPosition === "right"} onClick={() => setLabelPosition("right")}>Right</Choice><Choice active={labelPosition === "left"} onClick={() => setLabelPosition("left")}>Left</Choice></Control>
+            <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Appearance">
+                <Control label="Size">{(["small", "medium", "large"] as const).map((size) => <Choice key={size} active={controlSize === size} onClick={() => setControlSize(size)}>{capitalize(size)}</Choice>)}</Control>
+                <Control label="Label position"><Choice active={labelPosition === "right"} onClick={() => setLabelPosition("right")}>Right</Choice><Choice active={labelPosition === "left"} onClick={() => setLabelPosition("left")}>Left</Choice></Control>
+              </ControlSection>
+              <ControlSection title="State">
+                <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
+              </ControlSection>
+              <ControlSection title="Content">
+                <Toggle label="On" value={checked} onChange={setChecked} />
+              </ControlSection>
             </div>
           </div>
         </Section>
@@ -238,6 +244,8 @@ export function SwitchWorkbench() {
     </div>
   );
 }
+
+function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function Example({ label, children }: { label: string; children: ReactNode; isStatic?: boolean }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-xs font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }

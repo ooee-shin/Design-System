@@ -54,13 +54,22 @@ export function CheckboxWorkbench() {
             <div lang="en" className="min-h-44 rounded-xl bg-oe-background-primary p-5">
               {showLabel ? <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} appearance={appearance} /> : <Checkbox aria-label="Checkbox" checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} appearance={appearance} />}
             </div>
-            <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
-              <Toggle label="Checked" value={checked} onChange={(value) => { setChecked(value); if (value) setIndeterminate(false); }} />
-              <Control label="Appearance"><Choice active={appearance === "rounded"} onClick={() => setAppearance("rounded")}>Rounded</Choice><Choice active={appearance === "ghost"} onClick={() => { setAppearance("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
-              {appearance !== "ghost" ? <><Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /><Toggle label="Disabled" value={disabled} onChange={setDisabled} /></> : null}
-              <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
+            <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Appearance">
+                <Control label="Appearance"><Choice active={appearance === "rounded"} onClick={() => setAppearance("rounded")}>Rounded</Choice><Choice active={appearance === "ghost"} onClick={() => { setAppearance("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
+              </ControlSection>
+              <ControlSection title="State">
+                {appearance !== "ghost" ? <Toggle label="Disabled" value={disabled} onChange={setDisabled} /> : null}
+                <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
+              </ControlSection>
+              <ControlSection title="Content">
+                <Toggle label="Checked" value={checked} onChange={(value) => { setChecked(value); if (value) setIndeterminate(false); }} />
+                {appearance !== "ghost" ? <Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /> : null}
+              </ControlSection>
+              <ControlSection title="Elements">
               <Toggle label="Label" value={showLabel} onChange={setShowLabel} />
               {showLabel ? <DependentControlGroup><Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} /><Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} /><Toggle label="Parent item" value={isParent} onChange={setIsParent} /><Toggle label="Flipped" value={flipped} onChange={setFlipped} /><Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control></DependentControlGroup> : null}
+              </ControlSection>
             </div>
           </div>
         </Section>
@@ -295,6 +304,8 @@ function AppearanceExample({ title, appearance, label }: { title: string; appear
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) {
   return <div className="flex items-center justify-between gap-3"><span className="text-[11px] font-medium text-oe-foreground-tertiary">{label}</span><button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-5 w-9 rounded-full ${value ? "bg-oe-background-bold-primary" : "bg-oe-background-secondary ring-1 ring-inset ring-oe-border-primary"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-oe-background-primary shadow-sm transition-[left] ${value ? "left-[18px]" : "left-0.5"}`} /></button></div>;
 }
+
+function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
 
 function Control({ label, children }: { label: string; children: ReactNode }) {
   return <fieldset><legend className="mb-2 text-[11px] font-medium text-oe-foreground-tertiary">{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>;
