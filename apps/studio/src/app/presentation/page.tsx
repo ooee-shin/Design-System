@@ -49,10 +49,12 @@ export default function PresentationPage() {
                   <h2 id={`${entry.id}-title`} className="text-2xl font-semibold tracking-tight">
                     {entry.title}
                   </h2>
-                  <div className="mt-6 flex flex-col gap-6">
+                  {/* 제목에서 첫 칸까지를 칸 사이보다 벌린다. 같은 간격이면 제목이 소제목과 나란히 놓인 것처럼 읽힌다. */}
+                  <div className="mt-8 flex flex-col gap-6">
                     {entry.sections.map((section) => (
                       <section key={section.heading}>
-                        <h3 className="max-w-3xl text-lg font-semibold leading-7 tracking-tight text-foreground">
+                        {/* 꼭지 제목과 본문 사이의 중간 위계다. 소제목이 제목과 같은 검정이면 카드 하나에 제목이 여럿 있는 것처럼 읽힌다. */}
+                        <h3 className="max-w-3xl text-lg font-semibold leading-7 tracking-tight text-oe-foreground-secondary">
                           {section.heading}
                         </h3>
                         <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{withLinks(section.body)}</p>
