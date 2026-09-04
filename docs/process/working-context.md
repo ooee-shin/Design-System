@@ -332,6 +332,8 @@ Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구
 
 각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. 문서 구조 분리는 끝났지만 본문에는 아직 과정 성격의 문장이 남아 있다. 제거 대상은 자산의 유래(「Combobox 사례에서 추출한 뒤」), Studio 검수 도구 설명(「Studio는 Structure map에서 표시한다」), 진행 상태 서술(「현재 첫 번째 초안이다」)이다. `현재 정의 없음`은 시스템 정의이므로 남기고, `확인 필요` 항목은 `docs/process/open-questions.md`로 옮긴다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
+`2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면 3중 대조 검수를 돌렸다. 총 109건이며 폼 요소 10개가 84건, 후순위인 Chip·Badge·Message Bubble이 25건이다. 결과와 확정한 정책 네 가지, 작업 순서는 [component-audit.md](component-audit.md)에 있다. 폼 요소를 먼저 처리하고 나머지 셋은 뒤로 미룬다.
+
 `Presentation` 화면을 만들었다. 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 세 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
 사용자 확인을 기다리는 항목:

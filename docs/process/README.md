@@ -16,6 +16,7 @@
 | [working-context.md](working-context.md) | 현재 구현, 열린 결정과 바로 다음 작업 |
 | [git-workflow.md](git-workflow.md) | 안전한 branch·commit 운영 |
 | [open-questions.md](open-questions.md) | 화면을 만들며 검증할 항목 |
+| [component-audit.md](component-audit.md) | 13개 컴포넌트 3중 대조 검수 결과와 확정한 정책. 고치는 작업이 끝나면 제거한다 |
 
 ## 핵심 제작 철학: Template First, Asset Later
 
