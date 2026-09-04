@@ -50,10 +50,6 @@ export function TextareaWorkbench() {
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
       <div className="min-w-0 space-y-5">
-        <header id="overview" className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5">
-          <h2 className="text-lg font-semibold text-oe-foreground-primary">Textarea</h2>
-          <p className="mt-1 max-w-2xl text-sm leading-6 text-oe-foreground-secondary">{c.description}</p>
-        </header>
 
         <Section id="playground" title="🚩 Playground" description="Style, Resize와 Optional element를 조합해 실제 여러 줄 입력 상태를 확인합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[900px]:grid-cols-[minmax(18rem,1fr)_18rem]">
@@ -149,7 +145,7 @@ function TextareaAnatomy() {
 }
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) {
-  return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-sm font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
+  return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
 }
 
 function Example({ label, description, children }: { label: string; description?: string; children: ReactNode; fixed?: boolean }) {
