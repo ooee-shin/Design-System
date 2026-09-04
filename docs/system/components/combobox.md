@@ -31,6 +31,14 @@
 - `MultiCombobox.selectAllLabel`: 전체 선택 행의 locale별 label이며 기본값은 `All`
 - `disabled`: 기본값 `false`
 - `invalid`: 기본값 `false`
+- `options`: 선택지 배열이며 필수다
+- `defaultValue`: uncontrolled 초기값
+- `onValueChange`: 값이 바뀔 때 호출한다
+- `placeholder`: 선택값이 없을 때 Trigger에 표시하는 문자열
+- `searchPlaceholder`: Popup 내부 Search input의 placeholder
+- `emptyMessage`: 검색 결과가 없을 때 표시하는 문구
+- `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
+- `name`: native form 연결 속성
 
 Control height는 Input과 Button의 공통 높이인 Small 32px, Regular 36px, Large 40px, XLarge 48px를 사용한다.
 Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.

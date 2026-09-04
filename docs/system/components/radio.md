@@ -34,6 +34,7 @@ Basic 번호는 반복하지 않고 Content container와 Optional 요소만 표�
 - `leadingElement`, `trailingElement`
 - `layout`: `inline | block`, 기본값 `inline`
 - `flipped`: Control을 Label의 왼쪽 또는 오른쪽에 배치
+- `indicatorClassName`, `radioClassName`: Indicator와 Control에 각각 적용하는 class다
 
 Layout, Label, Description, Leading/Trailing 배치와 Flipped 규칙은 CheckboxField와 동일하다. Trailing은 Label 뒤에 바로 배치하고 20px 첫 행 안에서 중앙 정렬한다.
 

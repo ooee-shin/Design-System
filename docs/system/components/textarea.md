@@ -22,6 +22,7 @@ Prefix, Clear button, Suffix, Leading element와 Trailing element는 지원하�
 
 - `fill`만 지원하며 부모 너비를 채운다.
 - Layout 선택 Property는 제공하지 않는다.
+- `containerClassName`: Container에만 적용하는 class다. Textarea field에는 `className`을 사용한다
 
 ### Auto size
 

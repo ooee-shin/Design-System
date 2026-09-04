@@ -40,6 +40,7 @@ SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing
 
 - `label`: `SwitchField`의 필수 `ReactNode`
 - `labelPosition`: `left | right`, 기본값 `right`
+- `switchClassName`, `thumbClassName`: Control과 Thumb에 각각 적용하는 class다
 
 ### State
 
@@ -55,7 +56,7 @@ SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing
 - Disabled는 현재 On/Off 값을 유지하지만 변경할 수 없다.
 - `checked`, `defaultChecked`, `onCheckedChange`로 controlled 또는 uncontrolled 상태를 지원한다.
 - On/Off 전환에서는 Thumb 위치와 Track 색상이 함께 부드럽게 바뀐다. Disabled 전환에서는 현재 Thumb 위치를 유지하고 Track과 Thumb 색상만 전환한다.
-- `readOnly`, `required`, `name`, `value`, `form`은 Base UI의 Form 연결 범위에서 전달한다.
+- `readOnly`, `required`, `name`, `value`, `uncheckedValue`, `form`은 Base UI의 Form 연결 범위에서 전달한다.
 - `SwitchField`는 표시 Label과 Control을 `aria-labelledby`로 직접 연결한다. 원자적인 `Switch`는 소비자가 `aria-label` 또는 `aria-labelledby`를 제공한다.
 
 ## Guidelines

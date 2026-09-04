@@ -54,6 +54,7 @@ Option은 Content container 안의 선택 항목이다. 같은 목록에서 Lead
 - `readOnly`: 현재 값 변경 제한
 - `invalid`: 오류 상태 표시
 - `required`, `name`: native form 연결 속성
+- `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
 
 Control height는 Input과 Button이 공유하는 Small 32px, Regular 36px, Large 40px, XLarge 48px를 사용한다. Outline Disabled에서도 외곽 border를 유지한다.
 

@@ -47,6 +47,7 @@ Checkbox와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제�
 - `trailingElement`: `ReactNode`, 텍스트 Content 뒤에 표시하는 선택적 Slot
 - `layout`: `inline | block`, 기본값 `inline`. `inline`은 콘텐츠 너비, `block`은 부모 너비 전체를 사용
 - `flipped`: `boolean`, 기본값 `false`. `false`는 Control을 Label 왼쪽에, `true`는 오른쪽에 배치
+- `checkboxClassName`: Control에만 적용하는 class다. Field에는 `className`을 사용한다
 
 Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE 컴포넌트로 대응한다. Control은 16px다. Square Indicator는 0px radius, Rounded Indicator는 4px radius이며 둘 다 10px icon을 사용한다. 박스 없이 Indicator 자체로 구분하는 Ghost icon은 15px다. Ghost는 Default · Unchecked에서도 체크 아이콘을 `oe-foreground-placeholder`로 표시하고, Checked에서 Brand foreground로 강조한다. Focus ring을 소유하는 Control은 세 Shape 모두 4px radius를 유지하므로 Square에서도 Focus ring은 각지지 않는다. CheckboxField 행은 OOEE Regular form control과 같은 최소 36px다. Control은 Label의 20px 첫 줄 안에서 수직 중앙에 오도록 2px 보정한다. 기본 Label은 Regular이며 하위 항목을 대표하는 부모 항목만 Semibold다. Indeterminate와 Disabled 상태는 Square와 Rounded에 제공하고 Ghost에는 제공하지 않는다.
 

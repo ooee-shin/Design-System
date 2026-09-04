@@ -19,18 +19,22 @@
 
 ## Properties
 
-- Style: `outline | filled`, 기본값 `outline`
-- Size: `small | regular | large | xlarge`, 기본값 `regular`
-- Layout: `fill | fixed`, 기본값 `fill`
-- Text alignment: `left | right`, 기본값 `left`. Split controls에서는 중앙 정렬이 우선
-- Value: `number | undefined`
-- Range: `min`, `max`
-- Step: 기본값 `1`
-- Prefix / Suffix: 숫자 앞뒤에 표시하는 선택 요소, 기본값 `undefined`
-- Prefix tone / Suffix tone: 각각 `secondary | tertiary`, 기본값 `secondary`
-- Controls: `hideControls`, 기본값 `false`
-- Controls position: `trailing | split`, 기본값 `trailing`
-- Negative: `allowNegative`, 기본값 `true`
+- `variant` (Style): `outline | filled`, 기본값 `outline`
+- `controlSize` (Size): `small | regular | large | xlarge`, 기본값 `regular`
+- `layout`: `fill | fixed`, 기본값 `fill`
+- `textAlign` (Text alignment): `left | right`, 기본값 `left`. Split controls에서는 중앙 정렬이 우선
+- `value`, `defaultValue`: `number | undefined`
+- `min`, `max`: 허용 범위
+- `step`: 기본값 `1`
+- `prefix`, `suffix`: 숫자 앞뒤에 표시하는 선택 요소, 기본값 `undefined`
+- `prefixTone`, `suffixTone`: 각각 `secondary | tertiary`, 기본값 `secondary`
+- `hideControls`: 기본값 `false`
+- `controlsPosition`: `trailing | split`, 기본값 `trailing`
+- `allowNegative`: 기본값 `true`
+- `decreaseLabel`, `increaseLabel`: 증감 버튼의 접근 가능한 이름
+- `decreaseTooltip`, `increaseTooltip`: 증감 버튼의 tooltip 문구
+- `onValueChange`: 값이 바뀔 때 호출한다
+- `onLimitReached`: 범위 경계에 도달할 때 `min | max`를 전달한다
 - State: Default, Focus, Invalid, Disabled, Read only
 
 Style, Size, Layout, Focus, Invalid와 Disabled 외곽은 별도 시각 구현을 만들지 않고 공용 `Input`을 재사용한다. Filled는 Neutral secondary background를 사용하고 Focus에서는 Input과 동일하게 기본 surface로 전환한다.

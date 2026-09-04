@@ -21,6 +21,8 @@
 
 두 번째 항목인 명세 첫머리 정리도 끝냈다. 구현 경로를 제목 아래 메타 한 줄로 옮기고, 유래와 진행 상태와 Studio 도구 설명을 걷어냈다. 정보가 살아 있는 미결 항목 여덟 건은 [open-questions.md](open-questions.md)의 「컴포넌트」와 「Token candidate」로 옮겼다. `radio.md`의 Guidelines 문단은 실제 규칙과 Studio 예시 서술이 얽혀 있어 Radio 개별 순회로 넘겼다.
 
+2단계 중 두 가지를 끝냈다. `className` 계열은 `docs/system/README.md`의 공통 규칙으로 한 번 적고, 이름이 예측되지 않는 `containerClassName`·`indicatorClassName`·`radioClassName`·`checkboxClassName`·`switchClassName`·`thumbClassName`만 해당 명세에 한 줄로 남겼다. Property 이름은 `variant`와 `controlSize`로 통일하고 범주는 괄호로 붙였으며, 명세에 없던 Property 열여덟 개를 더했다. Anatomy 명칭 통일은 `Popup`과 `Content container`를 `vocabulary.md`에 어떻게 정의할지 정해야 해서 남겨 두었다.
+
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.
 3. **동작 불일치 4건.** Focus 기준, Switch 터치 영역, MultiSelect Leading element, `tabIndex=-1`. Focus는 `input.tsx`의 공유 스타일을 바꿔 Input과 Input Button에 동시에 영향을 주므로 시각 회귀를 화면에서 확인해야 한다.

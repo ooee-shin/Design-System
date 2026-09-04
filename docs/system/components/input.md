@@ -26,17 +26,18 @@
 
 ## Properties
 
-- Style: `outline | filled`, 기본값 `outline`
+- `variant` (Style): `outline | filled`, 기본값 `outline`
   - Outline: 기본 surface와 Neutral border
   - Filled: Neutral secondary background와 투명 border. Focus 상태에서는 기본 흰색 surface로 전환
-- Size: `small | regular | large | xlarge`, 기본값 `regular`
-- Layout: `fill | fixed`, 기본값 `fill`
+- `controlSize` (Size): `small | regular | large | xlarge`, 기본값 `regular`
+- `layout`: `fill | fixed`, 기본값 `fill`
   - Fill: 부모가 제공하는 너비를 채우며 Field 결합의 기본 동작
   - Fixed: `fixedWidth`에 명시한 너비를 유지하되 부모보다 넓어지지 않음
   - Hug는 입력값 변화에 따라 외곽 너비가 달라질 수 있어 Input Container의 공식 Layout에서 제외
-- Text alignment: `left | right`, 기본값 `left`. 입력값과 Placeholder에만 적용
+- `textAlign`: `left | right`, 기본값 `left`. 입력값과 Placeholder에만 적용
 - State: native 속성과 focus에서 확인되는 Empty / Placeholder, Default with value, Focus, Invalid, Disabled, Read only
 - Optional elements: `leadingElement`, `prefix`, `clearable`, `suffix`, `trailingElement`
+- `containerClassName`: Container에만 적용하는 class다. Input field에는 `className`을 사용한다
 
 Focus는 테두리와 바깥 ring에 동일한 `oe-focus-ring` 색을 사용한다. 기본 1px border 바깥에 1px ring을 겹쳐 하나의 진한 2px 선처럼 보이게 하며, 실제 box size를 변경하지 않아 인접 요소나 중첩 배치가 흔들리지 않는다.
 

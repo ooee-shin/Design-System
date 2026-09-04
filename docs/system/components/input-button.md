@@ -25,9 +25,9 @@ Clear button은 제공하지 않는다. Value는 현재 문자열만 허용하�
 
 ## Properties
 
-- Style: `outline | filled`, 기본값 `outline`
-- Size: `small | regular | large | xlarge`, 기본값 `regular`
-- Layout: `fill | fixed`, 기본값 `fill`
+- `variant` (Style): `outline | filled`, 기본값 `outline`
+- `controlSize` (Size): `small | regular | large | xlarge`, 기본값 `regular`
+- `layout`: `fill | fixed`, 기본값 `fill`
 - Content: `value`, `placeholder`
 - Optional elements: `leadingElement`, `prefix`, `suffix`, `trailingElement`
 - State: 실제 Button 속성과 focus에서 확인되는 Default, Focus, Invalid, Disabled

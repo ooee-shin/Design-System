@@ -85,6 +85,8 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 `packages/ui`는 위 외에 `Button`, `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공하며 아직 상세 문서가 없다.
 
+모든 공용 컴포넌트는 `className`을 받아 바깥 요소에 class를 덧붙일 수 있다. 내부 요소를 따로 스타일링해야 하는 컴포넌트는 `containerClassName`, `indicatorClassName`처럼 대상을 앞에 붙인 추가 Property를 가지며 그 이름은 각 컴포넌트 문서에 적는다. 개별 문서의 `Properties`는 시각과 동작을 결정하는 Property만 다루므로 `className` 자체는 나열하지 않는다.
+
 ## Example
 
 외부 화면을 공용 컴포넌트로 다시 만든 사례다. **컴포넌트가 실제 화면에서 어떻게 조합되는지 보여주는 참고 자료이며, 시스템이 확정한 Pattern이 아니다.** 여기서 반복되는 조합이 확인되면 그때 Pattern으로 추출한다.
