@@ -5,7 +5,7 @@ import { useState, type ReactNode } from "react";
 import { Textarea } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
+import { DependentControlGroup, PlaygroundChoice as Choice } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
@@ -59,12 +59,12 @@ export function TextareaWorkbench() {
             <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
               <Control label="Style"><Choice active={playgroundVariant === "outline"} onClick={() => setPlaygroundVariant("outline")}>Outline</Choice><Choice active={playgroundVariant === "filled"} onClick={() => setPlaygroundVariant("filled")}>Filled</Choice></Control>
               <Toggle label="Auto size" value={playgroundAutoSize} onChange={setPlaygroundAutoSize} />
-              <div className={playgroundAutoSize ? "pointer-events-none opacity-40" : undefined} aria-disabled={playgroundAutoSize}>
+              <DependentControlGroup className={playgroundAutoSize ? "pointer-events-none opacity-40" : undefined}>
                 <div className="space-y-4">
                   <Toggle label="Resize" value={playgroundResize} onChange={setPlaygroundResize} />
                   <label className="flex items-center justify-between gap-3 text-[11px] font-medium text-oe-foreground-tertiary">Height <input type="number" min={88} step={4} value={playgroundHeight} onChange={(event) => setPlaygroundHeight(Math.max(88, Number(event.target.value) || 88))} className="h-8 w-20 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-2 text-right text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring" /></label>
                 </div>
-              </div>
+              </DependentControlGroup>
             </div>
           </div>
         </Section>
@@ -104,7 +104,6 @@ export function TextareaWorkbench() {
               <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead>
               <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
                 <MapRow property="variant" values="outline | filled" defaultValue="outline" />
-                <MapRow property="layout" values="fill" defaultValue="fill" />
                 <MapRow property="autoSize" values="false | true" defaultValue="false" note="Parent property" />
                 <MapRow property="resize" values="false | true" defaultValue="false" note="autoSize=false only" />
                 <MapRow property="height" values="≥ 88px" defaultValue="88px" note="autoSize=false only" />

@@ -100,7 +100,7 @@ function Select({
         <SelectPrimitive.Value className="flex min-w-0 flex-1 items-center gap-2.5 truncate">
           {(selectedValue: string | null) => {
             const option = resolvedOptions.find((item) => item.value === selectedValue) ?? null
-            return option ? <>{option.leadingElement ?? leadingElement ? <span className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{option.leadingElement ?? leadingElement}</span> : null}<span className="min-w-0 truncate">{option.label}</span></> : <span className="min-w-0 truncate text-oe-foreground-placeholder">{placeholder}</span>
+            return option ? <>{leadingElement ? <span className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{leadingElement}</span> : null}<span className="min-w-0 truncate">{option.label}</span></> : <span className="min-w-0 truncate text-oe-foreground-placeholder">{placeholder}</span>
           }}
         </SelectPrimitive.Value>
         <SelectPrimitive.Icon className="flex shrink-0 items-center text-oe-foreground-tertiary data-[popup-open]:rotate-180">
@@ -184,8 +184,7 @@ function MultiSelect({
             })
             if (selectedOptions.length === 0) return <span className="min-w-0 truncate text-oe-foreground-placeholder">{placeholder}</span>
             const representative = selectedOptions[0]
-            const triggerLeading = selectedOptions.length === 1 ? representative.leadingElement ?? leadingElement : leadingElement
-            return <>{triggerLeading ? <span className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{triggerLeading}</span> : null}<span className="min-w-0 truncate">{valueDisplay === "count" ? selectedCountLabel(selectedOptions.length) : selectedSummaryLabel(representative.label, selectedOptions.length - 1)}</span></>
+            return <>{leadingElement ? <span className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{leadingElement}</span> : null}<span className="min-w-0 truncate">{valueDisplay === "count" ? selectedCountLabel(selectedOptions.length) : selectedSummaryLabel(representative.label, selectedOptions.length - 1)}</span></>
           }}
         </SelectPrimitive.Value>
         <SelectPrimitive.Icon className="flex shrink-0 items-center text-oe-foreground-tertiary data-[popup-open]:rotate-180">

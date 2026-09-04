@@ -16,10 +16,10 @@
 
 1. Container: 모든 내부 요소와 focus/invalid/disabled 시각 상태를 감싼다.
 2. Leading element: 선택 요소이며 현재 Icon을 사용한다.
-3. Prefix: 선택적인 앞쪽 텍스트다.
+3. Prefix: 값 앞에 붙는 선택 요소다. `ReactNode`를 받으므로 텍스트 외의 요소도 둘 수 있다.
 4. Input field: 필수 입력 요소다.
 5. Clear button: 선택적인 입력 지우기 action이다. 입력값 바로 뒤에 위치하며 실제 값 변경은 `onClear`가 소유한다. 값이 있어도 Input에 focus가 있을 때만 표시한다. 접근 가능한 이름은 `clearLabel`로 전달하며 기본값은 `Clear input`이다.
-6. Suffix: 선택적인 뒤쪽 텍스트다.
+6. Suffix: 값 뒤에 붙는 선택 요소다. `ReactNode`를 받으므로 텍스트 외의 요소도 둘 수 있다.
 7. Trailing element: 선택 요소이며 현재 Icon을 사용한다.
 
 내부 요소의 고정 순서는 `Leading element → Prefix → Input field → Clear button → Suffix → Trailing element`다.

@@ -284,7 +284,7 @@ function StateExample({ label, children }: { label: string; children: ReactNode 
 }
 
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) {
-  return <div className="col-span-full mt-5 first:mt-0"><h4 className="text-sm font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>;
+  return <div className="col-span-full mt-8 first:mt-0"><h4 className="text-sm font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>;
 }
 
 function AppearanceExample({ title, appearance, label }: { title: string; appearance: "rounded" | "ghost"; label: string }) {
