@@ -323,7 +323,7 @@ Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구
 4. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
 5. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
 6. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
-7. 모양 어휘 적용. Badge에 `square` 추가, Checkbox `appearance` → `shape`와 `square` 복원. `docs/system/components/checkbox.md`가 이미 Square·Rounded·Ghost와 `Properties · Shape`를 명세로 기술하고 있으므로 문서를 기준으로 코드와 Studio를 맞춘다.
+7. 모양 어휘 적용. Checkbox의 `appearance` → `shape`와 `square` 복원은 끝냈다. Badge에 `square`를 추가하는 일이 남아 있으며 Badge는 후순위다.
 8. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
 
 1~6은 검수 수정, 7~8은 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
