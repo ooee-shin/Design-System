@@ -57,6 +57,8 @@ export function CheckboxWorkbench() {
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
                 <Control label="Shape"><Choice active={shape === "square"} onClick={() => setShape("square")}>Square</Choice><Choice active={shape === "rounded"} onClick={() => setShape("rounded")}>Rounded</Choice><Choice active={shape === "ghost"} onClick={() => { setShape("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
+                <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
+                <div className={showLabel ? undefined : "pointer-events-none opacity-40"} aria-disabled={!showLabel}><Toggle label="Flipped" value={flipped} onChange={setFlipped} /></div>
               </ControlSection>
               <ControlSection title="State">
                 {shape !== "ghost" ? <Toggle label="Disabled" value={disabled} onChange={setDisabled} /> : null}
@@ -68,7 +70,7 @@ export function CheckboxWorkbench() {
               </ControlSection>
               <ControlSection title="Elements">
               <Toggle label="Label" value={showLabel} onChange={setShowLabel} />
-              {showLabel ? <DependentControlGroup><Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} /><Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} /><Toggle label="Parent item" value={isParent} onChange={setIsParent} /><Toggle label="Flipped" value={flipped} onChange={setFlipped} /><Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control></DependentControlGroup> : null}
+              {showLabel ? <DependentControlGroup><Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} /><Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} /><Toggle label="Parent item" value={isParent} onChange={setIsParent} /></DependentControlGroup> : null}
               </ControlSection>
             </div>
           </div>
