@@ -75,6 +75,7 @@ function Select({
   leadingElement,
 }: SelectProps) {
   const resolvedOptions = options ?? groups?.flatMap((group) => group.options) ?? []
+  const paddingX = optionPaddingX[controlSize ?? "regular"]
   const rootItems = resolvedOptions.map((option) => ({ value: option.value, label: option.label }))
 
   return (
@@ -116,11 +117,11 @@ function Select({
                 <React.Fragment key={group.label}>
                   {groupIndex > 0 ? <SelectPrimitive.Separator className="my-1.5 h-px bg-oe-border-secondary" /> : null}
                   <SelectPrimitive.Group>
-                    <SelectPrimitive.GroupLabel className="px-2 py-1.5 text-[11px] font-medium text-oe-foreground-tertiary">{group.label}</SelectPrimitive.GroupLabel>
-                    {group.options.map(renderOption)}
+                    <SelectPrimitive.GroupLabel className={cn("py-1.5 text-[11px] font-medium text-oe-foreground-tertiary", paddingX)}>{group.label}</SelectPrimitive.GroupLabel>
+                    {group.options.map((option) => renderOption(option, paddingX))}
                   </SelectPrimitive.Group>
                 </React.Fragment>
-              )) : resolvedOptions.map(renderOption)}
+              )) : resolvedOptions.map((option) => renderOption(option, paddingX))}
             </SelectPrimitive.List>
           </SelectPrimitive.Popup>
         </SelectPrimitive.Positioner>
@@ -153,6 +154,7 @@ function MultiSelect({
   selectedCountLabel = (selectedCount) => `${selectedCount} selected`,
 }: MultiSelectProps) {
   const resolvedOptions = options ?? groups?.flatMap((group) => group.options) ?? []
+  const paddingX = optionPaddingX[controlSize ?? "regular"]
   const rootItems = resolvedOptions.map((option) => ({ value: option.value, label: option.label }))
 
   return (
@@ -200,11 +202,11 @@ function MultiSelect({
                 <React.Fragment key={group.label}>
                   {groupIndex > 0 ? <SelectPrimitive.Separator className="my-1.5 h-px bg-oe-border-secondary" /> : null}
                   <SelectPrimitive.Group>
-                    <SelectPrimitive.GroupLabel className="px-2 py-1.5 text-[11px] font-medium text-oe-foreground-tertiary">{group.label}</SelectPrimitive.GroupLabel>
-                    {group.options.map(renderOption)}
+                    <SelectPrimitive.GroupLabel className={cn("py-1.5 text-[11px] font-medium text-oe-foreground-tertiary", paddingX)}>{group.label}</SelectPrimitive.GroupLabel>
+                    {group.options.map((option) => renderOption(option, paddingX))}
                   </SelectPrimitive.Group>
                 </React.Fragment>
-              )) : resolvedOptions.map(renderOption)}
+              )) : resolvedOptions.map((option) => renderOption(option, paddingX))}
             </SelectPrimitive.List>
           </SelectPrimitive.Popup>
         </SelectPrimitive.Positioner>
@@ -213,13 +215,16 @@ function MultiSelect({
   )
 }
 
-function renderOption(option: SelectOption) {
+/** Trigger 의 좌우 여백에서 List 의 `px-1` 을 뺀 값이다. Trigger 와 Popup 의 Leading 열 시작점을 맞춘다. */
+const optionPaddingX = { small: "px-1.5", regular: "px-2", large: "px-2", xlarge: "px-3" } as const
+
+function renderOption(option: SelectOption, paddingX: string) {
   return (
     <SelectPrimitive.Item
       key={option.value}
       value={option.value}
       disabled={option.disabled}
-      className="group/option relative flex min-h-8 w-full cursor-default items-center gap-2.5 rounded-md px-2 py-1.5 outline-none data-[disabled]:pointer-events-none data-[disabled]:!text-oe-foreground-disabled data-[highlighted]:bg-oe-interaction-hover data-[selected]:font-medium data-[selected]:data-[highlighted]:!bg-transparent"
+      className={cn("group/option relative flex min-h-8 w-full cursor-default items-center gap-2.5 rounded-md py-1.5 outline-none data-[disabled]:pointer-events-none data-[disabled]:!text-oe-foreground-disabled data-[highlighted]:bg-oe-interaction-hover data-[selected]:font-medium data-[selected]:data-[highlighted]:!bg-transparent", paddingX)}
     >
       {option.leadingElement ? <span className="relative flex shrink-0 self-center text-oe-foreground-tertiary [&_svg]:size-4">{option.leadingElement}</span> : null}
       <SelectPrimitive.ItemText className="relative min-w-0 flex-1">

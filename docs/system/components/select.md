@@ -81,7 +81,7 @@ Control height는 Input과 Button이 공유하는 Small 32px, Regular 36px, Larg
 - Group을 사용하면 Group label과 Option 묶음을 표시하고 Group 사이에 Divider를 자동 배치한다.
 - Popup는 Trigger와 같은 너비와 좌우 시작점을 사용한다. Base UI의 선택 Item 중심 정렬은 사용하지 않는다.
 - Leading element에는 Icon, Badge, Avatar처럼 Option을 식별하는 요소를 둔다. 한 줄 Control의 높이를 바꾸지 않는 크기를 유지하고, 같은 목록에서는 종류를 섞지 않는다.
-- Leading element를 사용하면 Trigger와 Popup의 Leading 열 시작점을 동일하게 맞춘다.
+- Leading element를 사용하면 Trigger와 Popup의 Leading 열 시작점을 동일하게 맞춘다. Option의 좌우 여백은 `controlSize`를 따라가며 List가 가진 여백만큼을 뺀 값을 사용한다.
 - Trigger의 Leading element는 Select의 `leadingElement`를 사용한다. 어떤 Option을 몇 개 골랐는지에 따라 바뀌지 않는다. Option의 `leadingElement`는 Popup 안의 해당 Option에만 표시한다.
 - 같은 Group에서 Leading element를 사용하면 모든 Option에 같은 Leading 영역을 제공한다. Group마다 다른 요소를 사용할 수 있지만 같은 Group 안의 일부 Option만 Leading element를 생략하지 않는다.
 - Item description은 열린 Content에서 Label 아래에만 표시하고 Trigger 선택값에는 포함하지 않는다.

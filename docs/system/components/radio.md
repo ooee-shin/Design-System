@@ -44,7 +44,7 @@ Layout, Label, Description, Leading/Trailing 배치와 Flipped 규칙은 Checkbo
 - 제공하지 않음: Parent item, Indeterminate, Ghost
 - 현재 정의 없음: Loading, Error/Invalid, Hover 전용 표현
 
-Unchecked는 `oe-background-primary`와 `oe-border-primary`를 사용한다. Checked는 Control 전체를 `oe-brand-background-bold-primary`로 채우고 중앙에 8px 흰 Indicator를 표시한다. Focus visible은 2px 간격의 2px `oe-focus-ring`을 사용한다. Disabled Checked는 `oe-background-disabled-selected` Control과 흰 Indicator를 사용한다.
+Unchecked는 `oe-background-primary`와 `oe-border-primary`를 사용한다. Checked는 Control 전체를 `oe-brand-background-bold-primary`로 채우고 중앙에 8px Indicator를 `oe-background-primary`로 표시한다. Focus visible은 2px 간격의 2px `oe-focus-ring`을 사용한다. Disabled Checked는 `oe-background-disabled-selected` Control과 `oe-foreground-inverse` Indicator를 사용한다. Disabled 채움은 Light와 Dark가 모두 같은 값이므로 Indicator만 모드에 따라 대비를 얻는 토큰을 쓴다.
 
 현재 RadioField에는 크기 또는 위치가 변하는 Pressed motion을 적용하지 않는다. Control의 상태색과 Field의 Hover 등 기존 상호작용 피드백만 유지하며, 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 다시 검수한다.
 
