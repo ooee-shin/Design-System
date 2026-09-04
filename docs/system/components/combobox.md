@@ -6,7 +6,7 @@
 
 ## Anatomy
 
-1. Select trigger container
+1. Trigger container
 2. Selected value / Placeholder
 3. Trigger icon: Remix `RiArrowDownSLine`
 4. Popup

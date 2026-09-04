@@ -274,7 +274,7 @@ export function SelectWorkbench() {
         </Section>
 
         <Section id="interaction" title="Interaction" description="현재 구현에서 확인되는 열림, 키보드와 선택 동작입니다.">
-          <Behavior title="Open / Close">Trigger를 누르면 Content container가 열리고, 바깥 영역을 누르거나 Escape를 누르면 닫힙니다.</Behavior>
+          <Behavior title="Open / Close">Trigger를 누르면 Popup가 열리고, 바깥 영역을 누르거나 Escape를 누르면 닫힙니다.</Behavior>
           <Behavior title="Keyboard">방향키로 Option을 이동하고 Enter 또는 Space로 선택하며 Escape로 닫습니다.</Behavior>
           <Behavior title="Single selection">Option을 고르면 Content가 닫힙니다. 선택한 Option을 다시 골라도 선택이 해제되지 않습니다.</Behavior>
           <Behavior title="Multiple selection">Option을 고른 뒤에도 Content가 열린 상태로 유지됩니다. 선택한 Option을 다시 고르면 선택이 해제됩니다.</Behavior>
@@ -363,11 +363,11 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
     <div className="col-span-full grid min-w-0 gap-8">
       <AnatomyPanel
         title="Select structure"
-        parts={["Trigger container", "Value / Placeholder", "Trigger icon", "Content container", "Group", "Group label"]}
-        summary="Select는 Trigger와 Content container로 구성됩니다. Content 안의 관련 Option은 Group으로 묶으며, Group 사이에만 Divider가 표시됩니다."
+        parts={["Trigger container", "Value / Placeholder", "Trigger icon", "Popup", "Group", "Group label"]}
+        summary="Select는 Trigger와 Popup로 구성됩니다. Content 안의 관련 Option은 Group으로 묶으며, Group 사이에만 Divider가 표시됩니다."
         notes={[
-          { term: "Trigger", description: "현재 선택값 또는 Placeholder를 표시하고, 누르면 Content container를 엽니다. 선택적인 Leading element와 열림 상태를 나타내는 Chevron을 포함할 수 있습니다." },
-          { term: "Content container", description: "Trigger에 이어져 Option 목록을 보여주는 영역입니다. Trigger와 같은 너비와 좌우 시작점을 사용합니다." },
+          { term: "Trigger", description: "현재 선택값 또는 Placeholder를 표시하고, 누르면 Popup를 엽니다. 선택적인 Leading element와 열림 상태를 나타내는 Chevron을 포함할 수 있습니다." },
+          { term: "Popup", description: "Trigger에 이어져 Option 목록을 보여주는 영역입니다. Trigger와 같은 너비와 좌우 시작점을 사용합니다." },
           { term: "Group", description: "관련 있는 Option을 묶는 단위입니다. Group label로 제목을 표시하며 Group 사이에는 Divider를 자동으로 배치합니다." },
         ]}
       >
@@ -394,7 +394,7 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
       <AnatomyPanel
         title="Option anatomy"
         parts={["Option", "Leading element (Optional)", "Item label", "Item description (Optional)"]}
-        summary="Option은 Content container 안에서 선택할 수 있는 하나의 항목입니다. 같은 목록에서 Leading element를 사용하면 모든 Option에 같은 영역을 유지하며, 선택 상태와 Indicator는 Properties · State에서 확인합니다."
+        summary="Option은 Popup 안에서 선택할 수 있는 하나의 항목입니다. 같은 목록에서 Leading element를 사용하면 모든 Option에 같은 영역을 유지하며, 선택 상태와 Indicator는 Properties · State에서 확인합니다."
         notes={[
           { term: "Option", description: "Item label을 필수 정보로 사용하고, 필요할 때 Leading element와 Item description으로 내용을 보완합니다." },
           { term: "Leading element", description: "Option 내용 앞에 표시하는 선택 요소입니다. 현재는 Remix Icon으로 검수하며 Label과 Description 전체 블록을 기준으로 수직 중앙 정렬합니다." },

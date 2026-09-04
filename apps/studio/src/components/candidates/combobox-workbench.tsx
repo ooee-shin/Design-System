@@ -68,7 +68,7 @@ export function ComboboxWorkbench() {
             <div className="space-y-4 rounded-xl bg-oe-background-primary p-4"><Control label="Selected display"><Choice active={selectedDisplay === "summary"} onClick={() => setSelectedDisplay("summary")}>Summary</Choice><Choice active={selectedDisplay === "container"} onClick={() => setSelectedDisplay("container")}>Container</Choice></Control><Control label="Style"><Choice active={multiVariant === "outline"} onClick={() => setMultiVariant("outline")}>Outline</Choice><Choice active={multiVariant === "filled"} onClick={() => setMultiVariant("filled")}>Filled</Choice></Control><Control label="Size">{(["small", "regular", "large", "xlarge"] as const).map((size) => <Choice key={size} active={multiControlSize === size} onClick={() => setMultiControlSize(size)}>{size}</Choice>)}</Control><Toggle label="Disabled" value={multiDisabled} onChange={setMultiDisabled} /><Toggle label="Invalid" value={multiInvalid} onChange={setMultiInvalid} /></div>
           </div>
         </Section>
-        <Section id="anatomy" title="Anatomy" description="닫힌 Trigger와 열린 Content container의 구조를 분리해 확인합니다.">
+        <Section id="anatomy" title="Anatomy" description="닫힌 Trigger와 열린 Popup의 구조를 분리해 확인합니다.">
           <div className="col-span-full grid gap-8">
             <div>
               <AnatomySurface ariaLabel="Combobox trigger anatomy" title="Trigger anatomy" className="px-5">
@@ -113,7 +113,7 @@ export function ComboboxWorkbench() {
                   <AnatomyNumber number={7} className="left-[32%] bottom-4" lineClassName="bottom-5 left-2.5 h-8 w-px" />
                 </div>
               </AnatomySurface>
-              <AnatomyLegend start={4} items={[{ name: "Content container" }, { name: "Search input" }, { name: "Option list" }, { name: "Option / Checkbox" }]} />
+              <AnatomyLegend start={4} items={[{ name: "Popup" }, { name: "Search input" }, { name: "Option list" }, { name: "Option / Checkbox" }]} />
             </div>
 
             <AnatomyStructureMap lines={[
@@ -121,7 +121,7 @@ export function ComboboxWorkbench() {
               { prefix: "├─ ", name: "Trigger container" },
               { prefix: "│  ├─ ", name: "Selected value / Placeholder" },
               { prefix: "│  └─ ", name: "Trigger icon" },
-              { prefix: "└─ ", name: "Content container" },
+              { prefix: "└─ ", name: "Popup" },
               { prefix: "   ├─ ", name: "Search input" },
               { prefix: "   └─ ", name: "Option list" },
               { prefix: "      └─ ", name: "Option" },

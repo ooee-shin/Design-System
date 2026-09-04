@@ -9,6 +9,8 @@
 - `Field`는 Control과 Label을 기본으로 결합하고 Description, Leading/Trailing element 같은 Content를 선택적으로 포함하는 전체 조작 영역이다.
 - `Content container`는 Label, Description과 Leading/Trailing element를 묶는 내부 영역이다. Label 하나만 가리킬 때 Content라고 부르지 않는다.
 - `Container`는 Field 전체를 border, background 또는 다른 Surface로 감싼 선택 영역이다. 단순 Wrapper나 Popup을 Container로 부르지 않고 실제 시각 Surface 또는 명확한 구조 범위를 가질 때 사용한다.
+- `Popup`은 Trigger를 눌러 여는 떠 있는 영역이다. Select와 Combobox의 옵션 목록이 이에 해당하며 시각 Surface를 가져도 `Container`라고 부르지 않는다.
+- `Trigger`는 Popup을 여는 조작 요소다. 자체 Surface를 가질 때는 `Trigger container`라고 부른다.
 
 별도 Wrapper가 실제로 존재하지 않으면 `Control container`처럼 역할명 뒤에 Container를 덧붙이지 않는다. `Control` 또는 컴포넌트가 분명해야 할 때는 `Radio control`, `Checkbox control`처럼 쓴다. 원자 예시 제목은 실제 역할에 따라 `Control only`, `Indicator only`처럼 작성한다.
 

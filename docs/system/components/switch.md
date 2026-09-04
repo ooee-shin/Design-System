@@ -27,7 +27,7 @@ SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing
 - `medium`: Control `38×24px`, Thumb `20px`. 기본값이다.
 - `large`: Control `52×32px`, Thumb `26px`.
 - React Property 이름은 공용 control 문법에 맞춰 `controlSize`를 사용한다.
-- Size의 `16px`, `24px`, `32px`는 Track만의 높이가 아니라 Switch Control 전체 높이다. 실제 pointer·touch target은 이 시각 크기와 분리해 더 크게 확보한다.
+- Size의 `16px`, `24px`, `32px`는 Track만의 높이가 아니라 Switch Control 전체 높이다. Small은 시각 크기보다 큰 `24px` target을 확보하고, Medium과 Large는 Control 높이 자체가 충분하므로 별도로 넓히지 않는다.
 - SwitchField는 크기가 커질수록 Label 크기와 Control–Label gap도 함께 키운다.
 
 ### Label position
