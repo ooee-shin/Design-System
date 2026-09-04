@@ -143,15 +143,17 @@ function InputButtonAnatomy() {
       <AnatomySurface ariaLabel="Input Button anatomy" title="Input Button structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
           <div className="relative mx-auto flex h-48 w-[30rem] items-center justify-center">
-            <div className="pointer-events-none w-72"><InputButton value="Value / Placeholder" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
+            <div className="pointer-events-none w-72"><InputButton value="2026-09-14" leadingElement={<AnatomySwapSlot />} prefix="+82" suffix="KST" trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
             <AnatomyBoundaryMarker number={1} side="left" connectorLength={48} boundaryLength={36} className="left-5 top-[5.4rem]" />
-            <AnatomyNumber number={2} className="left-[6.75rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
-            <AnatomyNumber number={3} className="left-[10.25rem] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
-            <AnatomyNumber number={4} className="right-[6.625rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+            <AnatomyNumber number={2} className="left-[106px] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+            <AnatomyNumber number={3} className="left-[135px] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
+            <AnatomyNumber number={4} className="left-[230px] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+            <AnatomyNumber number={5} className="left-[325px] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
+            <AnatomyNumber number={6} className="left-[354px] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
           </div>
         </div>
       </AnatomySurface>
-      <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Value / Placeholder" }, { name: "Trailing element", optional: true }]} />
+      <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Prefix", optional: true }, { name: "Value / Placeholder" }, { name: "Suffix", optional: true }, { name: "Trailing element", optional: true }]} />
     </div>
   );
 }

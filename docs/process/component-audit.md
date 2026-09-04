@@ -37,7 +37,11 @@ Anatomy의 Slot 표시는 문제가 없었다. `studio.md:66-68`이 핑크 점�
 
 남아 있던 판단 항목 다섯 개를 처리했다. Radio의 Indicator 색은 코드가 맞고 명세가 부정확해 명세를 고쳤다. Select의 Option 여백을 `controlSize`에 따라 정해 Trigger와 Leading 열 시작점을 맞췄다. Select Playground의 `Show selected value` Boolean Toggle을 `value` 값 선택으로 바꿨다. Radio의 `Properties · Elements`에서 State와 중복인 카드 두 개를 걷어내 계층과 상호작용 문제를 함께 풀었다. Combobox의 `Properties · Selection`을 `Properties · Selected display`와 `Examples`로 나누고 Playground와 중복인 Single 카드를 지웠다.
 
-Input Button의 Anatomy 도식에 Prefix와 Suffix를 그리는 일만 남았다. 후순위인 Chip·Badge·Message Bubble 25건은 지시가 있을 때 시작한다.
+Input Button의 Anatomy 도식에 Prefix와 Suffix를 그리고 마커를 여섯 개로 늘렸다. 좌표는 기존 마커 두 개가 계산과 일치하는 것을 확인한 뒤 잡았으므로 화면에서 연결선 위치를 한 번 봐야 한다.
+
+Input의 Anatomy에서도 같은 규칙 위반 두 건을 함께 고쳤다. 요소 이름 `Input field`를 컴포넌트 안에 렌더링하던 것과, 교체 가능 영역에 공용 `AnatomySwapSlot` 대신 실제 아이콘을 쓰던 것이다. 검수 보고가 잡지 못한 항목이다.
+
+폼 요소 10개의 검수는 이것으로 끝났다. 후순위인 Chip·Badge·Message Bubble 25건은 지시가 있을 때 시작한다.
 
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.

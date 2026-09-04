@@ -6,6 +6,7 @@ import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiLink, RiSearchL
 import { Input } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -234,12 +235,12 @@ function InputAnatomy() {
             <AnatomyNumber number={7} className="left-[614px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
 
             <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
-              <RiSearchLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+              <AnatomySwapSlot className="justify-self-center" />
               <span className="text-oe-foreground-secondary">https://</span>
-              <span className="min-w-0 truncate text-oe-foreground-placeholder">Input field</span>
+              <span className="min-w-0 truncate text-oe-foreground-placeholder">example</span>
               <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary"><RiCloseLine className="size-4" aria-hidden="true" /></span>
               <span className="text-oe-foreground-secondary">.com</span>
-              <RiCalendarLine className="size-4 justify-self-center text-oe-foreground-tertiary" aria-hidden="true" />
+              <AnatomySwapSlot className="justify-self-center" />
             </div>
           </div>
         </div>
