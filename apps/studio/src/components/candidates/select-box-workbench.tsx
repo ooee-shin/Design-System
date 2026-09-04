@@ -84,21 +84,29 @@ export function SelectBoxWorkbench() {
                 ))}
               </SelectBoxGroup>
             </PreviewLocaleScope>
-            <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
-              <ControlGroup label="Selection mode">{(["single", "multiple"] as const).map((item) => <Choice key={item} active={selectionMode === item} onClick={() => setSelectionMode(item)}>{capitalize(item)}</Choice>)}</ControlGroup>
-              <ControlGroup label="Columns">
-                <Choice active={columnMode === "single"} onClick={() => setColumnMode("single")}>Single column</Choice>
-                <Choice active={columnMode === "multiple"} onClick={() => setColumnMode("multiple")}>Multi column</Choice>
-              </ControlGroup>
-              {columnMode === "multiple" ? <DependentControlGroup><NumberControl label="Column count" value={columnCount} min={2} max={6} onChange={setColumnCount} /></DependentControlGroup> : null}
-              <ControlGroup label="Trailing element">
-                <Choice active={showTrailingElement} onClick={() => setShowTrailingElement(true)}>{selectionMode === "single" ? "Radio" : "Checkbox"}</Choice>
-                <Choice active={!showTrailingElement} onClick={() => setShowTrailingElement(false)}>None</Choice>
-              </ControlGroup>
-              <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
-              <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
-              <PlaygroundElementControl label="Leading element" value={leadingElement} onChange={setLeadingElement} showValueControl={false} />
-              <Toggle label="Description" value={description} onChange={setDescription} />
+            <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Appearance">
+                <ControlGroup label="Columns">
+                  <Choice active={columnMode === "single"} onClick={() => setColumnMode("single")}>Single column</Choice>
+                  <Choice active={columnMode === "multiple"} onClick={() => setColumnMode("multiple")}>Multi column</Choice>
+                </ControlGroup>
+                {columnMode === "multiple" ? <DependentControlGroup><NumberControl label="Column count" value={columnCount} min={2} max={6} onChange={setColumnCount} /></DependentControlGroup> : null}
+              </ControlSection>
+              <ControlSection title="State">
+                <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
+                <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
+              </ControlSection>
+              <ControlSection title="Elements">
+                <PlaygroundElementControl label="Leading element" value={leadingElement} onChange={setLeadingElement} showValueControl={false} />
+                <ControlGroup label="Trailing element">
+                  <Choice active={showTrailingElement} onClick={() => setShowTrailingElement(true)}>{selectionMode === "single" ? "Radio" : "Checkbox"}</Choice>
+                  <Choice active={!showTrailingElement} onClick={() => setShowTrailingElement(false)}>None</Choice>
+                </ControlGroup>
+                <Toggle label="Description" value={description} onChange={setDescription} />
+              </ControlSection>
+              <ControlSection title="Behavior">
+                <ControlGroup label="Selection mode">{(["single", "multiple"] as const).map((item) => <Choice key={item} active={selectionMode === item} onClick={() => setSelectionMode(item)}>{capitalize(item)}</Choice>)}</ControlGroup>
+              </ControlSection>
             </div>
           </div>
         </Section>
@@ -130,6 +138,8 @@ export function SelectBoxWorkbench() {
     </div>
   );
 }
+
+function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5">{children}</div></section>; }
 function ControlGroup({ label, children, className = "" }: { label: string; children: ReactNode; className?: string }) { return <fieldset className={className}><legend className="mb-2 text-[11px] font-medium text-oe-foreground-tertiary">{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>; }

@@ -50,14 +50,22 @@ export function RadioIndicatorWorkbench() {
                 <RadioField value="option" disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} layout={layout} flipped={flipped} />
               </RadioGroup>
             </PreviewLocaleScope>
-            <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
-              <Toggle label="Selected" value={selected} onChange={setSelected} />
-              <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
-              <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
-              <Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} />
-              <Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} />
-              <Toggle label="Flipped" value={flipped} onChange={setFlipped} />
-              <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
+            <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Appearance">
+                <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
+                <Toggle label="Flipped" value={flipped} onChange={setFlipped} />
+              </ControlSection>
+              <ControlSection title="State">
+                <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
+                <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
+              </ControlSection>
+              <ControlSection title="Content">
+                <Toggle label="Selected" value={selected} onChange={setSelected} />
+              </ControlSection>
+              <ControlSection title="Elements">
+                <Toggle label="Right description" value={showRightDescription} onChange={setShowRightDescription} />
+                <Toggle label="Bottom description" value={showBottomDescription} onChange={setShowBottomDescription} />
+              </ControlSection>
             </div>
           </div>
         </Section>
@@ -237,6 +245,8 @@ export function RadioIndicatorWorkbench() {
 
 type FieldExampleProps = Omit<ComponentProps<typeof RadioField>, "value"> & { value: string; selected?: boolean };
 function StaticField({ value, selected = false, ...props }: FieldExampleProps) { return <RadioGroup value={selected ? value : "none"} onValueChange={() => undefined}><RadioField value={value} {...props} /></RadioGroup>; }
+function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
+
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function StateExample({ label, children }: { label: string; children: ReactNode }) { return <div className="flex min-h-24 flex-col gap-4 rounded-xl border border-oe-border-secondary p-4"><p className="text-xs font-medium text-oe-foreground-primary">{label}</p><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 function StateGroup({ title, description, children }: { title: string; description: string; children: ReactNode }) { return <div className="col-span-full mt-8 first:mt-0"><h4 className="text-sm font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>; }

@@ -56,8 +56,11 @@ export function TextareaWorkbench() {
             <div className="rounded-xl bg-oe-background-primary p-5">
               <Textarea variant={playgroundVariant} autoSize={playgroundAutoSize} resize={playgroundResize} height={playgroundHeight} value={playgroundValue} onChange={(event) => setPlaygroundValue(event.target.value)} placeholder={c.placeholder} />
             </div>
-            <div className="space-y-4 rounded-xl bg-oe-background-primary p-4">
-              <Control label="Style"><Choice active={playgroundVariant === "outline"} onClick={() => setPlaygroundVariant("outline")}>Outline</Choice><Choice active={playgroundVariant === "filled"} onClick={() => setPlaygroundVariant("filled")}>Filled</Choice></Control>
+            <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Appearance">
+                <Control label="Style"><Choice active={playgroundVariant === "outline"} onClick={() => setPlaygroundVariant("outline")}>Outline</Choice><Choice active={playgroundVariant === "filled"} onClick={() => setPlaygroundVariant("filled")}>Filled</Choice></Control>
+              </ControlSection>
+              <ControlSection title="Behavior">
               <Toggle label="Auto size" value={playgroundAutoSize} onChange={setPlaygroundAutoSize} />
               <DependentControlGroup className={playgroundAutoSize ? "pointer-events-none opacity-40" : undefined}>
                 <div className="space-y-4">
@@ -65,6 +68,7 @@ export function TextareaWorkbench() {
                   <label className="flex items-center justify-between gap-3 text-[11px] font-medium text-oe-foreground-tertiary">Height <input type="number" min={88} step={4} value={playgroundHeight} onChange={(event) => setPlaygroundHeight(Math.max(88, Number(event.target.value) || 88))} className="h-8 w-20 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-2 text-right text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring" /></label>
                 </div>
               </DependentControlGroup>
+              </ControlSection>
             </div>
           </div>
         </Section>
@@ -142,6 +146,8 @@ function TextareaAnatomy() {
     </div>
   );
 }
+
+function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) {
   return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
