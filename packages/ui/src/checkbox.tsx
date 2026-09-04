@@ -15,12 +15,13 @@ const checkboxIndicatorVariants = cva(
   "inline-grid size-4 shrink-0 place-items-center transition-[background-color,border-color,color]",
   {
     variants: {
-      appearance: {
+      shape: {
+        square: cn("rounded-none", filledIndicatorClasses),
         rounded: cn("rounded", filledIndicatorClasses),
         ghost: "rounded border border-transparent bg-transparent text-oe-foreground-placeholder data-[checked]:text-oe-brand-foreground-primary",
       },
     },
-    defaultVariants: { appearance: "rounded" },
+    defaultVariants: { shape: "rounded" },
   },
 )
 
@@ -28,12 +29,13 @@ const checkboxVariants = cva(
   "group/checkbox inline-grid size-4 shrink-0 place-items-center outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary data-[disabled]:cursor-not-allowed",
   {
     variants: {
-      appearance: {
+      shape: {
+        square: cn("rounded-none", filledCheckboxClasses),
         rounded: cn("rounded", filledCheckboxClasses),
         ghost: "rounded data-[checked]:[&>[data-slot=checkbox-indicator]]:text-oe-brand-foreground-primary",
       },
     },
-    defaultVariants: { appearance: "rounded" },
+    defaultVariants: { shape: "rounded" },
   },
 )
 
@@ -61,7 +63,7 @@ type CheckboxFieldProps = CheckboxProps & {
   checkboxClassName?: string
 }
 
-function CheckboxIndicator({ checked = false, indeterminate = false, disabled = false, appearance = "rounded", className, children }: CheckboxIndicatorProps) {
+function CheckboxIndicator({ checked = false, indeterminate = false, disabled = false, shape = "rounded", className, children }: CheckboxIndicatorProps) {
   return (
     <span
       aria-hidden="true"
@@ -69,9 +71,9 @@ function CheckboxIndicator({ checked = false, indeterminate = false, disabled = 
       data-checked={checked || indeterminate ? "" : undefined}
       data-indeterminate={indeterminate ? "" : undefined}
       data-disabled={disabled ? "" : undefined}
-      className={cn(checkboxIndicatorVariants({ appearance }), className)}
+      className={cn(checkboxIndicatorVariants({ shape }), className)}
     >
-      {children ?? (appearance === "ghost" ? (
+      {children ?? (shape === "ghost" ? (
         <RiCheckLine className="size-[15px]" />
       ) : indeterminate ? (
         <RiSubtractLine className="size-2.5" />
@@ -82,27 +84,27 @@ function CheckboxIndicator({ checked = false, indeterminate = false, disabled = 
   )
 }
 
-function Checkbox({ className, indeterminate = false, appearance = "rounded", disabled, readOnly, ...props }: CheckboxProps) {
+function Checkbox({ className, indeterminate = false, shape = "rounded", disabled, readOnly, ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
-      indeterminate={appearance !== "ghost" ? indeterminate : false}
-      disabled={appearance !== "ghost" ? disabled : undefined}
+      indeterminate={shape !== "ghost" ? indeterminate : false}
+      disabled={shape !== "ghost" ? disabled : undefined}
       className={cn(
-        checkboxVariants({ appearance }),
-        !readOnly && appearance === "rounded" && "active:[&>[data-slot=checkbox-indicator]]:bg-oe-interaction-hover data-[checked]:active:[&>[data-slot=checkbox-indicator]]:bg-oe-brand-background-bold-primary data-[indeterminate]:active:[&>[data-slot=checkbox-indicator]]:bg-oe-brand-background-bold-primary",
+        checkboxVariants({ shape }),
+        !readOnly && shape !== "ghost" && "active:[&>[data-slot=checkbox-indicator]]:bg-oe-interaction-hover data-[checked]:active:[&>[data-slot=checkbox-indicator]]:bg-oe-brand-background-bold-primary data-[indeterminate]:active:[&>[data-slot=checkbox-indicator]]:bg-oe-brand-background-bold-primary",
         className,
       )}
       readOnly={readOnly}
       {...props}
     >
-      <CheckboxIndicator indeterminate={indeterminate} appearance={appearance} />
+      <CheckboxIndicator indeterminate={indeterminate} shape={shape} />
     </CheckboxPrimitive.Root>
   )
 }
 
-function CheckboxFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, isParent = false, layout = "inline", flipped = false, checkboxClassName, className, disabled, readOnly, appearance = "rounded", ...props }: CheckboxFieldProps) {
-  const effectiveDisabled = appearance !== "ghost" ? disabled : false
+function CheckboxFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, isParent = false, layout = "inline", flipped = false, checkboxClassName, className, disabled, readOnly, shape = "rounded", ...props }: CheckboxFieldProps) {
+  const effectiveDisabled = shape !== "ghost" ? disabled : false
   const labelId = React.useId()
 
   return (
@@ -114,7 +116,7 @@ function CheckboxFieldBase({ label, rightDescription, bottomDescription, leading
       effectiveDisabled && "cursor-not-allowed",
       className,
     )}>
-      <Checkbox aria-labelledby={labelId} className={cn("mt-0.5", checkboxClassName)} disabled={effectiveDisabled} readOnly={readOnly} appearance={appearance} {...props} />
+      <Checkbox aria-labelledby={labelId} className={cn("mt-0.5", checkboxClassName)} disabled={effectiveDisabled} readOnly={readOnly} shape={shape} {...props} />
       <span className={cn("flex min-w-0 flex-col", layout === "block" && "flex-1") }>
         <span className="flex min-w-0 items-start gap-2">
           {leadingElement ? <span data-slot="checkbox-leading" className="mt-0.5 shrink-0">{leadingElement}</span> : null}

@@ -21,7 +21,7 @@ const previewCopy = {
 const sections = [
   { id: "playground", label: "Playground" },
   { id: "anatomy", label: "Anatomy" },
-  { id: "appearance", label: "Appearance" },
+  { id: "shape", label: "Shape" },
   { id: "elements", label: "Elements" },
   { id: "state", label: "State" },
   { id: "layout", label: "Layout" },
@@ -42,7 +42,7 @@ export function CheckboxWorkbench() {
   const [isParent, setIsParent] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [layout, setLayout] = useState<"inline" | "block">("inline");
-  const [appearance, setAppearance] = useState<"rounded" | "ghost">("rounded");
+  const [shape, setShape] = useState<"square" | "rounded" | "ghost">("rounded");
   const [selectedAssets, setSelectedAssets] = useState<Array<"indicator" | "pdf">>(["indicator", "pdf"]);
 
   return (
@@ -52,19 +52,19 @@ export function CheckboxWorkbench() {
         <Section id="playground" title="🚩 Playground" description="현재 구현된 선택, 부분 선택과 비활성 상태를 조합해 확인합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <div lang="en" className="min-h-44 rounded-xl bg-oe-background-primary p-5">
-              {showLabel ? <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} appearance={appearance} /> : <Checkbox aria-label="Checkbox" checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} appearance={appearance} />}
+              {showLabel ? <CheckboxField checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} label="Label" rightDescription={showRightDescription ? "Right Description" : undefined} bottomDescription={showBottomDescription ? "Bottom Description" : undefined} isParent={isParent} layout={layout} flipped={flipped} shape={shape} /> : <Checkbox aria-label="Checkbox" checked={checked} onCheckedChange={setChecked} indeterminate={indeterminate} disabled={disabled} readOnly={readOnly} shape={shape} />}
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
-                <Control label="Appearance"><Choice active={appearance === "rounded"} onClick={() => setAppearance("rounded")}>Rounded</Choice><Choice active={appearance === "ghost"} onClick={() => { setAppearance("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
+                <Control label="Shape"><Choice active={shape === "square"} onClick={() => setShape("square")}>Square</Choice><Choice active={shape === "rounded"} onClick={() => setShape("rounded")}>Rounded</Choice><Choice active={shape === "ghost"} onClick={() => { setShape("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
               </ControlSection>
               <ControlSection title="State">
-                {appearance !== "ghost" ? <Toggle label="Disabled" value={disabled} onChange={setDisabled} /> : null}
+                {shape !== "ghost" ? <Toggle label="Disabled" value={disabled} onChange={setDisabled} /> : null}
                 <Toggle label="Read only" value={readOnly} onChange={setReadOnly} />
               </ControlSection>
               <ControlSection title="Content">
                 <Toggle label="Checked" value={checked} onChange={(value) => { setChecked(value); if (value) setIndeterminate(false); }} />
-                {appearance !== "ghost" ? <Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /> : null}
+                {shape !== "ghost" ? <Toggle label="Indeterminate" value={indeterminate} onChange={(value) => { setIndeterminate(value); if (value) setChecked(false); }} /> : null}
               </ControlSection>
               <ControlSection title="Elements">
               <Toggle label="Label" value={showLabel} onChange={setShowLabel} />
@@ -123,10 +123,11 @@ export function CheckboxWorkbench() {
           </div>
         </Section>
 
-        <Section id="appearance" title="Properties · Appearance" description="Rounded를 기본값으로 사용하며, 박스 없이 Indicator만 표시하는 Ghost를 선택할 수 있습니다.">
+        <Section id="shape" title="Properties · Shape" description="Rounded를 기본값으로 사용하며, 박스 없이 Indicator만 표시하는 Ghost를 선택할 수 있습니다.">
           <div className="col-span-full grid gap-3 @min-[720px]:grid-cols-2">
-            <AppearanceExample title="Rounded" appearance="rounded" label={c.label} />
-            <AppearanceExample title="Ghost" appearance="ghost" label={c.label} />
+            <ShapeExample title="Square" shape="square" label={c.label} />
+            <ShapeExample title="Rounded" shape="rounded" label={c.label} />
+            <ShapeExample title="Ghost" shape="ghost" label={c.label} />
           </div>
         </Section>
 
@@ -167,9 +168,9 @@ export function CheckboxWorkbench() {
           </StateGroup>
 
           <StateGroup title="Ghost" description="박스 없이 Check Indicator의 색상으로 선택 상태를 구분합니다. Ghost는 Indeterminate와 Disabled 상태를 제공하지 않습니다.">
-            <StateExample label="Unchecked"><CheckboxField checked={false} onCheckedChange={() => undefined} label={c.label} appearance="ghost" /></StateExample>
-            <StateExample label="Checked"><CheckboxField checked onCheckedChange={() => undefined} label={c.label} appearance="ghost" /></StateExample>
-            <StateExample label="Focus visible"><CheckboxField checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} appearance="ghost" /></StateExample>
+            <StateExample label="Unchecked"><CheckboxField checked={false} onCheckedChange={() => undefined} label={c.label} shape="ghost" /></StateExample>
+            <StateExample label="Checked"><CheckboxField checked onCheckedChange={() => undefined} label={c.label} shape="ghost" /></StateExample>
+            <StateExample label="Focus visible"><CheckboxField checked={false} onCheckedChange={() => undefined} checkboxClassName="ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary" label={c.label} shape="ghost" /></StateExample>
           </StateGroup>
 
         </Section>
@@ -260,7 +261,7 @@ export function CheckboxWorkbench() {
                 <MapRow property="defaultChecked" values="false | true" defaultValue="false" />
                 <MapRow property="indeterminate" values="false | true (Rounded)" defaultValue="false" />
                 <MapRow property="disabled" values="false | true (Rounded)" defaultValue="false" />
-                <MapRow property="appearance" values="rounded | ghost (Checkbox / Field)" defaultValue="rounded" />
+                <MapRow property="shape" values="square | rounded | ghost (Checkbox / Field)" defaultValue="rounded" />
                 <MapRow property="label" values="ReactNode (Field)" defaultValue="required" />
                 <MapRow property="isParent" values="false | true" defaultValue="false" />
                 <MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" />
@@ -296,8 +297,8 @@ function StateGroup({ title, description, children }: { title: string; descripti
   return <div className="col-span-full mt-8 first:mt-0"><h4 className="text-sm font-semibold text-oe-foreground-primary">{title}</h4><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></div>;
 }
 
-function AppearanceExample({ title, appearance, label }: { title: string; appearance: "rounded" | "ghost"; label: string }) {
-  return <StateExample label={title}><div className="grid"><CheckboxField checked={false} onCheckedChange={() => undefined} label={label} appearance={appearance} /><CheckboxField checked onCheckedChange={() => undefined} label={label} appearance={appearance} /></div></StateExample>;
+function ShapeExample({ title, shape, label }: { title: string; shape: "square" | "rounded" | "ghost"; label: string }) {
+  return <StateExample label={title}><div className="grid"><CheckboxField checked={false} onCheckedChange={() => undefined} label={label} shape={shape} /><CheckboxField checked onCheckedChange={() => undefined} label={label} shape={shape} /></div></StateExample>;
 }
 
 

@@ -63,8 +63,8 @@ test("CheckboxIndicator exposes reusable visual states without adding another ch
   assert.equal(indicators[2].hasAttribute("data-disabled"), true)
 })
 
-test("Checkbox appearances preserve focus radius and Ghost remains icon-only", () => {
-  const view = render(<><Checkbox aria-label="Rounded" /><Checkbox aria-label="Ghost" appearance="ghost" checked /></>)
+test("Checkbox shapes preserve focus radius and Ghost remains icon-only", () => {
+  const view = render(<><Checkbox aria-label="Rounded" /><Checkbox aria-label="Ghost" shape="ghost" checked /></>)
   const rounded = view.getByRole("checkbox", { name: "Rounded" })
   const ghost = view.getByRole("checkbox", { name: "Ghost" })
   const roundedIndicator = rounded.querySelector('[data-slot="checkbox-indicator"]')

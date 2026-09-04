@@ -140,8 +140,8 @@ Properties 존재 여부와 Anatomy는 불일치가 없었다.
 
 ### Checkbox (8건)
 
-1. 명세는 `shape`에 `square | rounded | ghost`를 적었으나(`checkbox.md:42`) 구현은 `appearance`이고 `square` 값 자체가 없다(`checkbox.tsx:85`, `:17-24`, `:30-37`). `working-context.md` 7번 작업과 같다.
-2. `indeterminate` 설명이 없는 `Square`를 전제로 쓰여 있다 — `checkbox.md:106` 대 `checkbox.tsx:89`
+1. ~~명세는 `shape`에 `square | rounded | ghost`를 적었으나 구현은 `appearance`이고 `square` 값 자체가 없다.~~ 해결했다. 구현을 `shape`로 바꾸고 `square`를 0px radius로 더했으며 Studio의 컨트롤·섹션·Property map도 맞췄다.
+2. ~~`indeterminate` 설명이 없는 `Square`를 전제로 쓰여 있다.~~ 1번과 함께 해결했다. `square`가 생겼고 구현이 `shape !== "ghost"`로 판정한다.
 3. `checkboxClassName`이 명세에 없다 — `checkbox.tsx:61`
 4. 명세가 「검수를 완료했다」면서 `Layout`에 별도 카드를 두지 않는다고 했으나 화면에 `Layout` Section이 독립으로 있다 — `checkbox.md:122` 대 `checkbox-workbench.tsx:27`, `:172`
 5. 하위 카드 제목이 `text-xs`와 `text-[11px]`이다. 공통 A 참고.
