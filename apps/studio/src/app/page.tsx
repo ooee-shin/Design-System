@@ -58,7 +58,7 @@ export default function Home() {
     {
       id: "references",
       label: "참고와 전달",
-      description: "자산을 읽고, 사례를 보고, 바뀐 내용을 전합니다.",
+      description: "자산을 읽고, 사례를 보고, 작업 의도를 전합니다.",
       items: [
         {
           title: "Docs",
@@ -76,7 +76,7 @@ export default function Home() {
         },
         {
           title: "Presentation",
-          description: "무엇을, 왜, 어떻게 바꿨는지 전달합니다.",
+          description: "결과물만으로는 보이지 않는 작업 의도를 전달합니다.",
           status: `${presentationEntries.length}개 기록`,
           href: "/presentation",
           icon: Slideshow,

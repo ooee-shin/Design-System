@@ -34,7 +34,7 @@ export default function PresentationPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Presentation</h1>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-              무엇을, 왜, 어떻게 바꿨는지 전달합니다. 개별 수정이 아니라 설명할 수 있는 한 꼭지 단위로 기록합니다.
+              결과물만으로는 보이지 않는 작업 의도를 전달합니다. 무엇이 문제였고, 어떻게 바꿨고, 그래서 무엇이 좋아졌는지를 하나의 판단 단위로 묶어 기록합니다.
             </p>
           </div>
         </header>
