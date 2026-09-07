@@ -34,6 +34,8 @@ const copy = {
     quantityLabel: "수량", decrease: "값 줄이기", increase: "값 늘리기", decreaseTooltip: "감소", increaseTooltip: "증가",
     businessLabel: "사업자등록번호", businessValue: "123-45-67890",
     siteLabel: "웹사이트", siteValue: "bluekey.kr", amountLabel: "금액", amountValue: "1,250,000",
+    passwordLabel: "비밀번호", maskedValue: "bluekey1234",
+    accountPinLabel: "계좌 비밀번호", accountPinValue: "1234",
     expiryLabel: "카드 유효기간", expiryValue: "09 / 28",
   },
   en: {
@@ -53,6 +55,8 @@ const copy = {
     quantityLabel: "Quantity", decrease: "Decrease value", increase: "Increase value", decreaseTooltip: "Decrease", increaseTooltip: "Increase",
     businessLabel: "Business number", businessValue: "123-45-67890",
     siteLabel: "Website", siteValue: "bluekey.kr", amountLabel: "Amount", amountValue: "1,250,000",
+    passwordLabel: "Password", maskedValue: "bluekey1234",
+    accountPinLabel: "Account PIN", accountPinValue: "1234",
     expiryLabel: "Card expiry", expiryValue: "09 / 28",
   },
 } as const;
@@ -278,6 +282,22 @@ export function InputWorkbench() {
             ]} />
           </div>
           <div>
+            <GuidelineTitle>민감한 정보는 마스킹하기</GuidelineTitle>
+            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+              <GuideVisual label="보기 전환 제공">
+                <PasswordSample c={c} />
+              </GuideVisual>
+              <GuideVisual label="마스킹만 유지">
+                <PreviewLocaleScope className="w-full"><Input type="password" value={c.accountPinValue} readOnly aria-label={c.accountPinLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+            </div>
+            <GuidelineList items={[
+              "비밀번호나 개인정보처럼 화면에 드러나면 곤란한 값은 마스킹해 표시합니다.",
+              "사용자가 자기 입력을 확인해야 하는 자리에는 Trailing element로 보기 전환 action을 제공합니다. 실제 input type을 password와 text로 바꾸며, 비밀번호용 Leading icon은 사용하지 않습니다.",
+              "계좌 비밀번호나 보안 코드처럼 아주 민감한 값은 보기 전환을 제공하지 않고 마스킹만 유지합니다. 어깨너머로 읽히는 것을 막는 것이 확인 편의보다 앞섭니다.",
+            ]} />
+          </div>
+          <div>
             <GuidelineTitle>특수한 포맷은 Custom input으로 정의하기</GuidelineTitle>
             <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
               <GuideVisual label={c.businessLabel}>
@@ -356,6 +376,25 @@ const focusedClearVisual = [
   "[&_[data-slot=input-clear]]:visible [&_[data-slot=input-clear]]:pointer-events-auto",
   "[&_[data-slot=input-clear]]:ml-0 [&_[data-slot=input-clear]]:w-6 [&_[data-slot=input-clear]]:opacity-100",
 ].join(" ");
+
+function PasswordSample({ c }: { c: (typeof copy)[keyof typeof copy] }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <PreviewLocaleScope className="w-full">
+      <Input
+        type={visible ? "text" : "password"}
+        value={c.maskedValue}
+        readOnly
+        aria-label={c.passwordLabel}
+        trailingElement={
+          <button type="button" aria-label={visible ? c.hidePassword : c.showPassword} onClick={() => setVisible((current) => !current)} className="grid size-6 place-items-center rounded-md text-oe-foreground-tertiary transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
+            {visible ? <RiEyeOffLine className="size-oe-icon-small" aria-hidden="true" /> : <RiEyeLine className="size-oe-icon-small" aria-hidden="true" />}
+          </button>
+        }
+      />
+    </PreviewLocaleScope>
+  );
+}
 
 function ClearableSample({ defaultValue, label, leading }: { defaultValue: string; label: string; leading?: ReactNode }) {
   const [value, setValue] = useState(defaultValue);
