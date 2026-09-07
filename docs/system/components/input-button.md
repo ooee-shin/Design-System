@@ -73,11 +73,13 @@ Container 전체가 하나의 Button이다. 안에 별도 Input이나 Clear butt
 
 그래서 Clear button을 제공하지 않는다. 값을 비우거나 오늘로 맞추는 것처럼 값을 바꾸는 동작은 여는 화면에서 처리하거나 Field 쪽에 둔다. Value는 문자열만 표시하며, 여러 값을 Chip으로 나열해야 하면 Combobox를 사용한다.
 
-### Trailing element에는 조작이 아니라 여는 표시를 두기
+### Trailing element는 시각 정보만 전달하기
 
-Leading element는 Input과 같은 성격이다. 값을 식별하는 요소를 둔다.
+Trailing element는 눌러서 무엇을 하는 자리가 아니라 상태나 다음 동작을 알리는 자리다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없고 시각 정보만 전달할 수 있다. 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시를 둔다.
 
-Trailing element는 다르다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둔다. Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않으며, 그 동작이 필요하면 값을 직접 입력받는 Input을 사용한다.
+보기 전환처럼 누르는 action이 필요하면 값을 직접 입력받는 Input을 사용한다. Input의 Trailing element는 조작을 담을 수 있다.
+
+Leading element는 Input과 같은 성격이며 값을 식별하는 요소를 둔다. Prefix와 Suffix는 제공하지 않으므로 값의 의미를 보완하는 짧은 표기가 필요하면 Input을 사용한다.
 
 ### Input Button과 Select를 나눠 쓰기
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiArrowRightSLine, RiCalendarLine, RiMapPinLine, RiTimeLine } from "@remixicon/react";
+import { RiArrowRightSLine, RiCalendarLine, RiEyeLine, RiEyeOffLine, RiMapPinLine, RiTimeLine } from "@remixicon/react";
 import { Input, InputButton, Select } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
@@ -26,6 +26,7 @@ const copy = {
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
     periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
     colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD", today: "오늘", addressSentence: "주소를 선택해 주세요", startDate: "시작일", endDate: "종료일",
+    passwordLabel: "비밀번호", passwordValue: "bluekey1234", showPassword: "비밀번호 보기", hidePassword: "비밀번호 숨기기",
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
@@ -36,6 +37,7 @@ const copy = {
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
     periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
     colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD", today: "Today", addressSentence: "Please select an address", startDate: "Start date", endDate: "End date",
+    passwordLabel: "Password", passwordValue: "bluekey1234", showPassword: "Show password", hidePassword: "Hide password",
   },
 } as const;
 
@@ -191,11 +193,20 @@ export function InputButtonWorkbench() {
               dontVisual={<PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<span className="flex h-6 items-center rounded-md border border-oe-border-primary px-2 text-xs font-medium text-oe-foreground-secondary">{c.today}</span>} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>}
             />
             <div>
-              <GuidelineTitle>Trailing element에는 조작이 아니라 여는 표시를 두기</GuidelineTitle>
+              <GuidelineTitle>Trailing element는 시각 정보만 전달하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Input Button · 여는 표시">
+                  <PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Input · 누를 수 있는 action">
+                  <PasswordSample c={c} />
+                </GuideVisual>
+              </div>
               <GuidelineList items={[
-                "Leading element는 Input과 같은 성격입니다. 값을 식별하는 요소를 둡니다. Prefix와 Suffix는 제공하지 않으므로, 값의 의미를 보완하는 짧은 표기가 필요하면 값을 직접 입력받는 Input을 사용합니다.",
-                "Trailing element는 다릅니다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둡니다.",
-                "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
+                "Trailing element는 눌러서 무엇을 하는 자리가 아니라 상태나 다음 동작을 알리는 자리입니다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없고 시각 정보만 전달할 수 있습니다.",
+                "오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시를 둡니다.",
+                "보기 전환처럼 누르는 action이 필요하면 값을 직접 입력받는 Input을 사용합니다. Input의 Trailing element는 조작을 담을 수 있습니다.",
+                "Leading element는 Input과 같은 성격입니다. 값을 식별하는 요소를 둡니다. Prefix와 Suffix는 제공하지 않으므로 값의 의미를 보완하는 짧은 표기가 필요하면 Input을 사용합니다.",
               ]} />
             </div>
             <div>
@@ -263,6 +274,25 @@ function InputButtonAnatomy() {
       </AnatomySurface>
       <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Prefix", optional: true }, { name: "Value / Placeholder" }, { name: "Suffix", optional: true }, { name: "Trailing element", optional: true }]} />
     </div>
+  );
+}
+
+function PasswordSample({ c }: { c: (typeof copy)[keyof typeof copy] }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <PreviewLocaleScope className="w-full">
+      <Input
+        type={visible ? "text" : "password"}
+        value={c.passwordValue}
+        readOnly
+        aria-label={c.passwordLabel}
+        trailingElement={
+          <button type="button" aria-label={visible ? c.hidePassword : c.showPassword} aria-pressed={visible} onClick={() => setVisible((current) => !current)} className="grid size-6 place-items-center rounded-md text-oe-foreground-tertiary transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
+            {visible ? <RiEyeOffLine className="size-oe-icon-small" aria-hidden="true" /> : <RiEyeLine className="size-oe-icon-small" aria-hidden="true" />}
+          </button>
+        }
+      />
+    </PreviewLocaleScope>
   );
 }
 
