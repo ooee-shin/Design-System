@@ -19,9 +19,9 @@
 3. Value / Placeholder: 선택된 텍스트 값 또는 값이 없을 때 안내 문구를 표시한다.
 4. Trailing element: 선택 요소다. Anatomy에서는 Leading element와 동일한 Pink 점선 Swap 영역으로 표시하고 `Properties · Elements` 카드에서는 오른쪽 화살표 예시를 확인한다. 일반 예시에서는 기본 표시하지 않는다.
 
-내부 순서는 `Leading element → Prefix → Value / Placeholder → Suffix → Trailing element`다.
+내부 순서는 `Leading element → Value / Placeholder → Trailing element`다.
 
-Clear button은 제공하지 않는다. Value는 현재 문자열만 허용하며 Chip 타입은 제공하지 않는다.
+Clear button과 Prefix, Suffix는 제공하지 않는다. Value는 현재 문자열만 허용하며 Chip 타입은 제공하지 않는다. 값의 의미를 보완하는 짧은 표기가 필요하면 값을 직접 입력받는 Input을 사용한다.
 
 ## Properties
 
@@ -29,7 +29,7 @@ Clear button은 제공하지 않는다. Value는 현재 문자열만 허용하�
 - `controlSize` (Size): `small | regular | large | xlarge`, 기본값 `regular`
 - `layout`: `fill | fixed`, 기본값 `fill`
 - Content: `value`, `placeholder`
-- Optional elements: `leadingElement`, `prefix`, `suffix`, `trailingElement`
+- Optional elements: `leadingElement`, `trailingElement`
 - `readOnly`: `boolean`, 기본값 `false`. 값은 보여주되 `onClick`을 호출하지 않는다
 - State: 실제 Button 속성과 focus에서 확인되는 Default, Focus, Invalid, Disabled, Read only
 
@@ -75,7 +75,7 @@ Container 전체가 하나의 Button이다. 안에 별도 Input이나 Clear butt
 
 ### Trailing element에는 조작이 아니라 여는 표시를 두기
 
-Leading element와 Prefix, Suffix는 Input과 같은 성격이다. 값을 식별하는 요소와 값의 의미를 보완하는 짧은 표기를 둔다.
+Leading element는 Input과 같은 성격이다. 값을 식별하는 요소를 둔다.
 
 Trailing element는 다르다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둔다. Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않으며, 그 동작이 필요하면 값을 직접 입력받는 Input을 사용한다.
 

@@ -8,13 +8,12 @@ type InputButtonLayoutProps =
   | { layout?: "fill"; fixedWidth?: never }
   | { layout: "fixed"; fixedWidth: React.CSSProperties["width"] }
 
+// prefix 는 button 의 native 속성이므로, Property 로 제공하지 않는다는 것이 드러나도록 함께 걷어낸다.
 type InputButtonProps = Omit<React.ComponentProps<"button">, "children" | "value" | "prefix"> &
   VariantProps<typeof inputContainerVariants> & {
     value?: string
     placeholder?: string
     leadingElement?: React.ReactNode
-    prefix?: string
-    suffix?: string
     trailingElement?: React.ReactNode
     readOnly?: boolean
   } & InputButtonLayoutProps
@@ -28,8 +27,6 @@ function InputButton({
   value,
   placeholder = "Select an option",
   leadingElement,
-  prefix,
-  suffix,
   trailingElement,
   disabled,
   readOnly,
@@ -65,9 +62,7 @@ function InputButton({
       onKeyDown={readOnly ? (event) => { if (event.key === "Enter" || event.key === " ") event.preventDefault() } : props.onKeyDown}
     >
       {leadingElement ? <span data-slot="input-button-leading" className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{leadingElement}</span> : null}
-      {prefix ? <span data-slot="input-button-prefix" className="shrink-0 text-oe-foreground-secondary">{prefix}</span> : null}
       <span data-slot="input-button-value" className={cn("min-w-0 flex-1 truncate", hasValue ? "text-oe-foreground-primary" : "text-oe-foreground-placeholder")}>{hasValue ? value : placeholder}</span>
-      {suffix ? <span data-slot="input-button-suffix" className="shrink-0 text-oe-foreground-secondary">{suffix}</span> : null}
       {trailingElement ? <span data-slot="input-button-trailing" className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{trailingElement}</span> : null}
     </button>
   )

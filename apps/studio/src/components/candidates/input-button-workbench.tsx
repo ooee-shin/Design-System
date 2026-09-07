@@ -112,7 +112,7 @@ export function InputButtonWorkbench() {
           <Example label="Fixed"><InputButton layout="fixed" fixedWidth={240} value={c.value} /></Example>
         </Section>
 
-        <Section id="elements" title="Properties · Elements" description="텍스트 값 앞뒤에 선택적인 Element를 배치할 수 있습니다. Clear button과 Chip value는 제공하지 않습니다.">
+        <Section id="elements" title="Properties · Elements" description="텍스트 값 앞뒤에 선택적인 Element를 배치할 수 있습니다. Prefix와 Suffix, Clear button과 Chip value는 제공하지 않습니다.">
           <Example label="Leading element"><InputButton value={c.value} leadingElement={<RiCalendarLine />} /></Example>
           <Example label="Trailing element"><InputButton value={c.value} trailingElement={<RiArrowRightSLine />} /></Example>
         </Section>
@@ -193,7 +193,7 @@ export function InputButtonWorkbench() {
             <div>
               <GuidelineTitle>Trailing element에는 조작이 아니라 여는 표시를 두기</GuidelineTitle>
               <GuidelineList items={[
-                "Leading element와 Prefix, Suffix는 Input과 같은 성격입니다. 값을 식별하는 요소와 값의 의미를 보완하는 짧은 표기를 둡니다.",
+                "Leading element는 Input과 같은 성격입니다. 값을 식별하는 요소를 둡니다. Prefix와 Suffix는 제공하지 않으므로, 값의 의미를 보완하는 짧은 표기가 필요하면 값을 직접 입력받는 Input을 사용합니다.",
                 "Trailing element는 다릅니다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둡니다.",
                 "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
               ]} />
@@ -235,7 +235,7 @@ export function InputButtonWorkbench() {
         <Section id="property-map" title="Property map" description="현재 구현에서 확인되는 Property와 허용 값을 정리합니다.">
           <div className="col-span-full overflow-x-auto"><table className="w-full min-w-[44rem] text-left text-xs"><thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead><tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
             <MapRow property="variant" values="outline | filled" defaultValue="outline" /><MapRow property="controlSize" values="small | regular | large | xlarge" defaultValue="regular" /><MapRow property="layout" values="fill | fixed" defaultValue="fill" />
-            <MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="value / placeholder" values="string" defaultValue="undefined / Select an option" /><MapRow property="leadingElement / trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="prefix / suffix" values="string" defaultValue="undefined" />
+            <MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="value / placeholder" values="string" defaultValue="undefined / Select an option" /><MapRow property="leadingElement / trailingElement" values="ReactNode" defaultValue="undefined" />
             <MapRow property="state" values="default | focus | invalid | disabled" defaultValue="default" note="Button attributes and focus" />
           </tbody></table></div>
         </Section>
@@ -251,7 +251,7 @@ function InputButtonAnatomy() {
       <AnatomySurface ariaLabel="Input Button anatomy" title="Input Button structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
           <div className="relative mx-auto flex h-48 w-[30rem] items-center justify-center">
-            <div className="pointer-events-none w-72"><InputButton value="2026. 09. 14" leadingElement={<AnatomySwapSlot />} prefix="+82" suffix="KST" trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
+            <div className="pointer-events-none w-72"><InputButton value="2026. 09. 14" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
             <AnatomyBoundaryMarker number={1} side="left" connectorLength={48} boundaryLength={36} className="left-5 top-[5.4rem]" />
             <AnatomyNumber number={2} className="left-[106px] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
             <AnatomyNumber number={3} className="left-[135px] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
