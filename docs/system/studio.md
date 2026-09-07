@@ -63,7 +63,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 같은 섹션 안에서 제목·설명·카드 묶음이 Surface 밖에 반복되는 StateGroup 같은 구조는 그룹 사이를 32px 수준으로 분리한다. 제목 없이 카드만 연속되는 Elements 구조에는 기본 카드 간격을 유지한다.
 - Guidelines의 시각 카드는 안에 놓인 요소를 카드 너비만큼 늘린다. 공용 `GuideVisual`과 `UsageComparison`이 이 동작을 소유하므로 화면마다 `w-full`을 다시 붙이지 않는다. 두 열의 예시 크기가 서로 다르면 비교 대상이 아니라 크기 차이가 먼저 읽힌다.
 - Anatomy는 유형명·시각 예제·범례 전체를 Neutral 회색 Surface로 묶는다. Guidelines의 시각 예시 카드는 Neutral 회색 배경만 사용하고 바깥 border는 두지 않는다. 그 안에서 실제 화면 또는 컴포넌트를 감싸는 Container는 흰색 `oe-background-primary` Surface와 옅은 Neutral border를 사용한다. Properties, Layout과 State의 일반 예시는 흰색 Surface와 Neutral border를 유지한다. Playground는 검수용 테스트 환경임을 드러내기 위해 Neutral 회색 Surface와 2px `oe-border-bold-primary` 외곽을 사용하고, 그 안에서 실제 컴포넌트를 두는 영역만 흰색 `oe-background-primary`를 사용한다. 카드 구조 자체는 별도 화면 체계 재설계 전까지 임의로 제거하거나 다른 배경형으로 바꾸지 않는다.
-- Guidelines 안에서 다른 Component와의 선택이나 차이를 설명하는 꼭지는 뒤쪽에 둔다. 이 컴포넌트를 쓰기로 정한 사람에게 먼저 필요한 것은 이 컴포넌트를 어떻게 쓰는지이며, 다른 컴포넌트와 비교하는 내용은 그다음이다.
+- Guidelines의 첫 꼭지는 이 컴포넌트를 쓸 자리인지 가리는 사용 조건이 될 수 있다. 그 자리가 아니면 나머지 규칙을 읽을 필요가 없기 때문이다. 둘 다 쓸 수 있는 자리에서 어느 쪽이 나은지 가리는 비교 꼭지는 뒤쪽에 둔다. 이미 이 컴포넌트를 쓰기로 정한 사람에게 먼저 필요한 것은 이 컴포넌트를 어떻게 쓰는지다. 다른 Component가 언급되는지는 기준이 아니며, 사용 조건도 결론이 다른 Component를 가리킬 수 있다.
 - Property map이나 Playground control에만 존재하고 별도 설명 카드가 없는 주요 Property를 발견하면 자동으로 카드를 만들지 말고 사용자에게 카드가 필요한지 묻는다.
 - `name`, `value`, `form`처럼 native 연결을 위한 기술 속성까지 모두 시각 카드로 만들지는 않는다. 시각·구조·동작을 이해하는 데 독립 설명이 필요한 상위 Property를 카드 점검 대상으로 삼는다.
 
