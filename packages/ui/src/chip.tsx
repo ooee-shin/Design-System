@@ -1,21 +1,18 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { RiCloseLine } from "@remixicon/react"
+import { Tooltip } from "@base-ui/react/tooltip"
 
 import { cn } from "./utils"
 
-type ChipVariant = "outline" | "filled"
+type ChipTone = "secondary" | "tertiary"
 type ChipShape = "rounded" | "circle"
 type ChipSize = "small" | "regular" | "large" | "xlarge"
 
 const chipVariants = cva(
-  "inline-flex max-w-full shrink-0 items-center border text-sm font-medium transition-[background-color,border-color,color] duration-[60ms] data-[disabled]:cursor-not-allowed data-[disabled]:border-oe-border-disabled data-[disabled]:bg-transparent data-[disabled]:text-oe-foreground-disabled",
+  "inline-flex max-w-full shrink-0 items-center border border-oe-border-primary bg-oe-background-primary text-sm font-medium text-oe-foreground-secondary transition-[background-color,border-color,color] duration-[60ms]",
   {
     variants: {
-      variant: {
-        outline: "border-oe-border-primary bg-oe-background-primary text-oe-foreground-secondary",
-        filled: "border-transparent bg-oe-background-secondary text-oe-foreground-secondary",
-      },
       controlSize: {
         small: "h-oe-control-small gap-1 px-2.5",
         regular: "h-oe-control-regular gap-1.5 px-3",
@@ -31,7 +28,7 @@ const chipVariants = cva(
         false: "",
       },
     },
-    defaultVariants: { variant: "outline", controlSize: "regular", shape: "rounded", iconOnly: false },
+    defaultVariants: { controlSize: "regular", shape: "circle", iconOnly: false },
   },
 )
 
@@ -40,6 +37,23 @@ const iconOnlyWidth: Record<ChipSize, string> = {
   regular: "w-oe-control-regular",
   large: "w-oe-control-large",
   xlarge: "w-oe-control-xlarge",
+}
+
+// 아이콘은 자기 상자를 거의 채우고 글자는 좌우에 여유를 갖는다. 한쪽 변이 아이콘으로
+// 끝나고 반대 변이 글자로 끝나면 글자 쪽이 답답해 보인다. 그때 글자가 닿는 변에만 여백을
+// 더한다. 아이콘 쪽을 줄이지 않으므로 어느 변도 기준보다 좁아지지 않는다.
+const textSidePadding: Record<ChipSize, { left: string; right: string }> = {
+  small: { left: "pl-3", right: "pr-3" },
+  regular: { left: "pl-4", right: "pr-4" },
+  large: { left: "pl-4", right: "pr-4" },
+  xlarge: { left: "pl-5", right: "pr-5" },
+}
+
+// 아이콘은 Label 과 같은 위계(secondary)나 한 단계 옅은 위계(tertiary)를 고를 수 있다.
+// Active 에서도 같은 관계를 brand 계열 안에서 유지한다.
+const toneClassName: Record<ChipTone, { default: string; active: string }> = {
+  secondary: { default: "text-oe-foreground-secondary", active: "text-oe-brand-foreground-primary" },
+  tertiary: { default: "text-oe-foreground-tertiary", active: "text-oe-brand-foreground-secondary" },
 }
 
 const iconSize: Record<ChipSize, string> = {
@@ -51,10 +65,12 @@ const iconSize: Record<ChipSize, string> = {
 
 type ChipBaseProps = VariantProps<typeof chipVariants> & {
   children?: string
+  prefix?: string
   leadingElement?: React.ReactNode
+  leadingTone?: ChipTone
   trailingElement?: React.ReactNode
+  trailingTone?: ChipTone
   active?: boolean
-  disabled?: boolean
   ariaLabel?: string
   className?: string
 }
@@ -63,55 +79,71 @@ type ChipBaseProps = VariantProps<typeof chipVariants> & {
 // Button 인데 안에 또 Button 을 두면 어느 것을 눌렀는지 알 수 없다. Select Box 의
 // 「내부에 다른 조작 요소를 두지 않기」와 같은 이유다.
 type ChipProps =
-  | (ChipBaseProps & { onClick?: () => void; onRemove?: never; removeLabel?: never })
-  | (ChipBaseProps & { onClick?: never; onRemove: () => void; removeLabel: string })
+  | (ChipBaseProps & { onClick?: () => void; onRemove?: never; removeLabel?: never; removeTooltip?: never })
+  | (ChipBaseProps & { onClick?: never; onRemove: () => void; removeLabel: string; removeTooltip?: string })
 
 function Chip({
   children,
+  prefix,
   leadingElement,
+  leadingTone = "secondary",
   trailingElement,
-  variant,
+  trailingTone = "secondary",
   controlSize = "regular",
   shape,
   active = false,
-  disabled = false,
   ariaLabel,
   className,
   onClick,
   onRemove,
   removeLabel,
+  removeTooltip = "Remove",
 }: ChipProps) {
   const iconOnly = !children
   const size = controlSize ?? "regular"
+  const leftEndsWithIcon = Boolean(leadingElement)
+  const rightEndsWithIcon = Boolean(trailingElement) || Boolean(onRemove)
+  const oneSideOnly = leftEndsWithIcon !== rightEndsWithIcon
   const shared = cn(
-    chipVariants({ variant, controlSize, shape, iconOnly }),
+    chipVariants({ controlSize, shape, iconOnly }),
+    !iconOnly && oneSideOnly && !leftEndsWithIcon && textSidePadding[size].left,
+    !iconOnly && oneSideOnly && !rightEndsWithIcon && textSidePadding[size].right,
     iconOnly && iconOnlyWidth[size],
     iconSize[size],
-    active && !disabled && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-foreground-primary",
+    active && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-brand-foreground-primary",
     className,
   )
   const content = (
     <>
-      {leadingElement ? <span data-slot="chip-leading-element" className="flex shrink-0 items-center" aria-hidden="true">{leadingElement}</span> : null}
+      {leadingElement ? <span data-slot="chip-leading-element" className={cn("flex shrink-0 items-center", active ? toneClassName[leadingTone].active : toneClassName[leadingTone].default)} aria-hidden="true">{leadingElement}</span> : null}
+      {prefix ? <span data-slot="chip-prefix" className={cn("shrink-0", active ? "text-oe-brand-foreground-secondary" : "text-oe-foreground-tertiary")}>{prefix}</span> : null}
       {children ? <span data-slot="chip-label" className="min-w-0 truncate">{children}</span> : null}
-      {trailingElement ? <span data-slot="chip-trailing-element" className="flex shrink-0 items-center" aria-hidden="true">{trailingElement}</span> : null}
+      {trailingElement ? <span data-slot="chip-trailing-element" className={cn("flex shrink-0 items-center", active ? toneClassName[trailingTone].active : toneClassName[trailingTone].default)} aria-hidden="true">{trailingElement}</span> : null}
     </>
   )
 
   if (onRemove) {
     return (
-      <span data-slot="chip" data-active={active ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
+      <span data-slot="chip" data-active={active ? "" : undefined} aria-label={ariaLabel} className={shared}>
         {content}
-        <button
-          type="button"
-          data-slot="chip-remove"
-          aria-label={removeLabel}
-          disabled={disabled}
-          onClick={onRemove}
-          className={cn("-mr-1 grid shrink-0 place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none", size === "small" ? "size-4" : "size-5")}
-        >
-          <RiCloseLine aria-hidden="true" />
-        </button>
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            render={<button type="button" data-slot="chip-remove" />}
+            delay={150}
+            aria-label={removeLabel}
+            onClick={onRemove}
+            className={cn("grid shrink-0 cursor-pointer place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring", size === "small" ? "size-4" : "size-5")}
+          >
+            <RiCloseLine aria-hidden="true" />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Positioner positionMethod="fixed" side="bottom" align="center" sideOffset={4} collisionPadding={8} collisionAvoidance={{ side: "flip", align: "shift" }}>
+              <Tooltip.Popup className="text-oe-label z-50 w-max whitespace-nowrap rounded-lg bg-oe-background-bold-primary px-2 py-1.5 font-normal text-oe-foreground-inverse shadow-sm transition-[transform,opacity] duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0">
+                {removeTooltip}
+              </Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       </span>
     )
   }
@@ -122,12 +154,16 @@ function Chip({
         type="button"
         data-slot="chip"
         data-active={active ? "" : undefined}
-        data-disabled={disabled ? "" : undefined}
         aria-pressed={active}
         aria-label={iconOnly ? ariaLabel : undefined}
-        disabled={disabled}
         onClick={onClick}
-        className={cn(shared, "outline-none hover:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none", active && !disabled && "hover:bg-[var(--brand-alpha-05)]")}
+        className={cn(
+          shared,
+          "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+          "hover:bg-oe-interaction-hover-subtle active:bg-oe-interaction-hover",
+          // 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. Active 가 우선한다.
+          active && "hover:bg-[var(--brand-alpha-05)] active:bg-[var(--brand-alpha-05)]",
+        )}
       >
         {content}
       </button>
@@ -135,11 +171,11 @@ function Chip({
   }
 
   return (
-    <span data-slot="chip" data-active={active ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
+    <span data-slot="chip" data-active={active ? "" : undefined} aria-label={ariaLabel} className={shared}>
       {content}
     </span>
   )
 }
 
 export { Chip }
-export type { ChipProps, ChipShape, ChipSize, ChipVariant }
+export type { ChipProps, ChipShape, ChipSize, ChipTone }
