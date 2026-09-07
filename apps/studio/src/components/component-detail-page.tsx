@@ -5,6 +5,8 @@ import { RiArrowLeftLine, RiBookOpenLine } from "@remixicon/react";
 import { getComponent, type ComponentKey } from "@/components/component-registry";
 import { MarkdownView } from "@/components/markdown-view";
 import { StudioPreviewFrame } from "@/components/studio-preview-frame";
+import { RiArrowRightSLine } from "@remixicon/react";
+
 import { hasDoc, renderDoc } from "@/lib/docs";
 
 export function ComponentDetailPage({ componentKey, children }: { componentKey: ComponentKey; children: ReactNode }) {
@@ -34,15 +36,20 @@ export function ComponentDetailPage({ componentKey, children }: { componentKey: 
         <StudioPreviewFrame>{children}</StudioPreviewFrame>
         {spec ? (
           <section id="spec" aria-labelledby="spec-title" className="scroll-mt-16 rounded-2xl border bg-background p-6 sm:p-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-2 border-b pb-4">
-              <h2 id="spec-title" className="text-lg font-semibold tracking-tight">명세 문서</h2>
-              <Link href={`/docs/${docSlug}`} className="font-mono text-xs text-muted-foreground hover:text-foreground">
-                docs/system/{docSlug}.md
-              </Link>
-            </div>
-            <div className="mt-5">
-              <MarkdownView html={spec.html} />
-            </div>
+            <details className="group">
+              <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-between gap-2 border-b pb-4 [&::-webkit-details-marker]:hidden">
+                <span className="flex items-center gap-2">
+                  <RiArrowRightSLine aria-hidden="true" className="size-oe-icon-small shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
+                  <h2 id="spec-title" className="text-xl font-semibold tracking-tight">명세 문서</h2>
+                </span>
+                <Link href={`/docs/${docSlug}`} className="font-mono text-xs text-muted-foreground hover:text-foreground">
+                  docs/system/{docSlug}.md
+                </Link>
+              </summary>
+              <div className="mt-5">
+                <MarkdownView html={spec.html} />
+              </div>
+            </details>
           </section>
         ) : null}
       </div>
