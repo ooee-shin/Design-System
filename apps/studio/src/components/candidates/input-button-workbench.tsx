@@ -5,7 +5,7 @@ import { RiArrowRightSLine, RiCalendarLine, RiMapPinLine, RiTimeLine } from "@re
 import { Input, InputButton, Select } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
-import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { ColorSwatch } from "@/components/color-swatch";
@@ -25,7 +25,7 @@ const copy = {
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
     periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
-    colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD",
+    colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD", today: "오늘", addressSentence: "주소를 선택해 주세요",
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
@@ -35,7 +35,7 @@ const copy = {
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
     periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
-    colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD",
+    colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD", today: "Today", addressSentence: "Please select an address",
   },
 } as const;
 
@@ -157,14 +157,18 @@ export function InputButtonWorkbench() {
                 "Read only가 막는 것은 여는 동작 자체가 아니라 그 호출입니다. 실제로 무엇을 열지는 이 컴포넌트를 가져다 쓰는 화면이 소유합니다.",
               ]} />
             </div>
-            <div>
-              <GuidelineTitle>내부에 다른 조작 요소를 두지 않기</GuidelineTitle>
-              <GuidelineList items={[
-                "Container 전체가 하나의 Button입니다. 안에 별도 Input이나 Clear button, 다른 Button을 중첩하면 무엇을 눌렀는지 알 수 없게 됩니다.",
-                "그래서 Clear button을 제공하지 않습니다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둡니다.",
+            <UsageComparison
+              title="내부에 다른 조작 요소를 두지 않기"
+              doText="Container 전체를 하나의 Button으로 두세요."
+              dontText="안에 별도 Button을 중첩하지 마세요."
+              description={[
+                "Container 전체가 하나의 Button입니다. 안에 별도 Input이나 Clear button, 다른 Button을 중첩하면 어느 것을 눌렀는지 알 수 없고 키보드 순서도 갈라집니다.",
+                "그래서 Clear button을 제공하지 않습니다. 값을 비우거나 오늘로 맞추는 것처럼 값을 바꾸는 동작은 여는 화면에서 처리하거나 Field 쪽에 둡니다.",
                 "Value는 문자열만 표시합니다. 여러 값을 Chip으로 나열해야 하면 Combobox를 사용합니다.",
-              ]} />
-            </div>
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<span className="flex h-6 items-center rounded-md border border-oe-border-primary px-2 text-xs font-medium text-oe-foreground-secondary">{c.today}</span>} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>Trailing element에는 조작이 아니라 여는 표시를 두기</GuidelineTitle>
               <GuidelineList items={[
@@ -173,22 +177,18 @@ export function InputButtonWorkbench() {
                 "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
               ]} />
             </div>
-            <div>
-              <GuidelineTitle>Placeholder는 문장이 아니라 형식이나 키워드로 쓰기</GuidelineTitle>
-              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="키워드">
-                  <PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>
-                </GuideVisual>
-                <GuideVisual label="형식">
-                  <PreviewLocaleScope className="w-full"><InputButton placeholder={c.datePattern} leadingElement={<RiCalendarLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>
-                </GuideVisual>
-              </div>
-              <GuidelineList items={[
+            <UsageComparison
+              title="Placeholder는 문장이 아니라 형식이나 키워드로 쓰기"
+              doText="고를 값을 키워드로 쓰세요."
+              dontText="문장으로 쓰지 마세요."
+              description={[
                 "값이 없으면 Placeholder가 유일한 안내입니다. 눌러야 값을 정할 수 있으므로 무엇을 고르는 자리인지 먼저 읽혀야 합니다.",
-                "「주소를 선택해 주세요」 같은 문장 대신 「주소 선택」처럼 키워드로 씁니다. 정해진 형식이 있으면 「YYYY. MM. DD」처럼 형식을 그대로 보여줍니다.",
+                <>정해진 형식이 있으면 <code className="text-xs text-oe-foreground-primary">YYYY. MM. DD</code>처럼 형식을 그대로 보여줍니다.</>,
                 "한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없습니다.",
-              ]} />
-            </div>
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressSentence} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>Color input은 직접 입력 여부로 나누기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
