@@ -68,7 +68,13 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 Prefix와 Suffix는 값의 의미를 보완하는 짧은 표기 자리다. 통화 기호와 단위가 여기에 온다. Leading element와 Trailing element는 값을 식별하거나 조작을 여는 요소 자리이며 검색을 나타내는 아이콘이나 보기 전환 action이 여기에 온다.
 
-내부 순서는 `Leading element → Prefix → Input field → Clear button → Suffix → Trailing element`로 고정된다. 같은 의미의 요소를 두 자리에 나눠 두지 않는다.
+내부 순서는 `Leading element → Prefix → Input field → Clear button → Suffix → Trailing element`로 고정된다.
+
+### Prefix·Suffix는 필요할 때만 쓰기
+
+값만으로 의미가 통하면 Prefix와 Suffix를 두지 않는다. 두 자리는 값의 의미를 보완할 때만 쓰는 선택 요소다.
+
+중복된 의미를 전달하지 않는다. 통화 기호를 Prefix에 두었다면 통화 단위를 Suffix에 또 두지 않는다. 금액은 값과 통화 단위를 분리해 `원`을 Suffix로 표시하는 것이 확정된 사례다.
 
 ### Clear button은 값을 자주 비우는 자리에 두기
 

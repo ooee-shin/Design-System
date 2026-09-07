@@ -33,6 +33,7 @@ const copy = {
     phoneLabel: "전화번호", phoneValue: "010-1234-5678",
     quantityLabel: "수량", decrease: "값 줄이기", increase: "값 늘리기", decreaseTooltip: "감소", increaseTooltip: "증가",
     businessLabel: "사업자등록번호", businessValue: "123-45-67890",
+    siteLabel: "웹사이트", siteValue: "ooee.kr", amountLabel: "금액", amountValue: "1,250,000",
     expiryLabel: "카드 유효기간", expiryValue: "09 / 28",
   },
   en: {
@@ -51,6 +52,7 @@ const copy = {
     phoneLabel: "Phone number", phoneValue: "010-1234-5678",
     quantityLabel: "Quantity", decrease: "Decrease value", increase: "Increase value", decreaseTooltip: "Decrease", increaseTooltip: "Increase",
     businessLabel: "Business number", businessValue: "123-45-67890",
+    siteLabel: "Website", siteValue: "ooee.kr", amountLabel: "Amount", amountValue: "1,250,000",
     expiryLabel: "Card expiry", expiryValue: "09 / 28",
   },
 } as const;
@@ -218,7 +220,10 @@ export function InputWorkbench() {
             <GuidelineTitle>Prefix·Suffix와 Leading·Trailing element를 나눠 쓰기</GuidelineTitle>
             <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
               <GuideVisual label="Prefix · Suffix">
-                <PreviewLocaleScope className="w-full"><Input value="1,250,000" readOnly prefix="₩" suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} /></PreviewLocaleScope>
+                <PreviewLocaleScope className="w-full space-y-2">
+                  <Input value={c.siteValue} readOnly prefix="https://" aria-label={c.siteLabel} />
+                  <Input value={c.amountValue} readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={c.amountLabel} />
+                </PreviewLocaleScope>
               </GuideVisual>
               <GuideVisual label="Leading · Trailing element">
                 <PreviewLocaleScope className="w-full space-y-2">
@@ -230,9 +235,21 @@ export function InputWorkbench() {
             <GuidelineList items={[
               "Prefix와 Suffix는 값의 의미를 보완하는 짧은 표기 자리입니다. 통화 기호와 단위가 여기에 옵니다.",
               "Leading element와 Trailing element는 값을 식별하거나 조작을 여는 요소 자리입니다. 검색을 나타내는 아이콘이나 보기 전환 action이 여기에 옵니다.",
-              <>내부 순서는 <code className="text-xs text-oe-foreground-primary">Leading element → Prefix → Input field → Clear button → Suffix → Trailing element</code>로 고정됩니다. 같은 의미의 요소를 두 자리에 나눠 두지 않습니다.</>,
+              <>내부 순서는 <code className="text-xs text-oe-foreground-primary">Leading element → Prefix → Input field → Clear button → Suffix → Trailing element</code>로 고정됩니다.</>,
             ]} />
           </div>
+          <UsageComparison
+            title="Prefix·Suffix는 필요할 때만 쓰기"
+            doText="의미를 보완하는 자리 하나만 쓰세요."
+            dontText="같은 의미를 앞뒤에 겹쳐 표시하지 마세요."
+            description={[
+              "값만으로 의미가 통하면 Prefix와 Suffix를 두지 않습니다. 두 자리는 값의 의미를 보완할 때만 쓰는 선택 요소입니다.",
+              "중복된 의미를 전달하지 않습니다. 통화 기호를 Prefix에 두었다면 통화 단위를 Suffix에 또 두지 않습니다.",
+              "금액은 값과 통화 단위를 분리해 원을 Suffix로 표시하는 것이 확정된 사례입니다.",
+            ]}
+            doVisual={<PreviewLocaleScope className="w-full"><Input value={c.amountValue} readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={c.amountLabel} /></PreviewLocaleScope>}
+            dontVisual={<PreviewLocaleScope className="w-full"><Input value={c.amountValue} readOnly prefix="₩" suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={c.amountLabel} /></PreviewLocaleScope>}
+          />
           <UsageComparison
             title="Clear button은 값을 자주 비우는 자리에 두기"
             doText="값을 지우고 다시 입력하는 자리에 두세요."
