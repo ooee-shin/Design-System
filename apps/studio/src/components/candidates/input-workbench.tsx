@@ -3,8 +3,9 @@
 import { useState, type ReactNode } from "react";
 import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiLink, RiSearchLine } from "@remixicon/react";
 
-import { Input, NumberInput } from "@ooee/ui";
+import { Input, InputButton, NumberInput } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
+import { ColorSwatch } from "@/components/color-swatch";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
@@ -36,6 +37,7 @@ const copy = {
     siteLabel: "웹사이트", siteValue: "bluekey.kr", amountLabel: "금액", amountValue: "1,250,000",
     passwordLabel: "비밀번호", maskedValue: "bluekey1234",
     accountPinLabel: "계좌 비밀번호", accountPinValue: "1234",
+    colorHexLabel: "색상 코드", colorPickLabel: "색상", colorPickValue: "파란색",
     expiryLabel: "카드 유효기간", expiryValue: "09 / 28",
   },
   en: {
@@ -57,6 +59,7 @@ const copy = {
     siteLabel: "Website", siteValue: "bluekey.kr", amountLabel: "Amount", amountValue: "1,250,000",
     passwordLabel: "Password", maskedValue: "bluekey1234",
     accountPinLabel: "Account PIN", accountPinValue: "1234",
+    colorHexLabel: "Color code", colorPickLabel: "Color", colorPickValue: "Blue",
     expiryLabel: "Card expiry", expiryValue: "09 / 28",
   },
 } as const;
@@ -311,6 +314,22 @@ export function InputWorkbench() {
               "정해진 자릿수와 구분자가 있는 값, 일부만 입력받고 나머지를 고정 마스킹하는 값은 기본 Property로 표현되지 않습니다. 이때는 Input을 조합해 포맷과 동작을 직접 정의합니다.",
               <>반복 사용되는 부분 입력과 고정 마스킹은 공용 <code className="text-xs text-oe-foreground-primary">PartialMaskedInput</code>이 소유합니다. 같은 마스킹을 화면마다 다시 만들지 않습니다.</>,
               "새 포맷을 만들어도 Container와 Focus·Invalid·Disabled 표현은 Input이 소유한 것을 그대로 씁니다. 확정된 사례는 위 Custom input 절에 있습니다.",
+            ]} />
+          </div>
+          <div>
+            <GuidelineTitle>Color input은 직접 입력 여부로 나누기</GuidelineTitle>
+            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+              <GuideVisual label="Input · HEX 직접 입력">
+                <PreviewLocaleScope className="w-full"><Input value="#0073FF" readOnly leadingElement={<ColorSwatch color="#0073FF" />} aria-label={c.colorHexLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+              <GuideVisual label="Input Button · 선택 화면만 열기">
+                <PreviewLocaleScope className="w-full"><InputButton value={c.colorPickValue} leadingElement={<ColorSwatch color="#0073FF" />} aria-haspopup="dialog" aria-label={c.colorPickLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+            </div>
+            <GuidelineList items={[
+              "색상 코드를 직접 입력받아야 하면 Input을 사용합니다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여줍니다.",
+              "값을 타이핑하지 않고 색상 선택 화면에서만 정한다면 Input Button을 사용합니다.",
+              <>두 컴포넌트는 같은 16px 사각형 swatch와 안쪽 1px <code className="text-xs text-oe-foreground-primary">oe-border-visual</code> 경계를 공유합니다. 갈리는 것은 겉모습이 아니라 값을 직접 입력받는지 여부입니다.</>,
             ]} />
           </div>
         </div>

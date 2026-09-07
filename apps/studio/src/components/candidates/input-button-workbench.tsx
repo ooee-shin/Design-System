@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { RiArrowRightSLine, RiCalendarLine, RiMapPinLine, RiTimeLine } from "@remixicon/react";
-import { InputButton, Select } from "@ooee/ui";
+import { Input, InputButton, Select } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
@@ -25,6 +25,7 @@ const copy = {
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
     periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
+    colorHexLabel: "색상 코드", colorPickLabel: "색상",
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
@@ -34,6 +35,7 @@ const copy = {
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
     periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
+    colorHexLabel: "Color code", colorPickLabel: "Color",
   },
 } as const;
 
@@ -162,6 +164,22 @@ export function InputButtonWorkbench() {
                 "그래서 Clear button을 제공하지 않습니다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둡니다.",
                 "Value는 문자열만 표시합니다. 여러 값을 Chip으로 나열해야 하면 Combobox를 사용합니다.",
               ]} />
+            </div>
+            <div>
+              <GuidelineTitle>Color input은 직접 입력 여부로 나누기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Input · HEX 직접 입력">
+                  <PreviewLocaleScope className="w-full"><Input value="#0073FF" readOnly leadingElement={<ColorSwatch color="#0073FF" />} aria-label={c.colorHexLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Input Button · 선택 화면만 열기">
+                  <PreviewLocaleScope className="w-full"><InputButton value={c.colorValue} leadingElement={<ColorSwatch color="#0073FF" />} aria-haspopup="dialog" aria-label={c.colorPickLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+              "색상 코드를 직접 입력받아야 하면 Input을 사용합니다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여줍니다.",
+              "값을 타이핑하지 않고 색상 선택 화면에서만 정한다면 Input Button을 사용합니다.",
+              <>두 컴포넌트는 같은 16px 사각형 swatch와 안쪽 1px <code className="text-xs text-oe-foreground-primary">oe-border-visual</code> 경계를 공유합니다. 갈리는 것은 겉모습이 아니라 값을 직접 입력받는지 여부입니다.</>,
+            ]} />
             </div>
           </div>
         </Section>

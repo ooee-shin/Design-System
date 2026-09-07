@@ -67,6 +67,12 @@ Container 전체가 하나의 Button이다. 안에 별도 Input이나 Clear butt
 
 그래서 Clear button을 제공하지 않는다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둔다. Value는 문자열만 표시하며, 여러 값을 Chip으로 나열해야 하면 Combobox를 사용한다.
 
+### Color input은 직접 입력 여부로 나누기
+
+색상 코드를 직접 입력받아야 하면 Input을 사용한다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여준다.
+
+값을 타이핑하지 않고 색상 선택 화면에서만 정한다면 Input Button을 사용한다. 두 컴포넌트는 같은 16px 사각형 swatch와 안쪽 1px `oe-border-visual` 경계를 공유한다. 갈리는 것은 겉모습이 아니라 값을 직접 입력받는지 여부다.
+
 ## 현재 검수 예시
 
 - Calendar: 달력에서 날짜를 선택하는 화면을 여는 Trigger

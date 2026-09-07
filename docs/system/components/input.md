@@ -85,6 +85,12 @@ Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비�
 
 반복 사용되는 부분 입력과 고정 마스킹은 공용 `PartialMaskedInput`이 소유한다. 같은 마스킹을 화면마다 다시 만들지 않는다. 새 포맷을 만들어도 Container와 Focus·Invalid·Disabled 표현은 Input이 소유한 것을 그대로 사용한다. 확정된 사례는 이 문서 뒤쪽의 Custom input 설명에 있다.
 
+### Color input은 직접 입력 여부로 나누기
+
+색상 코드를 직접 입력받아야 하면 Input을 사용한다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여준다.
+
+값을 타이핑하지 않고 색상 선택 화면에서만 정한다면 Input Button을 사용한다. 두 컴포넌트는 같은 16px 사각형 swatch와 안쪽 1px `oe-border-visual` 경계를 공유한다. 갈리는 것은 겉모습이 아니라 값을 직접 입력받는지 여부다.
+
 ## 현재 정의하지 않은 항목
 
 - Shape variant
