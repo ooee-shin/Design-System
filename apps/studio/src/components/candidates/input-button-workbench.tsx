@@ -149,14 +149,18 @@ export function InputButtonWorkbench() {
                 "미리 정의된 짧은 목록에서 바로 고르면 Select를 사용합니다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용합니다.",
               ]} />
             </div>
-            <div>
-              <GuidelineTitle>조회는 Read only, 쓸 수 없을 때만 Disabled</GuidelineTitle>
-              <GuidelineList items={[
+            <UsageComparison
+              title="조회는 Read only, 쓸 수 없을 때만 Disabled"
+              doText="조회 화면에서는 Read only로 값을 보여주세요."
+              dontText="조회 화면에 Disabled를 쓰지 마세요."
+              description={[
                 <>다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이므로, 조회에는 <code className="text-xs text-oe-foreground-primary">readOnly</code>를 사용합니다. focus가 유지되어 키보드로 값을 지나갈 수 있고 값은 그대로 읽힙니다.</>,
                 <><code className="text-xs text-oe-foreground-primary">disabled</code>는 값 자체를 쓸 수 없는 상태에만 사용합니다. 조작 대상에서 빠져 키보드로 지나갈 수 없으므로, 읽기만 하는 화면에 쓰면 값이 있는 자리를 건너뛰게 됩니다.</>,
                 "Read only가 막는 것은 여는 동작 자체가 아니라 그 호출입니다. 실제로 무엇을 열지는 이 컴포넌트를 가져다 쓰는 화면이 소유합니다.",
-              ]} />
-            </div>
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" readOnly leadingElement={<RiCalendarLine aria-hidden="true" />} aria-label={c.calendar} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" disabled leadingElement={<RiCalendarLine aria-hidden="true" />} aria-label={c.calendar} /></PreviewLocaleScope>}
+            />
             <UsageComparison
               title="내부에 다른 조작 요소를 두지 않기"
               doText="Container 전체를 하나의 Button으로 두세요."
