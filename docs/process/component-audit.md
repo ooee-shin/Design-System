@@ -65,6 +65,7 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 1. **선택 가능한 Chip.** 짧은 Label 여러 개를 각자의 Content 너비로 나열하고 줄바꿈되게 두면서 그중 하나 이상을 선택하는 배치가 필요하다. 이 배치를 Select Box의 `columns="fit"`으로 만들었다가 되돌렸다. `select-box.md`의 「역할과 경계」가 「Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다」고 이미 정해 두었고, 상세 정보를 비교한다는 Select Box의 목적과도 어긋난다. 같은 화면 모양을 두 컴포넌트가 갖게 되면 무엇을 선택하는 자리인지 구분할 수 없다.
    현재 Chip 명세는 Selected 상태와 Chip 전체 Click을 확인되지 않은 항목으로 두고 있다. 이 둘이 확정되어야 이 배치를 Chip이 담당할 수 있다.
+2. **Select Box Guidelines의 경계 시각.** 「다른 선택 컴포넌트와 나눠 쓰기」 규칙의 오른쪽 칸이 「Chip · 작업 예정」 문구로 비어 있다. Chip의 Selected 상태가 확정되면 Content 너비로 나열해 선택하는 예시를 그 자리에 넣는다.
 
 ## Combobox 잔여 작업
 

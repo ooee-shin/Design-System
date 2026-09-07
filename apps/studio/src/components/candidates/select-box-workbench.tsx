@@ -37,6 +37,8 @@ const copy = {
     shortA: "월간",
     shortB: "연간",
     shortC: "분기",
+    regionGroup: "지역",
+    regions: ["서울", "경기", "부산"],
     roleGroup: "역할 선택",
     owner: "사장님",
     staff: "직원",
@@ -58,6 +60,8 @@ const copy = {
     shortA: "Monthly",
     shortB: "Annual",
     shortC: "Quarterly",
+    regionGroup: "Region",
+    regions: ["Seoul", "Gyeonggi", "Busan"],
     roleGroup: "Select a role",
     owner: "Owner",
     staff: "Staff",
@@ -312,6 +316,18 @@ export function SelectBoxWorkbench() {
             />
             <div>
               <GuidelineTitle>다른 선택 컴포넌트와 나눠 쓰기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Select Box · 여러 열">
+                  <PreviewLocaleScope className="w-full">
+                    <SelectBoxGroup ariaLabel={c.regionGroup} columns={3} trailingElement="none" defaultValue="region-0">
+                      {c.regions.map((region, index) => <SelectBox key={region} value={`region-${index}`} title={region} />)}
+                    </SelectBoxGroup>
+                  </PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Chip · 작업 예정">
+                  <p className="text-xs leading-5 text-oe-foreground-placeholder">Chip의 Selected 상태가 확정된 뒤 Content 너비로 나열해 선택하는 예시를 이 자리에 추가합니다.</p>
+                </GuideVisual>
+              </div>
               <GuidelineList items={[
                 "Select처럼 Trigger와 Popup으로 접지 않습니다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제입니다.",
                 <>항목 배치는 <code className="text-xs text-oe-foreground-primary">columns</code>로만 지원합니다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않습니다. 항목 너비가 서로 달라지면 나란히 비교할 기준이 사라지기 때문입니다.</>,
