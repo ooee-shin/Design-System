@@ -45,7 +45,9 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 ## 하나씩 검토 진행 상황
 
-`2026-09-07`부터 사용자가 컴포넌트를 하나씩 훑으며 수정 요청을 준다. 대상은 Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다.
+`2026-09-07`부터 사용자가 컴포넌트를 하나씩 순서대로 훑으며 수정 요청을 준다. 대상은 Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다.
+
+**사용자가 완료라고 말하면 그 컴포넌트에 남은 확인 필요 사항을 브리핑한다.** 볼 곳은 세 군데다. [open-questions.md](open-questions.md)의 「컴포넌트」와 「Token candidate」, 해당 명세의 「현재 정의하지 않은 항목」, 그리고 명세 본문의 `확인 필요` 항목이다.
 
 - **Checkbox** — 문제없음으로 확인받았다.
 - **Input Button** — 완료. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
