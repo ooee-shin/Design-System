@@ -20,7 +20,7 @@ const copy = {
   ko: {
     description: "검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택하는 컴포넌트입니다. 선택값 전체를 펼쳐 편집해야 하면 Combobox를 사용합니다.",
     ariaLabel: "옵션 선택",
-    placeholder: "옵션을 선택해 주세요",
+    placeholder: "옵션 선택",
     options: [
       { value: "option-a", label: "Option A" },
       { value: "option-b", label: "Option B" },
@@ -32,8 +32,8 @@ const copy = {
   },
   en: {
     description: "Selects one or more values from a short option list without search. Use Combobox when every selected value must stay visible and editable.",
-    ariaLabel: "Select an option",
-    placeholder: "Select an option",
+    ariaLabel: "Select option",
+    placeholder: "Select option",
     options: [
       { value: "option-a", label: "Option A" },
       { value: "option-b", label: "Option B" },
@@ -80,7 +80,7 @@ const usageCopy = {
     placeholderTitle: "Placeholder 작성하기",
     placeholderDo: "어떤 종류의 값을 고르는지 알 수 있게 작성하세요.",
     placeholderDont: "값의 종류를 알 수 없는 막연한 표현은 쓰지 마세요.",
-    placeholderDescription: ["Placeholder는 선택값이 없을 때 Trigger에 표시됩니다.", "Field label이 있다면 같은 문구를 Placeholder에 그대로 반복하지 않습니다."],
+    placeholderDescription: ["Placeholder는 선택값이 없을 때 Trigger에 표시됩니다.", "Field label이 있다면 같은 문구를 Placeholder에 그대로 반복하지 않습니다.", "문장이 아니라 「지역 선택」처럼 키워드로 씁니다. 한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없습니다."],
     placeholderDoValue: "지역 선택",
     placeholderDontValue: "여기를 눌러 펼쳐보기",
     selectionLimitTitle: "선택 방식과 개수 안내하기",
@@ -127,8 +127,8 @@ const usageCopy = {
     placeholderTitle: "Write placeholders",
     placeholderDo: "State what kind of value the user can choose.",
     placeholderDont: "Do not use vague text that hides the type of value.",
-    placeholderDescription: ["The placeholder appears in the trigger when no value is selected.", "When a field label exists, do not repeat the same wording in the placeholder."],
-    placeholderDoValue: "Select a region",
+    placeholderDescription: ["The placeholder appears in the trigger when no value is selected.", "When a field label exists, do not repeat the same wording in the placeholder.", "Write a keyword such as \u201cSelect region\u201d rather than a full sentence. A sentence is easy to truncate inside a single-line control."],
+    placeholderDoValue: "Select region",
     placeholderDontValue: "Click here to open",
     selectionLimitTitle: "Describe selection mode and limits",
     selectionLimitDescription: ["Use the field label to make it clear whether the user can choose one value or multiple values.", "When the number of selections is limited, include that limit in the label. For example: ‘Select an assignee (1)’ or ‘Select interests (up to 3)’."],
