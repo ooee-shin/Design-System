@@ -83,7 +83,7 @@ export function InputCustomExamples() {
       </CustomInputCard>
 
       <CustomInputCard label="Amount" description={c.amountDescription}>
-        <Input type="text" inputMode="numeric" autoComplete="off" aria-label={c.amount} value={formatCurrencyAmount(amountValue)} onChange={(event) => setAmountValue(event.target.value.replace(/\D/g, ""))} placeholder="0" suffix={c.currencyUnit} clearable={amountValue.length > 0} clearLabel={c.clear} onClear={() => setAmountValue("")} textAlign="right" className="tabular-nums" containerClassName="gap-0 [&_[data-slot=input-suffix]]:ml-2 [&_[data-slot=input-clear]]:visible [&_[data-slot=input-clear]]:mr-0 [&_[data-slot=input-clear]]:w-0 [&_[data-slot=input-clear]]:overflow-hidden [&_[data-slot=input-clear]]:transition-[color,background-color,opacity,width,margin] focus-within:[&_[data-slot=input-clear]]:w-6" />
+        <Input type="text" inputMode="numeric" autoComplete="off" aria-label={c.amount} value={formatCurrencyAmount(amountValue)} onChange={(event) => setAmountValue(event.target.value.replace(/\D/g, ""))} placeholder="0" suffix={c.currencyUnit} clearable={amountValue.length > 0} clearLabel={c.clear} onClear={() => setAmountValue("")} textAlign="right" className="tabular-nums" />
       </CustomInputCard>
 
       <CustomInputCard label={c.segmentedInput} description={c.segmentedInputDescription}>
