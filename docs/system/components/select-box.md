@@ -71,10 +71,12 @@ Select Box는 박스 전체를 하나의 터치 타겟으로 구성하여 오조
 
 Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저장, 확인이나 다음 단계는 별도 Button이 담당한다. 카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않는다.
 
-### 다른 선택 컴포넌트와 나눠 쓰기
+### Select Box와 Chip을 나눠 쓰기
 
-Select처럼 Trigger와 Popup으로 접지 않는다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제다.
+항목 배치는 `columns`로만 지원한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다. 항목 너비가 서로 달라지면 나란히 비교할 기준이 사라지기 때문이다.
 
-항목 배치는 `columns`로만 지원한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다. 항목 너비가 서로 달라지면 나란히 비교할 기준이 사라지기 때문이다. 짧은 키워드를 Content 너비로 나열해 선택해야 하면 Chip을 사용한다. Select Box에 그 배치를 만들면 두 컴포넌트의 화면 모양이 같아져 무엇을 선택하는 자리인지 구분할 수 없다.
+짧은 키워드를 Content 너비로 나열해 선택해야 하면 Chip을 사용한다. Select Box에 그 배치를 만들면 두 컴포넌트의 화면 모양이 같아져 무엇을 선택하는 자리인지 구분할 수 없다.
 
-카드형 전체 선택 Surface는 Select Box가 소유하며 Radio와 Checkbox에는 별도 Container 변형을 두지 않는다.
+### 카드형 선택 Surface는 Select Box만 갖기
+
+카드형 전체 선택 Surface는 Select Box가 소유하며 Radio와 Checkbox에는 별도 Container 변형을 두지 않는다. 짧은 Label을 넓은 카드 없이 밀도 있게 나열해야 하면 Radio나 Checkbox를 그대로 사용한다. 두 컴포넌트에 Container를 덧붙여 Select Box를 대신하지 않는다.

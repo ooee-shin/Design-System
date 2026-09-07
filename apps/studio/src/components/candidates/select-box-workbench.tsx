@@ -315,7 +315,7 @@ export function SelectBoxWorkbench() {
               dontVisual={<RoleChoice c={c} />}
             />
             <div>
-              <GuidelineTitle>다른 선택 컴포넌트와 나눠 쓰기</GuidelineTitle>
+              <GuidelineTitle>Select Box와 Chip을 나눠 쓰기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Select Box · 여러 열">
                   <PreviewLocaleScope className="w-full">
@@ -329,10 +329,15 @@ export function SelectBoxWorkbench() {
                 </GuideVisual>
               </div>
               <GuidelineList items={[
-                "Select처럼 Trigger와 Popup으로 접지 않습니다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제입니다.",
                 <>항목 배치는 <code className="text-xs text-oe-foreground-primary">columns</code>로만 지원합니다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않습니다. 항목 너비가 서로 달라지면 나란히 비교할 기준이 사라지기 때문입니다.</>,
                 "짧은 키워드를 Content 너비로 나열해 선택해야 하면 Chip을 사용합니다. Select Box에 그 배치를 만들면 두 컴포넌트의 화면 모양이 같아져 무엇을 선택하는 자리인지 구분할 수 없습니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>카드형 선택 Surface는 Select Box만 갖기</GuidelineTitle>
+              <GuidelineList items={[
                 "카드형 전체 선택 Surface는 Select Box가 소유합니다. Radio와 Checkbox에는 별도 Container 변형을 두지 않습니다.",
+                "짧은 Label을 넓은 카드 없이 밀도 있게 나열해야 하면 Radio나 Checkbox를 그대로 사용합니다. 두 컴포넌트에 Container를 덧붙여 Select Box를 대신하지 않습니다.",
               ]} />
             </div>
           </div>
