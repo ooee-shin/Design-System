@@ -216,7 +216,6 @@ export function TextareaWorkbench() {
               <GuidelineList items={[
                 <><code className="text-xs text-oe-foreground-primary">resize</code>의 기본값은 <code className="text-xs text-oe-foreground-primary">true</code>이며 세로 방향만 제공합니다. 가로는 제공하지 않습니다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋납니다.</>,
                 "받을 내용의 분량을 사용자가 스스로 조절하는 편이 낫기 때문에 켠 상태를 기본으로 둡니다. 높이를 고정해야 하는 자리에서만 끕니다.",
-                <><code className="text-xs text-oe-foreground-primary">resize</code>는 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 꺼져 있을 때만 적용됩니다. 둘을 함께 켜지 않습니다.</>,
               ]} />
             </div>
             <UsageComparison
@@ -231,6 +230,13 @@ export function TextareaWorkbench() {
               doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
               dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-6"><FieldLabel>{c.replyLabel}</FieldLabel><RadioGroup aria-label={c.replyLabel} className="-ml-2 flex flex-wrap gap-x-4">{c.replyOptions.map((label, index) => <RadioField key={label} value={`reply-${index}`} label={label} />)}</RadioGroup></div></PreviewLocaleScope>}
             />
+            <div>
+              <GuidelineTitle>Resize와 Auto size는 같이 사용하지 않기</GuidelineTitle>
+              <GuidelineList items={[
+                "높이를 사용자가 직접 정하는 것과 내용에 맡겨 자동으로 정하는 것은, 같은 값을 두 주체가 정하는 일이므로 함께 성립하지 않습니다. 어느 쪽으로 갈지 먼저 정하고 한쪽만 켭니다.",
+                <>구현은 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 켜져 있으면 <code className="text-xs text-oe-foreground-primary">resize</code>를 적용하지 않습니다. <code className="text-xs text-oe-foreground-primary">resize</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">true</code>이므로, <code className="text-xs text-oe-foreground-primary">autoSize</code>를 켜는 순간 켜져 있던 세로 조절이 조용히 꺼집니다. 두 Property를 함께 넘기고 세로 조절이 동작하기를 기대하지 않습니다.</>,
+              ]} />
+            </div>
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
               <GuidelineList items={[
