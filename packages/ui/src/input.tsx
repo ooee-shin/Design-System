@@ -101,7 +101,7 @@ function Input({
         {...props}
       />
       {clearRendered ? (
-        <button type="button" data-slot="input-clear" data-visible={clearEntered ? "true" : undefined} aria-label={clearLabel} className="-mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity] duration-150 group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none" disabled={disabled || readOnly} onClick={onClear}>
+        <button type="button" data-slot="input-clear" data-visible={clearEntered ? "true" : undefined} aria-label={clearLabel} className="-mr-1 flex h-6 w-0 shrink-0 items-center justify-center overflow-hidden rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity,width] duration-150 group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:w-6 group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none" disabled={disabled || readOnly} onClick={onClear}>
           <RiCloseLine className="size-4" aria-hidden="true" />
         </button>
       ) : null}
