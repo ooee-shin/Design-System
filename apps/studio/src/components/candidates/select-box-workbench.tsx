@@ -17,7 +17,7 @@ const sections = [
   { id: "playground", label: "Playground" },
   { id: "anatomy", label: "Anatomy" },
   { id: "selection", label: "Selection mode" },
-  { id: "layout", label: "Layout" },
+  { id: "columns", label: "Columns" },
   { id: "elements", label: "Elements" },
   { id: "state", label: "State" },
   { id: "guidelines", label: "Guidelines" },
@@ -187,15 +187,20 @@ export function SelectBoxWorkbench() {
           </div>
         </Section>
 
-        <Section id="layout" title="Properties · Layout" description="항목을 한 열로 쌓거나 여러 열로 나눕니다. 좁은 Container에서는 한 열을 유지하고 640px 이상에서 지정한 열 수를 적용합니다.">
+        <Section id="columns" title="Properties · Columns" description="항목을 한 열로 쌓거나 여러 열로 나눕니다. 좁은 Container에서는 한 열을 유지하고 640px 이상에서 지정한 열 수를 적용합니다. 열이 여럿이면 Leading element가 Title 위로 올라갑니다.">
           <div className="grid gap-3">
-            <Example label="Single column · Default" description="columns의 기본값은 1이며 항목이 Container 너비를 채웁니다.">
+            <Example label="1 · Default" description="항목이 Container 너비를 채우고 Leading element는 Title 왼쪽에 놓입니다.">
               <SelectBoxGroup ariaLabel="Single column example" defaultValue="option-a" className="w-full">
-                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" /><SelectBox value="option-c" title="Label C" />
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
               </SelectBoxGroup>
             </Example>
-            <Example label="Multi column · 3열" description="검수 범위는 2~6열입니다. 열 수를 늘려도 항목마다 같은 너비를 유지합니다.">
-              <SelectBoxGroup ariaLabel="Multi column example" columns={3} defaultValue="option-a" className="w-full">
+            <Example label="2" description="열이 둘 이상이면 항목이 좁아지므로 Leading element를 Title 위 왼쪽에 배치합니다.">
+              <SelectBoxGroup ariaLabel="Two column example" columns={2} defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="3 · 검수 범위 2~6" description="열 수를 늘려도 항목마다 같은 너비를 유지합니다. 이 폭에서는 시각 요소를 덜어내는 것을 권장합니다.">
+              <SelectBoxGroup ariaLabel="Three column example" columns={3} defaultValue="option-a" className="w-full">
                 <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" /><SelectBox value="option-c" title="Label C" />
               </SelectBoxGroup>
             </Example>
@@ -318,6 +323,13 @@ export function SelectBoxWorkbench() {
               dontVisual={<RoleChoice c={c} />}
             />
             <div>
+              <GuidelineTitle>세 열에서는 시각 요소를 덜어내기</GuidelineTitle>
+              <GuidelineList items={[
+                "열이 셋 이상이면 항목 폭이 Title 한 줄에 가까워집니다. Leading element까지 두면 Title이 줄바꿈되거나 잘립니다.",
+                "이 폭에서는 시각 요소를 덜어내고 Title만 두는 것을 권장합니다. 아이콘이 값을 식별하는 데 꼭 필요하면 열 수를 줄입니다.",
+              ]} />
+            </div>
+            <div>
               <GuidelineTitle>Select Box와 Chip을 나눠 쓰기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Select Box · 여러 열">
@@ -325,7 +337,7 @@ export function SelectBoxWorkbench() {
                     <SelectBoxGroup ariaLabel={c.serviceQuestion} columns={2} trailingElement="none" defaultValue="appliance-1">
                       {c.appliances.map((appliance, index) => {
                         const Icon = applianceIcons[index];
-                        return <SelectBox key={appliance} value={`appliance-${index}`} title={<span className="flex flex-col items-start gap-2 py-1"><Icon className="size-oe-icon-medium text-oe-foreground-tertiary" aria-hidden="true" /><span>{appliance}</span></span>} />;
+                        return <SelectBox key={appliance} value={`appliance-${index}`} title={appliance} leadingElement={<Icon aria-hidden="true" />} />;
                       })}
                     </SelectBoxGroup>
                   </PreviewLocaleScope>

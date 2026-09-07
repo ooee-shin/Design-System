@@ -35,8 +35,9 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - 항목마다 `disabled`를 둘 수 있고 Group의 `disabled`와 함께 적용된다.
 - `selectionMode`의 기본값은 `single`, `columns`의 기본값은 `1`이며 Multi column 검수 범위는 2~6열이다. 좁은 Preview에서는 한 열을 유지하고 640px 이상 Container에서 지정한 열 수를 적용한다.
 - 항목 배치는 `columns`로만 지원한다. 한 열에서는 항목이 Container 너비를 채우고 여러 열에서는 열마다 같은 너비를 사용한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다.
+- `columns`가 2 이상이면 Leading element를 Title 왼쪽이 아니라 Title 위 왼쪽에 배치한다. 열이 여럿이면 항목이 좁아져 한 줄에 두 요소를 나란히 두기 어렵다. 이 배치는 `columns` 값으로 결정되며 별도 Property를 두지 않는다.
 - Group의 항목 간격은 8px이다. 항목은 고정 높이를 갖지 않고 Content에 맞춰 늘어나며 현재 내부 여백은 좌우 16px, 상하 12px이다.
-- Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
+- 한 열에서 Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 여러 열에서 Leading element는 Title 위로 올라가고 Trailing element만 수직 중앙 정렬을 유지한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
 - Title과 Description 간격은 2px이다. Title은 14px Medium, Description은 12px Tertiary foreground를 사용한다.
 - 선택 상태는 진한 Filled action과 구분하기 위해 `brand-alpha-05` 배경과 `brand-alpha-40` 경계를 사용한다. Pointer 선택만으로 Focus ring을 표시하지 않는다.
 - 키보드 `:focus-visible`에서는 선택선과 별도 ring을 중첩하지 않고 같은 2px 경계를 `oe-focus-ring` 색으로 바꾼다.
@@ -70,6 +71,10 @@ Select Box는 박스 전체를 하나의 터치 타겟으로 구성하여 오조
 ### 선택과 실행을 나누기
 
 Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저장, 확인이나 다음 단계는 별도 Button이 담당한다. 카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않는다.
+
+### 세 열에서는 시각 요소를 덜어내기
+
+열이 셋 이상이면 항목 폭이 Title 한 줄에 가까워진다. Leading element까지 두면 Title이 줄바꿈되거나 잘린다. 이 폭에서는 시각 요소를 덜어내고 Title만 두는 것을 권장한다. 아이콘이 값을 식별하는 데 꼭 필요하면 열 수를 줄인다.
 
 ### Select Box와 Chip을 나눠 쓰기
 

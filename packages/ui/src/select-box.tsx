@@ -42,6 +42,7 @@ type SelectBoxContextValue = {
   disabled: boolean
   readOnly: boolean
   trailingElement: SelectBoxTrailingElement
+  stackLeadingElement: boolean
 }
 
 const SelectBoxContext = React.createContext<SelectBoxContextValue | null>(null)
@@ -89,7 +90,8 @@ function SelectBoxGroup({
     disabled,
     readOnly,
     trailingElement: resolvedTrailingElement,
-  }), [disabled, readOnly, resolvedTrailingElement, selectedValue, selectionMode, updateValue])
+    stackLeadingElement: resolvedColumns > 1,
+  }), [disabled, readOnly, resolvedColumns, resolvedTrailingElement, selectedValue, selectionMode, updateValue])
 
   const groupClassName = cn(
     "grid grid-cols-1 gap-2",
@@ -173,7 +175,7 @@ function SelectBox({
         className,
       )}
     >
-      <span className="flex min-w-0 flex-1 items-center gap-3">
+      <span className={cn("flex min-w-0 flex-1", context.stackLeadingElement ? "flex-col items-start gap-2" : "items-center gap-3")}>
         {leadingElement ? <span data-slot="select-box-leading-element" className="flex size-8 shrink-0 items-center justify-center overflow-hidden text-oe-foreground-tertiary [&_img]:size-full [&_img]:object-cover [&_svg]:size-5">{leadingElement}</span> : null}
         <div data-slot="select-box-content" className="min-w-0 flex-1">
           <span className={cn("block text-sm font-medium leading-5 text-oe-foreground-primary", isDisabled && "text-oe-foreground-disabled")}>{title}</span>
