@@ -53,7 +53,7 @@ type ChipBaseProps = VariantProps<typeof chipVariants> & {
   children?: string
   leadingElement?: React.ReactNode
   trailingElement?: React.ReactNode
-  selected?: boolean
+  active?: boolean
   disabled?: boolean
   ariaLabel?: string
   className?: string
@@ -73,7 +73,7 @@ function Chip({
   variant,
   controlSize = "regular",
   shape,
-  selected = false,
+  active = false,
   disabled = false,
   ariaLabel,
   className,
@@ -87,7 +87,7 @@ function Chip({
     chipVariants({ variant, controlSize, shape, iconOnly }),
     iconOnly && iconOnlyWidth[size],
     iconSize[size],
-    selected && !disabled && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-foreground-primary",
+    active && !disabled && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-foreground-primary",
     className,
   )
   const content = (
@@ -100,7 +100,7 @@ function Chip({
 
   if (onRemove) {
     return (
-      <span data-slot="chip" data-selected={selected ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
+      <span data-slot="chip" data-active={active ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
         {content}
         <button
           type="button"
@@ -121,13 +121,13 @@ function Chip({
       <button
         type="button"
         data-slot="chip"
-        data-selected={selected ? "" : undefined}
+        data-active={active ? "" : undefined}
         data-disabled={disabled ? "" : undefined}
-        aria-pressed={selected}
+        aria-pressed={active}
         aria-label={iconOnly ? ariaLabel : undefined}
         disabled={disabled}
         onClick={onClick}
-        className={cn(shared, "outline-none hover:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none", selected && !disabled && "hover:bg-[var(--brand-alpha-05)]")}
+        className={cn(shared, "outline-none hover:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none", active && !disabled && "hover:bg-[var(--brand-alpha-05)]")}
       >
         {content}
       </button>
@@ -135,7 +135,7 @@ function Chip({
   }
 
   return (
-    <span data-slot="chip" data-selected={selected ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
+    <span data-slot="chip" data-active={active ? "" : undefined} data-disabled={disabled ? "" : undefined} aria-label={ariaLabel} className={shared}>
       {content}
     </span>
   )
