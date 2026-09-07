@@ -44,9 +44,9 @@ const copy = {
     autoDistribution: { title: "자동분배", description: "접수한 순서에 따라 담당자에게 자동으로 배분합니다." },
     manualDistribution: { title: "수동분배", description: "담당자를 직접 지정해 배분합니다." },
     permissionFields: [
-      { label: "데이터 등록 권한", options: ["관리자", "공유자", "전체"] },
-      { label: "데이터 수정 권한", options: ["관리자", "등록자", "공유자", "전체"] },
-      { label: "데이터 삭제 권한", options: ["관리자", "등록자"] },
+      { label: "데이터 등록 권한", options: ["관리자", "공유자", "전체"], selected: 1 },
+      { label: "데이터 수정 권한", options: ["관리자", "등록자", "공유자", "전체"], selected: 2 },
+      { label: "데이터 삭제 권한", options: ["관리자", "등록자", "공유자", "전체"], selected: 0 },
     ],
     serviceQuestion: "A/S가 필요한 항목을 선택해주세요",
     appliances: ["냉장고", "커피머신", "제빙기", "온수기"],
@@ -75,9 +75,9 @@ const copy = {
     autoDistribution: { title: "Automatic", description: "Assigns each request to an owner in the order received." },
     manualDistribution: { title: "Manual", description: "Lets you pick the owner for each request." },
     permissionFields: [
-      { label: "Create permission", options: ["Admin", "Shared", "Everyone"] },
-      { label: "Edit permission", options: ["Admin", "Owner", "Shared", "Everyone"] },
-      { label: "Delete permission", options: ["Admin", "Owner"] },
+      { label: "Create permission", options: ["Admin", "Shared", "Everyone"], selected: 1 },
+      { label: "Edit permission", options: ["Admin", "Owner", "Shared", "Everyone"], selected: 2 },
+      { label: "Delete permission", options: ["Admin", "Owner", "Shared", "Everyone"], selected: 0 },
     ],
     serviceQuestion: "Select the item that needs service",
     appliances: ["Refrigerator", "Coffee machine", "Ice maker", "Water heater"],
@@ -383,7 +383,7 @@ export function SelectBoxWorkbench() {
                     {c.permissionFields.map((field) => (
                       <div key={field.label}>
                         <p className="text-xs font-medium text-oe-foreground-primary">{field.label}</p>
-                        <RadioGroup aria-label={field.label} defaultValue={`${field.label}-0`} className="-ml-2 mt-1 flex flex-wrap gap-x-4">
+                        <RadioGroup aria-label={field.label} defaultValue={`${field.label}-${field.selected}`} className="-ml-2 mt-1 flex flex-wrap gap-x-4">
                           {field.options.map((option, index) => <RadioField key={option} value={`${field.label}-${index}`} label={option} />)}
                         </RadioGroup>
                       </div>
