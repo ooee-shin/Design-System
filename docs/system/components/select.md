@@ -74,7 +74,6 @@ Control height는 [interaction.md](../interaction.md)의 「공통 Control Heigh
 - MultiSelect의 `summary`는 가장 먼저 선택한 대표값과 그 값을 제외한 나머지 개수를 표시한다.
 - MultiSelect의 `count`는 대표값 없이 선택한 전체 개수만 표시한다.
 - 선택된 Option은 별도 배경과 Label 색상 변경 없이 Neutral label의 Medium 굵기와 `oe-brand-foreground-primary` Check indicator로 표시한다.
-- 선택된 Option에는 Hover highlight를 중첩하지 않는다.
 
 ### Content structure
 

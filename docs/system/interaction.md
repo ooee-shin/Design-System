@@ -12,6 +12,12 @@ Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Foc
 2. 선택선처럼 기존 경계가 이미 2px인 요소는 두께, 위치와 레이아웃을 바꾸지 않고 같은 2px 선의 색만 `oe-focus-ring`으로 교체한다. 선택선과 별도 Focus ring을 중첩하지 않는다.
 3. 기존 경계와 분리된 Focus 표시가 필요한 요소는 기본 2px 간격을 두고 바깥에 2px ring을 그린다. 컴포넌트 구조상 별도 조정이 필요한 경우에만 간격을 2px보다 크게 할 수 있다.
 
+## 선택 상태와 Hover·Pressed
+
+선택된 상태에는 Hover와 Pressed 하이라이트를 중첩하지 않는다. 선택 배경이 pointer와 키보드 Hover highlight보다 우선하며, 선택된 요소 위에서 포인터를 움직이거나 누르는 동안에도 그 배경을 유지한다.
+
+회색조 하이라이트를 선택 배경 위에 덧입히면 선택 색이 흐려져 무엇이 선택되어 있는지 알기 어려워진다. 선택되지 않은 요소에는 Hover에 `oe-interaction-hover-subtle`, Pressed에 `oe-interaction-hover`를 사용한다.
+
 ## Disabled
 
 Outline 형태의 공용 Form control과 선택 요소는 Disabled 상태에서도 외곽선을 제거하거나 배경과 구분되지 않는 색으로 바꾸지 않는다. 구조를 인지할 수 있도록 기본 Outline border를 유지하고, Disabled 위계는 foreground와 background 및 상호작용 제한으로 표현한다. Filled 형태는 별도 Border가 없는 기존 구조를 유지한다.

@@ -52,8 +52,8 @@ Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContain
 - 다중 선택 목록 맨 위의 `전체 N`은 disabled가 아닌 전체 Option 수를 표시한다. `N`은 레이블과 4px 간격을 두고 `oe-foreground-tertiary`로 낮춰 표시하며, 행을 누르면 전체 선택 또는 전체 해제한다.
 - 선택된 Option은 check indicator로 표시한다.
 - 전체 선택 행의 label은 Checkbox의 Parent item과 같은 Semibold 600을 사용한다. 나머지 Option label은 Regular 400이다.
-- 선택·활성 상태의 Option, 전체 선택 행과 2-depth Checkbox 행에는 별도의 Hover 배경을 중첩하지 않는다.
-- 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 선택 배경은 pointer/keyboard Hover highlight보다 우선한다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
+- 선택·활성 상태의 Option, 전체 선택 행과 2-depth Checkbox 행에 이 규칙이 적용된다. 근거는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」다.
+- 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
 - Popup Option 행의 배경은 scrollbar 폭까지 확장해 Search input과 가로 범위를 맞춘다.
 - 다중 선택은 첫 번째 선택 label과 나머지 개수를 `서울특별시 외 2곳`처럼 Trigger에 표시하고, 아래의 별도 선택 영역 Container 안에 공용 Chip을 전부 표시한다. Container는 끌 수 없다. 선택한 값을 계속 보면서 개별로 빼는 것이 Combobox의 역할이기 때문이다.
 - Container는 외곽 Border 없이 Neutral secondary background로만 구분한다.
