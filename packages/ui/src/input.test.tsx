@@ -53,5 +53,6 @@ test("Input fades the clear button in when a value appears", () => {
 
   assert.ok(clear)
   assert.match(clear.className, /transition-\[color,background-color,opacity\]/)
+  assert.match(clear.className, /duration-150/)
   assert.match(clear.className, /opacity-0/)
 })
