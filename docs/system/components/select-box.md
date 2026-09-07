@@ -48,7 +48,11 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 �
 
 ### 설명이나 시각 정보가 있는 선택지에 사용하기
 
-Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보다. 비교할 정보가 없으면 이 영역이 빈 자리로 남는다. 짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용하고, 선택지를 접어 두어도 되면 Select를 사용한다.
+Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 한다.
+
+Title만 있는 짧은 선택지는 `columns`를 늘려 여러 열로 나누고 `trailingElement`를 `none`으로 둔다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어진다. 어느 쪽이 잘못이 아니라 Content 분량에 따라 갈리는 권장 배치다.
+
+짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용하고, 선택지를 접어 두어도 되면 Select를 사용한다.
 
 ### 항목마다 같은 정보 구성을 유지하기
 

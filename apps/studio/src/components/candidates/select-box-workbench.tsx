@@ -6,7 +6,7 @@ import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelecti
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { GuidelineList, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -36,6 +36,7 @@ const copy = {
     planB: { title: "연간 요금제", description: "두 달치 요금을 아낄 수 있습니다." },
     shortA: "월간",
     shortB: "연간",
+    shortC: "분기",
     planGroup: "요금제",
   },
   en: {
@@ -50,6 +51,7 @@ const copy = {
     planB: { title: "Annual plan", description: "Saves the cost of two months." },
     shortA: "Monthly",
     shortB: "Annual",
+    shortC: "Quarterly",
     planGroup: "Plan",
   },
 } as const;
@@ -235,17 +237,22 @@ export function SelectBoxWorkbench() {
 
         <Section id="guidelines" title="Guidelines" description="Select Box를 고르고 항목을 구성할 때 적용하는 기준의 첫 번째 초안입니다.">
           <div className="grid gap-8">
-            <UsageComparison
-              title="설명이나 시각 정보가 있는 선택지에 사용하기"
-              doText="선택지마다 비교할 정보가 있을 때 Select Box를 사용하세요."
-              dontText="짧은 Label만 나열할 때 Select Box를 쓰지 마세요."
-              description={[
-                "Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description과 시각 정보입니다. 비교할 정보가 없으면 이 영역이 빈 자리로 남습니다.",
+            <div>
+              <GuidelineTitle>설명이나 시각 정보가 있는 선택지에 사용하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="설명이 있는 선택지 · 한 열">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="짧은 Label · 여러 열 · Trailing element 제거">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} columns={3} trailingElement="none" defaultValue="plan-a"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.shortB} /><SelectBox value="plan-c" title={c.shortC} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보입니다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 합니다.",
+                <>Title만 있는 짧은 선택지는 <code className="text-xs text-oe-foreground-primary">columns</code>를 늘려 여러 열로 나누고 <code className="text-xs text-oe-foreground-primary">trailingElement</code>를 <code className="text-xs text-oe-foreground-primary">none</code>으로 둡니다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어집니다.</>,
                 "짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용합니다. 선택지를 접어 두어도 되면 Select를 사용합니다.",
-              ]}
-              doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.shortB} /></SelectBoxGroup></PreviewLocaleScope>}
-            />
+              ]} />
+            </div>
             <UsageComparison
               title="항목마다 같은 정보 구성을 유지하기"
               doText="한 Group의 모든 항목에 같은 요소를 두세요."
