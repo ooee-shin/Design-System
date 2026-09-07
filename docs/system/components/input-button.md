@@ -43,6 +43,30 @@ Input Button은 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰�
 - Click 이후 동작은 소비자가 `onClick`과 필요한 `aria-haspopup`을 연결한다.
 - Input Button 내부에는 별도의 Input, Clear button 또는 다른 Button을 중첩하지 않는다.
 
+## Guidelines
+
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
+
+### Input Button과 Select를 나눠 쓰기
+
+달력, 주소 검색, 시간 선택처럼 값을 정하는 수단이 별도 화면이면 Input Button을 사용한다. 어떤 화면을 열지는 이 컴포넌트가 소유하지 않는다.
+
+미리 정의된 짧은 목록에서 바로 고르면 Select를 사용한다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용한다.
+
+### 조회는 Read only, 쓸 수 없을 때만 Disabled
+
+다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이므로 조회에는 `readOnly`를 사용한다. focus가 유지되어 키보드로 값을 지나갈 수 있고 값은 그대로 읽힌다.
+
+`disabled`는 값 자체를 쓸 수 없는 상태에만 사용한다. 조작 대상에서 빠져 키보드로 지나갈 수 없으므로, 읽기만 하는 화면에 쓰면 값이 있는 자리를 건너뛰게 된다.
+
+Read only가 막는 것은 여는 동작 자체가 아니라 그 호출이다. 실제로 무엇을 열지는 이 컴포넌트를 가져다 쓰는 화면이 소유한다.
+
+### 내부에 다른 조작 요소를 두지 않기
+
+Container 전체가 하나의 Button이다. 안에 별도 Input이나 Clear button, 다른 Button을 중첩하면 무엇을 눌렀는지 알 수 없게 된다.
+
+그래서 Clear button을 제공하지 않는다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둔다. Value는 문자열만 표시하며, 여러 값을 Chip으로 나열해야 하면 Combobox를 사용한다.
+
 ## 현재 검수 예시
 
 - Calendar: 달력에서 날짜를 선택하는 화면을 여는 Trigger

@@ -8,6 +8,8 @@ import { InputColorExample, InputCustomExamples } from "@/components/candidates/
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
+import { GuidelineTitle } from "@/components/guideline-title";
 import { PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -52,6 +54,7 @@ const inputSections = [
   { id: "elements", label: "Elements" },
   { id: "custom-input", label: "Custom input" },
   { id: "color-input", label: "Color input" },
+  { id: "guidelines", label: "Guidelines" },
   { id: "property-map", label: "Property map" },
 ];
 
@@ -195,6 +198,45 @@ export function InputWorkbench() {
 
       <Section id="color-input" title="Color input" description={c.colorInputDescription}>
         <InputColorExample />
+      </Section>
+
+      <Section id="guidelines" title="Guidelines" description="Input을 고르고 내부 요소를 구성할 때 적용하는 기준입니다.">
+        <div className="col-span-full grid gap-8">
+          <div>
+            <GuidelineTitle>Prefix·Suffix와 Leading·Trailing element를 나눠 쓰기</GuidelineTitle>
+            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+              <GuideVisual label="Prefix · Suffix">
+                <PreviewLocaleScope className="w-full"><Input value="1,250,000" readOnly prefix="₩" suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} /></PreviewLocaleScope>
+              </GuideVisual>
+              <GuideVisual label="Leading · Trailing element">
+                <PreviewLocaleScope className="w-full space-y-2">
+                  <Input value={locale === "ko" ? "검색어" : "Keyword"} readOnly leadingElement={<RiSearchLine aria-hidden="true" />} aria-label={locale === "ko" ? "검색" : "Search"} />
+                  <Input type="password" value="password" readOnly trailingElement={<RiEyeLine aria-hidden="true" />} aria-label={locale === "ko" ? "비밀번호" : "Password"} />
+                </PreviewLocaleScope>
+              </GuideVisual>
+            </div>
+            <GuidelineList items={[
+              "Prefix와 Suffix는 값의 의미를 보완하는 짧은 표기 자리입니다. 통화 기호와 단위가 여기에 옵니다.",
+              "Leading element와 Trailing element는 값을 식별하거나 조작을 여는 요소 자리입니다. 검색을 나타내는 아이콘이나 보기 전환 action이 여기에 옵니다.",
+              <>내부 순서는 <code className="text-xs text-oe-foreground-primary">Leading element → Prefix → Input field → Clear button → Suffix → Trailing element</code>로 고정됩니다. 같은 의미의 요소를 두 자리에 나눠 두지 않습니다.</>,
+            ]} />
+          </div>
+          <div>
+            <GuidelineTitle>Clear button은 값을 자주 비우는 자리에 두기</GuidelineTitle>
+            <GuidelineList items={[
+              <>Input은 값을 소유하지 않으므로 값의 유무는 쓰는 쪽이 판단해 <code className="text-xs text-oe-foreground-primary">clearable</code>로 전달합니다. 값이 없으면 버튼을 렌더링하지 않아 자리를 차지하지 않고, Input에 focus가 있을 때만 나타납니다.</>,
+              "검색, 필터, 금액처럼 값을 지우고 다시 입력하는 자리에 둡니다. 한 번 정하면 유지되는 이름이나 주소에는 두지 않습니다. 버튼이 늘 자리를 지키면 지울 일이 없는 값에도 지우기를 권하는 것처럼 보입니다.",
+            ]} />
+          </div>
+          <div>
+            <GuidelineTitle>숫자 값은 Number Input과 나눠 쓰기</GuidelineTitle>
+            <GuidelineList items={[
+              <>Input에는 별도 <code className="text-xs text-oe-foreground-primary">numeric</code> Property를 두지 않습니다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고, 증감 버튼이 필요 없으면 Number Input의 Controls를 숨깁니다.</>,
+              <>전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당합니다. native <code className="text-xs text-oe-foreground-primary">inputMode=&quot;numeric&quot;</code>과 필요한 포맷, <code className="text-xs text-oe-foreground-primary">tabular-nums</code>를 조합합니다.</>,
+              "자리 구분이 필요한 금액도 Input이 담당합니다. Number Input은 값에 구분자를 담을 수 없습니다.",
+            ]} />
+          </div>
+        </div>
       </Section>
 
       <Section id="property-map" title="Property map" description="상위 Property와 현재 허용하는 하위 값을 한 번에 확인합니다.">

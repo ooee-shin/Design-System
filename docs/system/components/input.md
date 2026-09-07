@@ -60,6 +60,28 @@ Input 전용 값이 아니라 Button과 한 줄 Form control이 함께 사용하
 
 Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea는 별도 최소 높이 또는 row 정책이 필요하다. Button과 다른 한 줄 Form control의 기존 API는 Input 이후 같은 공통 Size로 정규화한다.
 
+## Guidelines
+
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
+
+### Prefix·Suffix와 Leading·Trailing element를 나눠 쓰기
+
+Prefix와 Suffix는 값의 의미를 보완하는 짧은 표기 자리다. 통화 기호와 단위가 여기에 온다. Leading element와 Trailing element는 값을 식별하거나 조작을 여는 요소 자리이며 검색을 나타내는 아이콘이나 보기 전환 action이 여기에 온다.
+
+내부 순서는 `Leading element → Prefix → Input field → Clear button → Suffix → Trailing element`로 고정된다. 같은 의미의 요소를 두 자리에 나눠 두지 않는다.
+
+### Clear button은 값을 자주 비우는 자리에 두기
+
+Input은 값을 소유하지 않으므로 값의 유무는 소비자가 판단해 `clearable`로 전달한다. 값이 없으면 버튼을 렌더링하지 않아 자리를 차지하지 않고, Input에 focus가 있을 때만 나타난다.
+
+검색, 필터, 금액처럼 값을 지우고 다시 입력하는 자리에 둔다. 한 번 정하면 유지되는 이름이나 주소에는 두지 않는다. 버튼이 늘 자리를 지키면 지울 일이 없는 값에도 지우기를 권하는 것처럼 보인다.
+
+### 숫자 값은 Number Input과 나눠 쓰기
+
+Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고 증감 버튼이 필요 없으면 Number Input의 Controls를 숨긴다.
+
+전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당한다. native `inputMode="numeric"`과 필요한 포맷, `tabular-nums`를 조합한다. 자리 구분이 필요한 금액도 Input이 담당한다. Number Input은 값에 구분자를 담을 수 없다.
+
 ## 현재 정의하지 않은 항목
 
 - Shape variant

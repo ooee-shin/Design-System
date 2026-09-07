@@ -2,9 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import { RiArrowRightSLine, RiCalendarLine, RiMapPinLine, RiTimeLine } from "@remixicon/react";
-import { InputButton } from "@ooee/ui";
+import { InputButton, Select } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
+import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
+import { GuidelineTitle } from "@/components/guideline-title";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { ColorSwatch } from "@/components/color-swatch";
 import { OnThisPage } from "@/components/component-detail-navigation";
@@ -22,6 +24,7 @@ const copy = {
     address: "주소", addressPlaceholder: "주소를 선택해 주세요", addressDescription: "주소 검색 또는 선택 화면을 엽니다.",
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
+    periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
@@ -30,6 +33,7 @@ const copy = {
     address: "Address", addressPlaceholder: "Select an address", addressDescription: "Opens an address search or selection surface.",
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
+    periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
   },
 } as const;
 
@@ -37,7 +41,8 @@ const sections = [
   { id: "playground", label: "Playground" }, { id: "anatomy", label: "Anatomy" },
   { id: "style", label: "Style" }, { id: "size", label: "Size" }, { id: "layout", label: "Layout" },
   { id: "elements", label: "Elements" }, { id: "state", label: "State" },
-  { id: "examples", label: "Examples" }, { id: "property-map", label: "Property map" },
+  { id: "examples", label: "Examples" }, { id: "guidelines", label: "Guidelines" },
+  { id: "property-map", label: "Property map" },
 ];
 
 export function InputButtonWorkbench() {
@@ -123,6 +128,42 @@ export function InputButtonWorkbench() {
           <Example label={c.address} description={c.addressDescription}><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine />} aria-haspopup="dialog" /></Example>
           <Example label={c.time} description={c.timeDescription}><InputButton value={c.timeValue} leadingElement={<RiTimeLine />} aria-haspopup="dialog" /></Example>
           <Example label={c.color} description={c.colorDescription}><InputButton value={c.colorValue} leadingElement={<ColorSwatch color="#0073FF" />} aria-haspopup="dialog" /></Example>
+        </Section>
+
+        <Section id="guidelines" title="Guidelines" description="Input Button을 고르고 조회와 편집을 나눌 때 적용하는 기준입니다.">
+          <div className="col-span-full grid gap-8">
+            <div>
+              <GuidelineTitle>Input Button과 Select를 나눠 쓰기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Input Button · 별도 화면에서 값을 정함">
+                  <PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-label={locale === "ko" ? "날짜 선택" : "Select a date"} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Select · 짧은 목록에서 바로 고름">
+                  <PreviewLocaleScope className="w-full"><Select options={c.periodOptions.map((label, index) => ({ value: `period-${index}`, label }))} defaultValue="period-0" ariaLabel={c.periodLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "달력, 주소 검색, 시간 선택처럼 값을 정하는 수단이 별도 화면이면 Input Button을 사용합니다. 어떤 화면을 열지는 이 컴포넌트가 소유하지 않습니다.",
+                "미리 정의된 짧은 목록에서 바로 고르면 Select를 사용합니다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용합니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>조회는 Read only, 쓸 수 없을 때만 Disabled</GuidelineTitle>
+              <GuidelineList items={[
+                <>다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이므로, 조회에는 <code className="text-xs text-oe-foreground-primary">readOnly</code>를 사용합니다. focus가 유지되어 키보드로 값을 지나갈 수 있고 값은 그대로 읽힙니다.</>,
+                <><code className="text-xs text-oe-foreground-primary">disabled</code>는 값 자체를 쓸 수 없는 상태에만 사용합니다. 조작 대상에서 빠져 키보드로 지나갈 수 없으므로, 읽기만 하는 화면에 쓰면 값이 있는 자리를 건너뛰게 됩니다.</>,
+                "Read only가 막는 것은 여는 동작 자체가 아니라 그 호출입니다. 실제로 무엇을 열지는 이 컴포넌트를 가져다 쓰는 화면이 소유합니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>내부에 다른 조작 요소를 두지 않기</GuidelineTitle>
+              <GuidelineList items={[
+                "Container 전체가 하나의 Button입니다. 안에 별도 Input이나 Clear button, 다른 Button을 중첩하면 무엇을 눌렀는지 알 수 없게 됩니다.",
+                "그래서 Clear button을 제공하지 않습니다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둡니다.",
+                "Value는 문자열만 표시합니다. 여러 값을 Chip으로 나열해야 하면 Combobox를 사용합니다.",
+              ]} />
+            </div>
+          </div>
         </Section>
 
         <Section id="property-map" title="Property map" description="현재 구현에서 확인되는 Property와 허용 값을 정리합니다.">
