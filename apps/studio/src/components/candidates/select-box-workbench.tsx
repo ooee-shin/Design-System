@@ -6,7 +6,7 @@ import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelecti
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -253,17 +253,21 @@ export function SelectBoxWorkbench() {
                 "짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용합니다. 선택지를 접어 두어도 되면 Select를 사용합니다.",
               ]} />
             </div>
-            <UsageComparison
-              title="항목마다 같은 정보 구성을 유지하기"
-              doText="한 Group의 모든 항목에 같은 요소를 두세요."
-              dontText="일부 항목에만 Description을 두지 마세요."
-              description={[
-                "Select Box는 항목을 나란히 놓고 비교하는 컴포넌트이므로, 어떤 항목에만 정보가 있으면 값의 차이인지 작성의 누락인지 구분할 수 없습니다.",
-                "Leading element도 같습니다. Group 안에서는 모든 항목에 같은 Leading 영역을 유지하고 종류를 섞지 않습니다.",
-              ]}
-              doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} /></SelectBoxGroup></PreviewLocaleScope>}
-            />
+            <div>
+              <GuidelineTitle>Description은 필요한 항목에만 두기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="필요한 항목에만">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-b"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="모든 항목에">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "항목마다 정보 구성이 같아야 하는 것은 아닙니다. 부연이 필요한 항목에만 Description을 두고 나머지는 Title만 두어도 됩니다.",
+                "항목 높이는 고정되어 있지 않고 각자의 Content에 맞춰 늘어납니다. 한 항목만 길어져도 나머지 항목의 높이는 그대로입니다.",
+              ]} />
+            </div>
             <div>
               <GuidelineTitle>선택과 실행을 나누기</GuidelineTitle>
               <GuidelineList items={[
