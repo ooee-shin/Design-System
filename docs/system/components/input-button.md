@@ -67,6 +67,18 @@ Container 전체가 하나의 Button이다. 안에 별도 Input이나 Clear butt
 
 그래서 Clear button을 제공하지 않는다. 값을 비우는 동작이 필요하면 여는 화면에서 처리하거나 Field 쪽에 둔다. Value는 문자열만 표시하며, 여러 값을 Chip으로 나열해야 하면 Combobox를 사용한다.
 
+### Trailing element에는 조작이 아니라 여는 표시를 두기
+
+Leading element와 Prefix, Suffix는 Input과 같은 성격이다. 값을 식별하는 요소와 값의 의미를 보완하는 짧은 표기를 둔다.
+
+Trailing element는 다르다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둔다. Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않으며, 그 동작이 필요하면 값을 직접 입력받는 Input을 사용한다.
+
+### Placeholder는 문장이 아니라 형식이나 키워드로 쓰기
+
+값이 없으면 Placeholder가 유일한 안내다. 눌러야 값을 정할 수 있으므로 무엇을 고르는 자리인지 먼저 읽혀야 한다.
+
+`주소를 선택해 주세요` 같은 문장 대신 `주소 선택`처럼 키워드로 쓴다. 정해진 형식이 있으면 `YYYY. MM. DD`처럼 형식을 그대로 보여준다. 한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없다.
+
 ### Color input은 직접 입력 여부로 나누기
 
 색상 코드를 직접 입력받아야 하면 Input을 사용한다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여준다.

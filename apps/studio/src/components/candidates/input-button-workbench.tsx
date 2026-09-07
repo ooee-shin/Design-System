@@ -19,23 +19,23 @@ type PreviewState = "default" | "focus" | "invalid" | "disabled" | "readOnly";
 const copy = {
   ko: {
     description: "직접 입력하는 대신 달력, 주소 검색, 시간 선택과 같은 후속 화면을 여는 버튼입니다. Input과 같은 외관을 사용하지만 실제 역할과 HTML 요소는 Button입니다.",
-    value: "2026. 08. 26", placeholder: "날짜를 선택해 주세요",
+    value: "2026. 08. 26", placeholder: "날짜 선택",
     calendar: "날짜", calendarDescription: "달력에서 날짜를 선택하는 화면을 엽니다.",
-    address: "주소", addressPlaceholder: "주소를 선택해 주세요", addressDescription: "주소 검색 또는 선택 화면을 엽니다.",
+    address: "주소", addressPlaceholder: "주소 선택", addressDescription: "주소 검색 또는 선택 화면을 엽니다.",
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
     periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
-    colorHexLabel: "색상 코드", colorPickLabel: "색상",
+    colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD",
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
-    value: "Aug 26, 2026", placeholder: "Select a date",
+    value: "Aug 26, 2026", placeholder: "Select date",
     calendar: "Date", calendarDescription: "Opens a calendar for date selection.",
-    address: "Address", addressPlaceholder: "Select an address", addressDescription: "Opens an address search or selection surface.",
+    address: "Address", addressPlaceholder: "Select address", addressDescription: "Opens an address search or selection surface.",
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
     periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
-    colorHexLabel: "Color code", colorPickLabel: "Color",
+    colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD",
   },
 } as const;
 
@@ -166,6 +166,30 @@ export function InputButtonWorkbench() {
               ]} />
             </div>
             <div>
+              <GuidelineTitle>Trailing element에는 조작이 아니라 여는 표시를 두기</GuidelineTitle>
+              <GuidelineList items={[
+                "Leading element와 Prefix, Suffix는 Input과 같은 성격입니다. 값을 식별하는 요소와 값의 의미를 보완하는 짧은 표기를 둡니다.",
+                "Trailing element는 다릅니다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둡니다.",
+                "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>Placeholder는 문장이 아니라 형식이나 키워드로 쓰기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="키워드">
+                  <PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="형식">
+                  <PreviewLocaleScope className="w-full"><InputButton placeholder={c.datePattern} leadingElement={<RiCalendarLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "값이 없으면 Placeholder가 유일한 안내입니다. 눌러야 값을 정할 수 있으므로 무엇을 고르는 자리인지 먼저 읽혀야 합니다.",
+                "「주소를 선택해 주세요」 같은 문장 대신 「주소 선택」처럼 키워드로 씁니다. 정해진 형식이 있으면 「YYYY. MM. DD」처럼 형식을 그대로 보여줍니다.",
+                "한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없습니다.",
+              ]} />
+            </div>
+            <div>
               <GuidelineTitle>Color input은 직접 입력 여부로 나누기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Input · HEX 직접 입력">
@@ -203,7 +227,7 @@ function InputButtonAnatomy() {
       <AnatomySurface ariaLabel="Input Button anatomy" title="Input Button structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
           <div className="relative mx-auto flex h-48 w-[30rem] items-center justify-center">
-            <div className="pointer-events-none w-72"><InputButton value="2026-09-14" leadingElement={<AnatomySwapSlot />} prefix="+82" suffix="KST" trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
+            <div className="pointer-events-none w-72"><InputButton value="2026. 09. 14" leadingElement={<AnatomySwapSlot />} prefix="+82" suffix="KST" trailingElement={<AnatomySwapSlot />} tabIndex={-1} /></div>
             <AnatomyBoundaryMarker number={1} side="left" connectorLength={48} boundaryLength={36} className="left-5 top-[5.4rem]" />
             <AnatomyNumber number={2} className="left-[106px] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
             <AnatomyNumber number={3} className="left-[135px] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
