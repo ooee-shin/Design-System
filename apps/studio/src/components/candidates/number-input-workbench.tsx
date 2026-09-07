@@ -21,6 +21,7 @@ const copy = {
     increaseTooltip: "증가",
     quantity: "수량",
     guests: "인원",
+    amount: "금액",
   },
   en: {
     description: "A numeric control for entering an exact value directly or adjusting it with step buttons. It supports quantities, order, and percentages with defined ranges and increments.",
@@ -30,6 +31,7 @@ const copy = {
     increaseTooltip: "Increase",
     quantity: "Quantity",
     guests: "Guests",
+    amount: "Amount",
   },
 } as const;
 
@@ -167,14 +169,14 @@ export function NumberInputWorkbench() {
           <div className="col-span-full grid gap-8">
             <UsageComparison
               title="Input과 Number Input을 나눠 쓰기"
-              doText="계산에 쓰이는 숫자는 Number Input을 사용하세요."
+              doText="자리 구분이 필요한 금액은 Input으로 표기를 만드세요."
               dontText="자리 구분이 필요한 값에 Number Input을 쓰지 마세요."
               description={[
-                "수량, 순서, 비율처럼 더하고 빼고 비교하는 값은 Number Input이 담당합니다.",
-                "자리 구분이 필요한 값은 Input에서 표기를 만듭니다. Number Input은 값에 구분자를 담을 수 없고, 담게 만들면 키보드 화살표 증감과 범위 검증과 폼 제출값을 함께 잃습니다.",
+                "수량, 순서, 비율처럼 더하고 빼고 비교하는 값은 Number Input이 담당합니다. 숫자로 보이지만 계산하지 않는 전화번호와 사업자번호, 그리고 금액처럼 자리 구분이 필요한 값은 Input이 담당합니다.",
+                "Number Input은 값에 구분자를 담을 수 없어 자릿수를 눈으로 세야 합니다. 담게 만들면 키보드 화살표 증감과 범위 검증과 폼 제출값을 함께 잃습니다.",
               ]}
-              doVisual={<StudioNumberInput locale={locale} defaultValue={12} min={0} max={99} />}
-              dontVisual={<Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} />}
+              doVisual={<ComponentSample name="Input"><Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={copy[locale].amount} /></ComponentSample>}
+              dontVisual={<ComponentSample name="Number Input"><StudioNumberInput locale={locale} defaultValue={1250000} min={0} max={99999999} textAlign="right" aria-label={copy[locale].amount} /></ComponentSample>}
             />
             <UsageComparison
               title="증감 버튼 위치를 한 페이지에서 섞지 않기"
@@ -256,6 +258,10 @@ function NumberInputAnatomy({ locale }: { locale: keyof typeof copy }) {
 function StudioNumberInput({ locale, ...props }: NumberInputProps & { locale: keyof typeof copy }) {
   const c = copy[locale];
   return <NumberInput decreaseLabel={c.decrease} increaseLabel={c.increase} decreaseTooltip={c.decreaseTooltip} increaseTooltip={c.increaseTooltip} {...props} />;
+}
+
+function ComponentSample({ name, children }: { name: string; children: ReactNode }) {
+  return <div className="w-full space-y-1.5"><AffixToneLabel>{name}</AffixToneLabel>{children}</div>;
 }
 
 function ControlsPositionStack({ locale, second }: { locale: keyof typeof copy; second: "trailing" | "split" }) {
