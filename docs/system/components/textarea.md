@@ -72,7 +72,7 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 ### 내부 요소와 Layout 선택은 제공하지 않기
 
-Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않는다. Container와 Textarea field만으로 구성한다. Layout은 `fill`만이며 선택 Property가 없고 폭은 부모가 정한다.
+Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않는다. Container와 Textarea field만으로 구성한다. Layout은 `fill`만이며 선택 Property가 없다. 폭은 부모가 정하며, 폭을 따로 지정하면 같은 폼의 다른 필드와 오른쪽 끝이 어긋난다.
 
 Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 또는 Label과 도움말처럼 Field가 담당할 일인지 다시 본다.
 
@@ -82,7 +82,7 @@ Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 
 
 내용에 따라 초기 높이를 따로 지정할 수 있다. 이때 반 줄이 걸치는 지점으로 맞춘다. 글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힌다. 줄 수에 딱 맞추면 입력 영역이 거기서 끝난 것처럼 보인다.
 
-### 높이를 바꿀 수 있게 하면 세로만 허용하기
+### Resize는 세로만 허용하기
 
 `resize`는 세로 방향만 제공한다. 가로는 제공하지 않는다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋난다.
 

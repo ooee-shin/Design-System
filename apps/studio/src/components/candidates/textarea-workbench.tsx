@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-import { Textarea } from "@ooee/ui";
+import { Input, Select, Textarea } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
@@ -24,7 +24,10 @@ const copy = {
     titleLabel: "제목",
     titleValue: "결제 오류 문의",
     memoLabel: "메모",
-    attachmentLabel: "첨부 파일",
+    nameLabel: "이름",
+    nameValue: "홍길동",
+    contactTimeLabel: "연락 가능 시간",
+    contactTimeOptions: ["오전", "오후", "상관없음"],
   },
   en: {
     description: "A multi-line text entry component. It shares Input styles and states but does not support leading or trailing elements.",
@@ -38,7 +41,10 @@ const copy = {
     titleLabel: "Title",
     titleValue: "Duplicate payment",
     memoLabel: "Memo",
-    attachmentLabel: "Attachment",
+    nameLabel: "Name",
+    nameValue: "Jane Doe",
+    contactTimeLabel: "Available time",
+    contactTimeOptions: ["Morning", "Afternoon", "Anytime"],
   },
 } as const;
 
@@ -119,32 +125,40 @@ export function TextareaWorkbench() {
 
         <Section id="guidelines" title="Guidelines" description="Textarea를 고르고 높이를 정할 때 적용하는 기준입니다.">
           <div className="col-span-full grid gap-8">
-            <UsageComparison
-              title="여러 줄이 필요한 값에만 사용하기"
-              doText="여러 줄을 받는 값에 사용하세요."
-              dontText="한 줄로 끝나는 값에 쓰지 마세요."
-              description={[
-                "문의 내용, 설명, 메모처럼 줄바꿈이 생기는 값에 사용합니다.",
-                "제목이나 이름처럼 한 줄로 끝나는 값은 Input을 사용합니다. Textarea는 최소 88px를 차지하므로, 한 줄 값에 두면 쓰이지 않는 빈 영역이 남고 폼의 수직 리듬이 끊깁니다.",
-              ]}
-              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.titleValue} readOnly aria-label={c.titleLabel} /></PreviewLocaleScope>}
-            />
             <div>
-              <GuidelineTitle>내부 요소와 Layout 선택은 제공하지 않기</GuidelineTitle>
+              <GuidelineTitle>여러 줄이 필요한 값에만 사용하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Textarea · 여러 줄">
+                  <PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Input · 한 줄">
+                  <PreviewLocaleScope className="w-full"><FieldLabel>{c.nameLabel}</FieldLabel><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
               <GuidelineList items={[
-                "Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않습니다. Container와 Textarea field만으로 구성합니다.",
-                <>Layout은 <code className="text-xs text-oe-foreground-primary">fill</code>만이며 선택 Property가 없습니다. 폭은 부모가 정합니다.</>,
-                "Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 또는 Label과 도움말처럼 Field가 담당할 일인지 다시 봅니다.",
+                "문의 내용, 설명, 메모처럼 줄바꿈이 생기는 값에 Textarea를 사용합니다.",
+                "제목이나 이름처럼 한 줄로 끝나는 값은 Input을 사용합니다. Textarea는 최소 88px를 차지하므로, 한 줄 값에 두면 쓰이지 않는 빈 영역이 남고 폼의 수직 리듬이 끊깁니다.",
               ]} />
             </div>
+            <UsageComparison
+              title="내부 요소와 Layout 선택은 제공하지 않기"
+              doText="폭은 부모가 정하게 두세요."
+              dontText="Textarea에 폭을 따로 지정하지 마세요."
+              description={[
+                "Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않습니다. Container와 Textarea field만으로 구성합니다.",
+                <>Layout은 <code className="text-xs text-oe-foreground-primary">fill</code>만이며 선택 Property가 없습니다. 폭을 따로 지정하면 같은 폼의 다른 필드와 오른쪽 끝이 어긋납니다.</>,
+                "Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 또는 Label과 도움말처럼 Field가 담당할 일인지 다시 봅니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /><div className="mt-2"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></div></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /><div className="mt-2"><Textarea value={c.inquiryValue} readOnly containerClassName="w-2/3" aria-label={c.inquiryLabel} /></div></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>기본 높이는 3.5줄을 유지하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="기본 88px · 3.5줄">
+                <GuideVisual label="기본 제공 · 3.5줄 (88px)">
                   <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="초기 높이 128px · 5.5줄">
+                <GuideVisual label="별도 제어 · 기본 제공 높이보다 큰 값">
                   <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
@@ -154,7 +168,15 @@ export function TextareaWorkbench() {
               ]} />
             </div>
             <div>
-              <GuidelineTitle>높이를 바꿀 수 있게 하면 세로만 허용하기</GuidelineTitle>
+              <GuidelineTitle>Resize는 세로만 허용하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Resize 끔 · Default">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Resize 켬 · 세로만">
+                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.inquiryValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
               <GuidelineList items={[
                 <><code className="text-xs text-oe-foreground-primary">resize</code>는 세로 방향만 제공합니다. 가로는 제공하지 않습니다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋납니다.</>,
                 <><code className="text-xs text-oe-foreground-primary">resize</code>는 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 꺼져 있을 때만 적용됩니다. 둘을 함께 켜지 않습니다.</>,
@@ -169,8 +191,8 @@ export function TextareaWorkbench() {
                 "켤 수 있는 자리는 셋입니다. 그 화면에 이 입력만 있는 경우, 마지막 콘텐츠인 경우, 아래 콘텐츠가 밀리지 않는 배치인 경우입니다.",
                 "입력하는 동안 아래 콘텐츠가 계속 내려가면 방금 읽던 자리를 잃습니다. 두 예시에 직접 입력해 차이를 확인할 수 있습니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="w-full"><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.memoLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.memoLabel} /><p className="mt-3 text-xs font-medium text-oe-foreground-primary">{c.attachmentLabel}</p><div className="mt-1 h-9 rounded-lg border border-dashed border-oe-border-primary" /></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.contactTimeLabel}</FieldLabel><Select options={c.contactTimeOptions.map((label, index) => ({ value: `time-${index}`, label }))} defaultValue="time-0" ariaLabel={c.contactTimeLabel} /></div></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
@@ -228,6 +250,8 @@ function TextareaAnatomy() {
 }
 
 function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
+
+function FieldLabel({ children }: { children: ReactNode }) { return <p className="mb-1.5 text-xs font-medium text-oe-foreground-primary">{children}</p>; }
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) {
   return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-lg font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>;
