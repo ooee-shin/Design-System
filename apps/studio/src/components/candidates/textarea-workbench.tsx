@@ -239,10 +239,10 @@ export function TextareaWorkbench() {
               description={[
                 "높이를 사용자가 직접 정하는 것과 내용에 맡겨 자동으로 정하는 것은, 같은 값을 두 주체가 정하는 일이므로 함께 성립하지 않습니다. 어느 쪽으로 갈지 먼저 정하고 한쪽만 켭니다.",
                 <>구현은 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 켜져 있으면 <code className="text-xs text-oe-foreground-primary">resize</code>를 적용하지 않습니다. <code className="text-xs text-oe-foreground-primary">resize</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">true</code>이므로, <code className="text-xs text-oe-foreground-primary">autoSize</code>를 켜는 순간 켜져 있던 세로 조절이 조용히 꺼집니다.</>,
-                "Don't 쪽은 두 Property를 함께 넘긴 상태입니다. 세로 조절을 요청했는데도 아래 손잡이가 없습니다. 오류로 알려주지 않으므로 화면을 봐야 알 수 있습니다.",
+                "Don't 쪽은 두 Property가 모두 적용된 상태를 그린 것입니다. 내용에 맞춰 늘어나는 동시에 손잡이로 끌 수도 있으니 높이를 누가 정하는지 알 수 없습니다. 구현은 이 상태를 만들지 않고 resize를 무시하므로, 실제로 두 Property를 함께 넘기면 손잡이 없이 자동 확장만 남습니다. 오류로 알려주지 않아 화면을 봐야 압니다.",
               ]}
               doVisual={<PreviewLocaleScope className="w-full"><Textarea defaultValue={c.conflictValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><Textarea defaultValue={c.conflictValue} autoSize resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea defaultValue={c.conflictValue} autoSize resize containerClassName="resize-y" aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
