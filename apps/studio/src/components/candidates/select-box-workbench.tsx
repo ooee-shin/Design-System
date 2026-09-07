@@ -118,7 +118,7 @@ export function SelectBoxWorkbench() {
                     value={option.value}
                     title={option.title}
                     description={description ? "Description" : undefined}
-                    leadingElement={leadingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={leadingElement} className="size-8" />}
+                    leadingElement={leadingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={leadingElement} className={leadingElement.kind === "image" ? "size-8" : "size-oe-icon-medium"} />}
                   />
                 ))}
               </SelectBoxGroup>
@@ -191,12 +191,12 @@ export function SelectBoxWorkbench() {
           <div className="grid gap-3">
             <Example label="1 · Default" description="항목이 Container 너비를 채우고 Leading element는 Title 왼쪽에 놓입니다.">
               <SelectBoxGroup ariaLabel="Single column example" defaultValue="option-a" className="w-full">
-                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} />
               </SelectBoxGroup>
             </Example>
             <Example label="2" description="열이 둘 이상이면 항목이 좁아지므로 Leading element를 Title 위 왼쪽에 배치합니다.">
               <SelectBoxGroup ariaLabel="Two column example" columns={2} defaultValue="option-a" className="w-full">
-                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} /><SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} />
               </SelectBoxGroup>
             </Example>
             <Example label="3 · 검수 범위 2~6" description="열 수를 늘려도 항목마다 같은 너비를 유지합니다. 이 폭에서는 시각 요소를 덜어내는 것을 권장합니다.">
@@ -211,8 +211,8 @@ export function SelectBoxWorkbench() {
           <div className="grid gap-3 @min-[720px]:grid-cols-2">
             <Example label="Leading element · Icon" description="Title 왼쪽에 값을 식별하는 Icon을 둘 수 있습니다.">
               <SelectBoxGroup ariaLabel="Leading icon example" defaultValue="option-a" className="w-full">
-                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
-                <SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} />
+                <SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-oe-icon-medium" />} />
               </SelectBoxGroup>
             </Example>
             <Example label="Leading element · Image" description="공통 정사각 Avatar 샘플을 사용합니다.">
@@ -337,7 +337,7 @@ export function SelectBoxWorkbench() {
                     <SelectBoxGroup ariaLabel={c.serviceQuestion} columns={2} trailingElement="none" defaultValue="appliance-1">
                       {c.appliances.map((appliance, index) => {
                         const Icon = applianceIcons[index];
-                        return <SelectBox key={appliance} value={`appliance-${index}`} title={appliance} leadingElement={<Icon aria-hidden="true" />} />;
+                        return <SelectBox key={appliance} value={`appliance-${index}`} title={appliance} leadingElement={<Icon aria-hidden="true" className="size-oe-icon-medium" />} />;
                       })}
                     </SelectBoxGroup>
                   </PreviewLocaleScope>

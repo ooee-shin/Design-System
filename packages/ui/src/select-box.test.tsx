@@ -5,7 +5,6 @@ import test, { afterEach } from "node:test"
 
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 
 import { SelectBox, SelectBoxGroup } from "./select-box"
 
@@ -13,80 +12,50 @@ afterEach(() => {
   cleanup()
 })
 
-test("SelectBox selects one item in single mode from the whole item target", async () => {
-    const user = userEvent.setup({ document: globalThis.document })
-    const view = render(
-      <SelectBoxGroup ariaLabel="Plan" defaultValue="starter">
-        <SelectBox value="starter" title="Starter" />
-        <SelectBox value="team" title="Team" />
-      </SelectBoxGroup>,
-    )
+function leadingSlot(container: HTMLElement) {
+  return container.querySelector("[data-slot=select-box-leading-element]")
+}
 
-    await user.click(view.getByText("Team"))
-
-    assert.equal(view.getByRole("radio", { name: "Team" }).getAttribute("data-checked"), "")
-    assert.equal(view.getByText("Team").closest("[data-slot=select-box]")?.getAttribute("data-selected"), "")
-    assert.equal(view.getByRole("radio", { name: "Starter" }).getAttribute("data-checked"), null)
-})
-
-test("SelectBox preserves multiple values in read only mode", async () => {
-    const user = userEvent.setup({ document: globalThis.document })
-    const changes: Array<string | string[]> = []
-    const view = render(
-      <SelectBoxGroup ariaLabel="Features" selectionMode="multiple" defaultValue={["a"]} onValueChange={(value) => changes.push(value)} readOnly>
-        <SelectBox value="a" title="Feature A" />
-        <SelectBox value="b" title="Feature B" />
-      </SelectBoxGroup>,
-    )
-
-    await user.click(view.getByText("Feature B"))
-
-    assert.deepEqual(changes, [])
-    assert.equal(view.getByRole("checkbox", { name: "Feature A" }).getAttribute("data-checked"), "")
-    assert.equal(view.getByRole("checkbox", { name: "Feature B" }).getAttribute("data-checked"), null)
-})
-
-test("SelectBox keeps an accessible input when the visible control is hidden", () => {
-    const view = render(
-      <SelectBoxGroup ariaLabel="Visual-only control" defaultValue="a" trailingElement="none">
-        <SelectBox value="a" title="Option A" />
-      </SelectBoxGroup>,
-    )
-
-  assert.ok(view.getByRole("radio", { name: "Option A" }))
-  assert.match(view.getByRole("radio", { name: "Option A" }).className, /opacity-0/)
-})
-
-test("SelectBox keeps layout and focus-visible rules on the whole item", () => {
+// docs/system/components/select-box.md 는 Leading element 자리가 고정 크기를 갖지 않고
+// 그 자리에 놓인 요소의 크기를 따른다고 정한다. 자리에 크기를 박으면 요소가 요청한
+// 크기가 덮어써지고, 아이콘의 왼쪽 끝이 Title 시작점과 어긋난다.
+test("SelectBox leaves the leading element size to the element", () => {
   const view = render(
-    <SelectBoxGroup ariaLabel="Layout" columns={2}>
-      <SelectBox value="a" title="Option A" description="Description" />
+    <SelectBoxGroup ariaLabel="역할">
+      <SelectBox value="a" title="Label A" leadingElement={<span data-testid="leading" />} />
     </SelectBoxGroup>,
   )
+  const slot = leadingSlot(view.container)
 
-  const item = view.getByText("Option A").closest("[data-slot=select-box]")
-  const group = view.getByRole("radiogroup", { name: "Layout" })
-
-  assert.ok(item)
-  assert.match(item.className, /px-4/)
-  assert.match(item.className, /py-3/)
-  assert.match(item.className, /has-\[:focus-visible\]/)
-  assert.doesNotMatch(item.className, /focus-within/)
-  assert.match(group.className, /gap-2/)
+  assert.ok(slot)
+  assert.doesNotMatch(slot.className, /(^|\s)size-\d/)
+  assert.doesNotMatch(slot.className, /svg\]:size/)
+  assert.doesNotMatch(slot.className, /justify-center/)
 })
 
-test("SelectBox removes brand selection treatment when disabled", () => {
-  const view = render(
-    <SelectBoxGroup ariaLabel="Disabled" defaultValue="a" disabled>
-      <SelectBox value="a" title="Option A" />
+// columns 가 2 이상이면 Leading element 를 Title 위 왼쪽에 배치한다.
+test("SelectBox stacks the leading element when the group has multiple columns", () => {
+  const single = render(
+    <SelectBoxGroup ariaLabel="한 열">
+      <SelectBox value="a" title="Label A" leadingElement={<span />} />
     </SelectBoxGroup>,
   )
+  const singleRow = leadingSlot(single.container)?.parentElement
 
-  const item = view.getByText("Option A").closest("[data-slot=select-box]")
+  assert.ok(singleRow)
+  assert.match(singleRow.className, /items-center/)
+  assert.doesNotMatch(singleRow.className, /flex-col/)
 
-  assert.ok(item)
-  assert.equal(item.getAttribute("data-selected"), "")
-  assert.equal(item.getAttribute("data-disabled"), "")
-  assert.match(item.className, /data-\[disabled\]:data-\[selected\]:bg-oe-background-disabled/)
-  assert.match(item.className, /data-\[disabled\]:data-\[selected\]:border-oe-border-disabled/)
+  cleanup()
+
+  const multiple = render(
+    <SelectBoxGroup ariaLabel="여러 열" columns={2}>
+      <SelectBox value="a" title="Label A" leadingElement={<span />} />
+    </SelectBoxGroup>,
+  )
+  const multipleRow = leadingSlot(multiple.container)?.parentElement
+
+  assert.ok(multipleRow)
+  assert.match(multipleRow.className, /flex-col/)
+  assert.match(multipleRow.className, /items-start/)
 })

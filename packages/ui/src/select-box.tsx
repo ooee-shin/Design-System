@@ -176,7 +176,7 @@ function SelectBox({
       )}
     >
       <span className={cn("flex min-w-0 flex-1", context.stackLeadingElement ? "flex-col items-start gap-2" : "items-center gap-3")}>
-        {leadingElement ? <span data-slot="select-box-leading-element" className="flex size-8 shrink-0 items-center justify-center overflow-hidden text-oe-foreground-tertiary [&_img]:size-full [&_img]:object-cover [&_svg]:size-5">{leadingElement}</span> : null}
+        {leadingElement ? <span data-slot="select-box-leading-element" className="flex shrink-0 items-center text-oe-foreground-tertiary">{leadingElement}</span> : null}
         <div data-slot="select-box-content" className="min-w-0 flex-1">
           <span className={cn("block text-sm font-medium leading-5 text-oe-foreground-primary", isDisabled && "text-oe-foreground-disabled")}>{title}</span>
           {description ? <span className={cn("mt-0.5 block text-xs leading-5 text-oe-foreground-tertiary", isDisabled && "text-oe-foreground-disabled")}>{description}</span> : null}
