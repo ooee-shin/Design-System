@@ -56,6 +56,10 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
   증감 버튼이 Leading과 Trailing 자리를 사용해 `leadingElement`·`trailingElement`·`clearable`을 제공하지 않는다는 제약을 Guidelines에 적었다. 구현은 막아 두었는데 이유가 어디에도 없었다.
 - **Radio** — 문제없음으로 확인받았다. 화면에는 Guidelines 여섯 항목이 있으나 명세 `radio.md`에는 Guidelines 절이 없고 `## Specification`에 크기 값만 있다. 전달되는 것은 명세이므로 규칙이 화면에만 있는 상태다. 화면의 절 설명도 「기준의 첫 번째 초안입니다」로 초안 표기가 남아 있다. 사용자 확인 대기.
 - **Select** — 완료. Guidelines 시각 여섯 개가 내용 너비만큼만 차지해 `w-full`을 줬다. `GuideSurface` 안쪽이 `flex items-center`라 자식이 스스로 늘어나지 않는다.
+- **Select Box** — 완료. Playground와 Anatomy뿐이던 화면에 Selection mode·Columns·Elements·State·Guidelines·Property map을 만들었다. Anatomy 도식의 Container가 `bg-transparent`여서 회색 Surface가 비쳐 보이던 것을 흰색으로 고쳤다.
+  컴포넌트를 세 군데 고쳤다. `columns`가 2 이상이면 Leading element를 Title 위 왼쪽에 배치한다. 답이 하나로 정해지는 규칙이라 가이드가 아니라 컴포넌트가 소유한다. Leading element 자리에서 32px 고정 크기와 가운데 정렬과 `[&_svg]:size-5`를 걷어냈다. 자리가 요소의 크기를 정하고 있어서 호출하는 쪽이 넘긴 크기가 덮어써졌고, 세로 배치에서 아이콘이 Title 시작점보다 안쪽에서 시작했다. 세로 배치의 위 여백만 16px로 올렸다. 아이콘은 상자를 채우지만 Title은 줄높이 안에서 여유를 가져 상하가 같으면 아래가 넓어 보인다. 회귀 테스트 두 건으로 고정했다.
+  `columns="fit"`을 만들었다가 되돌렸다. 「역할과 경계」가 Chip처럼 흐르지 않는다고 이미 정해 두었고 상세 정보를 비교한다는 목적과도 어긋난다. 지원하지 않는다는 것을 Guidelines와 「현재 구현 규칙」에 명시했다.
+  Guidelines는 여덟 규칙이며 명세와 소제목이 같다. Do/Don't는 둘이고 나머지는 권장 비교이거나 규칙 목록이다.
 - **Input Button** — 완료. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
 - **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
 
