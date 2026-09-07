@@ -25,7 +25,7 @@ const copy = {
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
     periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
-    colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD", today: "오늘", addressSentence: "주소를 선택해 주세요",
+    colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD", today: "오늘", addressSentence: "주소를 선택해 주세요", startDate: "시작일", endDate: "종료일",
   },
   en: {
     description: "A button that opens a follow-up surface such as a calendar, address search, or time picker instead of accepting direct text entry. It shares Input styling but uses button semantics.",
@@ -35,7 +35,7 @@ const copy = {
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
     periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
-    colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD", today: "Today", addressSentence: "Please select an address",
+    colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD", today: "Today", addressSentence: "Please select an address", startDate: "Start date", endDate: "End date",
   },
 } as const;
 
@@ -150,6 +150,38 @@ export function InputButtonWorkbench() {
               ]} />
             </div>
             <UsageComparison
+              title="Placeholder는 문장이 아니라 형식이나 키워드로 쓰기"
+              doText="고를 값을 키워드로 쓰세요."
+              dontText="문장으로 쓰지 마세요."
+              description={[
+                "값이 없으면 Placeholder가 유일한 안내입니다. 눌러야 값을 정할 수 있으므로 무엇을 고르는 자리인지 먼저 읽혀야 합니다.",
+                <>정해진 형식이 있으면 <code className="text-xs text-oe-foreground-primary">YYYY. MM. DD</code>처럼 형식을 그대로 보여줍니다.</>,
+                "한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없습니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressSentence} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
+            />
+            <div>
+              <GuidelineTitle>형식과 기간은 Placeholder로 알리기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="형식">
+                  <PreviewLocaleScope className="w-full"><InputButton placeholder={c.datePattern} leadingElement={<RiCalendarLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.calendar} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="기간">
+                  <PreviewLocaleScope className="flex w-full items-center gap-2">
+                    <InputButton placeholder={c.startDate} aria-haspopup="dialog" aria-label={c.startDate} />
+                    <span aria-hidden="true" className="shrink-0 text-sm text-oe-foreground-tertiary">~</span>
+                    <InputButton placeholder={c.endDate} aria-haspopup="dialog" aria-label={c.endDate} />
+                  </PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                <>정해진 형식이 있으면 <code className="text-xs text-oe-foreground-primary">YYYY. MM. DD</code>처럼 형식을 그대로 보여줍니다. 무엇을 고르는지와 어떤 모양으로 채워지는지를 함께 알립니다.</>,
+                "기간처럼 값이 둘이면 Trigger를 두 개로 나누고 사이에 물결표를 둡니다. 각 Placeholder는 「시작일」과 「종료일」처럼 그 자리가 무엇인지 말합니다.",
+                "하나의 Trigger에 기간 전체를 담으면 어느 쪽을 고치는 중인지 알 수 없고, 값이 채워졌을 때 두 날짜가 한 줄에서 잘립니다.",
+              ]} />
+            </div>
+            <UsageComparison
               title="조회는 Read only, 쓸 수 없을 때만 Disabled"
               doText="조회 화면에서는 Read only로 값을 보여주세요."
               dontText="조회 화면에 Disabled를 쓰지 마세요."
@@ -181,18 +213,6 @@ export function InputButtonWorkbench() {
                 "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
               ]} />
             </div>
-            <UsageComparison
-              title="Placeholder는 문장이 아니라 형식이나 키워드로 쓰기"
-              doText="고를 값을 키워드로 쓰세요."
-              dontText="문장으로 쓰지 마세요."
-              description={[
-                "값이 없으면 Placeholder가 유일한 안내입니다. 눌러야 값을 정할 수 있으므로 무엇을 고르는 자리인지 먼저 읽혀야 합니다.",
-                <>정해진 형식이 있으면 <code className="text-xs text-oe-foreground-primary">YYYY. MM. DD</code>처럼 형식을 그대로 보여줍니다.</>,
-                "한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없습니다.",
-              ]}
-              doVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressPlaceholder} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><InputButton placeholder={c.addressSentence} leadingElement={<RiMapPinLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.address} /></PreviewLocaleScope>}
-            />
             <div>
               <GuidelineTitle>Color input은 직접 입력 여부로 나누기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
