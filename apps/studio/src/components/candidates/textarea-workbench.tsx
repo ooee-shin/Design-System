@@ -31,6 +31,7 @@ const copy = {
     layoutValue: "지난주에 신청한 교환 건이 어떻게 처리되고 있는지 알려주세요.",
     halfLineValue: "배송이 예정일보다 사흘 늦게 도착했습니다. 그동안 어디에 머물러 있는지 조회해도 상태가 바뀌지 않아서 두 번 문의했는데 같은 안내만 받았습니다. 첫 문의에서는 하루 안에 답을 준다고 했지만 이틀이 지나서야 회신을 받았고, 그 내용도 조회 화면에 이미 나와 있던 문장과 같았습니다. 물건은 결국 도착했으니 이 건의 보상을 바라는 것은 아닙니다. 다만 지연된 이유와 다음부터 같은 일이 생기지 않게 할 방법을 알려주세요.",
     resizeValue: "영수증을 다시 받을 수 있을까요. 회사에 제출해야 하는데 문자로 받은 내역은 항목이 나오지 않습니다.",
+    scrollValue: "쿠폰이 적용되지 않는 이유를 알고 싶습니다. 사용 기간 안에 있고 최소 금액도 넘겼는데 결제 화면에서 목록에 나오지 않습니다. 다른 쿠폰은 정상적으로 선택되는 것을 보면 이 쿠폰만 조건이 다른 것 같은데, 어떤 조건이 남아 있는지 알려주세요.",
     autoSizeValue: "직원분이 재고를 대신 확인해 주셔서 헛걸음하지 않았습니다. 다음에도 같은 매장을 이용하겠습니다.",
     heightValue: "매장 위치를 찾기 어려웠습니다. 지하철역에서 나와 어느 방향으로 가야 하는지 안내가 없어서 한참 헤맸습니다. 입구 사진이라도 있으면 좋겠습니다.",
   },
@@ -53,6 +54,7 @@ const copy = {
     layoutValue: "Please let me know how the exchange request from last week is being handled.",
     halfLineValue: "The delivery arrived three days later than the promised date. The tracking status never changed while it was in transit, and I asked twice but received the same reply both times. The first reply promised an answer within a day, but it took two days to arrive, and it repeated what the tracking page already said. The package did arrive, so I am not asking for compensation. I would like to know why it was delayed and how it will be prevented next time.",
     resizeValue: "Could I get the receipt again? I need to submit it at work, and the text message I received does not list the items.",
+    scrollValue: "I would like to know why my coupon is not being applied. It is within the valid period and the order is above the minimum amount, but it does not appear on the payment screen. Other coupons are selectable, so this one seems to have a different condition. Please tell me which condition is left.",
     autoSizeValue: "A staff member checked the stock for me, so I did not make the trip for nothing. I will visit the same store next time.",
     heightValue: "The store was hard to find. There was no guidance on which way to go after leaving the subway station, so I wandered for a while. A photo of the entrance would help.",
   },
@@ -188,6 +190,18 @@ export function TextareaWorkbench() {
               ]}
               doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.halfLineValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
               dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.halfLineValue} readOnly height={90} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+            />
+            <UsageComparison
+              title="Scrollbar는 Hover에서만 보이기"
+              doText="기본 상태에서는 Scrollbar를 감춰 두세요."
+              dontText="넘치는 값이 없을 때도 세로선을 남기지 마세요."
+              description={[
+                "Scrollbar thumb은 기본 상태에서 투명하고 Textarea를 Hover할 때만 보입니다. 값이 넘치지 않는 자리에서도 세로선이 남으면 입력 영역이 좁아 보이고 읽을 것이 더 있다는 잘못된 신호를 줍니다.",
+                "Scrollbar가 차지하는 공간은 언제나 확보합니다. 스크롤이 생기거나 사라져도 텍스트가 좌우로 움직이지 않습니다.",
+                "그래서 내용이 더 있다는 것을 알리는 것은 마지막 줄이 반쯤 잘려 보이는 것입니다. 앞의 높이 규칙이 이 규칙과 함께 동작합니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.scrollValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.scrollValue} readOnly aria-label={c.inquiryLabel} className="[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar-thumb]:bg-oe-border-primary" /></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>Resize는 세로만 허용하기</GuidelineTitle>
