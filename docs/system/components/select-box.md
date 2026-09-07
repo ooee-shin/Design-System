@@ -37,6 +37,7 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - 항목 배치는 `columns`로만 지원한다. 한 열에서는 항목이 Container 너비를 채우고 여러 열에서는 열마다 같은 너비를 사용한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다.
 - `columns`가 2 이상이면 Leading element를 Title 왼쪽이 아니라 Title 위 왼쪽에 배치한다. 열이 여럿이면 항목이 좁아져 한 줄에 두 요소를 나란히 두기 어렵다. 이 배치는 `columns` 값으로 결정되며 별도 Property를 두지 않는다.
 - Group의 항목 간격은 8px이다. 항목은 고정 높이를 갖지 않고 Content에 맞춰 늘어나며 현재 내부 여백은 좌우 16px, 상하 12px이다.
+- Leading element가 Title 위로 올라가는 여러 열 배치에서는 위 여백만 16px을 사용한다. 아이콘은 자기 상자를 거의 채우지만 Title은 줄높이 안에서 위아래로 여유를 갖기 때문에, 상하 여백을 같게 두면 아래가 더 넓어 보인다.
 - Leading element 자리는 고정 크기를 갖지 않고 그 자리에 놓인 요소의 크기를 따른다. 아이콘과 이미지의 크기는 요소를 넘기는 쪽이 정하며 Select Box가 덮어쓰지 않는다. 공통 Image 예시는 32px 정사각 Avatar, 아이콘 예시는 공통 Medium 20px을 사용한다.
 - 한 열에서 Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 여러 열에서 Leading element는 Title 위로 올라가며 왼쪽 시작점을 Title과 맞추고, Trailing element만 수직 중앙 정렬을 유지한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
 - Title과 Description 간격은 2px이다. Title은 14px Medium, Description은 12px Tertiary foreground를 사용한다.

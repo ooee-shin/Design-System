@@ -172,6 +172,7 @@ function SelectBox({
         "data-[disabled]:cursor-not-allowed data-[disabled]:border-oe-border-disabled data-[disabled]:bg-transparent data-[disabled]:shadow-none data-[disabled]:hover:bg-transparent",
         "data-[disabled]:data-[selected]:border-oe-border-disabled data-[disabled]:data-[selected]:bg-oe-background-disabled data-[disabled]:data-[selected]:shadow-none data-[disabled]:data-[selected]:hover:bg-oe-background-disabled",
         "data-[readonly]:cursor-default data-[readonly]:hover:bg-transparent data-[readonly]:active:bg-transparent",
+        context.stackLeadingElement && "pt-4",
         className,
       )}
     >

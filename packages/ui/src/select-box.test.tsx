@@ -58,4 +58,10 @@ test("SelectBox stacks the leading element when the group has multiple columns",
   assert.ok(multipleRow)
   assert.match(multipleRow.className, /flex-col/)
   assert.match(multipleRow.className, /items-start/)
+
+  // 아이콘은 자기 상자를 거의 채우지만 Title 은 줄높이 안에서 위아래 여유를 갖는다.
+  // 상하 여백이 같으면 아래가 더 넓어 보이므로 위 여백만 16px 로 올린다.
+  const stackedBox = multiple.container.querySelector("[data-slot=select-box]")
+  assert.ok(stackedBox)
+  assert.match(stackedBox.className, /(^|\s)pt-4(\s|$)/)
 })
