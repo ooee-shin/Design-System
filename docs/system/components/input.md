@@ -84,6 +84,12 @@ Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비�
 
 전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당한다. native `inputMode="numeric"`과 필요한 포맷, `tabular-nums`를 조합한다. 자리 구분이 필요한 금액도 Input이 담당한다. Number Input은 값에 구분자를 담을 수 없다.
 
+### 특수한 포맷은 Custom input으로 정의하기
+
+정해진 자릿수와 구분자가 있는 값, 일부만 입력받고 나머지를 고정 마스킹하는 값은 기본 Property로 표현되지 않는다. 이때는 Input을 조합해 포맷과 동작을 직접 정의한다.
+
+반복 사용되는 부분 입력과 고정 마스킹은 공용 `PartialMaskedInput`이 소유한다. 같은 마스킹을 화면마다 다시 만들지 않는다. 새 포맷을 만들어도 Container와 Focus·Invalid·Disabled 표현은 Input이 소유한 것을 그대로 사용한다. 확정된 사례는 이 문서 뒤쪽의 Custom input 설명에 있다.
+
 ## 현재 정의하지 않은 항목
 
 - Shape variant
