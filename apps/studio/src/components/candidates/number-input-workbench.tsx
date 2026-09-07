@@ -172,7 +172,8 @@ export function NumberInputWorkbench() {
               doText="자리 구분이 필요한 금액은 Input으로 표기를 만드세요."
               dontText="자리 구분이 필요한 값에 Number Input을 쓰지 마세요."
               description={[
-                "수량, 순서, 비율처럼 더하고 빼고 비교하는 값은 Number Input이 담당합니다. 숫자로 보이지만 계산하지 않는 전화번호와 사업자번호, 그리고 금액처럼 자리 구분이 필요한 값은 Input이 담당합니다.",
+                "수량, 순서, 비율처럼 더하고 빼고 비교하는 값은 Number Input이 담당합니다.",
+                "숫자로 보이지만 계산하지 않는 전화번호와 사업자번호, 그리고 금액처럼 자리 구분이 필요한 값은 Input이 담당합니다.",
                 "Number Input은 값에 구분자를 담을 수 없어 자릿수를 눈으로 세야 합니다. 담게 만들면 키보드 화살표 증감과 범위 검증과 폼 제출값을 함께 잃습니다.",
               ]}
               doVisual={<ComponentSample name="Input"><Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={copy[locale].amount} /></ComponentSample>}
