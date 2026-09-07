@@ -34,7 +34,9 @@ push하기 전에 로컬에서 `pnpm check`를 통과시킨다. `main` push에�
 
 ## branch와 pull request를 사용하는 경우
 
-공개된 이름이나 동작을 바꿔 소비자 코드가 깨지는 변경은 `main`에 넣기 전에 검사 결과를 확인한다. Component의 Property 이름을 바꾸는 작업이 여기에 해당한다.
+공개된 이름이나 API 모양을 바꿔 소비자 코드가 컴파일되지 않는 변경은 `main`에 넣기 전에 검사 결과를 확인한다. Component의 Property 이름을 바꾸거나 Property를 제거하는 작업이 여기에 해당한다.
+
+기본값 수치를 고치는 변경은 `main`에서 바로 한다. 이름과 API 모양이 그대로여서 소비자 코드가 깨지지 않고, 검토 중에 자주 나오는 수정이라 그때마다 검사를 기다리면 흐름이 끊긴다. 대신 로컬에서 `pnpm check`를 통과시키고 화면에서 결과를 확인한다.
 
 ```bash
 git switch -c fix/작업이름
