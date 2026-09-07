@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { RiCupLine, RiFridgeLine, RiSnowyLine, RiWaterFlashLine } from "@remixicon/react";
 
-import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelectionMode } from "@ooee/ui";
+import { RadioField, RadioGroup, SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelectionMode } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
@@ -40,6 +40,11 @@ const copy = {
     shortA: "월간",
     shortB: "연간",
     shortC: "분기",
+    distributionGroup: "배분 방식",
+    autoDistribution: { title: "자동분배", description: "접수한 순서에 따라 담당자에게 자동으로 배분합니다." },
+    manualDistribution: { title: "수동분배", description: "담당자를 직접 지정해 배분합니다." },
+    permissionGroup: "권한",
+    permissions: ["관리자", "편집자", "조회자"],
     serviceQuestion: "A/S가 필요한 항목을 선택해주세요",
     appliances: ["냉장고", "커피머신", "제빙기", "온수기"],
     roleGroup: "역할 선택",
@@ -63,6 +68,11 @@ const copy = {
     shortA: "Monthly",
     shortB: "Annual",
     shortC: "Quarterly",
+    distributionGroup: "Distribution",
+    autoDistribution: { title: "Automatic", description: "Assigns each request to an owner in the order received." },
+    manualDistribution: { title: "Manual", description: "Lets you pick the owner for each request." },
+    permissionGroup: "Permission",
+    permissions: ["Admin", "Editor", "Viewer"],
     serviceQuestion: "Select the item that needs service",
     appliances: ["Refrigerator", "Coffee machine", "Ice maker", "Water heater"],
     roleGroup: "Select a role",
@@ -353,6 +363,23 @@ export function SelectBoxWorkbench() {
             </div>
             <div>
               <GuidelineTitle>카드형 선택 Surface는 Select Box만 갖기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Select Box · 카드형 Surface">
+                  <PreviewLocaleScope className="w-full">
+                    <SelectBoxGroup ariaLabel={c.distributionGroup} defaultValue="distribution-auto">
+                      <SelectBox value="distribution-auto" title={c.autoDistribution.title} description={c.autoDistribution.description} />
+                      <SelectBox value="distribution-manual" title={c.manualDistribution.title} description={c.manualDistribution.description} />
+                    </SelectBoxGroup>
+                  </PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Radio Group · Container 없이">
+                  <PreviewLocaleScope className="w-full">
+                    <RadioGroup aria-label={c.permissionGroup} defaultValue="permission-0" className="-ml-2 grid">
+                      {c.permissions.map((permission, index) => <RadioField key={permission} value={`permission-${index}`} label={permission} />)}
+                    </RadioGroup>
+                  </PreviewLocaleScope>
+                </GuideVisual>
+              </div>
               <GuidelineList items={[
                 "카드형 전체 선택 Surface는 Select Box가 소유합니다. Radio와 Checkbox에는 별도 Container 변형을 두지 않습니다.",
                 "짧은 Label을 넓은 카드 없이 밀도 있게 나열해야 하면 Radio나 Checkbox를 그대로 사용합니다. 두 컴포넌트에 Container를 덧붙여 Select Box를 대신하지 않습니다.",
