@@ -37,6 +37,7 @@ type NumberInputProps = Omit<
   increaseTooltip?: string
   prefixTone?: NumberInputAffixTone
   suffixTone?: NumberInputAffixTone
+  useGrouping?: boolean
   onValueChange?: (value: number | undefined) => void
   onLimitReached?: (boundary: "min" | "max") => void
 } & (
@@ -58,7 +59,8 @@ function NumberInput({
   step = 1,
   hideControls = false,
   controlsPosition = "trailing",
-  allowNegative = true,
+  allowNegative = false,
+  useGrouping = false,
   decreaseLabel = "Decrease value",
   increaseLabel = "Increase value",
   decreaseTooltip = "Decrease",
@@ -135,23 +137,24 @@ function NumberInput({
     <Input
       {...props}
       {...(layout === "fixed" ? { layout: "fixed" as const, fixedWidth } : { layout: "fill" as const })}
-      type="number"
-      inputMode="decimal"
+      type={useGrouping ? "text" : "number"}
+      inputMode={useGrouping ? "numeric" : "decimal"}
       min={effectiveMin}
       max={max}
       step={step}
       prefix={prefix ? <span className={prefixTone === "tertiary" ? "text-oe-foreground-tertiary" : "text-oe-foreground-secondary"}>{prefix}</span> : undefined}
       suffix={suffix ? <span className={suffixTone === "tertiary" ? "text-oe-foreground-tertiary" : "text-oe-foreground-secondary"}>{suffix}</span> : undefined}
       controlSize={controlSize}
-      value={currentValue ?? ""}
+      value={useGrouping && currentValue !== undefined ? currentValue.toLocaleString("en-US") : currentValue ?? ""}
       disabled={disabled}
       readOnly={readOnly}
       onChange={(event) => {
-        if (event.currentTarget.value === "") {
+        const raw = useGrouping ? event.currentTarget.value.replace(/,/g, "") : event.currentTarget.value
+        if (raw === "" || raw === "-") {
           commit(undefined)
           return
         }
-        const parsed = Number(event.currentTarget.value)
+        const parsed = Number(raw)
         if (!Number.isFinite(parsed)) return
         if (max != null && parsed > max) onLimitReached?.("max")
         if (effectiveMin != null && parsed < effectiveMin) onLimitReached?.("min")
