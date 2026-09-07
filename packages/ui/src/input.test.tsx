@@ -5,6 +5,7 @@ import test, { afterEach } from "node:test"
 
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 
 import { Input } from "./input"
 import { Textarea } from "./textarea"
@@ -55,4 +56,18 @@ test("Input fades the clear button in when a value appears", () => {
   assert.match(clear.className, /transition-\[color,background-color,opacity,width,margin\]/)
   assert.match(clear.className, /duration-150/)
   assert.match(clear.className, /opacity-0/)
+})
+
+// Clear button 을 누를 때 focus 가 빠져나가면 focus 전환과 값 전환이 다른 시점에 시작된다.
+test("Input keeps focus in the field when the clear button is pressed", async () => {
+  const user = userEvent.setup({ document: globalThis.document })
+  const view = render(<Input aria-label="금액" clearable clearLabel="지우기" defaultValue="1000" />)
+  const field = view.getByLabelText("금액")
+  const clear = view.getByLabelText("지우기")
+
+  await user.click(field)
+  assert.equal(globalThis.document.activeElement, field)
+
+  await user.click(clear)
+  assert.equal(globalThis.document.activeElement, field)
 })
