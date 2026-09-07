@@ -88,9 +88,11 @@ Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 
 
 초기 높이를 따로 지정할 때도 같은 기준을 쓴다. 구현이 이 값을 검사하지 않으므로 높이를 정하는 쪽에서 맞춘다.
 
-### Scrollbar는 Hover에서만 보이기
+### Scrollbar는 Hover와 Focus에서만 보이기
 
-Scrollbar thumb은 기본 상태에서 투명하고 Textarea를 Hover할 때만 보인다. 조작하지 않는 동안에는 값만 남기고 장치는 감춘다. 세로선이 늘 남아 있으면 값보다 장치가 먼저 읽힌다.
+Scrollbar thumb은 기본 상태에서 투명하고, Textarea를 Hover하거나 입력에 focus가 있을 때 보인다. 조작하지 않는 동안에는 값만 남기고 장치는 감춘다. 세로선이 늘 남아 있으면 값보다 장치가 먼저 읽힌다.
+
+Hover만으로 조건을 잡지 않는다. 키보드로 들어와 방향키로 스크롤하는 사람은 Hover가 없으므로 감춰진 분량을 끝까지 알 수 없다. thumb의 길이가 그 정보다.
 
 Scrollbar가 차지하는 공간은 언제나 확보한다. 스크롤이 생기거나 사라져도 텍스트가 좌우로 움직이지 않는다. 그래서 내용이 더 있다는 것을 알리는 것은 마지막 줄이 반쯤 잘려 보이는 것이며, 앞의 높이 규칙이 이 규칙과 함께 동작한다.
 
@@ -127,7 +129,7 @@ Scrollbar가 차지하는 공간은 언제나 확보한다. 스크롤이 생기�
 - Textarea field vertical padding: `8px`
 - Placeholder: `oe-foreground-placeholder`
 
-스크롤 공간은 항상 동일하게 확보해 스크롤 유무가 바뀌어도 텍스트가 움직이지 않게 한다. 스크롤바 thumb은 기본 상태에서 투명하고 Textarea를 Hover할 때만 표시한다. 입력 내용은 Textarea field 자체의 패딩 안에서 스크롤하며 Container 내부에 별도 하단 공백을 만들지 않는다.
+스크롤 공간은 항상 동일하게 확보해 스크롤 유무가 바뀌어도 텍스트가 움직이지 않게 한다. 스크롤바 thumb은 기본 상태에서 투명하고 Textarea를 Hover하거나 입력에 focus가 있을 때 표시한다. 입력 내용은 Textarea field 자체의 패딩 안에서 스크롤하며 Container 내부에 별도 하단 공백을 만들지 않는다.
 
 현재 최소 높이는 내용이 넘칠 때 3.5줄이 보이는 값이다. `autoSize=true`일 때 `field-sizing-content`를 사용해 내용에 따라 높이를 계산한다.
 

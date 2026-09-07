@@ -194,11 +194,12 @@ export function TextareaWorkbench() {
               dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.halfLineValue} readOnly height={90} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
             />
             <UsageComparison
-              title="Scrollbar는 Hover에서만 보이기"
-              doText="기본 상태에서는 Scrollbar를 감춰 두세요."
+              title="Scrollbar는 Hover와 Focus에서만 보이기"
+              doText="조작하지 않는 동안에는 Scrollbar를 감춰 두세요."
               dontText="Scrollbar를 항상 보이게 두지 마세요."
               description={[
-                "Scrollbar thumb은 기본 상태에서 투명하고 Textarea를 Hover할 때만 보입니다. 조작하지 않는 동안에는 값만 남기고 장치는 감춥니다. 세로선이 늘 남아 있으면 값보다 장치가 먼저 읽힙니다.",
+                "Scrollbar thumb은 기본 상태에서 투명하고, Textarea를 Hover하거나 입력에 focus가 있을 때 보입니다. 조작하지 않는 동안에는 값만 남기고 장치는 감춥니다. 세로선이 늘 남아 있으면 값보다 장치가 먼저 읽힙니다.",
+                "Hover만으로 조건을 잡지 않습니다. 키보드로 들어와 방향키로 스크롤하는 사람은 Hover가 없으므로 감춰진 분량을 끝까지 알 수 없습니다. thumb의 길이가 그 정보입니다.",
                 "Scrollbar가 차지하는 공간은 언제나 확보합니다. 스크롤이 생기거나 사라져도 텍스트가 좌우로 움직이지 않습니다.",
                 "그래서 내용이 더 있다는 것을 알리는 것은 마지막 줄이 반쯤 잘려 보이는 것입니다. 앞의 높이 규칙이 이 규칙과 함께 동작합니다.",
               ]}

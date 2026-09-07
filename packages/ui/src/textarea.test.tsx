@@ -47,6 +47,17 @@ test("Textarea drops the fixed height when auto size is on", () => {
   assert.equal(box.dataset.autoSize, "true")
 })
 
+// Scrollbar thumb 은 조작하지 않는 동안 감추고 Hover 와 Focus 에서 보인다. Hover 만으로
+// 조건을 잡으면 키보드로 들어온 사람은 감춰진 분량을 끝까지 알 수 없다.
+test("Textarea reveals the scrollbar on hover and on focus", () => {
+  const view = render(<Textarea aria-label="문의 내용" />)
+  const field = view.container.querySelector("[data-slot=textarea]")
+
+  assert.ok(field)
+  assert.match(field.className, /hover:\[&::-webkit-scrollbar-thumb\]:bg-oe-border-primary/)
+  assert.match(field.className, /focus:\[&::-webkit-scrollbar-thumb\]:bg-oe-border-primary/)
+})
+
 // Resize 는 기본값이 켠 상태이며 세로 방향만 허용하고, autoSize 와 함께 켜지지 않는다.
 test("Textarea allows resizing only vertically and only without auto size", () => {
   const vertical = render(<Textarea aria-label="문의 내용" />)
