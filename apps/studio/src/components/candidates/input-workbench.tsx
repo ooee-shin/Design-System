@@ -292,7 +292,7 @@ export function InputWorkbench() {
               </GuideVisual>
             </div>
             <GuidelineList items={[
-              "비밀번호나 개인정보처럼 본인 외에 읽혀서는 안 되는 값은 입력하는 동안에도 마스킹해 표시합니다.",
+              "비밀번호나 개인정보처럼 민감한 정보는 입력하는 동안에도 마스킹해 표시합니다.",
               "사용자가 자기 입력을 확인해야 하는 자리에는 Trailing element로 보기 전환 action을 제공합니다. 실제 input type을 password와 text로 바꾸며, 비밀번호용 Leading icon은 사용하지 않습니다.",
               "계좌 비밀번호나 보안 코드처럼 노출 위험이 큰 값은 보기 전환을 제공하지 않고 마스킹만 유지합니다. 옆에서 화면을 보는 사람에게 값이 읽히지 않는 것이 입력값을 확인하는 편의보다 앞섭니다.",
             ]} />
