@@ -41,7 +41,7 @@ Input Button의 Anatomy 도식에 Prefix와 Suffix를 그리고 마커를 여섯
 
 Input의 Anatomy에서도 같은 규칙 위반 두 건을 함께 고쳤다. 요소 이름 `Input field`를 컴포넌트 안에 렌더링하던 것과, 교체 가능 영역에 공용 `AnatomySwapSlot` 대신 실제 아이콘을 쓰던 것이다. 검수 보고가 잡지 못한 항목이다.
 
-Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다. 그 결과 원자적인 `Checkbox`를 확인할 자리가 Playground 에서 사라졌다. `checkbox.md:26`과 `:101`이 원자적인 Checkbox 를 API 로 기술하고 있고 `vocabulary.md`는 원자 예시 제목을 `Control only`처럼 쓰라고 정한다. Radio 는 Guidelines 에 `Control only` 예시가 두 곳 있는데 Checkbox 에는 없다. Checkbox 에 같은 예시를 둘지 정해야 한다.
+Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다. 원자적인 `Checkbox`는 Guidelines 의 `16px Control` 예시와 `Do/Don't` 비교에서 이미 확인할 수 있으므로 추가로 둘 것이 없다.
 
 폼 요소 10개의 검수는 이것으로 끝났다. 후순위인 Chip·Badge·Message Bubble 25건은 지시가 있을 때 시작한다.
 

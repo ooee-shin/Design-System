@@ -2,7 +2,7 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 시스템 정의는 `docs/system/`, 제작 절차와 근거는 `docs/process/`, 작업 운영 규칙은 루트 `AGENTS.md`를 확인한다.
 
-마지막 내용 점검: `2026-09-03`
+마지막 내용 점검: `2026-09-07`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -311,41 +311,42 @@
 
 ## 바로 다음 작업
 
-2026-09-14까지 아래 1번을 Studio에서 진행한다.
+2026-09-14까지 1차 컴포넌트를 마무리한다.
 
-구조 정리는 끝났다. 토큰 값이 패키지 CSS로 나오고, 다크 변형과 Tailwind 스캔 경로도 각 패키지가 소유하며, Studio는 패키지 export로만 참조한다. 컴포넌트 성숙도 등급은 제거했고 Foundation의 `Provisional` 표시만 남겼다. 남긴 구조 항목은 [open-questions.md](open-questions.md)의 「구조상 알려진 한계」와 [roadmap.md](roadmap.md)의 「이관 전 함께 정할 것」에 있다.
+`2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 **폼 요소 10개의 84건을 모두 처리했다.** 결과와 확정한 정책, 단계별 진행 상황은 [component-audit.md](component-audit.md)에 있다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건은 사용자가 시작한다고 말할 때 착수한다.
 
-Studio 13개 컴포넌트 상세 페이지를 `docs/system/studio.md` 화면 구성 기준과 대조한 결과를 순서대로 처리한다. 규칙 문서 갱신과 공용 부품 통합은 완료했으며 아래 1~8이 남아 있다. 각 단계 끝에서 `pnpm check`를 통과시킨 뒤 다음 단계로 넘어간다.
+그 과정에서 다음 규칙이 새로 정해졌고 `docs/system/studio.md`가 소유한다.
 
-1. Anatomy 시각 일치. 정적 도식은 허용하되 실제 컴포넌트와 다르게 보이는 부분을 맞춘다. Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. Input·Textarea의 금지된 bracket과 Input의 가짜 Clear 아이콘, Textarea의 글자 상자는 공용 부품 통합에서 같은 코드를 고치며 함께 처리했다.
-2. Playground control 정합. `Preview state` 배타 선택을 독립 Boolean Toggle로 분리(Input·Input Button·Number Input·Select), 교체 Slot을 공용 `PlaygroundElementControl`로, Badge Playground 신설, 타입 불일치 5곳, 문장형 라벨 13종과 페이지 간 라벨 통일, 종속 표시 6곳.
-3. 섹션 구조와 타이포. Message Bubble의 예시 선행·2열 배치·`Properties ·` 카드 부재·Playground 배경, Chip의 Property map 순서, 목차 누락 7곳, 묶인 Property 카드 5곳, 뒤집힌 계층 3곳, 접두어 7곳, 제목 위계 통일.
-4. 언어 전환. Switch의 `copy.ko` 고정, Input의 얼어붙은 초기값 2곳, 하드코딩 예시 콘텐츠 5개 페이지, 영문 고정 접근 가능한 이름 6곳, `lang` 미전환 3곳, Message Bubble의 이니셜과 시각, `message-attachment.tsx`의 하드코딩.
-5. Focus. Select의 조건 없는 Focus 표시 3곳, Focus 표시가 없는 조작 요소 4곳, 선택선과 ring 중첩 3곳, `input-button.tsx`의 `focus-within` → `focus-visible`.
-6. 단일 원본과 정리. 13개 워크벤치가 registry와 별도로 가진 제목·설명, 존재하지 않는 Property 2곳, 자기모순 설명 6건, 사용되지 않는 `fixed` prop 3곳, Field 페이지와 registry 관계 제거.
-7. 모양 어휘 적용. Checkbox의 `appearance` → `shape`와 `square` 복원은 끝냈다. Badge에 `square`를 추가하는 일이 남아 있으며 Badge는 후순위다.
-8. Message Bubble 말줄임 기능. `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. Anatomy와 Playground의 본문 문구는 실제 채팅 대신 구현된 동작을 설명하는 중립 문장을 사용한다.
+- 명세는 구현 경로만 제목 아래 메타 한 줄로 남기고 유래·진행 상태·Studio 도구 설명을 담지 않는다.
+- Property 이름은 코드를 원본으로 하고 사람이 읽을 범주는 괄호로 붙인다.
+- 제목 위계는 네 층이다. 페이지 `text-xl`, Section `text-lg`, 그룹 `text-sm`, 카드 라벨 `text-xs`.
+- Playground control은 `Appearance → State → Content → Elements → Behavior` 순서로 묶는다. 그룹은 Property의 성격으로 정하고 종속 관계로 정하지 않는다.
+- Trigger로 여는 목록 영역은 `Popup`이라 부른다. `vocabulary.md`가 `Popup`과 `Trigger`를 요소 이름으로 소유한다.
 
-1~6은 검수 수정, 7~8은 API와 기능 변경이므로 섞지 않고 나눠 진행한다.
+Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking change라 PR로 처리해 끝냈다.
 
-7번은 기존 public API를 바꾸는 breaking change다. `appearance`를 `shape`로 바꾸면 그 이름을 쓰던 소비자 코드가 전부 깨지므로 블루키 이관 전에 끝낸다. 8번은 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
+### 남은 작업
 
-각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. 문서 구조 분리는 끝났지만 본문에는 아직 과정 성격의 문장이 남아 있다. 제거 대상은 자산의 유래(「Combobox 사례에서 추출한 뒤」), Studio 검수 도구 설명(「Studio는 Structure map에서 표시한다」), 진행 상태 서술(「현재 첫 번째 초안이다」)이다. `현재 정의 없음`은 시스템 정의이므로 남기고, `확인 필요` 항목은 `docs/process/open-questions.md`로 옮긴다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
+1. **Anatomy 시각 일치.** Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. 실제 화면에서 좌표를 봐야 하는 작업이다.
+2. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
+3. **Badge에 `square` 추가.** 모양 어휘 적용의 남은 절반이며 Badge는 후순위다.
+4. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 
-`2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면 3중 대조 검수를 돌렸다. 총 109건이며 폼 요소 10개가 84건, 후순위인 Chip·Badge·Message Bubble이 25건이다. 결과와 확정한 정책 네 가지, 작업 순서는 [component-audit.md](component-audit.md)에 있다. 폼 요소를 먼저 처리하고 나머지 셋은 뒤로 미룬다.
+각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
-`Presentation` 화면을 만들었다. 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 세 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
+`Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 다섯 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
-사용자 확인을 기다리는 항목:
+### 화면에서 확인이 밀린 항목
 
-- 공용 부품 통합 뒤 Anatomy 화면의 실제 좌표와 여백. 번호 마커가 18px에서 20px로 커져 Input·Textarea의 연결선 위치가 미세하게 달라졌을 수 있고, Checkbox·Radio는 제목 아래 설명 한 줄 때문에 Surface 상단 여백을 `pt-12`로 잡았다. 값이 적절한지 실제 화면에서 확인이 필요하다.
-- Combobox 범위 표시선을 공용으로 옮길지, 늘어나는 표시를 지원하도록 `AnatomyBoundaryMarker`를 확장할지. 아래 1번 작업에서 함께 판단한다.
-- 코드·Studio·문서 3중 대조 검수를 나머지 12개 컴포넌트로 확대할지. Checkbox 하나에서만 9곳의 불일치를 찾았고 그중 상당수가 문서가 맞고 코드가 틀린 경우였다.
+- Input Button의 Anatomy 연결선. Prefix와 Suffix를 그리며 마커를 여섯 개로 늘렸고 좌표는 계산으로 잡았다.
+- Checkbox의 Square 모양과 Radio·Checkbox의 컨트롤 그룹 순서.
+- 공용 부품 통합 뒤 Anatomy 화면의 실제 좌표와 여백. 번호 마커가 18px에서 20px로 커졌고 Checkbox·Radio의 Surface 상단 여백을 `pt-12`로 잡았다.
+- Combobox 범위 표시선을 공용으로 옮길지, 늘어나는 표시를 지원하도록 `AnatomyBoundaryMarker`를 확장할지. 1번 작업에서 함께 판단한다.
 
 ## 이전부터 이어지는 작업
 
-1. Select Box는 현재 요청된 Playground와 Anatomy까지만 유지하고 실제 화면에서 구조와 Control을 먼저 확정한다. Properties, State, Examples/Usage, Guidelines와 Property map은 사용자가 다음 단계를 요청하기 전에는 추가하지 않는다.
-2. Component 문서 1차 공통화 검수를 계속한다. Select와 Switch를 기준으로 나머지 상세 화면의 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`, 우측 목차, Similar/Works with와 Preview KO/EN 전환을 컴포넌트별로 확인한다.
+1. Select Box의 Playground·Anatomy 한정은 최초 검수 단계에만 적용하던 것이며 지금은 다른 컴포넌트와 같은 범위로 다룬다. 명세의 「현재 검수 범위」 절은 걷어냈다.
+2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Chip·Badge·Message Bubble이 남아 있으며 Message Bubble은 Anatomy·Properties·Property map 자체가 없다.
 3. Anatomy 시각 검수를 마무리한다. Checkbox와 Radio는 Basic/Extended로 분리했고, Input·Input Button·Number Input·Textarea·Switch는 유형명·시각 예제·범례를 하나의 Neutral Surface로 맞춘 상태다. Badge·Chip·Combobox는 공용 Anatomy Surface를 사용하며 Container 평행선과 번호 정렬을 실제 화면에서 다시 확인해야 한다.
 4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
 5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
