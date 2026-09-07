@@ -6,6 +6,8 @@ import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelecti
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { GuidelineList, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -13,6 +15,12 @@ import { useStudioPreferences } from "@/components/studio-preferences-provider";
 const sections = [
   { id: "playground", label: "Playground" },
   { id: "anatomy", label: "Anatomy" },
+  { id: "selection", label: "Selection mode" },
+  { id: "layout", label: "Layout" },
+  { id: "elements", label: "Elements" },
+  { id: "state", label: "State" },
+  { id: "guidelines", label: "Guidelines" },
+  { id: "property-map", label: "Property map" },
 ];
 
 const copy = {
@@ -24,6 +32,11 @@ const copy = {
       { value: "option-b", title: "Label B" },
       { value: "option-c", title: "Label C" },
     ],
+    planA: { title: "월간 요금제", description: "매달 결제하고 언제든 해지할 수 있습니다." },
+    planB: { title: "연간 요금제", description: "두 달치 요금을 아낄 수 있습니다." },
+    shortA: "월간",
+    shortB: "연간",
+    planGroup: "요금제",
   },
   en: {
     description: "Presents defined choices in place so users can compare details and select one or more values.",
@@ -33,6 +46,11 @@ const copy = {
       { value: "option-b", title: "Label B" },
       { value: "option-c", title: "Label C" },
     ],
+    planA: { title: "Monthly plan", description: "Billed every month and cancellable anytime." },
+    planB: { title: "Annual plan", description: "Saves the cost of two months." },
+    shortA: "Monthly",
+    shortB: "Annual",
+    planGroup: "Plan",
   },
 } as const;
 
@@ -115,7 +133,7 @@ export function SelectBoxWorkbench() {
           <div>
             <AnatomySurface ariaLabel="Select Box anatomy" title="Select Box structure" className="min-h-[290px]">
               <div className="absolute left-1/2 top-1/2 w-[min(72%,36rem)] -translate-x-1/2 -translate-y-1/2">
-                <div className="relative flex items-center gap-3 rounded-xl border border-oe-border-secondary bg-transparent px-4 py-3">
+                <div className="relative flex items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3">
                   <AnatomySwapSlot className="shrink-0" />
                   <span className="min-w-0 flex-1"><span className="block text-sm font-medium">Title</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">Description</span></span>
                   <AnatomySwapSlot className="shrink-0" />
@@ -133,11 +151,157 @@ export function SelectBoxWorkbench() {
           </div>
         </Section>
 
+        <Section id="selection" title="Properties · Selection mode" description="하나만 고르는 Single과 여러 개를 고르는 Multiple을 비교합니다. Trailing element는 선택 방식에 맞는 공용 Control로 대체됩니다.">
+          <div className="grid gap-3 @min-[720px]:grid-cols-2">
+            <Example label="Single · Default" description="하나만 선택되며 공용 Radio Control을 사용합니다.">
+              <SelectBoxGroup ariaLabel="Single selection example" selectionMode="single" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Multiple" description="여러 개를 선택할 수 있으며 공용 Checkbox Control을 사용합니다.">
+              <SelectBoxGroup ariaLabel="Multiple selection example" selectionMode="multiple" defaultValue={["option-a"]} className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+          </div>
+        </Section>
+
+        <Section id="layout" title="Properties · Layout" description="항목을 한 열로 쌓거나 여러 열로 나눕니다. 좁은 Container에서는 한 열을 유지하고 640px 이상에서 지정한 열 수를 적용합니다.">
+          <div className="grid gap-3">
+            <Example label="Single column · Default" description="columns의 기본값은 1이며 항목이 Container 너비를 채웁니다.">
+              <SelectBoxGroup ariaLabel="Single column example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" /><SelectBox value="option-c" title="Label C" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Multi column · 3열" description="검수 범위는 2~6열입니다. 열 수를 늘려도 항목마다 같은 너비를 유지합니다.">
+              <SelectBoxGroup ariaLabel="Multi column example" columns={3} defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" /><SelectBox value="option-c" title="Label C" />
+              </SelectBoxGroup>
+            </Example>
+          </div>
+        </Section>
+
+        <Section id="elements" title="Properties · Elements" description="항목 안에 표시하거나 교체할 수 있는 요소입니다. Title은 필수이며 나머지는 선택입니다.">
+          <div className="grid gap-3 @min-[720px]:grid-cols-2">
+            <Example label="Leading element · Icon" description="Title 왼쪽에 값을 식별하는 Icon을 둘 수 있습니다.">
+              <SelectBoxGroup ariaLabel="Leading icon example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+                <SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "icon", icon: "global", image: "avatar" }} className="size-8" />} />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Leading element · Image" description="공통 정사각 Avatar 샘플을 사용합니다.">
+              <SelectBoxGroup ariaLabel="Leading image example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" leadingElement={<PlaygroundElementGraphic value={{ kind: "image", icon: "global", image: "avatar" }} className="size-8" />} />
+                <SelectBox value="option-b" title="Label B" leadingElement={<PlaygroundElementGraphic value={{ kind: "image", icon: "global", image: "avatar" }} className="size-8" />} />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Description" description="Title 아래에 부연을 표시하며 항목 높이가 Content에 맞춰 늘어납니다.">
+              <SelectBoxGroup ariaLabel="Description example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" description="Description" /><SelectBox value="option-b" title="Label B" description="Description" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Trailing element · None" description="Control을 시각적으로만 숨기고 DOM과 키보드 순서에서는 유지합니다.">
+              <SelectBoxGroup ariaLabel="Trailing none example" trailingElement="none" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+          </div>
+        </Section>
+
+        <Section id="state" title="Properties · State" description="각 카드는 선택된 항목과 선택되지 않은 항목을 함께 표시합니다. Focus와 Pressed 피드백은 실제로 확인할 수 있습니다.">
+          <div className="grid gap-3 @min-[720px]:grid-cols-2">
+            <Example label="Default">
+              <SelectBoxGroup ariaLabel="Default state example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Disabled" description="선택 상태의 Brand 색을 제거하고 Disabled Neutral border와 background를 사용합니다.">
+              <SelectBoxGroup ariaLabel="Disabled state example" defaultValue="option-a" disabled className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Read only" description="현재 값을 보존하고 Focus는 허용하지만 Hover·Pressed와 값 변경은 제공하지 않습니다.">
+              <SelectBoxGroup ariaLabel="Read only state example" defaultValue="option-a" readOnly className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" />
+              </SelectBoxGroup>
+            </Example>
+            <Example label="Item disabled" description="항목마다 disabled를 둘 수 있고 Group의 disabled와 함께 적용됩니다.">
+              <SelectBoxGroup ariaLabel="Item disabled example" defaultValue="option-a" className="w-full">
+                <SelectBox value="option-a" title="Label A" /><SelectBox value="option-b" title="Label B" disabled />
+              </SelectBoxGroup>
+            </Example>
+          </div>
+        </Section>
+
+        <Section id="guidelines" title="Guidelines" description="Select Box를 고르고 항목을 구성할 때 적용하는 기준의 첫 번째 초안입니다.">
+          <div className="grid gap-8">
+            <UsageComparison
+              title="설명이나 시각 정보가 있는 선택지에 사용하기"
+              doText="선택지마다 비교할 정보가 있을 때 Select Box를 사용하세요."
+              dontText="짧은 Label만 나열할 때 Select Box를 쓰지 마세요."
+              description={[
+                "Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description과 시각 정보입니다. 비교할 정보가 없으면 이 영역이 빈 자리로 남습니다.",
+                "짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용합니다. 선택지를 접어 두어도 되면 Select를 사용합니다.",
+              ]}
+              doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.shortB} /></SelectBoxGroup></PreviewLocaleScope>}
+            />
+            <UsageComparison
+              title="항목마다 같은 정보 구성을 유지하기"
+              doText="한 Group의 모든 항목에 같은 요소를 두세요."
+              dontText="일부 항목에만 Description을 두지 마세요."
+              description={[
+                "Select Box는 항목을 나란히 놓고 비교하는 컴포넌트이므로, 어떤 항목에만 정보가 있으면 값의 차이인지 작성의 누락인지 구분할 수 없습니다.",
+                "Leading element도 같습니다. Group 안에서는 모든 항목에 같은 Leading 영역을 유지하고 종류를 섞지 않습니다.",
+              ]}
+              doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a" className="w-full"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} /></SelectBoxGroup></PreviewLocaleScope>}
+            />
+            <div>
+              <GuidelineTitle>선택과 실행을 나누기</GuidelineTitle>
+              <GuidelineList items={[
+                "Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않습니다.",
+                "저장, 확인이나 다음 단계는 별도 Button이 담당합니다. 카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않습니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>다른 선택 컴포넌트와 나눠 쓰기</GuidelineTitle>
+              <GuidelineList items={[
+                "Select처럼 Trigger와 Popup으로 접지 않습니다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제입니다.",
+                "Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않습니다. 항목 너비가 서로 달라지면 비교할 기준이 사라집니다.",
+                "카드형 전체 선택 Surface는 Select Box가 소유합니다. Radio와 Checkbox에는 별도 Container 변형을 두지 않습니다.",
+              ]} />
+            </div>
+          </div>
+        </Section>
+
+        <Section id="property-map" title="Property map" description="현재 구현에서 확인되는 Property와 허용 값입니다. Select Box의 API와 선택 표현은 검수용 초안이며 문서 규칙으로 확정하지 않았습니다.">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[44rem] text-left text-xs">
+              <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead>
+              <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
+                <MapRow property="selectionMode" values="single | multiple" defaultValue="single" />
+                <MapRow property="value / defaultValue" values="string | string[]" defaultValue={'"" | []'} />
+                <MapRow property="columns" values="number (2~6 검수)" defaultValue="1" />
+                <MapRow property="trailingElement" values="radio | checkbox | none" defaultValue="selectionMode에 맞는 Control" />
+                <MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" />
+                <MapRow property="title" values="ReactNode" defaultValue="필수" />
+                <MapRow property="description" values="ReactNode" defaultValue="undefined" />
+                <MapRow property="disabled / readOnly" values="boolean" defaultValue="false" />
+                <MapRow property="ariaLabel" values="string" defaultValue="필수" />
+              </tbody>
+            </table>
+          </div>
+        </Section>
+
       </div>
       <OnThisPage items={sections} componentKey="select-box" />
     </div>
   );
 }
+
+function Example({ label, description, children }: { label: string; description?: string; children: ReactNode }) { return <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-xs font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
+function MapRow({ property, values, defaultValue, note = "Draft" }: { property: string; values: string; defaultValue: string; note?: string }) { return <tr><td className="py-3 pr-4 font-medium text-oe-foreground-primary">{property}</td><td className="py-3 pr-4 font-mono text-[11px]">{values}</td><td className="py-3 pr-4 font-mono text-[11px]">{defaultValue}</td><td className="py-3">{note}</td></tr>; }
 
 function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
 

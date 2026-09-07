@@ -41,3 +41,23 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - 키보드 `:focus-visible`에서는 선택선과 별도 ring을 중첩하지 않고 같은 2px 경계를 `oe-focus-ring` 색으로 바꾼다.
 - Disabled에서는 선택 상태의 Brand 색을 제거하고 Disabled Neutral border와 background를 사용한다. Read only는 현재 값을 보존하고 Focus는 허용하지만 Hover·Pressed와 값 변경은 제공하지 않는다.
 - Trailing element를 `none`으로 설정해도 접근 가능한 Radio 또는 Checkbox input은 시각적으로만 숨기고 DOM과 키보드 순서에서 제거하지 않는다.
+
+## Guidelines
+
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 기준은 첫 번째 초안이며 「역할과 경계」에서 확정한 문장을 사용자 관점의 규칙으로 다시 쓴 것이다.
+
+### 설명이나 시각 정보가 있는 선택지에 사용하기
+
+Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보다. 비교할 정보가 없으면 이 영역이 빈 자리로 남는다. 짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용하고, 선택지를 접어 두어도 되면 Select를 사용한다.
+
+### 항목마다 같은 정보 구성을 유지하기
+
+한 Group의 모든 항목에 같은 요소를 둔다. 항목을 나란히 놓고 비교하는 컴포넌트이므로 어떤 항목에만 정보가 있으면 값의 차이인지 작성의 누락인지 구분할 수 없다. Leading element도 같으며 Group 안에서 종류를 섞지 않는다.
+
+### 선택과 실행을 나누기
+
+Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저장, 확인이나 다음 단계는 별도 Button이 담당한다. 카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않는다.
+
+### 다른 선택 컴포넌트와 나눠 쓰기
+
+Select처럼 Trigger와 Popup으로 접지 않는다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제다. Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다. 항목 너비가 서로 달라지면 비교할 기준이 사라진다. 카드형 전체 선택 Surface는 Select Box가 소유하며 Radio와 Checkbox에는 별도 Container 변형을 두지 않는다.
