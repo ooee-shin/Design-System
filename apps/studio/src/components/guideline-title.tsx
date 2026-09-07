@@ -15,7 +15,7 @@ export function GuidelineTitle({ children }: { children: ReactNode }) {
 // 두 층이 같은 표시를 갖지 않게 한다.
 export function GuidelineGroupTitle({ children }: { children: ReactNode }) {
   return (
-    <h4 className="flex items-center gap-2 text-base font-semibold text-oe-foreground-primary">
+    <h4 className="flex items-center gap-2 text-lg font-semibold text-oe-foreground-primary">
       <RiListUnordered className="size-oe-icon-medium shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
       {children}
     </h4>

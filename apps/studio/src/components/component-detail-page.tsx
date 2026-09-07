@@ -21,7 +21,7 @@ export function ComponentDetailPage({ componentKey, children }: { componentKey: 
             Components
           </Link>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">{component.title}</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">{component.title}</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{component.description}</p>
           </div>
           {spec ? (
