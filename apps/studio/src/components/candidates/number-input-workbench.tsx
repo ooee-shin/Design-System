@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Input, NumberInput, type NumberInputProps } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
-import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineList, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
@@ -169,15 +169,28 @@ export function NumberInputWorkbench() {
                 "수량, 순서, 비율처럼 더하고 빼고 비교하는 값은 Number Input이 담당합니다.",
                 "자리 구분이 필요한 값은 Input에서 표기를 만듭니다. Number Input은 값에 구분자를 담을 수 없고, 담게 만들면 키보드 화살표 증감과 범위 검증과 폼 제출값을 함께 잃습니다.",
               ]}
-              doVisual={<GuideVisual label="Number Input · 수량"><StudioNumberInput locale={locale} defaultValue={12} min={0} max={99} /></GuideVisual>}
-              dontVisual={<GuideVisual label="Input · 금액"><Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} /></GuideVisual>}
+              doVisual={<StudioNumberInput locale={locale} defaultValue={12} min={0} max={99} />}
+              dontVisual={<Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} />}
             />
             <div>
-              <GuidelineTitle>값을 정할 때</GuidelineTitle>
+              <GuidelineTitle>증감 버튼 위치를 한 페이지에서 섞지 않기</GuidelineTitle>
               <GuidelineList items={[
-                <>증감 버튼 위치는 한 페이지에서 <code>trailing</code>과 <code>split</code>을 섞지 않고 하나로 유지합니다. 두 배치가 함께 있으면 어느 버튼이 어느 값을 조절하는지 좇기 어렵습니다.</>,
-                <>음수는 필요한 자리에서만 허용합니다. 기본 최소값은 0이며 증감이나 온도차처럼 음수가 값의 일부일 때만 켭니다.</>,
-                <>증감 단위는 값이 실제로 움직이는 크기에 맞춥니다. 기본값은 1이고 비율은 5나 10, 금액은 1000처럼 한 번 누를 때 의미가 있는 크기를 사용합니다.</>,
+                <><code className="text-xs text-oe-foreground-primary">controlsPosition</code>은 <code className="text-xs text-oe-foreground-primary">trailing</code>과 <code className="text-xs text-oe-foreground-primary">split</code> 중 하나를 페이지 전체에서 일관되게 사용합니다.</>,
+                "같은 화면에 두 배치가 함께 있으면 어느 버튼이 어느 값을 조절하는지 눈으로 좇기 어려워집니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>음수는 필요한 자리에서만 허용하기</GuidelineTitle>
+              <GuidelineList items={[
+                <><code className="text-xs text-oe-foreground-primary">allowNegative</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">false</code>이므로 유효한 최소값은 0입니다.</>,
+                "이 컴포넌트가 담당하는 수량과 순서와 비율에는 음수가 필요하지 않습니다. 증감이나 온도차처럼 음수가 값의 일부인 자리에서만 켭니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>증감 단위를 값의 성격에 맞추기</GuidelineTitle>
+              <GuidelineList items={[
+                <><code className="text-xs text-oe-foreground-primary">step</code>의 기본값은 1이며, 값이 실제로 움직이는 단위가 다르면 페이지마다 조정합니다.</>,
+                "수량은 1, 비율은 5나 10, 금액은 1000처럼 한 번 누를 때 의미가 있는 크기를 사용합니다.",
               ]} />
             </div>
           </div>
