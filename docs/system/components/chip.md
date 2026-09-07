@@ -22,4 +22,4 @@
 
 - Close action을 누르면 `onRemove`를 실행한다.
 - Chip 전체는 버튼이 아니며 Close action만 상호작용한다.
-- MultiCombobox Container 타입은 선택 결과와 개별 삭제에 이 Chip을 사용한다.
+- MultiCombobox의 선택값 Container는 선택 결과와 개별 삭제에 이 Chip을 사용한다.
