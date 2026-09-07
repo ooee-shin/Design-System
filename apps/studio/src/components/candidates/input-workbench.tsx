@@ -33,7 +33,7 @@ const copy = {
     phoneLabel: "전화번호", phoneValue: "010-1234-5678",
     quantityLabel: "수량", decrease: "값 줄이기", increase: "값 늘리기", decreaseTooltip: "감소", increaseTooltip: "증가",
     businessLabel: "사업자등록번호", businessValue: "123-45-67890",
-    siteLabel: "웹사이트", siteValue: "ooee.kr", amountLabel: "금액", amountValue: "1,250,000",
+    siteLabel: "웹사이트", siteValue: "bluekey.kr", amountLabel: "금액", amountValue: "1,250,000",
     expiryLabel: "카드 유효기간", expiryValue: "09 / 28",
   },
   en: {
@@ -52,7 +52,7 @@ const copy = {
     phoneLabel: "Phone number", phoneValue: "010-1234-5678",
     quantityLabel: "Quantity", decrease: "Decrease value", increase: "Increase value", decreaseTooltip: "Decrease", increaseTooltip: "Increase",
     businessLabel: "Business number", businessValue: "123-45-67890",
-    siteLabel: "Website", siteValue: "ooee.kr", amountLabel: "Amount", amountValue: "1,250,000",
+    siteLabel: "Website", siteValue: "bluekey.kr", amountLabel: "Amount", amountValue: "1,250,000",
     expiryLabel: "Card expiry", expiryValue: "09 / 28",
   },
 } as const;
@@ -235,7 +235,6 @@ export function InputWorkbench() {
             <GuidelineList items={[
               "Prefix와 Suffix는 값의 의미를 보완하는 짧은 표기 자리입니다. 통화 기호와 단위가 여기에 옵니다.",
               "Leading element와 Trailing element는 값을 식별하거나 조작을 여는 요소 자리입니다. 검색을 나타내는 아이콘이나 보기 전환 action이 여기에 옵니다.",
-              <>내부 순서는 <code className="text-xs text-oe-foreground-primary">Leading element → Prefix → Input field → Clear button → Suffix → Trailing element</code>로 고정됩니다.</>,
             ]} />
           </div>
           <UsageComparison
