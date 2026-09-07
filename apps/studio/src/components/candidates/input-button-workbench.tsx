@@ -169,6 +169,18 @@ export function InputButtonWorkbench() {
               ]} />
             </div>
             <UsageComparison
+              title="값을 나눠 받을 때는 시각 요소를 줄이기"
+              doText="나눈 Trigger에는 Placeholder만 두세요."
+              dontText="같은 아이콘을 Trigger마다 반복하지 마세요."
+              description={[
+                "값을 여러 Trigger로 나누면 각 Trigger가 Leading element를 따로 갖게 됩니다. 같은 아이콘이 두 번 이상 나오면 정보를 더하지 않고 값이 쓸 폭만 줄입니다.",
+                "나눈 Trigger에는 Leading element를 두지 않고 Placeholder로 각 자리를 알립니다. 아이콘이 필요하면 묶음 전체를 설명하는 Field 쪽에 한 번만 둡니다.",
+                "Trigger가 좁아질수록 값이 잘리기 쉽습니다. 남는 폭은 값에 씁니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center gap-2"><InputButton placeholder={c.startDate} aria-haspopup="dialog" aria-label={c.startDate} /><span aria-hidden="true" className="shrink-0 text-sm text-oe-foreground-tertiary">~</span><InputButton placeholder={c.endDate} aria-haspopup="dialog" aria-label={c.endDate} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center gap-2"><InputButton placeholder={c.startDate} leadingElement={<RiCalendarLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.startDate} /><span aria-hidden="true" className="shrink-0 text-sm text-oe-foreground-tertiary">~</span><InputButton placeholder={c.endDate} leadingElement={<RiCalendarLine aria-hidden="true" />} aria-haspopup="dialog" aria-label={c.endDate} /></PreviewLocaleScope>}
+            />
+            <UsageComparison
               title="조회는 Read only, 쓸 수 없을 때만 Disabled"
               doText="조회 화면에서는 Read only로 값을 보여주세요."
               dontText="조회 화면에 Disabled를 쓰지 마세요."
