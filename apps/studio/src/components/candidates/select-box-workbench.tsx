@@ -278,22 +278,6 @@ export function SelectBoxWorkbench() {
         <Section id="guidelines" title="Guidelines" description="Select Box를 고르고 항목을 구성할 때 적용하는 기준의 첫 번째 초안입니다.">
           <div className="grid gap-8">
             <div>
-              <GuidelineTitle>설명이나 시각 정보가 있는 선택지에 사용하기</GuidelineTitle>
-              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="설명이 있는 선택지 · 한 열">
-                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>
-                </GuideVisual>
-                <GuideVisual label="짧은 Label · 여러 열 · Trailing element 제거">
-                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} columns={3} trailingElement="none" defaultValue="plan-a"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.shortB} /><SelectBox value="plan-c" title={c.shortC} /></SelectBoxGroup></PreviewLocaleScope>
-                </GuideVisual>
-              </div>
-              <GuidelineList items={[
-                "Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보입니다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 합니다.",
-                <>Title만 있는 짧은 선택지는 <code className="text-xs text-oe-foreground-primary">columns</code>를 늘려 여러 열로 나누고 <code className="text-xs text-oe-foreground-primary">trailingElement</code>를 <code className="text-xs text-oe-foreground-primary">none</code>으로 둡니다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어집니다.</>,
-                "짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용합니다. 선택지를 접어 두어도 되면 Select를 사용합니다.",
-              ]} />
-            </div>
-            <div>
               <GuidelineTitle>박스 전체를 하나의 터치 타겟으로 두기</GuidelineTitle>
               <GuidelineList items={[
                 "Select Box는 박스 전체를 하나의 터치 타겟으로 구성하여 오조작을 방지합니다. Title, Description과 Leading element 어디를 눌러도 같은 값이 선택됩니다.",
@@ -343,6 +327,22 @@ export function SelectBoxWorkbench() {
               <GuidelineList items={[
                 "열이 셋 이상이면 항목 폭이 Title 한 줄에 가까워집니다. Leading element까지 두면 Title이 줄바꿈되거나 잘립니다.",
                 "이 폭에서는 시각 요소를 덜어내고 Title만 두는 것을 권장합니다. 아이콘이 값을 식별하는 데 꼭 필요하면 열 수를 줄입니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>설명이나 시각 정보가 있는 선택지에 사용하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="설명이 있는 선택지 · 한 열">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="짧은 Label · 여러 열 · Trailing element 제거">
+                  <PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} columns={3} trailingElement="none" defaultValue="plan-a"><SelectBox value="plan-a" title={c.shortA} /><SelectBox value="plan-b" title={c.shortB} /><SelectBox value="plan-c" title={c.shortC} /></SelectBoxGroup></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보입니다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 합니다.",
+                <>Title만 있는 짧은 선택지는 <code className="text-xs text-oe-foreground-primary">columns</code>를 늘려 여러 열로 나누고 <code className="text-xs text-oe-foreground-primary">trailingElement</code>를 <code className="text-xs text-oe-foreground-primary">none</code>으로 둡니다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어집니다.</>,
+                "짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용합니다. 선택지를 접어 두어도 되면 Select를 사용합니다.",
               ]} />
             </div>
             <div>

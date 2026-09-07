@@ -269,22 +269,6 @@ export function InputWorkbench() {
             dontVisual={<ClearableSample defaultValue={c.clearAddressValue} label={c.clearAddressLabel} />}
           />
           <div>
-            <GuidelineTitle>숫자 값은 Number Input과 나눠 쓰기</GuidelineTitle>
-            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-              <GuideVisual label="Input · 계산하지 않는 식별자">
-                <PreviewLocaleScope className="w-full"><Input value={c.phoneValue} readOnly inputMode="numeric" autoComplete="tel" className="tabular-nums" aria-label={c.phoneLabel} /></PreviewLocaleScope>
-              </GuideVisual>
-              <GuideVisual label="Number Input · 계산에 쓰이는 값">
-                <PreviewLocaleScope className="w-full"><NumberInput defaultValue={12} min={0} max={99} decreaseLabel={c.decrease} increaseLabel={c.increase} decreaseTooltip={c.decreaseTooltip} increaseTooltip={c.increaseTooltip} aria-label={c.quantityLabel} /></PreviewLocaleScope>
-              </GuideVisual>
-            </div>
-            <GuidelineList items={[
-              <>Input에는 별도 <code className="text-xs text-oe-foreground-primary">numeric</code> Property를 두지 않습니다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고, 증감 버튼이 필요 없으면 Number Input의 Controls를 숨깁니다.</>,
-              <>전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당합니다. native <code className="text-xs text-oe-foreground-primary">inputMode=&quot;numeric&quot;</code>과 필요한 포맷, <code className="text-xs text-oe-foreground-primary">tabular-nums</code>를 조합합니다.</>,
-              "자리 구분이 필요한 금액도 Input이 담당합니다. Number Input은 값에 구분자를 담을 수 없습니다.",
-            ]} />
-          </div>
-          <div>
             <GuidelineTitle>민감한 정보는 마스킹하기</GuidelineTitle>
             <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
               <GuideVisual label="보기 전환 제공">
@@ -314,6 +298,22 @@ export function InputWorkbench() {
               "정해진 자릿수와 구분자가 있는 값, 일부만 입력받고 나머지를 고정 마스킹하는 값은 기본 Property로 표현되지 않습니다. 이때는 Input을 조합해 포맷과 동작을 직접 정의합니다.",
               <>반복 사용되는 부분 입력과 고정 마스킹은 공용 <code className="text-xs text-oe-foreground-primary">PartialMaskedInput</code>이 소유합니다. 같은 마스킹을 화면마다 다시 만들지 않습니다.</>,
               "새 포맷을 만들어도 Container와 Focus·Invalid·Disabled 표현은 Input이 소유한 것을 그대로 씁니다. 확정된 사례는 위 Custom input 절에 있습니다.",
+            ]} />
+          </div>
+          <div>
+            <GuidelineTitle>숫자 값은 Number Input과 나눠 쓰기</GuidelineTitle>
+            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+              <GuideVisual label="Input · 계산하지 않는 식별자">
+                <PreviewLocaleScope className="w-full"><Input value={c.phoneValue} readOnly inputMode="numeric" autoComplete="tel" className="tabular-nums" aria-label={c.phoneLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+              <GuideVisual label="Number Input · 계산에 쓰이는 값">
+                <PreviewLocaleScope className="w-full"><NumberInput defaultValue={12} min={0} max={99} decreaseLabel={c.decrease} increaseLabel={c.increase} decreaseTooltip={c.decreaseTooltip} increaseTooltip={c.increaseTooltip} aria-label={c.quantityLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+            </div>
+            <GuidelineList items={[
+              <>Input에는 별도 <code className="text-xs text-oe-foreground-primary">numeric</code> Property를 두지 않습니다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고, 증감 버튼이 필요 없으면 Number Input의 Controls를 숨깁니다.</>,
+              <>전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당합니다. native <code className="text-xs text-oe-foreground-primary">inputMode=&quot;numeric&quot;</code>과 필요한 포맷, <code className="text-xs text-oe-foreground-primary">tabular-nums</code>를 조합합니다.</>,
+              "자리 구분이 필요한 금액도 Input이 담당합니다. Number Input은 값에 구분자를 담을 수 없습니다.",
             ]} />
           </div>
           <div>

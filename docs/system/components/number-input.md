@@ -53,12 +53,6 @@ Small, Regular와 Large에서 버튼 터치 영역은 24px이다. XLarge에서�
 
 ## Guidelines
 
-### Input과 Number Input을 나눠 쓰기
-
-계산에 쓰이는 숫자는 Number Input을 사용한다. 수량, 순서, 비율처럼 더하고 빼고 비교하는 값이다. 숫자로 보이지만 계산하지 않는 식별자는 Input을 사용한다. 전화번호, 사업자번호, 카드번호가 여기에 해당한다.
-
-자리 구분이 필요한 값도 Input을 사용한다. Number Input은 `type="number"`라 값에 구분자를 담을 수 없어 자릿수를 눈으로 세야 하고, 이를 바꾸면 키보드 화살표 증감과 native 범위 검증과 폼 제출값을 함께 잃는다. 금액처럼 구분자를 보여야 하는 값은 Input에서 표기를 만든다.
-
 ### 증감 버튼 위치를 한 페이지에서 섞지 않기
 
 `controlsPosition`은 `trailing`과 `split` 중 하나를 페이지 전체에서 일관되게 사용한다. 같은 화면에 두 배치가 함께 있으면 어느 버튼이 어느 값을 조절하는지 눈으로 좇기 어려워진다.
@@ -76,6 +70,12 @@ Small, Regular와 Large에서 버튼 터치 영역은 24px이다. XLarge에서�
 `prefix`와 `suffix`는 공용 Input의 동일한 Slot을 재사용하며 숫자의 앞뒤에 통화 기호, 비율, 단위처럼 값의 의미를 보완하는 짧은 요소를 표시한다. 통화 기호는 숫자 앞에 오므로 Prefix에 두고, 백분율과 단위는 숫자 뒤에 오므로 Suffix에 둔다.
 
 한 줄 Control의 높이를 바꾸지 않는 짧은 요소만 둔다. Leading element와 Trailing element는 증감 버튼이 사용하므로 Number Input에서는 제공하지 않는다.
+
+### Input과 Number Input을 나눠 쓰기
+
+계산에 쓰이는 숫자는 Number Input을 사용한다. 수량, 순서, 비율처럼 더하고 빼고 비교하는 값이다. 숫자로 보이지만 계산하지 않는 식별자는 Input을 사용한다. 전화번호, 사업자번호, 카드번호가 여기에 해당한다.
+
+자리 구분이 필요한 값도 Input을 사용한다. Number Input은 `type="number"`라 값에 구분자를 담을 수 없어 자릿수를 눈으로 세야 하고, 이를 바꾸면 키보드 화살표 증감과 native 범위 검증과 폼 제출값을 함께 잃는다. 금액처럼 구분자를 보여야 하는 값은 Input에서 표기를 만든다.
 
 ## 확인된 예시
 

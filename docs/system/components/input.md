@@ -65,12 +65,6 @@ Input은 값을 소유하지 않으므로 값의 유무는 소비자가 판단�
 
 주소나 이름처럼 한 번 정하면 유지되는 값에는 두지 않는다. 지울 일이 없는 값에도 지우기를 권하는 것처럼 보이고, 별도 화면에서 고른 값을 한 번에 날릴 수 있다.
 
-### 숫자 값은 Number Input과 나눠 쓰기
-
-Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고 증감 버튼이 필요 없으면 Number Input의 Controls를 숨긴다.
-
-전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당한다. native `inputMode="numeric"`과 필요한 포맷, `tabular-nums`를 조합한다. 자리 구분이 필요한 금액도 Input이 담당한다. Number Input은 값에 구분자를 담을 수 없다.
-
 ### 민감한 정보는 마스킹하기
 
 비밀번호나 개인정보처럼 민감한 정보는 입력하는 동안에도 마스킹해 표시한다.
@@ -84,6 +78,12 @@ Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비�
 정해진 자릿수와 구분자가 있는 값, 일부만 입력받고 나머지를 고정 마스킹하는 값은 기본 Property로 표현되지 않는다. 이때는 Input을 조합해 포맷과 동작을 직접 정의한다.
 
 반복 사용되는 부분 입력과 고정 마스킹은 공용 `PartialMaskedInput`이 소유한다. 같은 마스킹을 화면마다 다시 만들지 않는다. 새 포맷을 만들어도 Container와 Focus·Invalid·Disabled 표현은 Input이 소유한 것을 그대로 사용한다. 확정된 사례는 이 문서 뒤쪽의 Custom input 설명에 있다.
+
+### 숫자 값은 Number Input과 나눠 쓰기
+
+Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고 증감 버튼이 필요 없으면 Number Input의 Controls를 숨긴다.
+
+전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당한다. native `inputMode="numeric"`과 필요한 포맷, `tabular-nums`를 조합한다. 자리 구분이 필요한 금액도 Input이 담당한다. Number Input은 값에 구분자를 담을 수 없다.
 
 ### Color input은 직접 입력 여부로 나누기
 

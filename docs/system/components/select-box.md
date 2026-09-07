@@ -50,14 +50,6 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 
 Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 기준은 첫 번째 초안이며 「역할과 경계」에서 확정한 문장을 사용자 관점의 규칙으로 다시 쓴 것이다.
 
-### 설명이나 시각 정보가 있는 선택지에 사용하기
-
-Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 한다.
-
-Title만 있는 짧은 선택지는 `columns`를 늘려 여러 열로 나누고 `trailingElement`를 `none`으로 둔다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어진다. 어느 쪽이 잘못이 아니라 Content 분량에 따라 갈리는 권장 배치다.
-
-짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용하고, 선택지를 접어 두어도 되면 Select를 사용한다.
-
 ### 박스 전체를 하나의 터치 타겟으로 두기
 
 Select Box는 박스 전체를 하나의 터치 타겟으로 구성하여 오조작을 방지한다. Title, Description과 Leading element 어디를 눌러도 같은 값이 선택된다. 따라서 박스 안에 따로 눌리는 요소를 두지 않는다. 링크나 Button을 넣으면 하나였던 터치 타겟이 갈라져 무엇을 눌렀는지 알 수 없게 된다.
@@ -77,6 +69,14 @@ Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저�
 ### 세 열에서는 시각 요소를 덜어내기
 
 열이 셋 이상이면 항목 폭이 Title 한 줄에 가까워진다. Leading element까지 두면 Title이 줄바꿈되거나 잘린다. 이 폭에서는 시각 요소를 덜어내고 Title만 두는 것을 권장한다. 아이콘이 값을 식별하는 데 꼭 필요하면 열 수를 줄인다.
+
+### 설명이나 시각 정보가 있는 선택지에 사용하기
+
+Select Box의 값은 넓은 조작 영역과 그 안에 담기는 Description, 시각 정보다. 비교할 정보가 있으면 한 열로 두어 항목마다 그 정보를 읽을 수 있게 한다.
+
+Title만 있는 짧은 선택지는 `columns`를 늘려 여러 열로 나누고 `trailingElement`를 `none`으로 둔다. 한 열로 두면 넓은 카드에 짧은 Label 하나만 남고 Control이 오른쪽 끝으로 떨어져 Label과 멀어진다. 어느 쪽이 잘못이 아니라 Content 분량에 따라 갈리는 권장 배치다.
+
+짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용하고, 선택지를 접어 두어도 되면 Select를 사용한다.
 
 ### Select Box와 Chip을 나눠 쓰기
 

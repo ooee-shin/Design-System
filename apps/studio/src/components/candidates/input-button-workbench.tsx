@@ -134,21 +134,6 @@ export function InputButtonWorkbench() {
 
         <Section id="guidelines" title="Guidelines" description="Input Button을 고르고 조회와 편집을 나눌 때 적용하는 기준입니다.">
           <div className="col-span-full grid gap-8">
-            <div>
-              <GuidelineTitle>Input Button과 Select를 나눠 쓰기</GuidelineTitle>
-              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="Input Button · 별도 화면에서 값을 정함">
-                  <PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-label={locale === "ko" ? "날짜 선택" : "Select a date"} /></PreviewLocaleScope>
-                </GuideVisual>
-                <GuideVisual label="Select · 짧은 목록에서 바로 고름">
-                  <PreviewLocaleScope className="w-full"><Select options={c.periodOptions.map((label, index) => ({ value: `period-${index}`, label }))} defaultValue="period-0" ariaLabel={c.periodLabel} /></PreviewLocaleScope>
-                </GuideVisual>
-              </div>
-              <GuidelineList items={[
-                "달력, 주소 검색, 시간 선택처럼 값을 정하는 수단이 별도 화면이면 Input Button을 사용합니다. 어떤 화면을 열지는 이 컴포넌트가 소유하지 않습니다.",
-                "미리 정의된 짧은 목록에서 바로 고르면 Select를 사용합니다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용합니다.",
-              ]} />
-            </div>
             <UsageComparison
               title="Placeholder는 문장이 아니라 형식이나 키워드로 쓰기"
               doText="고를 값을 키워드로 쓰세요."
@@ -211,6 +196,21 @@ export function InputButtonWorkbench() {
                 "Leading element와 Prefix, Suffix는 Input과 같은 성격입니다. 값을 식별하는 요소와 값의 의미를 보완하는 짧은 표기를 둡니다.",
                 "Trailing element는 다릅니다. Container 전체가 하나의 Button이라 이 자리에 조작을 걸 수 없으므로, 오른쪽 화살표처럼 눌렀을 때 화면이 열린다는 것을 알리는 표시만 둡니다.",
                 "Input에서 Trailing element에 두던 보기 전환 같은 action은 이 컴포넌트에 두지 않습니다. 그 동작이 필요하면 값을 직접 입력받는 Input을 사용합니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>Input Button과 Select를 나눠 쓰기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Input Button · 별도 화면에서 값을 정함">
+                  <PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-label={locale === "ko" ? "날짜 선택" : "Select a date"} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="Select · 짧은 목록에서 바로 고름">
+                  <PreviewLocaleScope className="w-full"><Select options={c.periodOptions.map((label, index) => ({ value: `period-${index}`, label }))} defaultValue="period-0" ariaLabel={c.periodLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "달력, 주소 검색, 시간 선택처럼 값을 정하는 수단이 별도 화면이면 Input Button을 사용합니다. 어떤 화면을 열지는 이 컴포넌트가 소유하지 않습니다.",
+                "미리 정의된 짧은 목록에서 바로 고르면 Select를 사용합니다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용합니다.",
               ]} />
             </div>
             <div>
