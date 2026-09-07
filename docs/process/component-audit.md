@@ -72,6 +72,12 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
   Scrollbar thumb이 보이는 조건에 `focus`를 더했다. `hover`만으로는 키보드로 들어온 사람이 감춰진 분량을 알 수 없었다. Touch 기기 확인은 `open-questions.md`에 남겼다.
   회귀 테스트 다섯 건을 뒀다. 기본 높이와 3.5줄 계산, 최소값 제한, `autoSize`가 고정 높이를 쓰지 않는 것, `resize`가 세로만이며 `autoSize`와 함께 켜지지 않는 것, Scrollbar가 Hover와 Focus에서 보이는 것이다.
 
+## 한번에 몰아서 할 작업
+
+검토 중에 나왔으나 컴포넌트마다 흩어져 있어 한 번에 처리하는 편이 나은 항목이다.
+
+1. **Structure map 누락.** Anatomy 절이 있는 화면 열한 개 중 공용 `AnatomyStructureMap`을 쓰는 것은 다섯 개뿐이다. 있는 곳은 Checkbox·Combobox·Radio·Select Box·Switch이고, 없는 곳은 **Badge·Input·Input Button·Number Input·Select·Textarea** 여섯 개다. 요소의 중첩 관계를 글로 보여 주는 자리이므로 Anatomy가 있으면 함께 있어야 한다. 하나씩 검토하면서 지나쳤으므로 여섯 화면에 한 번에 추가한다.
+
 ## Chip 잔여 작업
 
 `2026-09-07`에 Select Box를 검토하면서 나온 요구다. Chip은 이미 후순위이며 지시가 있을 때 시작한다.
