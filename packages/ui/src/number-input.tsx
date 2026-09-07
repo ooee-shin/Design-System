@@ -37,7 +37,6 @@ type NumberInputProps = Omit<
   increaseTooltip?: string
   prefixTone?: NumberInputAffixTone
   suffixTone?: NumberInputAffixTone
-  useGrouping?: boolean
   onValueChange?: (value: number | undefined) => void
   onLimitReached?: (boundary: "min" | "max") => void
 } & (
@@ -60,7 +59,6 @@ function NumberInput({
   hideControls = false,
   controlsPosition = "trailing",
   allowNegative = false,
-  useGrouping = false,
   decreaseLabel = "Decrease value",
   increaseLabel = "Increase value",
   decreaseTooltip = "Decrease",
@@ -137,19 +135,19 @@ function NumberInput({
     <Input
       {...props}
       {...(layout === "fixed" ? { layout: "fixed" as const, fixedWidth } : { layout: "fill" as const })}
-      type={useGrouping ? "text" : "number"}
-      inputMode={useGrouping ? "numeric" : "decimal"}
+      type="number"
+      inputMode="decimal"
       min={effectiveMin}
       max={max}
       step={step}
       prefix={prefix ? <span className={prefixTone === "tertiary" ? "text-oe-foreground-tertiary" : "text-oe-foreground-secondary"}>{prefix}</span> : undefined}
       suffix={suffix ? <span className={suffixTone === "tertiary" ? "text-oe-foreground-tertiary" : "text-oe-foreground-secondary"}>{suffix}</span> : undefined}
       controlSize={controlSize}
-      value={useGrouping && currentValue !== undefined ? currentValue.toLocaleString("en-US") : currentValue ?? ""}
+      value={currentValue ?? ""}
       disabled={disabled}
       readOnly={readOnly}
       onChange={(event) => {
-        const raw = useGrouping ? event.currentTarget.value.replace(/,/g, "") : event.currentTarget.value
+        const raw = event.currentTarget.value
         if (raw === "" || raw === "-") {
           commit(undefined)
           return
