@@ -325,7 +325,7 @@ export function SelectBoxWorkbench() {
                     <SelectBoxGroup ariaLabel={c.serviceQuestion} columns={2} trailingElement="none" defaultValue="appliance-1">
                       {c.appliances.map((appliance, index) => {
                         const Icon = applianceIcons[index];
-                        return <SelectBox key={appliance} value={`appliance-${index}`} title={<span className="flex flex-col items-center gap-2 py-1"><Icon className="size-oe-icon-large text-oe-foreground-tertiary" aria-hidden="true" /><span>{appliance}</span></span>} />;
+                        return <SelectBox key={appliance} value={`appliance-${index}`} title={<span className="flex flex-col items-start gap-2 py-1"><Icon className="size-oe-icon-large text-oe-foreground-tertiary" aria-hidden="true" /><span>{appliance}</span></span>} />;
                       })}
                     </SelectBoxGroup>
                   </PreviewLocaleScope>
