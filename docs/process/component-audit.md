@@ -43,6 +43,13 @@ Input의 Anatomy에서도 같은 규칙 위반 두 건을 함께 고쳤다. 요�
 
 Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다. 원자적인 `Checkbox`는 Guidelines 의 `16px Control` 예시와 `Do/Don't` 비교에서 이미 확인할 수 있으므로 추가로 둘 것이 없다.
 
+## 하나씩 검토 진행 상황
+
+`2026-09-07`부터 사용자가 컴포넌트를 하나씩 훑으며 수정 요청을 준다. 대상은 Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다.
+
+- **Checkbox** — 문제없음으로 확인받았다.
+- **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
+
 ## Combobox 잔여 작업
 
 `2026-09-07`에 Select 와의 경계를 다시 정하면서 사용자가 남긴 목록이다. 이 목록 때문에 Combobox 도 후순위로 옮겼다. Chip 을 먼저 확정한 뒤 진행한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다.
