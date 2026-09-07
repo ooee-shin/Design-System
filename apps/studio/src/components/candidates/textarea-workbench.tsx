@@ -29,6 +29,9 @@ const copy = {
     contactTimeLabel: "연락 가능 시간",
     contactTimeOptions: ["오전", "오후", "상관없음"],
     layoutValue: "지난주에 신청한 교환 건이 어떻게 처리되고 있는지 알려주세요.",
+    halfLineValue: "배송이 예정일보다 사흘 늦게 도착했습니다. 그동안 어디에 머물러 있는지 조회해도 상태가 바뀌지 않아서 두 번 문의했는데 같은 안내만 받았습니다. 지연된 이유와 다음부터 같은 일이 생기지 않게 할 방법을 알려주세요.",
+    resizeValue: "영수증을 다시 받을 수 있을까요. 회사에 제출해야 하는데 문자로 받은 내역은 항목이 나오지 않습니다.",
+    autoSizeValue: "직원분이 재고를 대신 확인해 주셔서 헛걸음하지 않았습니다. 다음에도 같은 매장을 이용하겠습니다.",
     heightValue: "매장 위치를 찾기 어려웠습니다. 지하철역에서 나와 어느 방향으로 가야 하는지 안내가 없어서 한참 헤맸습니다. 입구 사진이라도 있으면 좋겠습니다.",
   },
   en: {
@@ -48,6 +51,9 @@ const copy = {
     contactTimeLabel: "Available time",
     contactTimeOptions: ["Morning", "Afternoon", "Anytime"],
     layoutValue: "Please let me know how the exchange request from last week is being handled.",
+    halfLineValue: "The delivery arrived three days later than the promised date. The tracking status never changed while it was in transit, and I asked twice but received the same reply both times. Please explain the delay and how it will be prevented next time.",
+    resizeValue: "Could I get the receipt again? I need to submit it at work, and the text message I received does not list the items.",
+    autoSizeValue: "A staff member checked the stock for me, so I did not make the trip for nothing. I will visit the same store next time.",
     heightValue: "The store was hard to find. There was no guidance on which way to go after leaving the subway station, so I wandered for a while. A photo of the entrance would help.",
   },
 } as const;
@@ -70,7 +76,7 @@ export function TextareaWorkbench() {
   const [playgroundVariant, setPlaygroundVariant] = useState<"outline" | "filled">("outline");
   const [playgroundAutoSize, setPlaygroundAutoSize] = useState(false);
   const [playgroundResize, setPlaygroundResize] = useState(false);
-  const [playgroundHeight, setPlaygroundHeight] = useState(88);
+  const [playgroundHeight, setPlaygroundHeight] = useState(80);
 
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
@@ -108,10 +114,10 @@ export function TextareaWorkbench() {
         </Section>
 
         <Section id="sizing" title="Properties · Sizing" description="Auto size가 상위 속성이며, 값에 따라 Height와 Resize의 적용 여부가 결정됩니다.">
-          <Example label="Auto size · false" description="기본값입니다. Height로 초기 높이를 설정하고 Resize 사용 여부를 선택할 수 있습니다."><Textarea autoSize={false} height={88} defaultValue={c.value} /></Example>
+          <Example label="Auto size · false" description="기본값입니다. Height로 초기 높이를 설정하고 Resize 사용 여부를 선택할 수 있습니다."><Textarea autoSize={false} height={80} defaultValue={c.value} /></Example>
           <Example label="Auto size · true" description="내용에 따라 높이가 자동으로 증가합니다. 하위 속성인 Height와 Resize는 적용하지 않으며, viewport에서 고정 영역을 제외한 Max height를 넘지 않아야 합니다."><Textarea autoSize defaultValue={c.value} /></Example>
           <Example label="Resize · false / true" description="Auto size가 false일 때만 활성화됩니다. true이면 세로 방향으로 높이를 변경할 수 있지만 동일한 Max height 제한을 넘지 않아야 합니다."><Textarea autoSize={false} resize defaultValue={c.value} /></Example>
-          <Example label="Height · Minimum 88px" description="Auto size가 false일 때 초기 높이를 설정합니다. 기본값과 허용되는 최소값은 모두 88px입니다."><Textarea autoSize={false} height={112} defaultValue={c.value} /></Example>
+          <Example label="Height · Minimum 80px" description="Auto size가 false일 때 초기 높이를 설정합니다. 기본값과 허용되는 최소값은 모두 80px입니다."><Textarea autoSize={false} height={112} defaultValue={c.value} /></Example>
         </Section>
 
         <Section id="state" title="Properties · State" description="Input과 같은 단색 Focus/Error 외곽선 구조를 사용합니다.">
@@ -141,7 +147,7 @@ export function TextareaWorkbench() {
               </div>
               <GuidelineList items={[
                 "문의 내용, 설명, 메모처럼 줄바꿈이 생기는 값에 Textarea를 사용합니다.",
-                "제목이나 이름처럼 한 줄로 끝나는 값은 Input을 사용합니다. Textarea는 최소 88px를 차지하므로, 한 줄 값에 두면 쓰이지 않는 빈 영역이 남고 폼의 수직 리듬이 끊깁니다.",
+                "제목이나 이름처럼 한 줄로 끝나는 값은 Input을 사용합니다. Textarea는 최소 80px를 차지하므로, 한 줄 값에 두면 쓰이지 않는 빈 영역이 남고 폼의 수직 리듬이 끊깁니다.",
               ]} />
             </div>
             <UsageComparison
@@ -159,15 +165,15 @@ export function TextareaWorkbench() {
             <div>
               <GuidelineTitle>기본 높이는 3.5줄을 유지하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="기본 제공 · 3.5줄 (88px)" contentClassName="items-start">
+                <GuideVisual label="기본 제공 · 3.5줄 (80px)" contentClassName="items-start">
                   <PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
                 <GuideVisual label="별도 제어 · 기본 제공 높이보다 큰 값" contentClassName="items-start">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={120} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
-                "기본 높이는 약 3.5줄이며 88px입니다. 이 값보다 줄일 수 없습니다.",
+                "기본 높이는 80px이며 내용이 넘칠 때 3.5줄이 보입니다. 이 값보다 줄일 수 없습니다.",
                 "받을 내용이 길면 초기 높이를 따로 지정할 수 있습니다. 기본 제공 높이보다 큰 값만 쓸 수 있습니다.",
               ]} />
             </div>
@@ -176,21 +182,21 @@ export function TextareaWorkbench() {
               doText="마지막 줄이 일부 잘려 보이게 두세요."
               dontText="줄 수에 딱 맞춰 끊지 마세요."
               description={[
-                "글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힙니다. 기본 높이의 3.5줄이 그 이유로 정해진 값입니다.",
+                "글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힙니다. 기본값 80px이 그 이유로 정해진 값이며, Do는 그 기본값을 그대로 쓴 상태입니다.",
                 "줄 수에 딱 맞추면 입력 영역이 거기서 끝난 것처럼 보이고, 스크롤이 있다는 것을 알 방법이 없습니다.",
                 "초기 높이를 따로 지정할 때도 같은 기준을 씁니다. 구현이 이 값을 검사하지 않으므로 높이를 정하는 쪽에서 맞춥니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={118} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.halfLineValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.halfLineValue} readOnly height={90} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>Resize는 세로만 허용하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Resize 끔 · Default" contentClassName="items-start">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.layoutValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.resizeValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
                 <GuideVisual label="Resize 켬 · 세로만" contentClassName="items-start">
-                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.layoutValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.resizeValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
@@ -207,8 +213,8 @@ export function TextareaWorkbench() {
                 "켤 수 있는 자리는 셋입니다. 그 화면에 이 입력만 있는 경우, 마지막 콘텐츠인 경우, 아래 콘텐츠가 밀리지 않는 배치인 경우입니다.",
                 "입력하는 동안 아래 콘텐츠가 계속 내려가면 방금 읽던 자리를 잃습니다. 두 예시에 직접 입력해 차이를 확인할 수 있습니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.contactTimeLabel}</FieldLabel><Select options={c.contactTimeOptions.map((label, index) => ({ value: `time-${index}`, label }))} defaultValue="time-0" ariaLabel={c.contactTimeLabel} /></div></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.contactTimeLabel}</FieldLabel><Select options={c.contactTimeOptions.map((label, index) => ({ value: `time-${index}`, label }))} defaultValue="time-0" ariaLabel={c.contactTimeLabel} /></div></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
@@ -228,8 +234,8 @@ export function TextareaWorkbench() {
                 <MapRow property="variant" values="outline | filled" defaultValue="outline" />
                 <MapRow property="autoSize" values="false | true" defaultValue="false" note="Parent property" />
                 <MapRow property="resize" values="false | true" defaultValue="false" note="autoSize=false only" />
-                <MapRow property="height" values="≥ 88px" defaultValue="88px" note="autoSize=false only" />
-                <MapRow property="minHeight" values="88px" defaultValue="88px" note="Always applied" />
+                <MapRow property="height" values="≥ 80px" defaultValue="80px" note="autoSize=false only" />
+                <MapRow property="minHeight" values="80px" defaultValue="80px" note="Always applied" />
                 <MapRow property="maxHeight" values="viewport − reserved layout space" defaultValue="현재 정의 없음" note="Required; value pending" />
               </tbody>
             </table>
