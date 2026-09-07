@@ -45,6 +45,8 @@
 - **Select Box의 남은 정책** — Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수를 정하지 않았다.
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
+- **Filter Bar의 남은 정책** — Chip을 Filter로 쓰는 규칙을 Chip 페이지에서 다듬는 중이다. 초기화의 자리(지금은 맨 앞), Label에 적용된 값을 담는 표기 방식, 적용 시점(누르는 즉시인지 열리는 필터에서 확정이 필요한지)을 정하지 않았다. 이 셋이 정해지면 `filter-bar.tsx`로 분리하고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
+- **Chip의 Disabled와 Color** — 제공하지 않기로 두었다. 필요한 사례가 확인되면 검토한다.
 - **Number Input과 Slider의 경계** — 넓은 범위를 탐색하는 Slider 사용 정책을 공식 Usage 규칙으로 확정하지 않았다.
 - **Input과 Textarea의 Filled 배경 전환** — Focus 선과 ring은 `has-[:focus-visible]`로 바꿨지만 Filled의 흰 배경 전환은 `focus-within`으로 두었다. `interaction.md:7`을 엄격히 보면 이것도 focus-visible 기준이어야 하는데, 마우스로 입력 중인 필드가 회색으로 남는 것이 어색하다. 나중에 검토한다.
 - **Input의 Color input** — Color Picker 팝업이 완성되지 않아 예시 swatch에 클릭과 팝업 상호작용을 연결하지 않았다. 구현되면 직접 입력값과 팝업 선택값을 동기화하는 조합으로 검수한다.

@@ -78,6 +78,20 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 1. **Structure map 누락.** Anatomy 절이 있는 화면 열한 개 중 공용 `AnatomyStructureMap`을 쓰는 것은 다섯 개뿐이다. 있는 곳은 Checkbox·Combobox·Radio·Select Box·Switch이고, 없는 곳은 **Badge·Input·Input Button·Number Input·Select·Textarea** 여섯 개다. 요소의 중첩 관계를 글로 보여 주는 자리이므로 Anatomy가 있으면 함께 있어야 한다. 하나씩 검토하면서 지나쳤으므로 여섯 화면에 한 번에 추가한다.
 
+## Chip 진행 상황
+
+`2026-09-07`부터 새로 만들고 있다. 옛 Chip 은 24px 고정 하나에 삭제 버튼이 필수였고 검토를 거치지 않은 초안이었다.
+
+정한 것은 `docs/system/components/chip.md`에 있다. 공통 Control Height 넷, `shape`은 `circle` 기본, Style variant 없음, 요소 넷과 Icon only, 아이콘 위계 Property, `active` 하나, 전체 Click과 Remove button의 배타, 한쪽만 아이콘일 때의 여백 보정이다.
+
+남은 작업은 이렇다.
+
+1. **Filter 소제목 여섯 개에 시각 예제 붙이기.** 지금은 그룹 제목 아래에 조작 가능한 Filter bar 하나만 있고 소제목은 글로만 있다.
+2. **Selection·Suggestion·정보 표시 채우기.** 제목만 있다. 각각 설명 한 문장과 조작 가능한 이미지 하나, 규칙 소제목이 붙는다.
+3. **Filter bar 의 gradient 다듬기.** 폭 24px 이 좁고 `opacity` 로 켜지는 방식이 자연스럽지 않다.
+4. **경고 셋 정리.** 안 쓰는 `activeFilters` 상태와 `endDrag` 의 매개변수다.
+5. **Filter Bar 분리.** `open-questions.md` 의 미정 셋이 정해지면 `filter-bar.tsx` 로 옮긴다.
+
 ## Chip 잔여 작업
 
 `2026-09-07`에 Select Box를 검토하면서 나온 요구다. Chip은 이미 후순위이며 지시가 있을 때 시작한다.
