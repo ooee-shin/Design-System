@@ -43,8 +43,11 @@ const copy = {
     distributionGroup: "배분 방식",
     autoDistribution: { title: "자동분배", description: "접수한 순서에 따라 담당자에게 자동으로 배분합니다." },
     manualDistribution: { title: "수동분배", description: "담당자를 직접 지정해 배분합니다." },
-    permissionGroup: "권한",
-    permissions: ["관리자", "편집자", "조회자"],
+    permissionFields: [
+      { label: "데이터 등록 권한", options: ["관리자", "공유자", "전체"] },
+      { label: "데이터 수정 권한", options: ["관리자", "등록자", "공유자", "전체"] },
+      { label: "데이터 삭제 권한", options: ["관리자", "등록자"] },
+    ],
     serviceQuestion: "A/S가 필요한 항목을 선택해주세요",
     appliances: ["냉장고", "커피머신", "제빙기", "온수기"],
     roleGroup: "역할 선택",
@@ -71,8 +74,11 @@ const copy = {
     distributionGroup: "Distribution",
     autoDistribution: { title: "Automatic", description: "Assigns each request to an owner in the order received." },
     manualDistribution: { title: "Manual", description: "Lets you pick the owner for each request." },
-    permissionGroup: "Permission",
-    permissions: ["Admin", "Editor", "Viewer"],
+    permissionFields: [
+      { label: "Create permission", options: ["Admin", "Shared", "Everyone"] },
+      { label: "Edit permission", options: ["Admin", "Owner", "Shared", "Everyone"] },
+      { label: "Delete permission", options: ["Admin", "Owner"] },
+    ],
     serviceQuestion: "Select the item that needs service",
     appliances: ["Refrigerator", "Coffee machine", "Ice maker", "Water heater"],
     roleGroup: "Select a role",
@@ -372,11 +378,16 @@ export function SelectBoxWorkbench() {
                     </SelectBoxGroup>
                   </PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="Radio Group · 16px 간격 가로 줄바꿈">
-                  <PreviewLocaleScope className="w-full">
-                    <RadioGroup aria-label={c.permissionGroup} defaultValue="permission-0" className="-ml-2 flex flex-wrap gap-x-4">
-                      {c.permissions.map((permission, index) => <RadioField key={permission} value={`permission-${index}`} label={permission} />)}
-                    </RadioGroup>
+                <GuideVisual label="Radio Group · 여러 Field를 밀도 있게">
+                  <PreviewLocaleScope className="w-full space-y-3">
+                    {c.permissionFields.map((field) => (
+                      <div key={field.label}>
+                        <p className="text-xs font-medium text-oe-foreground-primary">{field.label}</p>
+                        <RadioGroup aria-label={field.label} defaultValue={`${field.label}-0`} className="-ml-2 mt-1 flex flex-wrap gap-x-4">
+                          {field.options.map((option, index) => <RadioField key={option} value={`${field.label}-${index}`} label={option} />)}
+                        </RadioGroup>
+                      </div>
+                    ))}
                   </PreviewLocaleScope>
                 </GuideVisual>
               </div>
