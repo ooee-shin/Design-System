@@ -19,6 +19,8 @@ const copy = {
     increase: "값 늘리기",
     decreaseTooltip: "감소",
     increaseTooltip: "증가",
+    quantity: "수량",
+    guests: "인원",
   },
   en: {
     description: "A numeric control for entering an exact value directly or adjusting it with step buttons. It supports quantities, order, and percentages with defined ranges and increments.",
@@ -26,6 +28,8 @@ const copy = {
     increase: "Increase value",
     decreaseTooltip: "Decrease",
     increaseTooltip: "Increase",
+    quantity: "Quantity",
+    guests: "Guests",
   },
 } as const;
 
@@ -172,13 +176,17 @@ export function NumberInputWorkbench() {
               doVisual={<StudioNumberInput locale={locale} defaultValue={12} min={0} max={99} />}
               dontVisual={<Input value="1,250,000" readOnly suffix={locale === "ko" ? "원" : "KRW"} textAlign="right" className="tabular-nums" aria-label={locale === "ko" ? "금액" : "Amount"} />}
             />
-            <div>
-              <GuidelineTitle>증감 버튼 위치를 한 페이지에서 섞지 않기</GuidelineTitle>
-              <GuidelineList items={[
+            <UsageComparison
+              title="증감 버튼 위치를 한 페이지에서 섞지 않기"
+              doText="한 페이지의 Number Input은 같은 증감 버튼 배치를 사용하세요."
+              dontText="한 화면에서 Trailing과 Split을 섞지 마세요."
+              description={[
                 <><code className="text-xs text-oe-foreground-primary">controlsPosition</code>은 <code className="text-xs text-oe-foreground-primary">trailing</code>과 <code className="text-xs text-oe-foreground-primary">split</code> 중 하나를 페이지 전체에서 일관되게 사용합니다.</>,
                 "같은 화면에 두 배치가 함께 있으면 어느 버튼이 어느 값을 조절하는지 눈으로 좇기 어려워집니다.",
-              ]} />
-            </div>
+              ]}
+              doVisual={<ControlsPositionStack locale={locale} second="trailing" />}
+              dontVisual={<ControlsPositionStack locale={locale} second="split" />}
+            />
             <div>
               <GuidelineTitle>음수는 필요한 자리에서만 허용하기</GuidelineTitle>
               <GuidelineList items={[
@@ -212,7 +220,7 @@ export function NumberInputWorkbench() {
                 <MapRow property="prefixTone / suffixTone" values="secondary | tertiary" defaultValue="secondary" />
                 <MapRow property="hideControls" values="boolean" defaultValue="false" />
                 <MapRow property="controlsPosition" values="trailing | split" defaultValue="trailing" />
-                <MapRow property="allowNegative" values="boolean" defaultValue="true" />
+                <MapRow property="allowNegative" values="boolean" defaultValue="false" />
                 <MapRow property="state" values="default | focus | invalid | disabled | readOnly" defaultValue="default" note="Native attributes and focus" />
               </tbody>
             </table>
@@ -248,6 +256,16 @@ function NumberInputAnatomy({ locale }: { locale: keyof typeof copy }) {
 function StudioNumberInput({ locale, ...props }: NumberInputProps & { locale: keyof typeof copy }) {
   const c = copy[locale];
   return <NumberInput decreaseLabel={c.decrease} increaseLabel={c.increase} decreaseTooltip={c.decreaseTooltip} increaseTooltip={c.increaseTooltip} {...props} />;
+}
+
+function ControlsPositionStack({ locale, second }: { locale: keyof typeof copy; second: "trailing" | "split" }) {
+  const c = copy[locale];
+  return (
+    <div className="w-full space-y-3">
+      <div className="space-y-1.5"><AffixToneLabel>{c.quantity}</AffixToneLabel><StudioNumberInput locale={locale} defaultValue={2} min={0} max={99} controlsPosition="trailing" /></div>
+      <div className="space-y-1.5"><AffixToneLabel>{c.guests}</AffixToneLabel><StudioNumberInput locale={locale} defaultValue={4} min={0} max={99} controlsPosition={second} /></div>
+    </div>
+  );
 }
 
 function AffixToneLabel({ children }: { children: ReactNode }) { return <p className="text-[10px] font-medium uppercase tracking-wide text-oe-foreground-placeholder">{children}</p>; }
