@@ -87,6 +87,8 @@ Leading element는 Input과 같은 성격이며 값을 식별하는 요소를 �
 
 미리 정의된 짧은 목록에서 바로 고르면 Select를 사용한다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용한다.
 
+Select와 혼동되지 않도록 아래 방향 화살표 아이콘은 지양한다. 그 아이콘은 같은 자리에서 목록이 펼쳐진다는 뜻으로 읽히는데, Input Button은 별도 화면을 연다.
+
 ### Color input은 직접 입력 여부로 나누기
 
 색상 코드를 직접 입력받아야 하면 Input을 사용한다. HEX 값을 타이핑할 수 있고 Leading element의 Color swatch가 현재 색을 함께 보여준다.

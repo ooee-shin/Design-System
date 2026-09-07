@@ -24,7 +24,7 @@ const copy = {
     address: "주소", addressPlaceholder: "주소 선택", addressDescription: "주소 검색 또는 선택 화면을 엽니다.",
     time: "시간", timeValue: "오후 2:30", timeDescription: "시간 선택 화면을 엽니다.",
     color: "Color picker · Select only", colorValue: "파란색", colorDescription: "직접 입력하지 않고 Color Picker에서 색상을 선택합니다.",
-    periodLabel: "조회 기간", periodOptions: ["최근 7일", "최근 30일", "이번 달", "지난 달"],
+    selectLabel: "옵션", selectOptions: ["Option A", "Option B", "Option C"],
     colorHexLabel: "색상 코드", colorPickLabel: "색상", datePattern: "YYYY. MM. DD", today: "오늘", addressSentence: "주소를 선택해 주세요", startDate: "시작일", endDate: "종료일",
     passwordLabel: "비밀번호", passwordValue: "bluekey1234", showPassword: "비밀번호 보기", hidePassword: "비밀번호 숨기기",
   },
@@ -35,7 +35,7 @@ const copy = {
     address: "Address", addressPlaceholder: "Select address", addressDescription: "Opens an address search or selection surface.",
     time: "Time", timeValue: "2:30 PM", timeDescription: "Opens a time selection surface.",
     color: "Color picker · Select only", colorValue: "Blue", colorDescription: "Selects a color from the Color Picker without direct text entry.",
-    periodLabel: "Period", periodOptions: ["Last 7 days", "Last 30 days", "This month", "Last month"],
+    selectLabel: "Option", selectOptions: ["Option A", "Option B", "Option C"],
     colorHexLabel: "Color code", colorPickLabel: "Color", datePattern: "YYYY. MM. DD", today: "Today", addressSentence: "Please select an address", startDate: "Start date", endDate: "End date",
     passwordLabel: "Password", passwordValue: "bluekey1234", showPassword: "Show password", hidePassword: "Hide password",
   },
@@ -216,12 +216,13 @@ export function InputButtonWorkbench() {
                   <PreviewLocaleScope className="w-full"><InputButton value="2026. 09. 07" leadingElement={<RiCalendarLine aria-hidden="true" />} trailingElement={<RiArrowRightSLine aria-hidden="true" />} aria-label={locale === "ko" ? "날짜 선택" : "Select a date"} /></PreviewLocaleScope>
                 </GuideVisual>
                 <GuideVisual label="Select · 짧은 목록에서 바로 고름">
-                  <PreviewLocaleScope className="w-full"><Select options={c.periodOptions.map((label, index) => ({ value: `period-${index}`, label }))} defaultValue="period-0" ariaLabel={c.periodLabel} /></PreviewLocaleScope>
+                  <PreviewLocaleScope className="w-full"><Select options={c.selectOptions.map((label, index) => ({ value: `option-${index}`, label }))} defaultValue="option-0" ariaLabel={c.selectLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
                 "달력, 주소 검색, 시간 선택처럼 값을 정하는 수단이 별도 화면이면 Input Button을 사용합니다. 어떤 화면을 열지는 이 컴포넌트가 소유하지 않습니다.",
                 "미리 정의된 짧은 목록에서 바로 고르면 Select를 사용합니다. Popup 안에서 검색해 고르거나 선택값을 계속 보면서 다뤄야 하면 Combobox를 사용합니다.",
+                "Select와 혼동되지 않도록 아래 방향 화살표 아이콘은 지양합니다. 그 아이콘은 같은 자리에서 목록이 펼쳐진다는 뜻으로 읽히는데, Input Button은 별도 화면을 엽니다.",
               ]} />
             </div>
             <div>
