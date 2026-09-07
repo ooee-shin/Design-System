@@ -52,7 +52,7 @@ test("Input fades the clear button in when a value appears", () => {
   const clear = view.container.querySelector("[data-slot=input-clear]")
 
   assert.ok(clear)
-  assert.match(clear.className, /transition-\[color,background-color,opacity,width\]/)
+  assert.match(clear.className, /transition-\[color,background-color,opacity,width,margin\]/)
   assert.match(clear.className, /duration-150/)
   assert.match(clear.className, /opacity-0/)
 })

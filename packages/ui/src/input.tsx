@@ -68,6 +68,9 @@ function Input({
   // 값이 없을 때 자리를 차지하지 않으려면 조건부로 렌더링해야 한다. 나타날 때는 마운트 직후
   // 프레임에 클래스를 바꿔야 전환이 시작 상태를 갖고, 사라질 때는 전환이 끝난 뒤에 걷어내야
   // 페이드가 끊기지 않는다. 아래 시간은 클래스의 duration-150 과 같아야 한다.
+  // 컨테이너의 gap 은 controlSize 마다 다르다. 버튼이 접힐 때 그만큼 음수 여백으로 상쇄하지
+  // 않으면 폭이 0 이 되어도 gap 만큼 자리가 남는다.
+  const clearCollapsedGap = { small: "-ml-1.5", regular: "-ml-2", large: "-ml-2", xlarge: "-ml-2.5" }[controlSize ?? "regular"]
   const [clearRendered, setClearRendered] = React.useState(Boolean(clearable))
   const [clearEntered, setClearEntered] = React.useState(false)
   React.useEffect(() => {
@@ -101,7 +104,7 @@ function Input({
         {...props}
       />
       {clearRendered ? (
-        <button type="button" data-slot="input-clear" data-visible={clearEntered ? "true" : undefined} aria-label={clearLabel} className="-mr-1 flex h-6 w-0 shrink-0 items-center justify-center overflow-hidden rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity,width] duration-150 group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:w-6 group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none" disabled={disabled || readOnly} onClick={onClear}>
+        <button type="button" data-slot="input-clear" data-visible={clearEntered ? "true" : undefined} aria-label={clearLabel} className={cn("-mr-1 flex h-6 w-0 shrink-0 items-center justify-center overflow-hidden rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity,width,margin] duration-150 group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:w-6 group-focus-within/input:data-[visible]:ml-0 group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none", clearCollapsedGap)} disabled={disabled || readOnly} onClick={onClear}>
           <RiCloseLine className="size-4" aria-hidden="true" />
         </button>
       ) : null}
