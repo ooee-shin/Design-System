@@ -34,6 +34,7 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - `ariaLabel`은 `SelectBoxGroup`의 필수 Property이며 Group의 접근 가능한 이름을 소유한다. Label 자체는 Field가 소유한다.
 - 항목마다 `disabled`를 둘 수 있고 Group의 `disabled`와 함께 적용된다.
 - `selectionMode`의 기본값은 `single`, `columns`의 기본값은 `1`이며 Multi column 검수 범위는 2~6열이다. 좁은 Preview에서는 한 열을 유지하고 640px 이상 Container에서 지정한 열 수를 적용한다.
+- 항목 배치는 `columns`로만 지원한다. 한 열에서는 항목이 Container 너비를 채우고 여러 열에서는 열마다 같은 너비를 사용한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다.
 - Group의 항목 간격은 8px이다. 항목은 고정 높이를 갖지 않고 Content에 맞춰 늘어나며 현재 내부 여백은 좌우 16px, 상하 12px이다.
 - Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
 - Title과 Description 간격은 2px이다. Title은 14px Medium, Description은 12px Tertiary foreground를 사용한다.
@@ -72,4 +73,8 @@ Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저�
 
 ### 다른 선택 컴포넌트와 나눠 쓰기
 
-Select처럼 Trigger와 Popup으로 접지 않는다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제다. Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다. 항목 너비가 서로 달라지면 비교할 기준이 사라진다. 카드형 전체 선택 Surface는 Select Box가 소유하며 Radio와 Checkbox에는 별도 Container 변형을 두지 않는다.
+Select처럼 Trigger와 Popup으로 접지 않는다. 선택지를 계속 노출하는 것이 이 컴포넌트의 전제다.
+
+항목 배치는 `columns`로만 지원한다. 각 항목이 Content 너비만큼만 차지하며 줄바꿈되는 배치는 제공하지 않는다. 항목 너비가 서로 달라지면 나란히 비교할 기준이 사라지기 때문이다. 짧은 키워드를 Content 너비로 나열해 선택해야 하면 Chip을 사용한다. Select Box에 그 배치를 만들면 두 컴포넌트의 화면 모양이 같아져 무엇을 선택하는 자리인지 구분할 수 없다.
+
+카드형 전체 선택 Surface는 Select Box가 소유하며 Radio와 Checkbox에는 별도 Container 변형을 두지 않는다.
