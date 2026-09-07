@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { RiCupLine, RiFridgeLine, RiSnowyLine, RiWaterFlashLine } from "@remixicon/react";
 
 import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelectionMode } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
@@ -23,6 +24,8 @@ const sections = [
   { id: "property-map", label: "Property map" },
 ];
 
+const applianceIcons = [RiFridgeLine, RiCupLine, RiSnowyLine, RiWaterFlashLine];
+
 const copy = {
   ko: {
     description: "정의된 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 입력 컴포넌트입니다.",
@@ -37,8 +40,8 @@ const copy = {
     shortA: "월간",
     shortB: "연간",
     shortC: "분기",
-    regionGroup: "지역",
-    regions: ["서울", "경기", "부산"],
+    serviceQuestion: "A/S가 필요한 항목을 선택해주세요",
+    appliances: ["냉장고", "커피머신", "제빙기", "온수기"],
     roleGroup: "역할 선택",
     owner: "사장님",
     staff: "직원",
@@ -60,8 +63,8 @@ const copy = {
     shortA: "Monthly",
     shortB: "Annual",
     shortC: "Quarterly",
-    regionGroup: "Region",
-    regions: ["Seoul", "Gyeonggi", "Busan"],
+    serviceQuestion: "Select the item that needs service",
+    appliances: ["Refrigerator", "Coffee machine", "Ice maker", "Water heater"],
     roleGroup: "Select a role",
     owner: "Owner",
     staff: "Staff",
@@ -319,8 +322,12 @@ export function SelectBoxWorkbench() {
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Select Box · 여러 열">
                   <PreviewLocaleScope className="w-full">
-                    <SelectBoxGroup ariaLabel={c.regionGroup} columns={3} trailingElement="none" defaultValue="region-0">
-                      {c.regions.map((region, index) => <SelectBox key={region} value={`region-${index}`} title={region} />)}
+                    <p className="mb-3 text-sm font-medium text-oe-foreground-primary">{c.serviceQuestion}</p>
+                    <SelectBoxGroup ariaLabel={c.serviceQuestion} columns={2} trailingElement="none" defaultValue="appliance-1">
+                      {c.appliances.map((appliance, index) => {
+                        const Icon = applianceIcons[index];
+                        return <SelectBox key={appliance} value={`appliance-${index}`} title={appliance} leadingElement={<Icon className="size-oe-icon-large text-oe-foreground-tertiary" aria-hidden="true" />} />;
+                      })}
                     </SelectBoxGroup>
                   </PreviewLocaleScope>
                 </GuideVisual>
