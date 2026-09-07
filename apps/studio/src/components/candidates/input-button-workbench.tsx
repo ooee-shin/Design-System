@@ -110,12 +110,12 @@ export function InputButtonWorkbench() {
           <Example label="Trailing element"><InputButton value={c.value} trailingElement={<RiArrowRightSLine />} /></Example>
         </Section>
 
-        <Section id="state" title="Properties · State" description="버튼에서 실제로 확인되는 Default, Focus, Invalid, Disabled와 Read only 상태입니다. 조회 화면에서는 Read only를 사용해 값을 보여주되 선택 화면을 열지 않습니다.">
+        <Section id="state" title="Properties · State" description="버튼에서 실제로 확인되는 Default, Focus, Invalid, Disabled와 Read only 상태입니다. 조회 화면에서는 Read only를 사용해 값을 보여주되 Trigger 호출을 막습니다. 실제로 무엇을 열지는 이 컴포넌트를 가져다 쓰는 화면이 정합니다.">
           <Example label="Default"><InputButton value={c.value} /></Example>
           <Example label="Focus"><InputButton value={c.value} className="border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" /></Example>
           <Example label="Invalid"><InputButton value={c.value} aria-invalid="true" /></Example>
           <Example label="Disabled"><InputButton value={c.value} disabled /></Example>
-          <Example label="Read only" description="focus는 유지하고 여는 동작만 막습니다."><InputButton value={c.value} readOnly /></Example>
+          <Example label="Read only" description="focus는 유지하고 Trigger 호출만 막습니다."><InputButton value={c.value} readOnly /></Example>
         </Section>
 
         <Section id="examples" title="Examples" description="직접 입력 대신 별도의 선택 화면이 필요한 현재 검수 사례입니다.">
