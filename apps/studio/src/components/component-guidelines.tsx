@@ -2,9 +2,10 @@ import type { ReactNode } from "react";
 import { RiCheckboxCircleFill, RiCloseCircleFill } from "@remixicon/react";
 
 import { GuidelineTitle } from "@/components/guideline-title";
+import { cn } from "@/lib/utils";
 
 export function GuideVisual({ label, children, contentClassName }: { label: string; children: ReactNode; contentClassName?: string }) {
-  return <div className="flex h-full flex-col rounded-xl bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{label}</p><div className={`flex flex-1 items-center *:min-w-0 *:flex-1 rounded-lg border border-oe-border-secondary bg-oe-background-primary ${contentClassName ?? "px-4 py-6"}`}>{children}</div></div>;
+  return <div className="flex h-full flex-col rounded-xl bg-oe-background-secondary p-4"><p className="mb-3 text-xs font-semibold text-oe-foreground-primary">{label}</p><div className={cn("flex flex-1 items-center *:min-w-0 *:flex-1 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-4 py-6", contentClassName)}>{children}</div></div>;
 }
 
 export function GuidelineList({ items, className = "mt-3" }: { items: ReactNode[]; className?: string }) {

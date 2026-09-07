@@ -28,6 +28,8 @@ const copy = {
     nameValue: "홍길동",
     contactTimeLabel: "연락 가능 시간",
     contactTimeOptions: ["오전", "오후", "상관없음"],
+    layoutValue: "지난주에 신청한 교환 건이 어떻게 처리되고 있는지 알려주세요.",
+    heightValue: "매장 위치를 찾기 어려웠습니다. 지하철역에서 나와 어느 방향으로 가야 하는지 안내가 없어서 한참 헤맸습니다. 입구 사진이라도 있으면 좋겠습니다.",
   },
   en: {
     description: "A multi-line text entry component. It shares Input styles and states but does not support leading or trailing elements.",
@@ -45,6 +47,8 @@ const copy = {
     nameValue: "Jane Doe",
     contactTimeLabel: "Available time",
     contactTimeOptions: ["Morning", "Afternoon", "Anytime"],
+    layoutValue: "Please let me know how the exchange request from last week is being handled.",
+    heightValue: "The store was hard to find. There was no guidance on which way to go after leaving the subway station, so I wandered for a while. A photo of the entrance would help.",
   },
 } as const;
 
@@ -128,10 +132,10 @@ export function TextareaWorkbench() {
             <div>
               <GuidelineTitle>여러 줄이 필요한 값에만 사용하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="Textarea · 여러 줄">
+                <GuideVisual label="Textarea · 여러 줄" contentClassName="items-start">
                   <PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="Input · 한 줄">
+                <GuideVisual label="Input · 한 줄" contentClassName="items-start">
                   <PreviewLocaleScope className="w-full"><FieldLabel>{c.nameLabel}</FieldLabel><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
@@ -142,39 +146,51 @@ export function TextareaWorkbench() {
             </div>
             <UsageComparison
               title="내부 요소와 Layout 선택은 제공하지 않기"
-              doText="폭은 부모가 정하게 두세요."
+              doText="전체 너비를 모두 채우게 두세요."
               dontText="Textarea에 폭을 따로 지정하지 마세요."
               description={[
                 "Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않습니다. Container와 Textarea field만으로 구성합니다.",
                 <>Layout은 <code className="text-xs text-oe-foreground-primary">fill</code>만이며 선택 Property가 없습니다. 폭을 따로 지정하면 같은 폼의 다른 필드와 오른쪽 끝이 어긋납니다.</>,
                 "Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 또는 Label과 도움말처럼 Field가 담당할 일인지 다시 봅니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="w-full"><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /><div className="mt-2"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></div></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><Input value={c.nameValue} readOnly aria-label={c.nameLabel} /><div className="mt-2"><Textarea value={c.inquiryValue} readOnly containerClassName="w-2/3" aria-label={c.inquiryLabel} /></div></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.layoutValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.layoutValue} readOnly containerClassName="w-2/3" aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>기본 높이는 3.5줄을 유지하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="기본 제공 · 3.5줄 (88px)">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="기본 제공 · 3.5줄 (88px)" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="별도 제어 · 기본 제공 높이보다 큰 값">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="별도 제어 · 기본 제공 높이보다 큰 값" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
                 "기본 높이는 약 3.5줄이며 88px입니다. 이 값보다 줄일 수 없습니다.",
-                "내용에 따라 초기 높이를 따로 지정할 수 있습니다. 이때 반 줄이 걸치는 지점으로 맞춥니다. 글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힙니다. 줄 수에 딱 맞추면 입력 영역이 거기서 끝난 것처럼 보입니다.",
+                "받을 내용이 길면 초기 높이를 따로 지정할 수 있습니다. 기본 제공 높이보다 큰 값만 쓸 수 있습니다.",
               ]} />
             </div>
+            <UsageComparison
+              title="초기 높이는 반 줄이 걸치는 지점으로 맞추기"
+              doText="마지막 줄이 일부 잘려 보이게 두세요."
+              dontText="줄 수에 딱 맞춰 끊지 마세요."
+              description={[
+                "글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힙니다. 기본 높이의 3.5줄이 그 이유로 정해진 값입니다.",
+                "줄 수에 딱 맞추면 입력 영역이 거기서 끝난 것처럼 보이고, 스크롤이 있다는 것을 알 방법이 없습니다.",
+                "초기 높이를 따로 지정할 때도 같은 기준을 씁니다. 구현이 이 값을 검사하지 않으므로 높이를 정하는 쪽에서 맞춥니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.heightValue} readOnly height={118} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>Resize는 세로만 허용하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="Resize 끔 · Default">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="Resize 끔 · Default" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.layoutValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="Resize 켬 · 세로만">
-                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.inquiryValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="Resize 켬 · 세로만" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.layoutValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
