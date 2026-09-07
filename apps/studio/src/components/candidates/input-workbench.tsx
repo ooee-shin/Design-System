@@ -8,7 +8,7 @@ import { InputColorExample, InputCustomExamples } from "@/components/candidates/
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -28,6 +28,8 @@ const copy = {
     hidePassword: "비밀번호 숨기기",
     customInputDescription: "특수한 포맷이나 마스킹 등의 기능이 필요한 경우, 포맷과 동작을 직접 정의해서 사용할 수 있습니다.",
     colorInputDescription: "색상값을 직접 입력하는 Input 조합입니다. 현재 Color Picker가 완성되지 않아 팝업 상호작용은 연결하지 않습니다.",
+    clearSearchLabel: "검색", clearSearchValue: "강남구 카페",
+    clearAddressLabel: "주소", clearAddressValue: "서울특별시 강남구 테헤란로 152",
   },
   en: {
     description: "A single-line text entry component. Labels, help text, and error messages belong to a separate Field.",
@@ -40,6 +42,8 @@ const copy = {
     hidePassword: "Hide password",
     customInputDescription: "When a special format or masking behavior is required, define the format and interaction directly.",
     colorInputDescription: "An Input composition for direct color-value entry. Popup interaction is not connected until the Color Picker is complete.",
+    clearSearchLabel: "Search", clearSearchValue: "Cafes in Gangnam",
+    clearAddressLabel: "Address", clearAddressValue: "152 Teheran-ro, Gangnam-gu, Seoul",
   },
 } as const;
 
@@ -221,13 +225,18 @@ export function InputWorkbench() {
               <>내부 순서는 <code className="text-xs text-oe-foreground-primary">Leading element → Prefix → Input field → Clear button → Suffix → Trailing element</code>로 고정됩니다. 같은 의미의 요소를 두 자리에 나눠 두지 않습니다.</>,
             ]} />
           </div>
-          <div>
-            <GuidelineTitle>Clear button은 값을 자주 비우는 자리에 두기</GuidelineTitle>
-            <GuidelineList items={[
-              <>Input은 값을 소유하지 않으므로 값의 유무는 쓰는 쪽이 판단해 <code className="text-xs text-oe-foreground-primary">clearable</code>로 전달합니다. 값이 없으면 버튼을 렌더링하지 않아 자리를 차지하지 않고, Input에 focus가 있을 때만 나타납니다.</>,
-              "검색, 필터, 금액처럼 값을 지우고 다시 입력하는 자리에 둡니다. 한 번 정하면 유지되는 이름이나 주소에는 두지 않습니다. 버튼이 늘 자리를 지키면 지울 일이 없는 값에도 지우기를 권하는 것처럼 보입니다.",
-            ]} />
-          </div>
+          <UsageComparison
+            title="Clear button은 값을 자주 비우는 자리에 두기"
+            doText="값을 지우고 다시 입력하는 자리에 두세요."
+            dontText="한 번 정하면 유지되는 값에는 두지 마세요."
+            description={[
+              <>Input은 값을 소유하지 않으므로 값의 유무는 쓰는 쪽이 판단해 <code className="text-xs text-oe-foreground-primary">clearable</code>로 전달합니다. 값이 없으면 버튼을 렌더링하지 않아 자리를 차지하지 않고, focus가 있을 때만 나타납니다. 두 예시는 그 모습을 보여주기 위해 포커스된 상태로 고정했습니다.</>,
+              "검색, 필터, 금액처럼 값을 지우고 다시 입력하는 자리에 둡니다. 지운 뒤에 이어서 입력할 수 있도록 버튼을 눌러도 focus는 입력창에 남습니다.",
+              "주소나 이름처럼 한 번 정하면 유지되는 값에는 두지 않습니다. 지울 일이 없는 값에도 지우기를 권하는 것처럼 보이고, 별도 화면에서 고른 값을 한 번에 날릴 수 있습니다.",
+            ]}
+            doVisual={<ClearableSample defaultValue={c.clearSearchValue} label={c.clearSearchLabel} leading={<RiSearchLine aria-hidden="true" />} />}
+            dontVisual={<ClearableSample defaultValue={c.clearAddressValue} label={c.clearAddressLabel} />}
+          />
           <div>
             <GuidelineTitle>숫자 값은 Number Input과 나눠 쓰기</GuidelineTitle>
             <GuidelineList items={[
@@ -289,6 +298,32 @@ function InputAnatomy() {
       </AnatomySurface>
       <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Prefix", optional: true }, { name: "Input field" }, { name: "Clear button", optional: true }, { name: "Suffix", optional: true }, { name: "Trailing element", optional: true }]} />
     </div>
+  );
+}
+
+// State 섹션의 Focus 카드와 같은 방식으로 포커스된 모습을 고정한다. Clear button 은
+// focus 가 있을 때만 나타나므로 그대로 두면 두 예시가 누르기 전에 같아 보인다.
+const focusedClearVisual = [
+  "border-oe-focus-ring ring-1 ring-oe-focus-ring",
+  "[&_[data-slot=input-clear]]:visible [&_[data-slot=input-clear]]:pointer-events-auto",
+  "[&_[data-slot=input-clear]]:ml-0 [&_[data-slot=input-clear]]:w-6 [&_[data-slot=input-clear]]:opacity-100",
+].join(" ");
+
+function ClearableSample({ defaultValue, label, leading }: { defaultValue: string; label: string; leading?: ReactNode }) {
+  const [value, setValue] = useState(defaultValue);
+  return (
+    <PreviewLocaleScope className="w-full">
+      <Input
+        value={value}
+        onChange={(event) => setValue(event.currentTarget.value)}
+        clearable={value.length > 0}
+        onClear={() => setValue("")}
+        clearLabel={label}
+        leadingElement={leading}
+        aria-label={label}
+        containerClassName={focusedClearVisual}
+      />
+    </PreviewLocaleScope>
   );
 }
 
