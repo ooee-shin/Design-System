@@ -372,9 +372,9 @@ export function SelectBoxWorkbench() {
                     </SelectBoxGroup>
                   </PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="Radio Group · Container 없이">
+                <GuideVisual label="Radio Group · 16px 간격 가로 줄바꿈">
                   <PreviewLocaleScope className="w-full">
-                    <RadioGroup aria-label={c.permissionGroup} defaultValue="permission-0" className="-ml-2 grid">
+                    <RadioGroup aria-label={c.permissionGroup} defaultValue="permission-0" className="-ml-2 flex flex-wrap gap-x-4">
                       {c.permissions.map((permission, index) => <RadioField key={permission} value={`permission-${index}`} label={permission} />)}
                     </RadioGroup>
                   </PreviewLocaleScope>
