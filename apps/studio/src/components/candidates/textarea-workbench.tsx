@@ -32,6 +32,7 @@ const copy = {
     halfLineValue: "배송이 예정일보다 사흘 늦게 도착했습니다. 그동안 어디에 머물러 있는지 조회해도 상태가 바뀌지 않아서 두 번 문의했는데 같은 안내만 받았습니다. 첫 문의에서는 하루 안에 답을 준다고 했지만 이틀이 지나서야 회신을 받았고, 그 내용도 조회 화면에 이미 나와 있던 문장과 같았습니다. 물건은 결국 도착했으니 이 건의 보상을 바라는 것은 아닙니다. 다만 지연된 이유와 다음부터 같은 일이 생기지 않게 할 방법을 알려주세요.",
     resizeValue: "영수증을 다시 받을 수 있을까요. 회사에 제출해야 하는데 문자로 받은 내역은 항목이 나오지 않습니다.",
     scrollValue: "쿠폰이 적용되지 않는 이유를 알고 싶습니다. 사용 기간 안에 있고 최소 금액도 넘겼는데 결제 화면에서 목록에 나오지 않습니다.",
+    conflictValue: "매장에서 받은 안내와 앱에 표시된 운영 시간이 다릅니다. 어느 쪽이 맞는지 확인해 주세요.",
     autoSizeValue: "직원분이 재고를 대신 확인해 주셔서 헛걸음하지 않았습니다. 다음에도 같은 매장을 이용하겠습니다.",
     heightValue: "매장 위치를 찾기 어려웠습니다. 지하철역에서 나와 어느 방향으로 가야 하는지 안내가 없어서 한참 헤맸습니다. 입구 사진이라도 있으면 좋겠습니다.",
   },
@@ -55,6 +56,7 @@ const copy = {
     halfLineValue: "The delivery arrived three days later than the promised date. The tracking status never changed while it was in transit, and I asked twice but received the same reply both times. The first reply promised an answer within a day, but it took two days to arrive, and it repeated what the tracking page already said. The package did arrive, so I am not asking for compensation. I would like to know why it was delayed and how it will be prevented next time.",
     resizeValue: "Could I get the receipt again? I need to submit it at work, and the text message I received does not list the items.",
     scrollValue: "I would like to know why my coupon is not being applied. It is within the valid period and the order is above the minimum amount, but it does not appear on the payment screen.",
+    conflictValue: "The hours posted at the store differ from the hours shown in the app. Please confirm which one is correct.",
     autoSizeValue: "A staff member checked the stock for me, so I did not make the trip for nothing. I will visit the same store next time.",
     heightValue: "The store was hard to find. There was no guidance on which way to go after leaving the subway station, so I wandered for a while. A photo of the entrance would help.",
   },
@@ -230,13 +232,18 @@ export function TextareaWorkbench() {
               doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
               dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-6"><FieldLabel>{c.replyLabel}</FieldLabel><RadioGroup aria-label={c.replyLabel} className="-ml-2 flex flex-wrap gap-x-4">{c.replyOptions.map((label, index) => <RadioField key={label} value={`reply-${index}`} label={label} />)}</RadioGroup></div></PreviewLocaleScope>}
             />
-            <div>
-              <GuidelineTitle>Resize와 Auto size는 같이 사용하지 않기</GuidelineTitle>
-              <GuidelineList items={[
+            <UsageComparison
+              title="Resize와 Auto size는 같이 사용하지 않기"
+              doText="한쪽만 켜세요."
+              dontText="두 Property를 함께 넘기지 마세요."
+              description={[
                 "높이를 사용자가 직접 정하는 것과 내용에 맡겨 자동으로 정하는 것은, 같은 값을 두 주체가 정하는 일이므로 함께 성립하지 않습니다. 어느 쪽으로 갈지 먼저 정하고 한쪽만 켭니다.",
-                <>구현은 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 켜져 있으면 <code className="text-xs text-oe-foreground-primary">resize</code>를 적용하지 않습니다. <code className="text-xs text-oe-foreground-primary">resize</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">true</code>이므로, <code className="text-xs text-oe-foreground-primary">autoSize</code>를 켜는 순간 켜져 있던 세로 조절이 조용히 꺼집니다. 두 Property를 함께 넘기고 세로 조절이 동작하기를 기대하지 않습니다.</>,
-              ]} />
-            </div>
+                <>구현은 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 켜져 있으면 <code className="text-xs text-oe-foreground-primary">resize</code>를 적용하지 않습니다. <code className="text-xs text-oe-foreground-primary">resize</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">true</code>이므로, <code className="text-xs text-oe-foreground-primary">autoSize</code>를 켜는 순간 켜져 있던 세로 조절이 조용히 꺼집니다.</>,
+                "Don't 쪽은 두 Property를 함께 넘긴 상태입니다. 세로 조절을 요청했는데도 아래 손잡이가 없습니다. 오류로 알려주지 않으므로 화면을 봐야 알 수 있습니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea defaultValue={c.conflictValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea defaultValue={c.conflictValue} autoSize resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
               <GuidelineList items={[
