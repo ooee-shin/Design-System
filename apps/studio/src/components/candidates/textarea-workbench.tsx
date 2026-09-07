@@ -5,6 +5,8 @@ import { useState, type ReactNode } from "react";
 import { Textarea } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
@@ -17,6 +19,12 @@ const copy = {
     invalid: "올바르지 않은 입력값",
     disabled: "비활성화된 입력값",
     readOnly: "읽기 전용 입력값",
+    inquiryLabel: "문의 내용",
+    inquiryValue: "결제가 두 번 승인된 것 같습니다. 어제 오후에 결제한 건이 카드 내역에 두 번 찍혀 있어서 확인을 부탁드립니다.",
+    titleLabel: "제목",
+    titleValue: "결제 오류 문의",
+    memoLabel: "메모",
+    attachmentLabel: "첨부 파일",
   },
   en: {
     description: "A multi-line text entry component. It shares Input styles and states but does not support leading or trailing elements.",
@@ -25,6 +33,12 @@ const copy = {
     invalid: "Invalid value",
     disabled: "Disabled value",
     readOnly: "Read-only value",
+    inquiryLabel: "Inquiry",
+    inquiryValue: "It looks like my payment went through twice. The charge from yesterday afternoon shows up twice on my card statement, so please take a look.",
+    titleLabel: "Title",
+    titleValue: "Duplicate payment",
+    memoLabel: "Memo",
+    attachmentLabel: "Attachment",
   },
 } as const;
 
@@ -35,6 +49,7 @@ const textareaSections = [
   { id: "sizing", label: "Sizing" },
   { id: "state", label: "State" },
   { id: "elements", label: "Elements" },
+  { id: "guidelines", label: "Guidelines" },
   { id: "property-map", label: "Property map" },
 ];
 
@@ -100,6 +115,71 @@ export function TextareaWorkbench() {
 
         <Section id="elements" title="Properties · Elements" description="Textarea는 Container와 Textarea field만으로 구성하며 내부 선택 요소를 지원하지 않습니다.">
           <Example label="Container + Textarea field"><Textarea placeholder={c.placeholder} /></Example>
+        </Section>
+
+        <Section id="guidelines" title="Guidelines" description="Textarea를 고르고 높이를 정할 때 적용하는 기준입니다.">
+          <div className="col-span-full grid gap-8">
+            <UsageComparison
+              title="여러 줄이 필요한 값에만 사용하기"
+              doText="여러 줄을 받는 값에 사용하세요."
+              dontText="한 줄로 끝나는 값에 쓰지 마세요."
+              description={[
+                "문의 내용, 설명, 메모처럼 줄바꿈이 생기는 값에 사용합니다.",
+                "제목이나 이름처럼 한 줄로 끝나는 값은 Input을 사용합니다. Textarea는 최소 88px를 차지하므로, 한 줄 값에 두면 쓰이지 않는 빈 영역이 남고 폼의 수직 리듬이 끊깁니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea value={c.titleValue} readOnly aria-label={c.titleLabel} /></PreviewLocaleScope>}
+            />
+            <div>
+              <GuidelineTitle>내부 요소와 Layout 선택은 제공하지 않기</GuidelineTitle>
+              <GuidelineList items={[
+                "Prefix와 Suffix, Clear button, Leading element와 Trailing element를 제공하지 않습니다. Container와 Textarea field만으로 구성합니다.",
+                <>Layout은 <code className="text-xs text-oe-foreground-primary">fill</code>만이며 선택 Property가 없습니다. 폭은 부모가 정합니다.</>,
+                "Input에서 쓰던 요소가 필요하다고 느껴지면 값이 한 줄인지, 또는 Label과 도움말처럼 Field가 담당할 일인지 다시 봅니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>기본 높이는 3.5줄을 유지하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="기본 88px · 3.5줄">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="초기 높이 128px · 5.5줄">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.inquiryValue} readOnly height={128} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                </GuideVisual>
+              </div>
+              <GuidelineList items={[
+                "기본 높이는 약 3.5줄이며 88px입니다. 이 값보다 줄일 수 없습니다.",
+                "내용에 따라 초기 높이를 따로 지정할 수 있습니다. 이때 반 줄이 걸치는 지점으로 맞춥니다. 글자가 일부 잘려 보여야 아래에 더 쓸 자리가 있다는 것이 읽힙니다. 줄 수에 딱 맞추면 입력 영역이 거기서 끝난 것처럼 보입니다.",
+              ]} />
+            </div>
+            <div>
+              <GuidelineTitle>높이를 바꿀 수 있게 하면 세로만 허용하기</GuidelineTitle>
+              <GuidelineList items={[
+                <><code className="text-xs text-oe-foreground-primary">resize</code>는 세로 방향만 제공합니다. 가로는 제공하지 않습니다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋납니다.</>,
+                <><code className="text-xs text-oe-foreground-primary">resize</code>는 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 꺼져 있을 때만 적용됩니다. 둘을 함께 켜지 않습니다.</>,
+              ]} />
+            </div>
+            <UsageComparison
+              title="자동 높이는 아래 콘텐츠가 밀리지 않는 자리에서만 켜기"
+              doText="마지막 콘텐츠이거나 아래가 밀리지 않는 자리에서 켜세요."
+              dontText="아래에 다른 콘텐츠가 있는 자리에서 켜지 마세요."
+              description={[
+                <><code className="text-xs text-oe-foreground-primary">autoSize</code>는 기본값이 아니므로 필요한 자리에서 명시적으로 켭니다.</>,
+                "켤 수 있는 자리는 셋입니다. 그 화면에 이 입력만 있는 경우, 마지막 콘텐츠인 경우, 아래 콘텐츠가 밀리지 않는 배치인 경우입니다.",
+                "입력하는 동안 아래 콘텐츠가 계속 내려가면 방금 읽던 자리를 잃습니다. 두 예시에 직접 입력해 차이를 확인할 수 있습니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="w-full"><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.memoLabel} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><Textarea autoSize defaultValue={c.inquiryValue} aria-label={c.memoLabel} /><p className="mt-3 text-xs font-medium text-oe-foreground-primary">{c.attachmentLabel}</p><div className="mt-1 h-9 rounded-lg border border-dashed border-oe-border-primary" /></PreviewLocaleScope>}
+            />
+            <div>
+              <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
+              <GuidelineList items={[
+                <><code className="text-xs text-oe-foreground-primary">resize</code>로 사용자가 늘리는 경우와 <code className="text-xs text-oe-foreground-primary">autoSize</code>로 자동으로 자라는 경우 모두, 최대 높이가 뷰포트 높이를 넘지 않게 합니다.</>,
+                "정확한 차감 값은 아직 정하지 않았습니다. 확정되기 전까지 임의의 수치를 쓰지 않습니다.",
+              ]} />
+            </div>
+          </div>
         </Section>
 
         <Section id="property-map" title="Property map" description="현재 확인된 Textarea의 상위 Property와 허용 값을 정리합니다.">
