@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { Input, NumberInput, type NumberInputProps } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
-import { GuidelineList, UsageComparison } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
@@ -22,6 +22,8 @@ const copy = {
     quantity: "수량",
     guests: "인원",
     amount: "금액",
+    ratio: "비율",
+    difference: "증감",
   },
   en: {
     description: "A numeric control for entering an exact value directly or adjusting it with step buttons. It supports quantities, order, and percentages with defined ranges and increments.",
@@ -32,6 +34,8 @@ const copy = {
     quantity: "Quantity",
     guests: "Guests",
     amount: "Amount",
+    ratio: "Ratio",
+    difference: "Difference",
   },
 } as const;
 
@@ -192,6 +196,10 @@ export function NumberInputWorkbench() {
             />
             <div>
               <GuidelineTitle>음수는 필요한 자리에서만 허용하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Min 0 · Default"><StudioNumberInput locale={locale} defaultValue={0} min={0} max={99} aria-label={copy[locale].quantity} /></GuideVisual>
+                <GuideVisual label="Allow negative · Min -100"><StudioNumberInput locale={locale} defaultValue={-5} min={-100} max={100} allowNegative aria-label={copy[locale].difference} /></GuideVisual>
+              </div>
               <GuidelineList items={[
                 <><code className="text-xs text-oe-foreground-primary">allowNegative</code>의 기본값이 <code className="text-xs text-oe-foreground-primary">false</code>이므로 유효한 최소값은 0입니다.</>,
                 "이 컴포넌트가 담당하는 수량과 순서와 비율에는 음수가 필요하지 않습니다. 증감이나 온도차처럼 음수가 값의 일부인 자리에서만 켭니다.",
@@ -199,6 +207,10 @@ export function NumberInputWorkbench() {
             </div>
             <div>
               <GuidelineTitle>증감 단위를 값의 성격에 맞추기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Step 1 · Default"><StudioNumberInput locale={locale} defaultValue={1} min={0} max={99} step={1} aria-label={copy[locale].quantity} /></GuideVisual>
+                <GuideVisual label="Step 5"><StudioNumberInput locale={locale} defaultValue={10} min={0} max={100} step={5} suffix="%" aria-label={copy[locale].ratio} /></GuideVisual>
+              </div>
               <GuidelineList items={[
                 <><code className="text-xs text-oe-foreground-primary">step</code>의 기본값은 1이며, 값이 실제로 움직이는 단위가 다르면 페이지마다 조정합니다.</>,
                 "수량은 1, 비율은 5나 10, 금액은 1000처럼 한 번 누를 때 의미가 있는 크기를 사용합니다.",
