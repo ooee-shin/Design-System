@@ -65,6 +65,18 @@ function Input({
   readOnly,
   ...props
 }: InputProps) {
+  // 값이 없을 때 자리를 차지하지 않으려면 조건부로 렌더링해야 한다. 마운트 직후 프레임에
+  // 클래스를 바꿔야 opacity 전환이 시작 상태를 갖는다.
+  const [clearEntered, setClearEntered] = React.useState(false)
+  React.useEffect(() => {
+    if (!clearable) {
+      setClearEntered(false)
+      return
+    }
+    const frame = requestAnimationFrame(() => setClearEntered(true))
+    return () => cancelAnimationFrame(frame)
+  }, [clearable])
+
   return (
     <div
       data-slot="input-container"
@@ -84,8 +96,8 @@ function Input({
         readOnly={readOnly}
         {...props}
       />
-      {clearable !== undefined ? (
-        <button type="button" data-slot="input-clear" data-visible={clearable ? "true" : undefined} aria-label={clearLabel} className="-mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity,visibility] [transition-behavior:allow-discrete] group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none" disabled={disabled || readOnly || !clearable} onClick={onClear}>
+      {clearable ? (
+        <button type="button" data-slot="input-clear" data-visible={clearEntered ? "true" : undefined} aria-label={clearLabel} className="-mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-oe-foreground-tertiary opacity-0 invisible pointer-events-none transition-[color,background-color,opacity] group-focus-within/input:data-[visible]:visible group-focus-within/input:data-[visible]:pointer-events-auto group-focus-within/input:data-[visible]:opacity-100 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none" disabled={disabled || readOnly} onClick={onClear}>
           <RiCloseLine className="size-4" aria-hidden="true" />
         </button>
       ) : null}

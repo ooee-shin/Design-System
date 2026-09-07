@@ -33,18 +33,25 @@ test("Textarea shows the focus ring only for focus-visible", () => {
   assert.doesNotMatch(container.className, /focus-within:ring/)
 })
 
-// clearable 이 false 일 때 버튼을 지우면 값이 생길 때 마운트로 튀어나와 전환 효과가 걸리지 않는다.
-test("Input keeps the clear button mounted while it is hidden", () => {
+// 값이 없을 때 버튼이 자리를 차지하면 focus 상태에서 빈 공백이 보인다.
+test("Input drops the clear button while there is no value", () => {
   const view = render(<Input aria-label="금액" clearable={false} clearLabel="지우기" />)
-  const clear = view.container.querySelector("[data-slot=input-clear]")
 
-  assert.ok(clear)
-  assert.equal(clear.getAttribute("data-visible"), null)
-  assert.match(clear.className, /transition-\[color,background-color,opacity,visibility\]/)
+  assert.equal(view.container.querySelector("[data-slot=input-clear]"), null)
 })
 
 test("Input drops the clear button when clearable is not given", () => {
   const view = render(<Input aria-label="금액" />)
 
   assert.equal(view.container.querySelector("[data-slot=input-clear]"), null)
+})
+
+// 값이 생길 때 마운트만 하면 튀어나온다. opacity 전환으로 나타나야 한다.
+test("Input fades the clear button in when a value appears", () => {
+  const view = render(<Input aria-label="금액" clearable clearLabel="지우기" />)
+  const clear = view.container.querySelector("[data-slot=input-clear]")
+
+  assert.ok(clear)
+  assert.match(clear.className, /transition-\[color,background-color,opacity\]/)
+  assert.match(clear.className, /opacity-0/)
 })
