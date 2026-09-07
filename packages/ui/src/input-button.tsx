@@ -16,6 +16,7 @@ type InputButtonProps = Omit<React.ComponentProps<"button">, "children" | "value
     prefix?: string
     suffix?: string
     trailingElement?: React.ReactNode
+    readOnly?: boolean
   } & InputButtonLayoutProps
 
 function InputButton({
@@ -31,6 +32,7 @@ function InputButton({
   suffix,
   trailingElement,
   disabled,
+  readOnly,
   type = "button",
   ...props
 }: InputButtonProps) {
@@ -45,17 +47,22 @@ function InputButton({
       data-size={controlSize}
       data-layout={layout}
       data-disabled={disabled ? "true" : undefined}
+      data-readonly={readOnly ? "true" : undefined}
+      aria-disabled={readOnly ? true : undefined}
       data-has-value={hasValue ? "true" : "false"}
       style={layout === "fixed" ? { width: fixedWidth } : undefined}
       disabled={disabled}
       className={cn(
         inputContainerVariants({ variant, controlSize }),
         "cursor-pointer text-left outline-none disabled:cursor-not-allowed",
+        readOnly && "cursor-default",
         layout === "fixed" ? "max-w-full shrink-0" : "w-full",
         invalid && "border-oe-danger-border-primary ring-1 ring-oe-danger-border-primary",
         className,
       )}
       {...props}
+      onClick={readOnly ? undefined : props.onClick}
+      onKeyDown={readOnly ? (event) => { if (event.key === "Enter" || event.key === " ") event.preventDefault() } : props.onKeyDown}
     >
       {leadingElement ? <span data-slot="input-button-leading" className="flex shrink-0 items-center text-oe-foreground-tertiary [&_svg]:size-4">{leadingElement}</span> : null}
       {prefix ? <span data-slot="input-button-prefix" className="shrink-0 text-oe-foreground-secondary">{prefix}</span> : null}

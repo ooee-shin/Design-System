@@ -30,11 +30,14 @@ Clear button은 제공하지 않는다. Value는 현재 문자열만 허용하�
 - `layout`: `fill | fixed`, 기본값 `fill`
 - Content: `value`, `placeholder`
 - Optional elements: `leadingElement`, `prefix`, `suffix`, `trailingElement`
-- State: 실제 Button 속성과 focus에서 확인되는 Default, Focus, Invalid, Disabled
+- `readOnly`: `boolean`, 기본값 `false`. 값은 보여주되 선택 화면을 열지 않는다
+- State: 실제 Button 속성과 focus에서 확인되는 Default, Focus, Invalid, Disabled, Read only
 
 Size는 Input과 Button이 공유하는 공통 Control Height인 32px, 36px, 40px, 48px를 사용한다. Outline Disabled에서는 입력 영역의 구조를 알 수 있도록 기본 border를 유지한다.
 
 ## Behavior
+
+Input Button은 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰인다. 조회에서는 `readOnly`를 사용한다. `readonly`는 `input`·`textarea`·`select`에만 있는 HTML 속성이고 `button`에는 없으므로, `aria-disabled`로 알리고 `disabled`는 걸지 않는다. 그래야 focus가 유지되어 키보드로 값을 지나갈 수 있다. 클릭과 Enter·Space 실행만 막으며 선택 화면을 열지 않는다. 값을 바꿀 수 없다는 점은 같지만 `disabled`와 달리 조작 대상에서 빠지지 않는다.
 
 - 실제 HTML 요소는 `button`이며 기본 `type`은 `button`이다.
 - Click 이후 동작은 소비자가 `onClick`과 필요한 `aria-haspopup`을 연결한다.

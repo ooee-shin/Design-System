@@ -48,6 +48,7 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 `2026-09-07`부터 사용자가 컴포넌트를 하나씩 훑으며 수정 요청을 준다. 대상은 Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다.
 
 - **Checkbox** — 문제없음으로 확인받았다.
+- **Input Button** — 완료. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
 - **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
 
 ## Combobox 잔여 작업

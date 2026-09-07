@@ -12,7 +12,7 @@ import { PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElement
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 
-type PreviewState = "default" | "focus" | "invalid" | "disabled";
+type PreviewState = "default" | "focus" | "invalid" | "disabled" | "readOnly";
 
 const copy = {
   ko: {
@@ -65,7 +65,7 @@ export function InputButtonWorkbench() {
                 value={showValue ? c.value : undefined} placeholder={c.placeholder}
                 leadingElement={leadingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={leadingElement} />}
                 trailingElement={trailingElement.kind === "none" ? undefined : <PlaygroundElementGraphic value={trailingElement} />}
-                disabled={previewState === "disabled"} aria-invalid={previewState === "invalid" ? "true" : undefined}
+                disabled={previewState === "disabled"} readOnly={previewState === "readOnly"} aria-invalid={previewState === "invalid" ? "true" : undefined}
                 className={previewState === "focus" ? "border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" : undefined}
                 aria-haspopup="dialog"
               />
@@ -75,7 +75,7 @@ export function InputButtonWorkbench() {
                 <ControlSection title="Appearance"><ControlGroup label="Style">{(["outline", "filled"] as const).map((item) => <Choice key={item} active={variant === item} onClick={() => setVariant(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
                 <ControlSection title="Size"><ControlGroup label="Control size">{(["small", "regular", "large", "xlarge"] as const).map((item) => <Choice key={item} active={controlSize === item} onClick={() => setControlSize(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
                 <ControlSection title="Layout"><ControlGroup label="Width behavior">{(["fill", "fixed"] as const).map((item) => <Choice key={item} active={layout === item} onClick={() => setLayout(item)}>{capitalize(item)}</Choice>)}</ControlGroup>{layout === "fixed" ? <NumberControl label="Width · px" value={fixedWidth} min={160} max={640} onChange={setFixedWidth} /> : null}</ControlSection>
-                <ControlSection title="State"><ControlGroup label="Preview state">{(["default", "focus", "invalid", "disabled"] as const).map((item) => <Choice key={item} active={previewState === item} onClick={() => setPreviewState(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
+                <ControlSection title="State"><ControlGroup label="Preview state">{(["default", "focus", "invalid", "disabled", "readOnly"] as const).map((item) => <Choice key={item} active={previewState === item} onClick={() => setPreviewState(item)}>{capitalize(item)}</Choice>)}</ControlGroup></ControlSection>
               </div>
               <div className="space-y-4">
                 <ControlSection title="Content"><Toggle label="Show value" value={showValue} onChange={setShowValue} /><p className="text-[11px] leading-4 text-oe-foreground-placeholder">Off에서는 Placeholder를 표시합니다.</p></ControlSection>
@@ -110,11 +110,12 @@ export function InputButtonWorkbench() {
           <Example label="Trailing element"><InputButton value={c.value} trailingElement={<RiArrowRightSLine />} /></Example>
         </Section>
 
-        <Section id="state" title="Properties · State" description="버튼에서 실제로 확인되는 Default, Focus, Invalid와 Disabled 상태입니다.">
+        <Section id="state" title="Properties · State" description="버튼에서 실제로 확인되는 Default, Focus, Invalid, Disabled와 Read only 상태입니다. 조회 화면에서는 Read only를 사용해 값을 보여주되 선택 화면을 열지 않습니다.">
           <Example label="Default"><InputButton value={c.value} /></Example>
           <Example label="Focus"><InputButton value={c.value} className="border-oe-focus-ring bg-oe-background-primary ring-1 ring-oe-focus-ring" /></Example>
           <Example label="Invalid"><InputButton value={c.value} aria-invalid="true" /></Example>
           <Example label="Disabled"><InputButton value={c.value} disabled /></Example>
+          <Example label="Read only" description="focus는 유지하고 여는 동작만 막습니다."><InputButton value={c.value} readOnly /></Example>
         </Section>
 
         <Section id="examples" title="Examples" description="직접 입력 대신 별도의 선택 화면이 필요한 현재 검수 사례입니다.">
@@ -127,7 +128,7 @@ export function InputButtonWorkbench() {
         <Section id="property-map" title="Property map" description="현재 구현에서 확인되는 Property와 허용 값을 정리합니다.">
           <div className="col-span-full overflow-x-auto"><table className="w-full min-w-[44rem] text-left text-xs"><thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead><tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
             <MapRow property="variant" values="outline | filled" defaultValue="outline" /><MapRow property="controlSize" values="small | regular | large | xlarge" defaultValue="regular" /><MapRow property="layout" values="fill | fixed" defaultValue="fill" />
-            <MapRow property="value / placeholder" values="string" defaultValue="undefined / Select an option" /><MapRow property="leadingElement / trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="prefix / suffix" values="string" defaultValue="undefined" />
+            <MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="value / placeholder" values="string" defaultValue="undefined / Select an option" /><MapRow property="leadingElement / trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="prefix / suffix" values="string" defaultValue="undefined" />
             <MapRow property="state" values="default | focus | invalid | disabled" defaultValue="default" note="Button attributes and focus" />
           </tbody></table></div>
         </Section>
