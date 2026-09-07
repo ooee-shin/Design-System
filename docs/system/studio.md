@@ -58,6 +58,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다.
 - 제목 위계는 페이지 제목 `text-3xl`, Section 제목 `text-xl`, Guidelines 그룹 제목 `text-lg`, Section 하위 그룹 제목과 Guidelines 규칙 제목 `text-sm`, 그룹 안 카드 라벨 `text-xs`를 사용한다. 그룹은 카드 묶음의 조건을, 카드 라벨은 그 한 칸이 무엇인지를 말하므로 두 층을 같은 크기로 쓰지 않는다. Guidelines 하위 주제 제목은 크기가 아니라 공용 `GuidelineTitle`의 아이콘으로 구분하므로 `text-sm`을 유지한다.
 - Guidelines 안에서 여러 규칙을 한 용도로 묶어야 하면 `text-lg`의 공용 `GuidelineGroupTitle`을 그 위에 둔다. 「Chip을 Filter로 사용하기」처럼 규칙 묶음이 어느 쓰임에 대한 것인지를 말하는 자리다. 아래 단계인 `GuidelineTitle`이 책 아이콘 16px을 쓰므로, 그룹 제목은 목록 아이콘 20px을 써서 두 층이 같은 표시를 갖지 않게 한다. 묶을 규칙이 하나뿐이면 이 단계를 만들지 않는다.
+- 그룹 제목과 설명 바로 아래에는 그 쓰임을 직접 조작할 수 있는 시각 하나를 둔다. 규칙마다 붙는 시각은 그 아래 규칙 제목 밑에 둔다. 조작 가능한 시각을 규칙마다 반복하면 같은 화면을 여러 번 그리게 된다.
 - 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
 - Appearance, State, Size, Elements처럼 확인된 Property 범주가 명확하면 각각을 `Properties · Appearance` 같은 독립된 바깥 Section 카드로 만든다. 구체적인 범주를 다시 더 큰 포괄 카드 하나에 묶지 않는다.
 - Property Section의 직접 하위 제목과 카드는 해당 Property 값으로 구성한다. 예를 들어 Checkbox의 `Properties · Appearance`에서는 Rounded·Ghost가 직접 하위가 되며, 비교를 위한 Unchecked·Checked 상태는 각 Appearance 카드 내부에 배치한다. 비교 상태를 상위 그룹으로 만들어 Property 계층을 뒤집지 않는다.

@@ -45,6 +45,7 @@
 - **Select Box의 남은 정책** — Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수를 정하지 않았다.
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
+- **Tab 컴포넌트** — 지금 서비스에 밑줄 Tab과 검정 Filled 형태의 Tab이 따로 쓰이고 있고, 후자를 Chip으로 합칠지 검토했다. 합치지 않기로 했다. Tab은 항상 하나가 켜져 있고 끌 수 없는 위치 표시이며 `role="tab"`과 방향키 이동을 갖는다. Chip은 여러 개를 켜고 끌 수 있고 아무것도 켜지지 않은 상태가 기본이다. 한 컴포넌트에 담으면 Property 하나가 키보드 동작과 필수 속성까지 바꾼다. Tab을 별도 컴포넌트로 만들 때 `underline`과 `filled` 두 모양을 갖게 하고, 검정 Filled는 그쪽으로 옮긴다. Chip의 Active는 brand alpha를 유지한다.
 - **Filter Bar의 남은 정책** — Chip을 Filter로 쓰는 규칙을 Chip 페이지에서 다듬는 중이다. 초기화의 자리(지금은 맨 앞), Label에 적용된 값을 담는 표기 방식, 적용 시점(누르는 즉시인지 열리는 필터에서 확정이 필요한지)을 정하지 않았다. 이 셋이 정해지면 `filter-bar.tsx`로 분리하고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
 - **Chip의 Disabled와 Color** — 제공하지 않기로 두었다. 필요한 사례가 확인되면 검토한다.
 - **Number Input과 Slider의 경계** — 넓은 범위를 탐색하는 Slider 사용 정책을 공식 Usage 규칙으로 확정하지 않았다.
