@@ -322,11 +322,10 @@ export function SelectBoxWorkbench() {
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="Select Box · 여러 열">
                   <PreviewLocaleScope className="w-full">
-                    <p className="mb-3 text-sm font-medium text-oe-foreground-primary">{c.serviceQuestion}</p>
                     <SelectBoxGroup ariaLabel={c.serviceQuestion} columns={2} trailingElement="none" defaultValue="appliance-1">
                       {c.appliances.map((appliance, index) => {
                         const Icon = applianceIcons[index];
-                        return <SelectBox key={appliance} value={`appliance-${index}`} title={appliance} leadingElement={<Icon className="size-oe-icon-large text-oe-foreground-tertiary" aria-hidden="true" />} />;
+                        return <SelectBox key={appliance} value={`appliance-${index}`} title={<span className="flex flex-col items-center gap-2 py-1"><Icon className="size-oe-icon-large text-oe-foreground-tertiary" aria-hidden="true" /><span>{appliance}</span></span>} />;
                       })}
                     </SelectBoxGroup>
                   </PreviewLocaleScope>
