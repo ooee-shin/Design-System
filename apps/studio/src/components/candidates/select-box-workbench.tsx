@@ -254,6 +254,13 @@ export function SelectBoxWorkbench() {
               ]} />
             </div>
             <div>
+              <GuidelineTitle>박스 전체를 하나의 터치 타겟으로 두기</GuidelineTitle>
+              <GuidelineList items={[
+                "Select Box는 박스 전체를 하나의 터치 타겟으로 구성하여 오조작을 방지합니다. Title, Description과 Leading element 어디를 눌러도 같은 값이 선택됩니다.",
+                "따라서 박스 안에 따로 눌리는 요소를 두지 않습니다. 링크나 Button을 넣으면 하나였던 터치 타겟이 갈라져 무엇을 눌렀는지 알 수 없게 됩니다.",
+              ]} />
+            </div>
+            <div>
               <GuidelineTitle>Description은 필요한 항목에만 두기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="필요한 항목에만">
