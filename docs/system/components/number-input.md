@@ -71,6 +71,12 @@ Small, Regular와 Large에서 버튼 터치 영역은 24px이다. XLarge에서�
 
 `step`의 기본값은 1이다. 값이 실제로 움직이는 단위가 다르면 페이지마다 조정한다. 수량은 1, 비율은 5나 10, 금액은 1000처럼 한 번 누를 때 의미가 있는 크기를 사용한다.
 
+### 숫자의 의미는 Prefix와 Suffix로 보완하기
+
+`prefix`와 `suffix`는 공용 Input의 동일한 Slot을 재사용하며 숫자의 앞뒤에 통화 기호, 비율, 단위처럼 값의 의미를 보완하는 짧은 요소를 표시한다. 통화 기호는 숫자 앞에 오므로 Prefix에 두고, 백분율과 단위는 숫자 뒤에 오므로 Suffix에 둔다.
+
+한 줄 Control의 높이를 바꾸지 않는 짧은 요소만 둔다. Leading element와 Trailing element는 증감 버튼이 사용하므로 Number Input에서는 제공하지 않는다.
+
 ## 확인된 예시
 
 - Quantity: 1–99 범위, Step 1

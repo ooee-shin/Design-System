@@ -216,6 +216,17 @@ export function NumberInputWorkbench() {
                 "수량은 1, 비율은 5나 10, 금액은 1000처럼 한 번 누를 때 의미가 있는 크기를 사용합니다.",
               ]} />
             </div>
+            <div>
+              <GuidelineTitle>숫자의 의미는 Prefix와 Suffix로 보완하기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="Prefix · ₩"><StudioNumberInput locale={locale} defaultValue={1000} min={0} max={99999} step={1000} prefix="₩" aria-label={copy[locale].amount} /></GuideVisual>
+                <GuideVisual label="Suffix · %"><StudioNumberInput locale={locale} defaultValue={25} min={0} max={100} step={5} suffix="%" aria-label={copy[locale].ratio} /></GuideVisual>
+              </div>
+              <GuidelineList items={[
+                <>숫자 앞뒤에 값의 의미를 보완하는 짧은 요소를 둘 수 있습니다. 통화 기호는 앞에 오므로 <code className="text-xs text-oe-foreground-primary">prefix</code>, 백분율과 단위는 뒤에 오므로 <code className="text-xs text-oe-foreground-primary">suffix</code>에 둡니다.</>,
+                "한 줄 Control의 높이를 바꾸지 않는 짧은 요소만 둡니다. 증감 버튼이 Leading과 Trailing 자리를 사용하므로 Number Input은 그 두 요소를 제공하지 않습니다.",
+              ]} />
+            </div>
           </div>
         </Section>
 
