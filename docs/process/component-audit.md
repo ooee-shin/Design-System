@@ -65,8 +65,12 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
   Anatomy 도식의 날짜가 `2026-09-14`로 다른 예시와 달라 점 표기로 통일했다.
 - **Input** — 완료. Guidelines 일곱 규칙을 만들었다. Prefix·Suffix와 Leading·Trailing element의 구분, Prefix·Suffix를 필요할 때만 쓰기, Clear button을 둘 자리, 마스킹, Custom input, Number Input과의 구분, Color input의 구분이다.
   `input.md`가 Input 규칙과 공통 규칙과 Studio 화면 규칙을 함께 담고 있어 정리했다. 공통 Control Height 절을 `interaction.md`로, Placeholder token 매핑을 `tokens.md`로 옮겼다. Focus·Invalid·Disabled는 `interaction.md`가 이미 소유하므로 가리키는 한 문장으로 줄였다. Studio 화면 규칙 일곱 문단 중 공통인 것은 `studio.md`로 옮기고 중복은 지웠다. Playground control 분류가 `studio.md:42`와 반대로 적혀 있던 것도 지웠다. 같은 높이 값을 다시 적던 Input Button·Select·Combobox도 `interaction.md`를 가리키게 했다.
-- **Input Button 이전 기록** — `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
-- **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
+  더 이른 검토에서는 Clear button의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity와 폭과 여백을 같은 150ms에 전환하며, 누를 때 focus를 유지한다. 금액 예시가 `containerClassName`으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
+- **Textarea** — 완료. Guidelines 아홉 꼭지를 만들고 여섯에 시각을 뒀다. 사용 조건, 지원하지 않는 요소와 Layout, 기본 높이, 초기 높이의 반 줄 걸침, Scrollbar 표시 조건, Resize 방향, 자동 높이를 켤 자리, 두 높이 옵션의 배타성, 최대 높이다.
+  기본 높이와 최소 높이를 88px에서 80px로 바꿨다 (PR #12). 88px는 여백 사이에 3.5줄이 들어가는 값이지만 내용이 넘칠 때 보이는 것은 3.9줄이어서 4줄에서 깔끔하게 끝난 것처럼 보였다. 아래 여백이 스크롤 영역 안에 있으므로 보이는 줄 수는 `(높이 − border 2px − 위 여백 8px) ÷ 20px`이며 3.5줄이 보이는 값은 80px이다. 반 줄이 걸치는 높이는 `20 × 정수 + 20`이다.
+  `resize` 기본값을 `false`에서 `true`로 바꿨다. 받을 내용의 분량은 사용자가 스스로 조절하는 편이 낫고, 높이를 고정해야 하는 자리에서만 끄면 된다. 이 때문에 `autoSize`를 켜면 켜져 있던 세로 조절이 조용히 꺼지므로 두 옵션의 배타성을 별도 꼭지로 세웠다.
+  Scrollbar thumb이 보이는 조건에 `focus`를 더했다. `hover`만으로는 키보드로 들어온 사람이 감춰진 분량을 알 수 없었다. Touch 기기 확인은 `open-questions.md`에 남겼다.
+  회귀 테스트 다섯 건을 뒀다. 기본 높이와 3.5줄 계산, 최소값 제한, `autoSize`가 고정 높이를 쓰지 않는 것, `resize`가 세로만이며 `autoSize`와 함께 켜지지 않는 것, Scrollbar가 Hover와 Focus에서 보이는 것이다.
 
 ## Chip 잔여 작업
 
