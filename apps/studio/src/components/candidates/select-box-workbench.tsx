@@ -6,7 +6,7 @@ import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelecti
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
+import { DeferredChoice, GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -37,6 +37,11 @@ const copy = {
     shortA: "월간",
     shortB: "연간",
     shortC: "분기",
+    roleGroup: "역할",
+    owner: "사장님",
+    staff: "직원",
+    cancel: "취소",
+    submit: "확인",
     planLong: { title: "월간 요금제로 결제하기", description: "매달 결제하는 방식이며 결제일은 최초 결제한 날짜를 기준으로 자동으로 정해지고, 해지를 원하면 다음 결제일 전까지 설정 화면에서 언제든 해지할 수 있습니다." },
     planGroup: "요금제",
   },
@@ -53,6 +58,11 @@ const copy = {
     shortA: "Monthly",
     shortB: "Annual",
     shortC: "Quarterly",
+    roleGroup: "Role",
+    owner: "Owner",
+    staff: "Staff",
+    cancel: "Cancel",
+    submit: "Confirm",
     planLong: { title: "Pay with the monthly plan", description: "Billed every month on the date of your first payment, and if you want to stop, you can cancel at any time before the next billing date from the settings screen." },
     planGroup: "Plan",
   },
@@ -289,13 +299,17 @@ export function SelectBoxWorkbench() {
               doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
               dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planLong.title} description={c.planLong.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
             />
-            <div>
-              <GuidelineTitle>선택과 실행을 나누기</GuidelineTitle>
-              <GuidelineList items={[
-                "Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않습니다.",
-                "저장, 확인이나 다음 단계는 별도 Button이 담당합니다. 카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않습니다.",
-              ]} />
-            </div>
+            <UsageComparison
+              title="선택과 실행을 나누기"
+              doText="선택한 값은 별도 Button으로 확정하세요."
+              dontText="카드를 누르는 즉시 다음 단계로 넘기지 마세요."
+              description={[
+                "Select Box는 값을 선택할 뿐 즉시 Action을 실행하지 않습니다. 저장, 확인이나 다음 단계는 별도 Button이 담당합니다.",
+                "카드가 넓어 Button처럼 보이더라도 누르는 즉시 화면을 이동시키지 않습니다. 실행할 Button이 없으면 잘못 누른 값을 되돌릴 기회가 사라집니다.",
+              ]}
+              doVisual={<DeferredChoice control={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.roleGroup} defaultValue="role-owner"><SelectBox value="role-owner" title={c.owner} /><SelectBox value="role-staff" title={c.staff} /></SelectBoxGroup></PreviewLocaleScope>} cancelLabel={c.cancel} submitLabel={c.submit} />}
+              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.roleGroup} defaultValue="role-owner"><SelectBox value="role-owner" title={c.owner} /><SelectBox value="role-staff" title={c.staff} /></SelectBoxGroup></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>다른 선택 컴포넌트와 나눠 쓰기</GuidelineTitle>
               <GuidelineList items={[
