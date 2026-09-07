@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiLink, RiSearchLine } from "@remixicon/react";
 
-import { Input } from "@ooee/ui";
+import { Input, NumberInput } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
@@ -30,6 +30,8 @@ const copy = {
     colorInputDescription: "색상값을 직접 입력하는 Input 조합입니다. 현재 Color Picker가 완성되지 않아 팝업 상호작용은 연결하지 않습니다.",
     clearSearchLabel: "검색", clearSearchValue: "강남구 카페",
     clearAddressLabel: "주소", clearAddressValue: "서울특별시 강남구 테헤란로 152",
+    phoneLabel: "전화번호", phoneValue: "010-1234-5678",
+    quantityLabel: "수량", decrease: "값 줄이기", increase: "값 늘리기", decreaseTooltip: "감소", increaseTooltip: "증가",
   },
   en: {
     description: "A single-line text entry component. Labels, help text, and error messages belong to a separate Field.",
@@ -44,6 +46,8 @@ const copy = {
     colorInputDescription: "An Input composition for direct color-value entry. Popup interaction is not connected until the Color Picker is complete.",
     clearSearchLabel: "Search", clearSearchValue: "Cafes in Gangnam",
     clearAddressLabel: "Address", clearAddressValue: "152 Teheran-ro, Gangnam-gu, Seoul",
+    phoneLabel: "Phone number", phoneValue: "010-1234-5678",
+    quantityLabel: "Quantity", decrease: "Decrease value", increase: "Increase value", decreaseTooltip: "Decrease", increaseTooltip: "Increase",
   },
 } as const;
 
@@ -239,6 +243,14 @@ export function InputWorkbench() {
           />
           <div>
             <GuidelineTitle>숫자 값은 Number Input과 나눠 쓰기</GuidelineTitle>
+            <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+              <GuideVisual label="Input · 계산하지 않는 식별자">
+                <PreviewLocaleScope className="w-full"><Input value={c.phoneValue} readOnly inputMode="numeric" autoComplete="tel" className="tabular-nums" aria-label={c.phoneLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+              <GuideVisual label="Number Input · 계산에 쓰이는 값">
+                <PreviewLocaleScope className="w-full"><NumberInput defaultValue={12} min={0} max={99} decreaseLabel={c.decrease} increaseLabel={c.increase} decreaseTooltip={c.decreaseTooltip} increaseTooltip={c.increaseTooltip} aria-label={c.quantityLabel} /></PreviewLocaleScope>
+              </GuideVisual>
+            </div>
             <GuidelineList items={[
               <>Input에는 별도 <code className="text-xs text-oe-foreground-primary">numeric</code> Property를 두지 않습니다. 수량, 순서, 비율처럼 계산에 쓰이는 숫자는 Number Input을 사용하고, 증감 버튼이 필요 없으면 Number Input의 Controls를 숨깁니다.</>,
               <>전화번호, 사업자번호, 카드번호처럼 숫자로 보이지만 계산하지 않는 식별자는 Input이 담당합니다. native <code className="text-xs text-oe-foreground-primary">inputMode=&quot;numeric&quot;</code>과 필요한 포맷, <code className="text-xs text-oe-foreground-primary">tabular-nums</code>를 조합합니다.</>,
