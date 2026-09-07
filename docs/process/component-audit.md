@@ -45,7 +45,7 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 ## Combobox 잔여 작업
 
-`2026-09-07`에 Select 와의 경계를 다시 정하면서 사용자가 남긴 목록이다. Chip 을 먼저 확정한 뒤 진행한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다.
+`2026-09-07`에 Select 와의 경계를 다시 정하면서 사용자가 남긴 목록이다. 이 목록 때문에 Combobox 도 후순위로 옮겼다. Chip 을 먼저 확정한 뒤 진행한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다.
 
 1. **Trigger 한 줄 요약을 없애고 결과 Chip 만 보이게 고정한다.** 지금은 Trigger 에 `서울특별시 외 2곳` 요약이 남아 있고 그 아래 Container 가 함께 있다. 요약을 걷어내면 Trigger 는 Placeholder 만 표시하고 선택 결과는 Chip 이 전담한다.
 2. **선택 결과 영역을 고도화한다.** 현재는 검색만 있다. 필터나 상태별 탭 같은 수단이 필요하다.
@@ -53,7 +53,7 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 4. **1~3depth 예시 가이드를 추가한다.** 현재 2-depth 예시 하나뿐이다.
 5. **수정된 Chip 디자인을 반영한다.** 1번의 Container 모양이 이 디자인에 달려 있다.
 
-폼 요소 10개의 검수는 이것으로 끝났다. 후순위인 Chip·Badge·Message Bubble 25건은 지시가 있을 때 시작한다.
+폼 요소 10개의 검수는 이것으로 끝났다. 후순위는 Chip·Badge·Message Bubble 25건에 Combobox 가 더해져 넷이다. 지시가 있을 때 시작하며 Chip 이 먼저다. 하나씩 검토하는 대상은 Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다.
 
 1. **판단이 필요 없는 일괄 작업.** 워크벤치 10개의 중복 `h2` 제거와 제목 위계 통일, 명세 10개의 첫머리 정형 문장 정리. 위계를 먼저 잡아야 이후 개별 화면 수정에서 다시 건드리지 않는다.
 2. **정책 적용 일괄 작업.** `className` 계열 이동, Property 이름 통일, Anatomy 명칭 통일.
