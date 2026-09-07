@@ -279,8 +279,8 @@ export function SelectBoxWorkbench() {
             </div>
             <UsageComparison
               title="Title과 Description을 간결하게 작성하기"
-              doText="한눈에 비교할 수 있는 길이로 작성하세요."
-              dontText="Description을 세 줄 이상으로 늘리지 마세요."
+              doText="옵션끼리 바로 견줄 수 있는 분량으로 작성하세요."
+              dontText="하나씩 끝까지 읽어야 하는 분량으로 늘리지 마세요."
               description={[
                 "사용자가 여러 옵션을 쉽고 빠르게 비교할 수 있도록 Title과 Description은 최대한 간결하게 작성합니다.",
                 "Description은 가독성을 위해 두 줄 이내를 권장합니다. 한 항목만 길어지면 그 항목의 높이가 늘어나 나머지 항목과 나란히 읽기 어려워집니다.",
