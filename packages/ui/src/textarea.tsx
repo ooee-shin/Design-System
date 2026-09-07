@@ -31,7 +31,7 @@ function Textarea({
   containerClassName,
   variant = "outline",
   autoSize = false,
-  resize = false,
+  resize = true,
   height = 80,
   disabled,
   readOnly,

@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-import { Input, Select, Textarea } from "@ooee/ui";
+import { Input, RadioField, RadioGroup, Textarea } from "@ooee/ui";
 import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
@@ -26,8 +26,8 @@ const copy = {
     memoLabel: "메모",
     nameLabel: "이름",
     nameValue: "홍길동",
-    contactTimeLabel: "연락 가능 시간",
-    contactTimeOptions: ["오전", "오후", "상관없음"],
+    replyLabel: "답변 수신 여부",
+    replyOptions: ["예", "아니오"],
     layoutValue: "지난주에 신청한 교환 건이 어떻게 처리되고 있는지 알려주세요.",
     halfLineValue: "배송이 예정일보다 사흘 늦게 도착했습니다. 그동안 어디에 머물러 있는지 조회해도 상태가 바뀌지 않아서 두 번 문의했는데 같은 안내만 받았습니다. 첫 문의에서는 하루 안에 답을 준다고 했지만 이틀이 지나서야 회신을 받았고, 그 내용도 조회 화면에 이미 나와 있던 문장과 같았습니다. 물건은 결국 도착했으니 이 건의 보상을 바라는 것은 아닙니다. 다만 지연된 이유와 다음부터 같은 일이 생기지 않게 할 방법을 알려주세요.",
     resizeValue: "영수증을 다시 받을 수 있을까요. 회사에 제출해야 하는데 문자로 받은 내역은 항목이 나오지 않습니다.",
@@ -48,8 +48,8 @@ const copy = {
     memoLabel: "Memo",
     nameLabel: "Name",
     nameValue: "Jane Doe",
-    contactTimeLabel: "Available time",
-    contactTimeOptions: ["Morning", "Afternoon", "Anytime"],
+    replyLabel: "Reply needed",
+    replyOptions: ["Yes", "No"],
     layoutValue: "Please let me know how the exchange request from last week is being handled.",
     halfLineValue: "The delivery arrived three days later than the promised date. The tracking status never changed while it was in transit, and I asked twice but received the same reply both times. The first reply promised an answer within a day, but it took two days to arrive, and it repeated what the tracking page already said. The package did arrive, so I am not asking for compensation. I would like to know why it was delayed and how it will be prevented next time.",
     resizeValue: "Could I get the receipt again? I need to submit it at work, and the text message I received does not list the items.",
@@ -75,7 +75,7 @@ export function TextareaWorkbench() {
   const [playgroundValue, setPlaygroundValue] = useState("");
   const [playgroundVariant, setPlaygroundVariant] = useState<"outline" | "filled">("outline");
   const [playgroundAutoSize, setPlaygroundAutoSize] = useState(false);
-  const [playgroundResize, setPlaygroundResize] = useState(false);
+  const [playgroundResize, setPlaygroundResize] = useState(true);
   const [playgroundHeight, setPlaygroundHeight] = useState(80);
 
   return (
@@ -116,7 +116,7 @@ export function TextareaWorkbench() {
         <Section id="sizing" title="Properties · Sizing" description="Auto size가 상위 속성이며, 값에 따라 Height와 Resize의 적용 여부가 결정됩니다.">
           <Example label="Auto size · false" description="기본값입니다. Height로 초기 높이를 설정하고 Resize 사용 여부를 선택할 수 있습니다."><Textarea autoSize={false} height={80} defaultValue={c.value} /></Example>
           <Example label="Auto size · true" description="내용에 따라 높이가 자동으로 증가합니다. 하위 속성인 Height와 Resize는 적용하지 않으며, viewport에서 고정 영역을 제외한 Max height를 넘지 않아야 합니다."><Textarea autoSize defaultValue={c.value} /></Example>
-          <Example label="Resize · false / true" description="Auto size가 false일 때만 활성화됩니다. true이면 세로 방향으로 높이를 변경할 수 있지만 동일한 Max height 제한을 넘지 않아야 합니다."><Textarea autoSize={false} resize defaultValue={c.value} /></Example>
+          <Example label="Resize · true / false" description="기본값은 true이며 Auto size가 false일 때만 활성화됩니다. 세로 방향으로 높이를 변경할 수 있지만 동일한 Max height 제한을 넘지 않아야 합니다."><Textarea autoSize={false} defaultValue={c.value} /></Example>
           <Example label="Height · Minimum 80px" description="Auto size가 false일 때 초기 높이를 설정합니다. 기본값과 허용되는 최소값은 모두 80px입니다."><Textarea autoSize={false} height={112} defaultValue={c.value} /></Example>
         </Section>
 
@@ -192,15 +192,16 @@ export function TextareaWorkbench() {
             <div>
               <GuidelineTitle>Resize는 세로만 허용하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                <GuideVisual label="Resize 끔 · Default" contentClassName="items-start">
-                  <PreviewLocaleScope className="w-full"><Textarea value={c.resizeValue} readOnly aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="Resize 켬 · Default · 세로만" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.resizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
-                <GuideVisual label="Resize 켬 · 세로만" contentClassName="items-start">
-                  <PreviewLocaleScope className="w-full"><Textarea defaultValue={c.resizeValue} resize aria-label={c.inquiryLabel} /></PreviewLocaleScope>
+                <GuideVisual label="Resize 끔 · 높이 고정" contentClassName="items-start">
+                  <PreviewLocaleScope className="w-full"><Textarea value={c.resizeValue} readOnly resize={false} aria-label={c.inquiryLabel} /></PreviewLocaleScope>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
-                <><code className="text-xs text-oe-foreground-primary">resize</code>는 세로 방향만 제공합니다. 가로는 제공하지 않습니다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋납니다.</>,
+                <><code className="text-xs text-oe-foreground-primary">resize</code>의 기본값은 <code className="text-xs text-oe-foreground-primary">true</code>이며 세로 방향만 제공합니다. 가로는 제공하지 않습니다. 폭이 달라지면 같은 폼의 다른 필드와 시작점과 끝점이 어긋납니다.</>,
+                "받을 내용의 분량을 사용자가 스스로 조절하는 편이 낫기 때문에 켠 상태를 기본으로 둡니다. 높이를 고정해야 하는 자리에서만 끕니다.",
                 <><code className="text-xs text-oe-foreground-primary">resize</code>는 <code className="text-xs text-oe-foreground-primary">autoSize</code>가 꺼져 있을 때만 적용됩니다. 둘을 함께 켜지 않습니다.</>,
               ]} />
             </div>
@@ -214,7 +215,7 @@ export function TextareaWorkbench() {
                 "입력하는 동안 아래 콘텐츠가 계속 내려가면 방금 읽던 자리를 잃습니다. 두 예시에 직접 입력해 차이를 확인할 수 있습니다.",
               ]}
               doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.contactTimeLabel}</FieldLabel><Select options={c.contactTimeOptions.map((label, index) => ({ value: `time-${index}`, label }))} defaultValue="time-0" ariaLabel={c.contactTimeLabel} /></div></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.replyLabel}</FieldLabel><RadioGroup aria-label={c.replyLabel} className="-ml-2 flex flex-wrap gap-x-4">{c.replyOptions.map((label, index) => <RadioField key={label} value={`reply-${index}`} label={label} />)}</RadioGroup></div></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
@@ -233,7 +234,7 @@ export function TextareaWorkbench() {
               <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
                 <MapRow property="variant" values="outline | filled" defaultValue="outline" />
                 <MapRow property="autoSize" values="false | true" defaultValue="false" note="Parent property" />
-                <MapRow property="resize" values="false | true" defaultValue="false" note="autoSize=false only" />
+                <MapRow property="resize" values="true | false" defaultValue="true" note="autoSize=false only" />
                 <MapRow property="height" values="≥ 80px" defaultValue="80px" note="autoSize=false only" />
                 <MapRow property="minHeight" values="80px" defaultValue="80px" note="Always applied" />
                 <MapRow property="maxHeight" values="viewport − reserved layout space" defaultValue="현재 정의 없음" note="Required; value pending" />

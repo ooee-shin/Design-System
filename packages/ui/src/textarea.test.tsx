@@ -47,9 +47,9 @@ test("Textarea drops the fixed height when auto size is on", () => {
   assert.equal(box.dataset.autoSize, "true")
 })
 
-// Resize 는 autoSize 가 꺼져 있을 때만 적용하며 세로 방향만 허용한다.
+// Resize 는 기본값이 켠 상태이며 세로 방향만 허용하고, autoSize 와 함께 켜지지 않는다.
 test("Textarea allows resizing only vertically and only without auto size", () => {
-  const vertical = render(<Textarea aria-label="문의 내용" resize />)
+  const vertical = render(<Textarea aria-label="문의 내용" />)
   const verticalBox = container(vertical)
 
   assert.ok(verticalBox)
