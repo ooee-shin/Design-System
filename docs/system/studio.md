@@ -41,6 +41,9 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
 - Playground control은 `Appearance → State → Content → Elements → Behavior` 순서의 그룹으로 묶고 각 그룹에 제목을 둔다. Appearance는 Style·Size·Shape·Layout처럼 시각을 결정하는 Property, State는 Disabled·Read only·Invalid처럼 조작 가능성과 유효성, Content는 값과 문구, Elements는 교체하거나 표시 여부를 정하는 요소, Behavior는 범위·단계·선택 방식처럼 동작을 정하는 Property다. 성격이 다른 Property를 사이에 끼우지 않는다. 값 Property 사이에 시각 Property가 들어가면 무엇을 조절하는 중인지 알기 어려워진다. Appearance에 Property가 많으면 `Style`, `Size`, `Layout`처럼 더 나눌 수 있으나 다섯 그룹의 순서는 유지한다. 그룹은 Property의 성격으로 정하고 종속 관계로 정하지 않는다. 상위 Property가 꺼져 있어야 의미가 없어지는 control은 자기 성격의 그룹에 두고 비활성으로 표시한다. 같은 Property가 컴포넌트마다 다른 그룹에 놓이면 화면을 옮길 때 찾는 자리가 달라진다.
 - Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Label·Description처럼 UI를 설명하는 정적 텍스트 요소의 문구는 구조 검수용 Playground에서 편집하지 않고 `Label`, `Description` 같은 고정 문구를 사용한다. 해당 텍스트 요소가 Optional이면 `Show label` 같은 임의 문장 대신 실제 Property 이름인 `Label`, `Description` Boolean Toggle만 제공한다. 실제 문구를 입력하는 Text control은 콘텐츠 길이, 줄바꿈이나 언어별 문구 검수가 목적일 때만 제공한다. Input의 Value·Placeholder처럼 사용자가 실제로 입력하거나 제출하는 데이터는 이 정적 텍스트 규칙에서 제외하고 public Property 타입에 맞는 값 Control을 유지한다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
+- Desktop Playground에서는 Preview를 상단에 유지하고 Property panel의 내부 스크롤은 사용하지 않는다. Property panel의 왼쪽 열은 여러 컴포넌트에 공통적인 Appearance, Size, Layout, State를, 오른쪽 열은 컴포넌트 고유 구성이 많은 Content, Elements, Behavior를 표시한다. 좁은 viewport에서는 두 열을 다시 한 열로 합쳐 중첩 스크롤과 가로 압축을 피한다.
+- Preview surface는 Property panel의 전체 높이를 채우되 컴포넌트 자체는 상단에 정렬한다. Property editor의 높이가 달라져도 Preview의 컴포넌트는 상단 위치를 유지한다.
+- 교체 가능한 Slot의 Icon 후보는 전체 Remix Icon catalog를 복제하지 않고 제한된 목록을 사용한다. 현재 후보는 Search, Password Lock, User, Global, Calendar다.
 - 종속 그룹은 영역의 border를 사용하지 않는다. 왼쪽에 폭 2px의 곧은 `oe-border-primary` 막대를 별도 요소로 두고 `border-radius: 9999px`로 선의 위아래 끝만 둥글게 처리하며, 콘텐츠는 16px 들여쓴다.
 - 단순한 시각 구분에는 이 표시를 사용하지 않는다. 상위값에 실제로 종속된 control에만 적용한다.
 
@@ -52,7 +55,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 신규 컴포넌트의 첫 Studio 초안은 `Playground`만 만든다. Anatomy, Properties, Examples/Usage, Guidelines와 Property map은 Playground 검수 후 사용자가 명시적으로 다음 단계를 요청할 때 추가한다. 이 제한은 Studio 문서 범위에 대한 것이며 공용 package 구현, 접근성 및 자동 테스트는 처음부터 함께 검증한다.
 - Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
-- 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다.
+- 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다.
 - 제목 위계는 페이지 제목 `text-xl`, Section 제목 `text-lg`, Section 하위 그룹 제목 `text-sm`, 그룹 안 카드 라벨 `text-xs`를 사용한다. 그룹은 카드 묶음의 조건을, 카드 라벨은 그 한 칸이 무엇인지를 말하므로 두 층을 같은 크기로 쓰지 않는다. Guidelines 하위 주제 제목은 크기가 아니라 공용 `GuidelineTitle`의 아이콘으로 구분하므로 `text-sm`을 유지한다.
 - 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
 - Appearance, State, Size, Elements처럼 확인된 Property 범주가 명확하면 각각을 `Properties · Appearance` 같은 독립된 바깥 Section 카드로 만든다. 구체적인 범주를 다시 더 큰 포괄 카드 하나에 묶지 않는다.

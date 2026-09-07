@@ -56,7 +56,7 @@ Option은 Popup 안의 선택 항목이다. 같은 목록에서 Leading element�
 - `required`, `name`: native form 연결 속성
 - `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
 
-Control height는 Input과 Button이 공유하는 Small 32px, Regular 36px, Large 40px, XLarge 48px를 사용한다. Outline Disabled에서도 외곽 border를 유지한다.
+Control height는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다. Outline Disabled에서도 외곽 border를 유지한다.
 
 ## Behavior
 

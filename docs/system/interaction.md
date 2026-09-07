@@ -22,6 +22,17 @@ Disabled는 선택값을 변경하지 않고 조작만 제한한다.
 
 선택 Control의 Read-only는 Enabled와 같은 색상과 키보드 Focus를 유지하지만 값 변경 가능성을 뜻하는 Hover 배경, Hover shadow와 Pressed 피드백은 제공하지 않는다. Disabled처럼 비활성 색상이나 `not-allowed` cursor를 사용하지 않으며 Pointer·Space·방향키로 값만 변경되지 않아야 한다.
 
+## 공통 Control Height
+
+Button과 한 줄 Form control이 함께 사용하는 높이 기준이다. 특정 컴포넌트의 값이 아니므로 각 명세는 이 값을 다시 적지 않고 이 절을 따른다.
+
+- Small: 32px
+- Regular: 36px
+- Large: 40px
+- XLarge: 48px
+
+Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea는 별도 최소 높이 또는 row 정책이 필요하다. 한 줄 Form control의 기존 API는 같은 공통 Size로 정규화한다.
+
 ## Style와 Layout 기본값
 
 - `outline | filled` Style을 제공하는 Form control은 `outline`을 기본값으로 사용한다.

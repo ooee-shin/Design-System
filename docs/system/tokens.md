@@ -59,6 +59,8 @@ Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록
 
 `foreground-tertiary`는 leading icon, timestamp와 더 약한 메타 정보의 실제 용례가 확인되어 사용한다.
 
+Placeholder는 실제 입력값과 명확히 구분하기 위해 전용 `oe-foreground-placeholder`를 사용한다. 현재 매핑은 Light `neutral-400`, Dark `neutral-500`이며 실제 입력값은 `oe-foreground-primary`를 유지한다.
+
 ## Semantic status token
 
 ```text

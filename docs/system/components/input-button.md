@@ -33,7 +33,7 @@ Clear button은 제공하지 않는다. Value는 현재 문자열만 허용하�
 - `readOnly`: `boolean`, 기본값 `false`. 값은 보여주되 `onClick`을 호출하지 않는다
 - State: 실제 Button 속성과 focus에서 확인되는 Default, Focus, Invalid, Disabled, Read only
 
-Size는 Input과 Button이 공유하는 공통 Control Height인 32px, 36px, 40px, 48px를 사용한다. Outline Disabled에서는 입력 영역의 구조를 알 수 있도록 기본 border를 유지한다.
+Size는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다. Outline Disabled에서는 입력 영역의 구조를 알 수 있도록 기본 border를 유지한다.
 
 ## Behavior
 

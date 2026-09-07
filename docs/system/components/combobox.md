@@ -39,7 +39,7 @@
 - `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
 - `name`: native form 연결 속성
 
-Control height는 Input과 Button의 공통 높이인 Small 32px, Regular 36px, Large 40px, XLarge 48px를 사용한다.
+Control height는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다.
 Disabled는 foreground와 background 위계를 낮추고 상호작용을 제한하되, Outline 스타일에서는 기본 Neutral border를 유지한다. Filled 스타일은 기존의 투명 border 구조를 유지한다.
 Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContainerVariants` recipe를 사용한다. 배경과 Border는 없으며 높이는 Small 32px로 고정한다.
 
