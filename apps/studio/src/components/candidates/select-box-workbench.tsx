@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
-import { SelectBox, SelectBoxGroup, type SelectBoxSelectionMode } from "@ooee/ui";
+import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelectionMode } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
@@ -42,8 +42,8 @@ export function SelectBoxWorkbench() {
   const [selectionMode, setSelectionMode] = useState<SelectBoxSelectionMode>("single");
   const [singleValue, setSingleValue] = useState<string>("");
   const [multipleValue, setMultipleValue] = useState<string[]>([]);
-  const [columnMode, setColumnMode] = useState<"single" | "multiple" | "fit">("single");
-  const [columnCount, setColumnCount] = useState(2);
+  const [columnMode, setColumnMode] = useState<"single" | "multiple">("single");
+  const [columnCount, setColumnCount] = useState<SelectBoxColumns>(2);
   const [showTrailingElement, setShowTrailingElement] = useState(true);
   const [leadingElement, setLeadingElement] = useState<PlaygroundElementValue>({ kind: "none", icon: "global", image: "avatar" });
   const [description, setDescription] = useState(false);
@@ -60,7 +60,7 @@ export function SelectBoxWorkbench() {
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
       <div className="min-w-0 space-y-5">
 
-        <Section id="playground" title="🚩 Playground" description="선택 방식, 항목 배치, Control과 선택 요소를 조합하고 전체 카드의 선택 동작을 확인합니다.">
+        <Section id="playground" title="🚩 Playground" description="선택 방식, 열 수, Control과 선택 요소를 조합하고 전체 카드의 선택 동작을 확인합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <PreviewLocaleScope className="rounded-xl bg-oe-background-primary p-5">
               <SelectBoxGroup
@@ -68,7 +68,7 @@ export function SelectBoxWorkbench() {
                 selectionMode={selectionMode}
                 value={value}
                 onValueChange={onValueChange}
-                columns={columnMode === "fit" ? "fit" : columnMode === "single" ? 1 : columnCount}
+                columns={columnMode === "single" ? 1 : columnCount}
                 trailingElement={showTrailingElement ? (selectionMode === "single" ? "radio" : "checkbox") : "none"}
                 disabled={disabled}
                 readOnly={readOnly}
@@ -89,7 +89,6 @@ export function SelectBoxWorkbench() {
                 <ControlGroup label="Columns">
                   <Choice active={columnMode === "single"} onClick={() => setColumnMode("single")}>Single column</Choice>
                   <Choice active={columnMode === "multiple"} onClick={() => setColumnMode("multiple")}>Multi column</Choice>
-                  <Choice active={columnMode === "fit"} onClick={() => setColumnMode("fit")}>Fit content</Choice>
                 </ControlGroup>
                 {columnMode === "multiple" ? <DependentControlGroup><NumberControl label="Column count" value={columnCount} min={2} max={6} onChange={setColumnCount} /></DependentControlGroup> : null}
               </ControlSection>

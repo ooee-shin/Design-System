@@ -8,7 +8,7 @@ import { cn } from "./utils"
 
 type SelectBoxSelectionMode = "single" | "multiple"
 type SelectBoxTrailingElement = "radio" | "checkbox" | "none"
-type SelectBoxColumns = number | "fit"
+type SelectBoxColumns = number
 
 type SelectBoxGroupValue = string | string[]
 
@@ -62,8 +62,7 @@ function SelectBoxGroup({
   const fallbackValue: SelectBoxGroupValue = selectionMode === "multiple" ? [] : ""
   const [uncontrolledValue, setUncontrolledValue] = React.useState<SelectBoxGroupValue>(defaultValue ?? fallbackValue)
   const selectedValue = value ?? uncontrolledValue
-  const fitContent = columns === "fit"
-  const resolvedColumns = typeof columns === "number" ? Math.max(1, Math.floor(columns)) : 1
+  const resolvedColumns = Math.max(1, Math.floor(columns))
   const resolvedTrailingElement = trailingElement === "none"
     ? "none"
     : selectionMode === "single"
@@ -93,11 +92,11 @@ function SelectBoxGroup({
   }), [disabled, readOnly, resolvedTrailingElement, selectedValue, selectionMode, updateValue])
 
   const groupClassName = cn(
-    fitContent ? "flex flex-wrap gap-2" : "grid grid-cols-1 gap-2",
-    !fitContent && resolvedColumns > 1 && "@min-[640px]:grid-cols-[repeat(var(--select-box-columns),minmax(0,1fr))]",
+    "grid grid-cols-1 gap-2",
+    resolvedColumns > 1 && "@min-[640px]:grid-cols-[repeat(var(--select-box-columns),minmax(0,1fr))]",
     className,
   )
-  const groupStyle = fitContent ? undefined : ({ "--select-box-columns": resolvedColumns } as React.CSSProperties)
+  const groupStyle = { "--select-box-columns": resolvedColumns } as React.CSSProperties
 
   return (
     <SelectBoxContext.Provider value={contextValue}>

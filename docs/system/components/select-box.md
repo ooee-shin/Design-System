@@ -34,7 +34,6 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - `ariaLabel`은 `SelectBoxGroup`의 필수 Property이며 Group의 접근 가능한 이름을 소유한다. Label 자체는 Field가 소유한다.
 - 항목마다 `disabled`를 둘 수 있고 Group의 `disabled`와 함께 적용된다.
 - `selectionMode`의 기본값은 `single`, `columns`의 기본값은 `1`이며 Multi column 검수 범위는 2~6열이다. 좁은 Preview에서는 한 열을 유지하고 640px 이상 Container에서 지정한 열 수를 적용한다.
-- `columns`에 `fit`을 주면 열 수를 정하지 않고 각 항목이 Content 너비만큼만 차지하며 Container 너비를 넘을 때 다음 줄로 넘어간다. 항목 길이가 서로 다르고 Title이 짧은 목록에 사용한다. 항목마다 너비가 달라지므로 Description처럼 폭을 크게 벌리는 요소와 함께 쓰지 않는다.
 - Group의 항목 간격은 8px이다. 항목은 고정 높이를 갖지 않고 Content에 맞춰 늘어나며 현재 내부 여백은 좌우 16px, 상하 12px이다.
 - Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
 - Title과 Description 간격은 2px이다. Title은 14px Medium, Description은 12px Tertiary foreground를 사용한다.

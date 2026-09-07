@@ -59,6 +59,13 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 - **Input Button** — 완료. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
 - **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
 
+## Chip 잔여 작업
+
+`2026-09-07`에 Select Box를 검토하면서 나온 요구다. Chip은 이미 후순위이며 지시가 있을 때 시작한다.
+
+1. **선택 가능한 Chip.** 짧은 Label 여러 개를 각자의 Content 너비로 나열하고 줄바꿈되게 두면서 그중 하나 이상을 선택하는 배치가 필요하다. 이 배치를 Select Box의 `columns="fit"`으로 만들었다가 되돌렸다. `select-box.md`의 「역할과 경계」가 「Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다」고 이미 정해 두었고, 상세 정보를 비교한다는 Select Box의 목적과도 어긋난다. 같은 화면 모양을 두 컴포넌트가 갖게 되면 무엇을 선택하는 자리인지 구분할 수 없다.
+   현재 Chip 명세는 Selected 상태와 Chip 전체 Click을 확인되지 않은 항목으로 두고 있다. 이 둘이 확정되어야 이 배치를 Chip이 담당할 수 있다.
+
 ## Combobox 잔여 작업
 
 `2026-09-07`에 Select 와의 경계를 다시 정하면서 사용자가 남긴 목록이다. 이 목록 때문에 Combobox 도 후순위로 옮겼다. Chip 을 먼저 확정한 뒤 진행한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다.
