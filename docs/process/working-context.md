@@ -313,13 +313,31 @@
 
 2026-09-14까지 1차 컴포넌트를 마무리한다.
 
+### 2026-09-07 마감 상태
+
+**하나씩 검토가 끝났다.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea 아홉 개다. 각 컴포넌트에 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
+
+그 과정에서 컴포넌트 다섯 개의 기본값과 Property가 바뀌었다. Number Input의 `allowNegative`가 `false`로, Textarea의 기본 높이가 88px에서 80px로, Textarea의 `resize`가 `true`로 바뀌었다. Number Input의 `useGrouping`과 Input Button의 `prefix`·`suffix`는 제거했다.
+
+**공통 문서를 정리했다.** `input.md`가 담고 있던 공통 규칙을 주인에게 돌려보냈다. 공통 Control Height는 `interaction.md`, Placeholder token은 `tokens.md`, Studio 화면 규칙은 `studio.md`가 소유한다. 「선택 상태에는 Hover와 Pressed를 중첩하지 않는다」도 `interaction.md`로 올렸다.
+
+**Studio 제목 위계가 다섯 층으로 늘었다.** 페이지 `text-3xl`, Section `text-xl`, Guidelines 그룹 `text-lg`, 규칙과 하위 그룹 `text-sm`, 카드 라벨 `text-xs`다. Guidelines 안에서 여러 규칙을 한 쓰임으로 묶는 `GuidelineGroupTitle`을 새로 만들었다. 상세 페이지의 명세 문서는 기본이 접힌 상태다.
+
+**지금 하는 일은 Chip을 새로 만드는 것이다.** 옛 Chip은 24px 고정 하나에 삭제 버튼이 필수인 미검토 초안이었다. 공통 Control Height를 따르고 `shape`은 `circle` 기본이며 Style variant는 없다. 정한 것은 [chip.md](../system/components/chip.md)에 있고, 남은 열한 가지는 [component-audit.md](component-audit.md)의 「Chip 진행 상황」에 있다.
+
+Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 컴포넌트가 될 후보다. 미정 셋은 초기화의 자리, 적용된 값의 표기 방식, 적용 시점이고 [open-questions.md](open-questions.md)에 있다.
+
+**후순위는 셋이다.** Badge 10건, Message Bubble 8건, Combobox 5건이다. 지시가 있을 때 시작한다.
+
+**한번에 몰아서 할 작업**도 [component-audit.md](component-audit.md)에 있다. Anatomy가 있는 열한 화면 중 여섯 곳에 Structure map이 없다.
+
 `2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 **폼 요소 10개의 84건을 모두 처리했다.** 결과와 확정한 정책, 단계별 진행 상황은 [component-audit.md](component-audit.md)에 있다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건은 사용자가 시작한다고 말할 때 착수한다.
 
 그 과정에서 다음 규칙이 새로 정해졌고 `docs/system/studio.md`가 소유한다.
 
 - 명세는 구현 경로만 제목 아래 메타 한 줄로 남기고 유래·진행 상태·Studio 도구 설명을 담지 않는다.
 - Property 이름은 코드를 원본으로 하고 사람이 읽을 범주는 괄호로 붙인다.
-- 제목 위계는 네 층이다. 페이지 `text-xl`, Section `text-lg`, 그룹 `text-sm`, 카드 라벨 `text-xs`.
+- 제목 위계는 다섯 층이다. 페이지 `text-3xl`, Section `text-xl`, Guidelines 그룹 `text-lg`, 규칙과 하위 그룹 `text-sm`, 카드 라벨 `text-xs`.
 - Playground control은 `Appearance → State → Content → Elements → Behavior` 순서로 묶는다. 그룹은 Property의 성격으로 정하고 종속 관계로 정하지 않는다.
 - Trigger로 여는 목록 영역은 `Popup`이라 부른다. `vocabulary.md`가 `Popup`과 `Trigger`를 요소 이름으로 소유한다.
 
