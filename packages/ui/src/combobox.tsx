@@ -37,7 +37,6 @@ type MultiComboboxProps = Omit<ComboboxProps, "value" | "defaultValue" | "onValu
   defaultValue?: string[]
   onValueChange?: (value: string[]) => void
   selectedSummaryLabel?: (firstLabel: string, remainingCount: number) => string
-  selectedDisplay?: "summary" | "container"
   selectAllLabel?: string
   selectedSearchPlaceholder?: string
   removeSelectedLabel?: (label: string) => string
@@ -101,7 +100,6 @@ function MultiCombobox({
   emptyMessage = "No options found.",
   ariaLabel,
   selectedSummaryLabel = (firstLabel, remainingCount) => remainingCount > 0 ? `${firstLabel} +${remainingCount}` : firstLabel,
-  selectedDisplay = "summary",
   selectAllLabel = "All",
   selectedSearchPlaceholder = "Search selected items",
   removeSelectedLabel = (label) => `Remove ${label}`,
@@ -150,11 +148,9 @@ function MultiCombobox({
             <RiArrowDownSLine className="size-4 transition-transform" aria-hidden="true" />
           </ComboboxPrimitive.Icon>
         </ComboboxPrimitive.Trigger>
-        {selectedDisplay === "container" ? (
-          <ComboboxPrimitive.Value>
+        <ComboboxPrimitive.Value>
             {(selected: ComboboxOption[]) => selected.length > 0 ? <div data-slot="combobox-selected-items" className="rounded-lg bg-oe-background-secondary p-2"><Input type="search" variant="filled" controlSize="small" value={selectedSearch} onChange={(event) => setSelectedSearch(event.target.value)} aria-label={selectedSearchPlaceholder} placeholder={selectedSearchPlaceholder} leadingElement={<RiSearchLine />} /><div className="mt-2 flex max-h-20 flex-wrap content-start gap-1.5 overflow-y-auto [scrollbar-color:transparent_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">{selected.filter((option) => option.label.toLocaleLowerCase().includes(selectedSearch.trim().toLocaleLowerCase())).map((option) => <Chip key={option.value} removeLabel={removeSelectedLabel(option.label)} onRemove={() => updateValue(resolvedValue.filter((optionValue) => optionValue !== option.value))}>{option.label}</Chip>)}</div></div> : <></>}
-          </ComboboxPrimitive.Value>
-        ) : null}
+        </ComboboxPrimitive.Value>
       </div>
       <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} someSelected={someSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
     </ComboboxPrimitive.Root>
@@ -175,7 +171,7 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
               <button type="button" data-slot="combobox-select-all" aria-pressed={allSelected} onClick={onToggleAll} className={cn("flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 py-2 text-left outline-none focus-visible:ring-1 focus-visible:ring-oe-focus-ring", allSelected ? "hover:bg-transparent" : "hover:bg-oe-interaction-hover")}>
                 <CheckboxIndicator checked={allSelected} indeterminate={someSelected} />
                 <span className="flex items-baseline gap-1">
-                  <span>{selectAllLabel}</span>
+                  <span className="font-semibold">{selectAllLabel}</span>
                   <span className="text-oe-foreground-tertiary tabular-nums">{totalCount}</span>
                 </span>
               </button>

@@ -9,7 +9,7 @@
 - Select는 미리 정의된 짧은 목록에서 하나 또는 여러 값을 선택한다.
 - Popup 내부 Search input을 제공하지 않는다.
 - 다중 선택 결과는 Trigger 한 줄에서 대표값과 나머지 개수 또는 전체 개수로 요약한다.
-- 선택값 전체를 별도 영역에 표시해 검색·삭제·편집하는 Container, 선택 Chip, 전체 선택과 2-depth 탐색은 Combobox가 담당한다.
+- 선택 결과를 접어 둔다. 선택한 값을 계속 보면서 개별로 빼야 하면 Combobox를 사용한다. Combobox는 선택값 Container를 항상 표시하며 검색·삭제·편집, 전체 선택과 2-depth 탐색을 담당한다.
 - 선택지를 화면에 펼쳐 놓고 설명이나 시각 정보를 계속 비교해야 하면 Select Box를 사용한다.
 - Label, Helper text와 Error message는 이후 별도 Field가 소유한다.
 
