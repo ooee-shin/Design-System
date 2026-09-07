@@ -309,7 +309,7 @@ export function SelectWorkbench() {
               dontText={usage.descriptionDont}
               description={usage.itemDescriptionDescription}
               doVisual={<ItemDescriptionContentPreview label={usage.people[0]} description={usage.organization} />}
-              dontVisual={<div className="flex min-h-14 items-center rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-oe-foreground-primary"><span className="min-w-0 flex-1"><span className="block text-sm">{usage.people[0]}</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">{usage.organization}</span></span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div>}
+              dontVisual={<div className="flex min-h-14 w-full items-center rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-oe-foreground-primary"><span className="min-w-0 flex-1"><span className="block text-sm">{usage.people[0]}</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">{usage.organization}</span></span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div>}
             />
             <TextUsageGuide title={usage.optionOrderTitle} description={usage.optionOrderDescription} />
             <UsageComparison
@@ -445,11 +445,11 @@ function GuidelineList({ items, className }: { items: ReactNode[]; className?: s
 }
 
 function OptionListUsagePreview({ labels }: { labels: [string, string, string] }) {
-  return <div className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1">{labels.map((label) => <div key={label} className="flex min-h-8 items-center rounded-md px-2.5 py-1.5 text-sm text-oe-foreground-primary">{label}</div>)}</div>;
+  return <div className="w-full rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1">{labels.map((label) => <div key={label} className="flex min-h-8 items-center rounded-md px-2.5 py-1.5 text-sm text-oe-foreground-primary">{label}</div>)}</div>;
 }
 
 function PlaceholderUsagePreview({ value }: { value: string }) {
-  return <div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-placeholder"><span className="min-w-0 flex-1 truncate">{value}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div>;
+  return <div className="flex h-9 w-full items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-placeholder"><span className="min-w-0 flex-1 truncate">{value}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div>;
 }
 
 function linkGuidelineReferences(text: string) {
@@ -461,16 +461,16 @@ function linkGuidelineReferences(text: string) {
 }
 
 function ItemDescriptionContentPreview({ label, description }: { label: string; description: string }) {
-  return <div className="space-y-1.5"><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><span className="min-w-0 flex-1 truncate">{label}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div><div className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1"><div className="flex min-h-11 items-center gap-2.5 rounded-md px-2.5 py-1.5"><span className="min-w-0 flex-1"><span className="block text-sm font-medium text-oe-foreground-primary">{label}</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">{description}</span></span><RiCheckLine className="size-4 shrink-0 text-oe-brand-foreground-primary" aria-hidden="true" /></div></div></div>;
+  return <div className="w-full space-y-1.5"><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><span className="min-w-0 flex-1 truncate">{label}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div><div className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1"><div className="flex min-h-11 items-center gap-2.5 rounded-md px-2.5 py-1.5"><span className="min-w-0 flex-1"><span className="block text-sm font-medium text-oe-foreground-primary">{label}</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">{description}</span></span><RiCheckLine className="size-4 shrink-0 text-oe-brand-foreground-primary" aria-hidden="true" /></div></div></div>;
 }
 
 function LeadingUsagePreview({ groupLabel, labels, mixed }: { groupLabel: string; labels: [string, string, string]; mixed: boolean }) {
   const icons = [RiGlobalLine, RiTeamLine, RiLockLine];
-  return <div className="space-y-1.5"><div className="flex h-9 items-center gap-2.5 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><RiGlobalLine className="size-oe-icon-small shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /><span className="min-w-0 flex-1 truncate">{labels[0]}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div><div className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1"><p className="px-2 pb-1 pt-1.5 text-[11px] font-medium text-oe-foreground-tertiary">{groupLabel}</p>{icons.map((Icon, index) => <div key={labels[index]} className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-oe-foreground-primary">{!mixed || index === 0 ? <Icon className="size-oe-icon-small shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /> : null}<span>{labels[index]}</span></div>)}</div></div>;
+  return <div className="w-full space-y-1.5"><div className="flex h-9 items-center gap-2.5 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><RiGlobalLine className="size-oe-icon-small shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /><span className="min-w-0 flex-1 truncate">{labels[0]}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div><div className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-1"><p className="px-2 pb-1 pt-1.5 text-[11px] font-medium text-oe-foreground-tertiary">{groupLabel}</p>{icons.map((Icon, index) => <div key={labels[index]} className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-oe-foreground-primary">{!mixed || index === 0 ? <Icon className="size-oe-icon-small shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /> : null}<span>{labels[index]}</span></div>)}</div></div>;
 }
 
 function FieldLabelUsagePreview({ fieldLabel, value, showLabel = false }: { fieldLabel: string; value: string; showLabel?: boolean }) {
-  return <div className="flex min-h-20 flex-col justify-center"><div className="space-y-1.5"><p aria-hidden={!showLabel || undefined} className={`px-0.5 text-xs font-medium text-oe-foreground-primary ${showLabel ? "" : "invisible"}`}>{fieldLabel}</p><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><span className="min-w-0 flex-1 truncate">{value}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div></div></div>;
+  return <div className="flex min-h-20 w-full flex-col justify-center"><div className="space-y-1.5"><p aria-hidden={!showLabel || undefined} className={`px-0.5 text-xs font-medium text-oe-foreground-primary ${showLabel ? "" : "invisible"}`}>{fieldLabel}</p><div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><span className="min-w-0 flex-1 truncate">{value}</span><RiArrowDownSLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /></div></div></div>;
 }
 
 function decoratePlaygroundOptions(options: SelectOption[], descriptions: readonly string[], leading: PlaygroundElementValue, description: boolean): SelectOption[] {
