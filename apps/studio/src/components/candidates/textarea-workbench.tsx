@@ -215,7 +215,7 @@ export function TextareaWorkbench() {
                 "입력하는 동안 아래 콘텐츠가 계속 내려가면 방금 읽던 자리를 잃습니다. 두 예시에 직접 입력해 차이를 확인할 수 있습니다.",
               ]}
               doVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-3"><FieldLabel>{c.replyLabel}</FieldLabel><RadioGroup aria-label={c.replyLabel} className="-ml-2 flex flex-wrap gap-x-4">{c.replyOptions.map((label, index) => <RadioField key={label} value={`reply-${index}`} label={label} />)}</RadioGroup></div></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="w-full"><FieldLabel>{c.inquiryLabel}</FieldLabel><Textarea autoSize defaultValue={c.autoSizeValue} aria-label={c.inquiryLabel} /><div className="mt-6"><FieldLabel>{c.replyLabel}</FieldLabel><RadioGroup aria-label={c.replyLabel} className="-ml-2 flex flex-wrap gap-x-4">{c.replyOptions.map((label, index) => <RadioField key={label} value={`reply-${index}`} label={label} />)}</RadioGroup></div></PreviewLocaleScope>}
             />
             <div>
               <GuidelineTitle>높이가 자라면 최대 높이를 뷰포트 안에 두기</GuidelineTitle>
