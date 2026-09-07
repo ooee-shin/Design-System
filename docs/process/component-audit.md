@@ -86,11 +86,17 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 남은 작업은 이렇다.
 
-1. **Filter 소제목 여섯 개에 시각 예제 붙이기.** 지금은 그룹 제목 아래에 조작 가능한 Filter bar 하나만 있고 소제목은 글로만 있다.
-2. **Selection·Suggestion·정보 표시 채우기.** 제목만 있다. 각각 설명 한 문장과 조작 가능한 이미지 하나, 규칙 소제목이 붙는다.
-3. **Filter bar 의 gradient 다듬기.** 폭 24px 이 좁고 `opacity` 로 켜지는 방식이 자연스럽지 않다.
-4. **경고 셋 정리.** 안 쓰는 `activeFilters` 상태와 `endDrag` 의 매개변수다.
-5. **Filter Bar 분리.** `open-questions.md` 의 미정 셋이 정해지면 `filter-bar.tsx` 로 옮긴다.
+1. **Filter 소제목 여섯 개에 시각 예제 붙이기.** 지금은 그룹 제목 아래에 조작 가능한 Filter bar 하나만 있고 소제목은 글로만 있다. 각 소제목 아래에 그 규칙만 보여 주는 시각이 붙는다.
+2. **Filter bar 의 gradient 다듬기.** 폭 24px 이 좁고 `opacity` 로 켜지는 방식이 자연스럽지 않다. 스크롤 정도에 따라 짙어지게 하는 편이 낫다.
+3. **Selection 쓰임 채우기.** 제목만 있다. 여러 값을 고르는 자리이며 전체 Click 을 사용한다.
+4. **Suggestion 쓰임 채우기.** 제목만 있다. 사용자에게 제안하는 항목이며 누르면 값이 채워진다.
+5. **Input 쓰임 채우기.** 제목만 있다. Combobox 처럼 고른 값을 계속 보여 주고 개별로 지우는 자리이며 Remove button 을 사용한다. Combobox 잔여 작업의 「선택 결과 영역 고도화」와 맞물린다.
+6. **정보 표시 쓰임 채우기.** 제목만 있다. 누를 수 없고 정보를 묶어 보여 주는 자리다. `onClick` 도 `onRemove` 도 없는 형태다.
+7. **네 쓰임의 공통 규칙 정리.** 쓰임마다 어느 동작을 쓰는지가 갈리므로, 그 표를 어디에 둘지 정한다. Guidelines 첫머리나 「역할과 경계」가 후보다.
+8. **경고 셋 정리.** 안 쓰는 `activeFilters` 상태와 `endDrag` 의 매개변수다.
+9. **Filter Bar 분리.** `open-questions.md` 의 미정 셋이 정해지면 `filter-bar.tsx` 로 옮기고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
+10. **Combobox 의 선택값 영역 높이 맞추기.** 24px Chip 이 사라져 `small` 32px 로 두었다. `max-h-20` 에 담기는 줄 수가 달라졌으므로 Combobox 작업에서 다시 잡는다.
+11. **Size 개수 확정.** 넷을 만들어 두었고 「3~4가지」라 했다. XLarge 48px 을 남길지 정한다.
 
 ## Chip 잔여 작업
 

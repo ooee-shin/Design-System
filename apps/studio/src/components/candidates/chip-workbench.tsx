@@ -358,6 +358,10 @@ export function ChipWorkbench() {
             </div>
 
             <div>
+              <GuidelineGroupTitle>Chip을 Input으로 사용하기</GuidelineGroupTitle>
+            </div>
+
+            <div>
               <GuidelineGroupTitle>Chip을 정보 표시로 사용하기</GuidelineGroupTitle>
             </div>
           </div>
