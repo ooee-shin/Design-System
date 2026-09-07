@@ -60,7 +60,12 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
   컴포넌트를 세 군데 고쳤다. `columns`가 2 이상이면 Leading element를 Title 위 왼쪽에 배치한다. 답이 하나로 정해지는 규칙이라 가이드가 아니라 컴포넌트가 소유한다. Leading element 자리에서 32px 고정 크기와 가운데 정렬과 `[&_svg]:size-5`를 걷어냈다. 자리가 요소의 크기를 정하고 있어서 호출하는 쪽이 넘긴 크기가 덮어써졌고, 세로 배치에서 아이콘이 Title 시작점보다 안쪽에서 시작했다. 세로 배치의 위 여백만 16px로 올렸다. 아이콘은 상자를 채우지만 Title은 줄높이 안에서 여유를 가져 상하가 같으면 아래가 넓어 보인다. 회귀 테스트 두 건으로 고정했다.
   `columns="fit"`을 만들었다가 되돌렸다. 「역할과 경계」가 Chip처럼 흐르지 않는다고 이미 정해 두었고 상세 정보를 비교한다는 목적과도 어긋난다. 지원하지 않는다는 것을 Guidelines와 「현재 구현 규칙」에 명시했다.
   Guidelines는 여덟 규칙이며 명세와 소제목이 같다. Do/Don't는 둘이고 나머지는 권장 비교이거나 규칙 목록이다.
-- **Input Button** — 완료. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
+- **Input Button** — 완료. Guidelines 여덟 규칙을 만들고 전부 시각을 갖췄다. Placeholder 문구, 형식과 기간 알리기, 나눠 받을 때 시각 요소 줄이기, 조회와 편집, 내부 중첩 금지, Trailing element의 한계, Select와의 구분, Color input의 구분이다. Placeholder를 「날짜를 선택해 주세요」에서 「날짜 선택」으로 바꿨다. 형식이 정해진 값은 `YYYY. MM. DD`를 그대로 보여준다.
+  `prefix`와 `suffix` Property를 제거했다 (PR #11). 구현과 명세 Anatomy, Optional elements, Property map, Anatomy 도식 네 곳이 있다고 하고 Playground만 없었다. 값의 의미를 보완하는 표기는 값을 직접 입력받는 Input이 담당한다. 공개 Property를 지우는 변경이라 branch와 PR을 썼다.
+  Anatomy 도식의 날짜가 `2026-09-14`로 다른 예시와 달라 점 표기로 통일했다.
+- **Input** — 완료. Guidelines 일곱 규칙을 만들었다. Prefix·Suffix와 Leading·Trailing element의 구분, Prefix·Suffix를 필요할 때만 쓰기, Clear button을 둘 자리, 마스킹, Custom input, Number Input과의 구분, Color input의 구분이다.
+  `input.md`가 Input 규칙과 공통 규칙과 Studio 화면 규칙을 함께 담고 있어 정리했다. 공통 Control Height 절을 `interaction.md`로, Placeholder token 매핑을 `tokens.md`로 옮겼다. Focus·Invalid·Disabled는 `interaction.md`가 이미 소유하므로 가리키는 한 문장으로 줄였다. Studio 화면 규칙 일곱 문단 중 공통인 것은 `studio.md`로 옮기고 중복은 지웠다. Playground control 분류가 `studio.md:42`와 반대로 적혀 있던 것도 지웠다. 같은 높이 값을 다시 적던 Input Button·Select·Combobox도 `interaction.md`를 가리키게 했다.
+- **Input Button 이전 기록** — `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다. `readOnly`를 더했다. 다른 폼 요소와 함께 조회와 편집 두 상태로 쓰이는데 조회 상태를 표현할 방법이 없었다.
 - **Input** — 완료. Clear button 의 전환을 컴포넌트가 소유하게 했다. 값의 유무와 focus 두 조건을 함께 보고, opacity 와 폭과 여백을 같은 150ms 에 전환하며, 누를 때 focus 를 유지한다. 금액 예시가 `containerClassName` 으로 같은 동작을 직접 구현하던 덮어쓰기를 걷어냈다.
 
 ## Chip 잔여 작업
