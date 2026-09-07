@@ -18,7 +18,7 @@
 2. Leading element: 선택 요소이며 현재 Icon을 사용한다.
 3. Prefix: 값 앞에 붙는 선택 요소다. `ReactNode`를 받으므로 텍스트 외의 요소도 둘 수 있다.
 4. Input field: 필수 입력 요소다.
-5. Clear button: 선택적인 입력 지우기 action이다. 입력값 바로 뒤에 위치하며 실제 값 변경은 `onClear`가 소유한다. 소비자가 `clearable`로 표시 여부를 전달하며 Input에 focus가 있을 때만 나타난다. Input은 값을 소유하지 않으므로 값의 유무는 소비자가 판단한다. 접근 가능한 이름은 `clearLabel`로 전달하며 기본값은 `Clear input`이다.
+5. Clear button: 선택적인 입력 지우기 action이다. 입력값 바로 뒤에 위치하며 실제 값 변경은 `onClear`가 소유한다. `clearable`이 `undefined`면 Clear button을 두지 않는다. `boolean`을 넘기면 버튼을 유지한 채 그 값에 따라 나타나고 사라지며, focus와 함께 두 조건이 모두 참일 때만 보인다. Input은 값을 소유하지 않으므로 값의 유무는 소비자가 판단한다. 값이 생기고 사라질 때도 focus 전환과 같은 전환 효과를 사용하므로 조건부로 렌더링해서 끊기게 하지 않는다. 접근 가능한 이름은 `clearLabel`로 전달하며 기본값은 `Clear input`이다.
 6. Suffix: 값 뒤에 붙는 선택 요소다. `ReactNode`를 받으므로 텍스트 외의 요소도 둘 수 있다.
 7. Trailing element: 선택 요소이며 현재 Icon을 사용한다.
 

@@ -102,7 +102,7 @@ export function InputWorkbench() {
               prefix={playgroundElements.showPrefix ? playgroundElements.prefixText : undefined}
               suffix={playgroundElements.showSuffix ? playgroundElements.suffixText : undefined}
               trailingElement={playgroundElements.trailing.kind === "none" ? undefined : <PlaygroundElementGraphic value={playgroundElements.trailing} />}
-              clearable={playgroundElements.showClear && playgroundValue.length > 0}
+              clearable={playgroundElements.showClear ? playgroundValue.length > 0 : undefined}
               clearLabel={c.clear}
               onClear={() => setPlaygroundValue("")}
             />
