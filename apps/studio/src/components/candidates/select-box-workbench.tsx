@@ -6,7 +6,7 @@ import { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelecti
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
-import { GuidelineList, GuideVisual } from "@/components/component-guidelines";
+import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -37,6 +37,7 @@ const copy = {
     shortA: "월간",
     shortB: "연간",
     shortC: "분기",
+    planLong: { title: "월간 요금제로 결제하기", description: "매달 결제하는 방식이며 결제일은 최초 결제한 날짜를 기준으로 자동으로 정해지고, 해지를 원하면 다음 결제일 전까지 설정 화면에서 언제든 해지할 수 있습니다." },
     planGroup: "요금제",
   },
   en: {
@@ -52,6 +53,7 @@ const copy = {
     shortA: "Monthly",
     shortB: "Annual",
     shortC: "Quarterly",
+    planLong: { title: "Pay with the monthly plan", description: "Billed every month on the date of your first payment, and if you want to stop, you can cancel at any time before the next billing date from the settings screen." },
     planGroup: "Plan",
   },
 } as const;
@@ -275,6 +277,18 @@ export function SelectBoxWorkbench() {
                 "항목 높이는 고정되어 있지 않고 각자의 Content에 맞춰 늘어납니다. 한 항목만 길어져도 나머지 항목의 높이는 그대로입니다.",
               ]} />
             </div>
+            <UsageComparison
+              title="Title과 Description을 간결하게 작성하기"
+              doText="한눈에 비교할 수 있는 길이로 작성하세요."
+              dontText="Description을 세 줄 이상으로 늘리지 마세요."
+              description={[
+                "사용자가 여러 옵션을 쉽고 빠르게 비교할 수 있도록 Title과 Description은 최대한 간결하게 작성합니다.",
+                "Description은 가독성을 위해 두 줄 이내를 권장합니다. 한 항목만 길어지면 그 항목의 높이가 늘어나 나머지 항목과 나란히 읽기 어려워집니다.",
+                "설명이 두 줄을 넘어야 하면 문장을 줄이거나, 선택 이후 화면에서 안내합니다.",
+              ]}
+              doVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planA.title} description={c.planA.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope><SelectBoxGroup ariaLabel={c.planGroup} defaultValue="plan-a"><SelectBox value="plan-a" title={c.planLong.title} description={c.planLong.description} /><SelectBox value="plan-b" title={c.planB.title} description={c.planB.description} /></SelectBoxGroup></PreviewLocaleScope>}
+            />
             <div>
               <GuidelineTitle>선택과 실행을 나누기</GuidelineTitle>
               <GuidelineList items={[
