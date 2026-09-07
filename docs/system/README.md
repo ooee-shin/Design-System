@@ -69,19 +69,19 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 | 컴포넌트 | 문서 | 용도 |
 | --- | --- | --- |
-| Switch | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
+| Badge | [badge.md](components/badge.md) | Badge, Dot Badge와 Number Badge |
 | Checkbox | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
+| Chip | [chip.md](components/chip.md) | Label 또는 Icon과 닫기 action으로 제거 가능한 항목을 표시 |
+| Combobox | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
+| Input | [input.md](components/input.md) | 한 줄 입력 |
+| Input Button | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
+| Message Bubble | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
+| Number Input | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
 | Radio | [radio.md](components/radio.md) | 여러 항목 중 하나를 선택 |
 | Select | [select.md](components/select.md) | 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택 |
 | Select Box | [select-box.md](components/select-box.md) | 상세 정보를 펼쳐 놓고 비교하며 하나 이상의 값을 선택 |
-| Combobox | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
-| Chip | [chip.md](components/chip.md) | Label 또는 Icon과 닫기 action으로 제거 가능한 항목을 표시 |
-| Input | [input.md](components/input.md) | 한 줄 입력 |
-| Input Button | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
-| Number Input | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
+| Switch | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
 | Textarea | [textarea.md](components/textarea.md) | 여러 줄 입력 |
-| Badge | [badge.md](components/badge.md) | Badge, Dot Badge와 Number Badge |
-| Message Bubble | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
 
 `packages/ui`는 위 외에 `Button`, `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공하며 아직 상세 문서가 없다.
 
