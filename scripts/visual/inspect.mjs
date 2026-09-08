@@ -103,6 +103,17 @@ const url = opts.url ?? base + (opts.path ?? "/");
 const [width, height] = opts.viewport.split("x").map(Number);
 const report = { url, viewport: { width, height } };
 
+// 크롬을 띄우기 전에 대상이 응답하는지 본다. 서버가 내려가 있으면
+// 모든 측정이 조용히 빈 값으로 나오므로 여기서 끊는다.
+try {
+  const res = await fetch(url, { redirect: "follow" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+} catch (cause) {
+  console.error(`${url} 에 접속하지 못했습니다: ${cause.message}`);
+  console.error("개발 서버가 떠 있는지 확인하세요. `pnpm dev`");
+  process.exit(1);
+}
+
 const chrome = await launch({ width, height });
 let targetId;
 try {
