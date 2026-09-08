@@ -65,6 +65,17 @@
 - 확인된 구현·문서 불일치는 수정할 수 있지만, 누락된 Property 카드의 필요성이나 새로운 사용 정책처럼 판단이 필요한 내용은 모아서 사용자에게 질문한다.
 - 화면 확정만으로 열린 결정을 확정하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청이 필요하다.
 
+- 화면을 눈으로 판단하기 전에 `scripts/visual/inspect.mjs`로 실제 값을 잰다. 측정할 때마다 새 스크립트를 쓰지 않는다. 개발 서버가 떠 있어야 하고 결과 이미지는 `.visual/`에 쌓이며 저장소에 포함하지 않는다.
+
+  ```bash
+  pnpm visual --path /components/badge \
+    --click Brand --click Fill --theme dark \
+    --measure "[data-slot=badge]" \
+    --shot badge-brand-fill --clip "#playground" --pad 12
+  ```
+
+  좌표·크기·computed style은 `--measure`, 화면 캡처는 `--shot`과 `--clip`, Control 조작은 `--click`과 `--theme`으로 한다. 이것으로 표현되지 않는 경우에만 `--eval`로 임의 식을 평가한다. 전체 옵션은 `--help`로 본다. Chrome 위치가 다른 기기에서는 `CHROME_BIN`으로 지정한다.
+
 ## 검증
 
 코드 변경 후 `pnpm check`를 실행한다. 세부 규칙과 테스트 배치 기준은 `docs/process/tooling.md`를 따른다.
