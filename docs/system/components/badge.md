@@ -42,21 +42,8 @@ Badge
 - `color` 는 `tone="custom"` 에서만 뜻을 가지므로 다른 tone 과 함께 쓰면 타입에서 걸린다.
 - `custom` 은 클래스를 색 이름으로 조립하기 때문에 Tailwind 가 소스를 훑어서 찾지 못한다. `packages/ui/src/styles.css` 의 `@source inline` 이 위 표의 단계만 미리 생성하며, 단계를 늘리면 그 선언도 함께 고친다.
 
-## 다시 넣어야 할 자리
-
-옛 Badge 를 쓰던 곳은 임시로 하드코딩해 두었다. 새 Badge 가 나오면 아래 자리를 교체한다. 시각은 옛 구현을 눈대중으로 옮긴 것이므로 새 Badge 의 규격에 맞게 다시 잡는다.
-
-| 자리 | 쓰임 | 옛 호출 |
-| --- | --- | --- |
-| `packages/patterns/src/breadcrumb-page-header.tsx` | 레코드 상태 | `color="amber"` Label |
-| `packages/patterns/src/breadcrumb-page-header.tsx` | Comments 개수 | `type="number"` neutral |
-| `packages/patterns/src/collapsible-sidebar-nav.tsx` | Deployments·Logs 개수 | `type="number"` neutral 또는 danger |
-| `packages/patterns/src/inbox-split-view.tsx` | 안 읽은 개수 | `type="number"` accent fill, `max={99}` |
-| `apps/studio/src/components/candidates/checkbox-workbench.tsx` | 목록 항목의 NEW 표시 | `color="red" size="xsmall"` Label |
-| `apps/studio/src/components/candidates/radio-indicator-workbench.tsx` | 목록 항목의 NEW 표시 | `color="red" size="xsmall"` Label |
-| `apps/studio/src/components/candidates/message-bubble-workbench.tsx` | 안 읽은 경계 개수 | `type="number"` accent fill |
-
 ## 정하지 않은 항목
+
 - **테마와 무관한 흰색 tone.** 어두운 화면이나 이미지 위에 얹는 자리에는 Light·Dark 어느 쪽에서도 흰색인 tone 이 필요하다. `oe-foreground-inverse` 는 Light 에서 `white`, Dark 에서 `neutral-950` 으로 뒤집히므로 그 자리에 맞지 않아 `inverse` tone 을 걷어냈다. 고정 흰색을 semantic token 으로 둘지, 아니면 그 자리를 Badge 가 담당하지 않을지 정한다.
 - 세 유형의 관계. Badge·Dot Badge·Number Badge 를 한 컴포넌트의 variant 로 둘지 나눌지 정하지 않았다. 옛 구현은 하나에 유니온으로 담았고 appearance 이름이 `solid` 와 `fill` 로 갈려 있었다.
 - **Dark 에서 회색 계열 `custom` 의 `tonal`.** `tonal` 의 Dark 배경은 900 단계인데, Studio 의 Dark Surface 가 `neutral-900` 이므로 `slate`·`gray`·`zinc`·`neutral`·`stone` 은 배경이 Surface 와 겹쳐 Container 가 보이지 않는다. 회색이 필요한 자리는 이미 `neutral` tone 이 `background-secondary` 로 담당하므로, `custom` 에서 회색 다섯을 빼는 방법과 회색 계열만 Dark 배경을 800 단계로 올리는 방법이 있다. 뒤쪽은 `statusFamily` 와의 단계 일치가 깨진다.

@@ -20,6 +20,9 @@ const HELP = `
   --viewport <WxH>     기본 1440x900
   --theme <dark|light> 테마를 전환한 뒤 측정한다.
   --click <텍스트>      그 텍스트를 가진 button을 누른다. 여러 번 쓰면 순서대로 누른다.
+  --sweep <a,b,c>      Control 축 하나. 여러 번 쓰면 모든 조합을 크롬 한 번으로 훑는다.
+                       예: --sweep Fill,Tonal,Outlined --sweep Brand,Neutral → 6개 조합
+  --json               훑은 결과를 표 대신 JSON 전문으로 낸다.
   --wait <ms>          클릭 뒤 대기. 기본 250
   --measure <셀렉터>    좌표·크기·주요 computed style을 잰다. 여러 번 쓸 수 있다.
   --eval <JS>          임의 식을 평가해 결과를 받는다.
@@ -31,16 +34,17 @@ const HELP = `
 `.trim();
 
 function parseArgs(argv) {
-  const opts = { click: [], measure: [], viewport: "1440x900", wait: 250, pad: 0, scale: 1, out: ".visual" };
+  const opts = { click: [], measure: [], sweep: [], viewport: "1440x900", wait: 250, pad: 0, scale: 1, out: ".visual" };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--help" || arg === "-h") return { help: true };
     if (!arg.startsWith("--")) throw new Error(`알 수 없는 인자: ${arg}`);
     const key = arg.slice(2);
+    if (key === "json") { opts.json = true; continue; }
     const value = argv[i + 1];
     if (value === undefined || value.startsWith("--")) throw new Error(`${arg}에 값이 없습니다.`);
     i += 1;
-    if (key === "click" || key === "measure") opts[key].push(value);
+    if (key === "click" || key === "measure" || key === "sweep") opts[key].push(value);
     else if (key === "wait" || key === "pad" || key === "scale") opts[key] = Number(value);
     else opts[key] = value;
   }
@@ -108,27 +112,24 @@ try {
 
   if (opts.theme) report.theme = await session.eval(THEME(opts.theme));
 
-  if (opts.click.length) {
-    report.clicked = [];
-    for (const text of opts.click) {
-      const hit = await session.eval(CLICK(text));
-      report.clicked.push({ text, found: hit });
-      await new Promise((r) => setTimeout(r, opts.wait));
+  const settle = () => new Promise((r) => setTimeout(r, opts.wait));
+
+  const clickAll = async (texts) => {
+    const log = [];
+    for (const text of texts) {
+      log.push({ text, found: await session.eval(CLICK(text)) });
+      await settle();
     }
-  }
+    return log;
+  };
 
-  if (opts.theme || opts.click.length) await new Promise((r) => setTimeout(r, opts.wait));
+  const measureAll = async () => {
+    const out = {};
+    for (const selector of opts.measure) out[selector] = await session.eval(MEASURE(selector));
+    return out;
+  };
 
-  if (opts.measure.length) {
-    report.measured = {};
-    for (const selector of opts.measure) {
-      report.measured[selector] = await session.eval(MEASURE(selector));
-    }
-  }
-
-  if (opts.eval) report.evaluated = await session.eval(opts.eval);
-
-  if (opts.shot) {
+  const capture = async (name) => {
     const dir = resolve(opts.out);
     mkdirSync(dir, { recursive: true });
     let clip;
@@ -148,12 +149,63 @@ try {
       captureBeyondViewport: true,
       ...(clip ? { clip } : {}),
     });
-    const file = join(dir, `${opts.shot}.png`);
+    const file = join(dir, `${name}.png`);
     writeFileSync(file, Buffer.from(shot.data, "base64"));
-    report.screenshot = file;
-  }
+    return file;
+  };
 
-  console.log(JSON.stringify(report, null, 2));
+  const slug = (v) => v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  if (opts.sweep.length) {
+    // 축을 곱해 모든 조합을 만든다. 크롬은 한 번만 띄운다.
+    const axes = opts.sweep.map((axis) => axis.split(",").map((v) => v.trim()).filter(Boolean));
+    const combos = axes.reduce((acc, axis) => acc.flatMap((c) => axis.map((v) => [...c, v])), [[]]);
+    report.combinations = combos.length;
+    report.rows = [];
+    for (const combo of combos) {
+      const clicked = await clickAll([...opts.click, ...combo]);
+      await settle();
+      const row = { combo, missing: clicked.filter((c) => !c.found).map((c) => c.text) };
+      if (opts.measure.length) row.measured = await measureAll();
+      if (opts.shot) row.screenshot = await capture(`${opts.shot}-${combo.map(slug).join("-")}`);
+      report.rows.push(row);
+    }
+
+    if (opts.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      const first = opts.measure[0];
+      const cells = report.rows.map((row) => {
+        const hit = first ? row.measured?.[first]?.[0] : null;
+        return {
+          combo: row.combo.join(" · "),
+          size: hit ? `${hit.rect.w}×${hit.rect.h}` : "-",
+          color: hit?.style.color ?? "-",
+          background: hit?.style.background ?? "-",
+          border: hit?.style.border ?? "-",
+          radius: hit?.style.radius ?? "-",
+          note: row.missing.length ? `못 찾음: ${row.missing.join(",")}` : "",
+        };
+      });
+      const cols = ["combo", "size", "color", "background", "border", "radius", "note"];
+      const width = Object.fromEntries(
+        cols.map((c) => [c, Math.max(c.length, ...cells.map((r) => String(r[c]).length))]),
+      );
+      const line = (r) => cols.map((c) => String(r[c]).padEnd(width[c])).join("  ").trimEnd();
+      console.log(`${report.url}  조합 ${combos.length}개${first ? `  기준 ${first}` : ""}`);
+      console.log(line(Object.fromEntries(cols.map((c) => [c, c]))));
+      console.log(cols.map((c) => "-".repeat(width[c])).join("  ").trimEnd());
+      for (const r of cells) console.log(line(r));
+      if (opts.shot) console.log(`\n이미지 ${report.rows.length}장 → ${resolve(opts.out)}`);
+    }
+  } else {
+    if (opts.click.length) report.clicked = await clickAll(opts.click);
+    if (opts.theme || opts.click.length) await settle();
+    if (opts.measure.length) report.measured = await measureAll();
+    if (opts.eval) report.evaluated = await session.eval(opts.eval);
+    if (opts.shot) report.screenshot = await capture(opts.shot);
+    console.log(JSON.stringify(report, null, 2));
+  }
 } finally {
   if (targetId) await closePage(targetId).catch(() => {});
   chrome.kill();
