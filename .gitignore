@@ -24,5 +24,5 @@ next-env.d.ts
 # 화면 검수 산출물
 .visual/
 
-# 에이전트 로컬 설정
-.claude/
+# 에이전트 설정 중 기기별 값만 제외한다. .claude/settings.json 은 저장소가 공유한다.
+.claude/settings.local.json
