@@ -367,6 +367,21 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 
 `Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 다섯 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
+### 2026-09-08 화면 검수 도구
+
+화면을 재고 찍는 일은 `scripts/visual/inspect.mjs`가 소유한다. 그전에는 측정할 때마다 일회용 스크립트를 새로 썼고 한 세션에 26개가 쌓였다. 그 왕복이 컨텍스트를 밀어 올려 뒤로 갈수록 요청 하나가 느려졌다. 사용법은 AGENTS.md의 「화면 확정 검수」가 소유한다.
+
+`--sweep`은 Control 축을 곱해 모든 조합을 크롬 한 번으로 훑는다. Badge의 `tone` 7 × `variant` 3 = 21개 조합을 19초에 재는 것까지 확인했다. **다만 아직 커밋하지 않았다.** 이어서 할 때 `git status`로 `scripts/visual/inspect.mjs`를 먼저 확인한다.
+
+```bash
+pnpm visual --path /components/badge \
+  --sweep Fill,Tonal,Outlined \
+  --sweep Brand,Neutral,Warning,Danger,Success,Info,Custom \
+  --measure "[data-slot=badge]"
+```
+
+**사용자 확인을 기다리는 항목 — Badge의 `compoundVariants` 21개를 규칙으로 줄일 수 있는가.** 지금은 `tone` 7과 `variant` 3의 조합 21개가 하나도 파생되지 않고 `packages/ui/src/badge.tsx`에 전부 개별로 적혀 있다. 그래서 한 조합을 고쳐도 나머지 20개가 따라오지 않고 21번을 각각 화면에서 확인해야 한다. Badge 검수가 다른 컴포넌트보다 오래 걸리는 직접적인 이유다. 색을 tone별 token에서 끌어오고 variant는 그 token을 배경·글자·선 중 어디에 쓸지만 정하는 형태로 바꿀 수 있는지 검토한다. 줄이면 21번이 3번이 되지만 tone마다 예외가 필요한 자리가 있는지는 화면에서 먼저 봐야 하므로 사용자 판단이 필요하다.
+
 ### 화면에서 확인이 밀린 항목
 
 - Checkbox의 Square 모양과 Radio·Checkbox의 컨트롤 그룹 순서.
