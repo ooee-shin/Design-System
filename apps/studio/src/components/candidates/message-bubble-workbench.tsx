@@ -16,7 +16,6 @@ import {
   MessageComposer,
   MessageFileAttachment,
 } from "@ooee/ui";
-import { Badge } from "@ooee/ui";
 import { useStudioPreferences } from "@/components/studio-preferences-provider";
 import { cn } from "@/lib/utils";
 import { createCoreSemanticCssVariables } from "@ooee/tokens";
@@ -377,7 +376,7 @@ export function MessageBubbleWorkbench() {
                     <span className="h-px flex-1 bg-oe-border-secondary" />
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-oe-foreground-secondary">
                       {activeCopy.readHandling.newMessages}
-                      <Badge type="number" value={1} label={activeCopy.readHandling.unreadMessages(1)} tone="accent" appearance="fill" />
+                      <span aria-label={activeCopy.readHandling.unreadMessages(1)} className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums bg-oe-accent-background-bold-primary text-oe-foreground-inverse">1</span>
                     </span>
                     <span className="h-px flex-1 bg-oe-border-secondary" />
                   </div>

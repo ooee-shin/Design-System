@@ -31,7 +31,7 @@
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Badge, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - `packages/ui`: Badge, Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -87,9 +87,10 @@
   - incoming/outgoing, avatar, 긴 콘텐츠, 국문/영문/일어, Light/Dark 검수
   - sending/sent/read/failed 및 별도 TypingIndicator 비교
 - `/components/badge`
-  - chip, number, dot 유형과 tonal/fill 표현을 검수하는 공용 컴포넌트
-  - Badge Size는 현재 검수값 XSmall 16px, Small 20px, Medium 24px를 지원
-  - Neutral·Accent·Warning·Danger·Success·Info를 지원하며 Navigation과 Chat의 실제 count 사례에 적용
+  - 새로 만드는 중이며 현재는 Playground, Anatomy, Color가 있다
+  - 높이는 24px 하나이고 Tone 일곱과 Style 셋을 조합해 확인하며, Custom Tone에서만 22색 선택이 나타난다
+  - 아이콘은 Label 앞에만 붙는다
+  - Color는 왼쪽부터 Fill·Tonal·Outlined 세 열이며, 위쪽에 Tone 여섯, 아래쪽에 Custom 22색을 두고 행 이름은 왼쪽에만 붙인다
 - `/components/input`
   - shadcn과 Seed Design Text Input을 기준으로 정리한 공용 컴포넌트
   - Input과 Field의 책임을 분리하며 현재 Input만 구현
@@ -172,9 +173,10 @@
   - Select는 숨겨진 짧은 목록, Chip은 간결한 키워드 선택·필터, Select Box는 설명이나 시각 정보를 계속 노출하는 비교 선택으로 구분
   - Field 결합 API, 최대 선택 개수와 피드백, 모바일 열 수와 Custom content motion은 아직 정의하지 않음
 - `/components/chip`
-  - Border가 있는 `oe-chip-default` 높이 token 24px, `text-oe-label` token 13px/16px, Rounded 8px의 제거 가능한 공용 컴포넌트
-  - Label + 선택적 Leading icon 또는 접근 가능한 이름을 갖는 Icon-only 유형 지원
-  - Close action은 Remix icon, `removeLabel`과 `onRemove`를 필수로 사용
+  - 공통 Control Height 중 XSmall 28px부터 XLarge 48px까지 다섯 단계를 제공하고, `shape`은 `circle`이 기본이며 Style variant는 두지 않음
+  - Label과 선택적 Leading·Trailing element, Prefix, Remove button. Label이 없으면 Icon only이며 높이와 같은 정사각 폭을 사용
+  - `onClick`과 `onRemove`는 타입으로 갈려 함께 넘길 수 없음. Container 전체가 Button인데 안에 또 Button을 두면 어느 것을 눌렀는지 알 수 없기 때문
+  - Guidelines에 Filter·Selection·Suggestion·Input·정보 표시 다섯 쓰임의 규칙이 있으며 첫머리 표가 쓰임마다 어느 동작을 쓰는지 대조
   - MultiCombobox Container 타입의 선택 결과에서 첫 실제 사용
 - `/components/checkbox`
   - Combobox 다중 선택에서 확인한 Checkbox 구조를 공용 자산으로 추출하고 OOEE Brand 선택 표현과 상태 규칙으로 정리
@@ -323,11 +325,19 @@
 
 **Studio 제목 위계가 다섯 층으로 늘었다.** 페이지 `text-3xl`, Section `text-xl`, Guidelines 그룹 `text-lg`, 규칙과 하위 그룹 `text-sm`, 카드 라벨 `text-xs`다. Guidelines 안에서 여러 규칙을 한 쓰임으로 묶는 `GuidelineGroupTitle`을 새로 만들었다. 상세 페이지의 명세 문서는 기본이 접힌 상태다.
 
-**지금 하는 일은 Chip을 새로 만드는 것이다.** 옛 Chip은 24px 고정 하나에 삭제 버튼이 필수인 미검토 초안이었다. 공통 Control Height를 따르고 `shape`은 `circle` 기본이며 Style variant는 없다. 정한 것은 [chip.md](../system/components/chip.md)에 있고, 남은 열한 가지는 [component-audit.md](component-audit.md)의 「Chip 진행 상황」에 있다.
+**Chip을 새로 만드는 일은 `2026-09-08`에 끝났다.** 옛 Chip은 24px 고정 하나에 삭제 버튼이 필수인 미검토 초안이었다. 공통 Control Height를 따르고 `shape`은 `circle` 기본이며 Style variant는 없다. 정한 것은 [chip.md](../system/components/chip.md)에 있다. Filter 쪽 다섯 가지가 남아 있으며 [component-audit.md](component-audit.md)의 「Chip 진행 상황」에 있다. 그중 셋은 Filter Bar 를 분리할 때 함께 다루는 편이 낫다.
+
+`2026-09-08`에 **Guidelines의 Selection과 Input 쓰임을 채웠다.** Guidelines 첫머리에 다섯 쓰임의 동작을 대조하는 표를 두고, 두 쓰임에 조작 가능한 시각과 규칙을 붙였다. 이어서 사용자가 쓰임과 사례를 알려 주어 Suggestion과 정보 표시까지 채웠고, 다섯 쓰임 전부가 규칙을 갖게 되었다. 정보 표시는 Badge를 검수한 뒤 대체 가능하면 Chip에서 걷어내는 쪽으로 검토한다.
+
+그 과정에서 **공통 Control Height가 24·28·32·36·40·48·56px 일곱 단계로 늘었다.** Suggestion에 32px보다 한 단계 작은 크기가 필요해서다. 값은 `packages/tokens`의 `CONTROL_HEIGHTS`가 소유하고, 모든 컴포넌트가 모든 단계를 제공하지는 않는다는 것을 `interaction.md`가 명시한다. Chip은 XSmall부터 XLarge까지 다섯을 제공한다.
 
 Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 컴포넌트가 될 후보다. 미정 셋은 초기화의 자리, 적용된 값의 표기 방식, 적용 시점이고 [open-questions.md](open-questions.md)에 있다.
 
-**후순위는 셋이다.** Badge 10건, Message Bubble 8건, Combobox 5건이다. 지시가 있을 때 시작한다.
+`2026-09-08`에 **Anatomy 번호선을 전부 손봤다.** 마커 안내선 85개 중 40개가 대상에서 2px 넘게 빗나가 있었고 그중 17개는 40px 이상이었다. 고정 좌표를 다시 계산하는 대신 마커가 대상을 참조해 스스로 자리를 잡도록 공용 컴포넌트를 바꿨다. 열두 화면 전부가 새 방식을 쓰며 남은 판단과 함께 처리한 항목은 [component-audit.md](component-audit.md)의 「Anatomy 좌표 정렬」에 있다.
+
+**후순위는 둘이다.** Message Bubble 8건과 Combobox 5건이며 지시가 있을 때 시작한다.
+
+`2026-09-08`에 **Badge의 색과 아이콘 자리를 정했다.** 옛 구현과 검수 화면을 걷어낸 뒤 24px 하나로 다시 만들었고, Tone은 `brand`·`neutral`·상태 넷·`custom` 일곱이며 Style은 `fill`·`tonal`·`outlined` 셋이다. `outlined`의 경계는 어느 Tone에서나 그 Tone 색의 30% 알파를 쓴다. `custom`은 semantic family가 없는 색을 Tailwind primitive 22색에서 받고, 단계 규칙을 tokens의 `statusFamily`와 같게 두어 나중에 그 색을 semantic family로 올려도 화면의 색이 달라지지 않게 했다. 아이콘은 Label 앞에만 붙이고 뒤쪽 아이콘은 걷어냈다. 정한 것과 그 이유는 [badge.md](../system/components/badge.md)가 소유한다.
 
 **한번에 몰아서 할 작업**도 [component-audit.md](component-audit.md)에 있다. Anatomy가 있는 열한 화면 중 여섯 곳에 Structure map이 없다.
 
@@ -345,12 +355,13 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 
 ### 남은 작업
 
-1. **Anatomy 시각 일치.** Combobox의 미선택 체크박스 2개, Badge·Chip·Select Box·Checkbox·Radio의 빗나간 번호선, Container를 점 마커로 표시한 3곳, Anatomy 안 흰색 내부 Container 5곳. 실제 화면에서 좌표를 봐야 하는 작업이다.
-2. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
-3. **Badge에 `square` 추가.** 모양 어휘 적용의 남은 절반이며 Badge는 후순위다.
-4. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
-5. **Chip 확정 후 Combobox 잔여 작업.** Combobox 도 후순위로 옮긴다. Select 와의 경계를 다시 정하면서 남은 다섯 항목이 Chip 디자인에 달려 있기 때문이다. Chip 은 후순위 안에서 먼저 처리한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다. Combobox 쪽 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
-6. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
+1. **Combobox의 미선택 체크박스 2개.** Anatomy 예시에서 두 Option이 모두 미선택 체크박스로 보인다. 하나는 공용 `CheckboxIndicator`이고 다른 하나는 도식으로 그린 사각형이라 시각이 거의 같다. 선택된 상태를 하나 두어 무엇을 보여 주는 예시인지 드러내야 한다. 좌표가 아니라 예시 내용의 문제다.
+2. **Anatomy 안 흰색 내부 Container 5곳.** `studio.md:67`은 Anatomy 회색 Surface 안에서 실제 화면이나 컴포넌트를 감싸는 Container에 흰색 `oe-background-primary`와 옅은 Neutral border를 쓰라고 정한다. 어느 다섯 곳이 이 규칙과 다른지 화면에서 확인한다.
+3. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
+4. **Badge를 새로 만든다.** 옛 구현과 검수 화면은 `2026-09-08`에 걷어냈고, 같은 날 역할과 경계에 이어 색과 아이콘 자리까지 정했다. 남은 것은 세 유형의 관계, 모양 어휘, 테마와 무관한 흰색 tone이며 [badge.md](../system/components/badge.md)가 소유한다. 옛 Badge 를 쓰던 일곱 자리는 하드코딩해 두었고 같은 문서의 「다시 넣어야 할 자리」에 있으며, 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다.
+5. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
+6. **Chip 확정 후 Combobox 잔여 작업.** Combobox 도 후순위로 옮긴다. Select 와의 경계를 다시 정하면서 남은 다섯 항목이 Chip 디자인에 달려 있기 때문이다. Chip 은 후순위 안에서 먼저 처리한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다. Combobox 쪽 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
+7. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
 
 각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
@@ -358,20 +369,18 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 
 ### 화면에서 확인이 밀린 항목
 
-- Input Button의 Anatomy 연결선. Prefix와 Suffix를 그리며 마커를 여섯 개로 늘렸고 좌표는 계산으로 잡았다.
 - Checkbox의 Square 모양과 Radio·Checkbox의 컨트롤 그룹 순서.
-- 공용 부품 통합 뒤 Anatomy 화면의 실제 좌표와 여백. 번호 마커가 18px에서 20px로 커졌고 Checkbox·Radio의 Surface 상단 여백을 `pt-12`로 잡았다.
-- Combobox 범위 표시선을 공용으로 옮길지, 늘어나는 표시를 지원하도록 `AnatomyBoundaryMarker`를 확장할지. 1번 작업에서 함께 판단한다.
+Anatomy 연결선 좌표와 범위 표시선 공용화는 `2026-09-08`에 끝냈다. Input Button의 Prefix·Suffix 마커, 공용 부품 통합 뒤의 좌표와 여백, Combobox 범위 표시선의 처리 방향이 여기에 있었다.
 
 ## 이전부터 이어지는 작업
 
 1. Select Box의 Playground·Anatomy 한정은 최초 검수 단계에만 적용하던 것이며 지금은 다른 컴포넌트와 같은 범위로 다룬다. 명세의 「현재 검수 범위」 절은 걷어냈다.
-2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Chip·Badge·Message Bubble이 남아 있으며 Message Bubble은 Anatomy·Properties·Property map 자체가 없다.
-3. Anatomy 시각 검수를 마무리한다. Checkbox와 Radio는 Basic/Extended로 분리했고, Input·Input Button·Number Input·Textarea·Switch는 유형명·시각 예제·범례를 하나의 Neutral Surface로 맞춘 상태다. Badge·Chip·Combobox는 공용 Anatomy Surface를 사용하며 Container 평행선과 번호 정렬을 실제 화면에서 다시 확인해야 한다.
+2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Message Bubble이 남아 있으며 Message Bubble은 Anatomy·Properties·Property map 자체가 없다.
+3. Anatomy 시각 검수는 번호선과 Container 평행선까지 `2026-09-08`에 마쳤다. 열두 화면 전부가 대상을 참조해 자리를 잡으므로 좌표를 다시 확인할 일은 없다. 남은 것은 Surface 안쪽 Container의 배경과 border 규칙이며 위 「남은 작업」 2번이 그것이다.
 4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
-5. 현재 Anatomy가 없는 MessageBubble과 Badge의 Dot Badge·Number Badge 탭은 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
+5. 현재 Anatomy가 없는 것은 MessageBubble이며 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Badge는 `2026-09-08`에 Container·Icon·Label 셋으로 Anatomy와 Structure map을 넣었다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
-7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트·수정일 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
+7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.
 9. Presentation 꼭지와 컴포넌트 상세를 잇는 역방향 링크를 만든다. 지금은 꼭지에서 컴포넌트로 가는 한 방향만 있어서, 컴포넌트 상세에서 「왜 이렇게 되어 있지」를 물었을 때 갈 곳이 없다. 꼭지 데이터에 관련 컴포넌트 key를 두고 registry와 연결해 `Similar`·`Works with` 옆에 표시한다. Presentation 화면 자체의 검색 기능은 넣지 않는다. 목차가 한 화면에 들어가지 않을 만큼, 대략 꼭지가 스무 개를 넘을 때 다시 검토한다.
 

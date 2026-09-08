@@ -2,10 +2,10 @@
 
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { RiNotification3Line } from "@remixicon/react";
-import { Badge, Radio, RadioField, RadioGroup } from "@ooee/ui";
+import { Radio, RadioField, RadioGroup } from "@ooee/ui";
 
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
-import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
@@ -76,13 +76,13 @@ export function RadioIndicatorWorkbench() {
               <AnatomySurface ariaLabel="Radio basic anatomy" title="Basic anatomy" className="px-5 pb-5 pt-12">
                 <p className="text-xs leading-5 text-oe-foreground-tertiary">RadioField의 기본 구조만 표시합니다.</p>
                 <div lang="en" className="mt-3 px-1 py-6">
-                  <div className="relative mx-auto my-14 w-fit">
+                  <AnatomyFrame className="mx-auto my-14">
                     <RadioGroup value="anatomy-basic"><RadioField value="anatomy-basic" label="Label" /></RadioGroup>
-                    <AnatomyBoundaryMarker number={1} side="left" connectorLength={32} boundaryLength={36} className="-left-16 top-2" />
-                    <AnatomyNumber number={2} className="left-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                    <AnatomyNumber number={3} className="left-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                    <AnatomyNumber number={4} className="right-0 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                  </div>
+                    <AnatomyBoundaryMarker number={1} target="label" side="left" connectorLength={32} />
+                    <AnatomyNumber number={2} target="[data-slot=radio]" side="top" />
+                    <AnatomyNumber number={3} target="[data-slot=radio-indicator]" side="bottom" />
+                    <AnatomyNumber number={4} target="text:Label" side="bottom" />
+                  </AnatomyFrame>
                 </div>
               </AnatomySurface>
               <AnatomyLegend items={[{ name: "Field" }, { name: "Radio control" }, { name: "Selection indicator" }, { name: "Label" }]} />
@@ -92,14 +92,14 @@ export function RadioIndicatorWorkbench() {
               <AnatomySurface ariaLabel="Radio extended anatomy" title="Extended anatomy" className="px-5 pb-5 pt-12">
                 <p className="text-xs leading-5 text-oe-foreground-tertiary">Basic 구조에 추가할 수 있는 Optional 요소만 번호로 표시합니다.</p>
                 <div lang="en" className="mt-3 px-1 py-6">
-                  <div className="relative mx-auto my-14 w-fit">
+                  <AnatomyFrame className="mx-auto my-14">
                     <RadioGroup value="anatomy-extended"><RadioField value="anatomy-extended" label="Label" rightDescription="Right Description" bottomDescription="Bottom Description" leadingElement={<AnatomySwapSlot />} trailingElement={<AnatomySwapSlot />} /></RadioGroup>
-                    <AnatomyBoundaryMarker number={5} side="right" connectorLength={32} boundaryLength={48} className="-right-16 top-2" />
-                    <AnatomyNumber number={6} className="left-7 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                    <AnatomyNumber number={7} className="right-[34px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                    <AnatomyNumber number={8} className="right-0 -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                    <AnatomyNumber number={9} className="left-7 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                  </div>
+                    <AnatomyBoundaryMarker number={5} target="wraps:Label,Right Description,Bottom Description" side="right" connectorLength={32} />
+                    <AnatomyNumber number={6} target="[data-slot=radio-leading]" side="top" />
+                    <AnatomyNumber number={7} target="text:Right Description" side="top" />
+                    <AnatomyNumber number={8} target="[data-slot=radio-trailing]" side="top" />
+                    <AnatomyNumber number={9} target="text:Bottom Description" side="bottom" />
+                  </AnatomyFrame>
                 </div>
               </AnatomySurface>
               <AnatomyLegend start={5} items={[{ name: "Content container" }, { name: "Leading element", optional: true }, { name: "Right Description", optional: true }, { name: "Trailing element", optional: true }, { name: "Bottom Description", optional: true }]} />
@@ -128,7 +128,7 @@ export function RadioIndicatorWorkbench() {
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-xs font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
-            <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="block" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<Badge color="red" size="xsmall">NEW</Badge>} /></RadioGroup>
+            <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="block" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<span className="inline-flex h-4 items-center gap-0.5 rounded-full bg-red-100 px-1.5 text-[10px] font-medium leading-none text-red-800 dark:bg-red-950 dark:text-red-200">NEW</span>} /></RadioGroup>
           </div>
         </Section>
 

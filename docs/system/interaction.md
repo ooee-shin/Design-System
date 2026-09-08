@@ -30,14 +30,31 @@ Disabled는 선택값을 변경하지 않고 조작만 제한한다.
 
 ## 공통 Control Height
 
-Button과 한 줄 Form control이 함께 사용하는 높이 기준이다. 특정 컴포넌트의 값이 아니므로 각 명세는 이 값을 다시 적지 않고 이 절을 따른다.
+Button과 한 줄 Form control이 함께 사용하는 높이 기준이다. 특정 컴포넌트의 값이 아니므로 각 명세는 이 값을 다시 적지 않고 이 절을 따른다. 값은 `packages/tokens`의 `CONTROL_HEIGHTS`가 소유하고 `--spacing-oe-control-*`로 노출한다.
 
+- XXSmall: 24px
+- XSmall: 28px
 - Small: 32px
 - Regular: 36px
 - Large: 40px
 - XLarge: 48px
+- XXLarge: 56px
+
+**모든 컴포넌트가 모든 단계를 제공하지는 않는다.** 이 절은 쓸 수 있는 값의 목록이며, 어느 컴포넌트가 어느 단계를 갖는지는 각 명세가 정한다. 컴포넌트에 단계를 더할 때는 그 크기가 실제로 필요한 자리를 함께 적는다.
 
 Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea는 별도 최소 높이 또는 row 정책이 필요하다. 한 줄 Form control의 기존 API는 같은 공통 Size로 정규화한다.
+
+## 공통 Control Radius
+
+값을 입력받거나 고르는 컨트롤이 함께 사용하는 모서리 반지름 기준이다. **8px**이며 `packages/tokens`가 `--radius-oe-control`로 소유한다. 각 명세는 값을 다시 적지 않고 이 절을 따른다.
+
+같은 페이지에, 때로는 같은 Field 안에 나란히 놓이는 요소들이므로 모서리가 몇 픽셀만 달라도 줄이 어긋나 보인다. 그래서 단계 이름(`rounded-md` 등)을 각자 고르지 않고 컨트롤 전용 이름 하나를 공유한다. 컨트롤만 값을 조정할 일이 생겨도 한 자리에서 끝난다.
+
+- 적용 대상: Button, Input, Input Button, Number Input, Textarea, Select, Combobox의 Container와 Chip의 `rounded`
+- 적용하지 않는 것: 카드형 선택지인 Select Box, Trigger로 여는 Popup, Tooltip, Message Bubble과 첨부 카드. 컨트롤과 나란히 놓이는 요소가 아니므로 각자의 단계를 사용한다.
+- Chip의 기본 모양은 `circle`이며 이 기준은 `rounded`를 골랐을 때 적용된다.
+
+`packages/ui/src/control-radius.test.tsx`가 컨트롤들이 같은 토큰을 쓰는지 검사하고, `packages/tokens/src/index.test.ts`가 토큰 값과 `RADII` 원본의 일치를 검사한다.
 
 ## Style와 Layout 기본값
 

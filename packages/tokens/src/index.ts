@@ -4,11 +4,19 @@ export const BRAND_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950
 export const BRAND_ALPHA_STEPS = [5, 8, 10, 16, 20, 30, 40, 50, 60, 70, 80, 90] as const;
 export const DEFAULT_BRAND_SEED = "#2563EB";
 
+/**
+ * Button과 한 줄 Form control이 공유하는 높이 scale이다. 모든 컴포넌트가 모든 단계를
+ * 제공하지는 않으며, 어느 컴포넌트가 어느 단계를 갖는지는 각 명세가 정한다.
+ * 기준은 docs/system/interaction.md의 「공통 Control Height」다.
+ */
 export const CONTROL_HEIGHTS = {
+  xxsmall: 24,
+  xsmall: 28,
   small: 32,
   regular: 36,
   large: 40,
   xlarge: 48,
+  xxlarge: 56,
 } as const;
 
 export type ControlSize = keyof typeof CONTROL_HEIGHTS;
@@ -22,6 +30,24 @@ export const ICON_SIZES = {
 } as const;
 
 export type IconSize = keyof typeof ICON_SIZES;
+
+/**
+ * 모서리 반지름 scale이다. `control`은 값을 입력받거나 고르는 컨트롤이 공유하는 값이며,
+ * 나머지 단계와 값이 같아도 이름을 따로 두어 컨트롤만 조정할 수 있게 한다.
+ * 단위는 px이고 CSS에는 rem으로 노출한다.
+ */
+export const RADII = {
+  control: 8,
+  sm: 6,
+  md: 8,
+  lg: 10,
+  xl: 14,
+  "2xl": 18,
+  "3xl": 22,
+  "4xl": 26,
+} as const;
+
+export type RadiusName = keyof typeof RADII;
 
 export type SemanticFamily = "neutral" | "accent" | "warning" | "danger" | "success" | "info";
 export type SemanticTokenDefinition = {

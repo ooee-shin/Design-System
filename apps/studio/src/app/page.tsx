@@ -102,11 +102,11 @@ export default function Home() {
           <div className="max-w-3xl space-y-5">
             <p className="text-sm font-medium text-muted-foreground">Design in context</p>
             <h1 className="text-balance text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">
-              화면 안에서 검수하고, oe 자산으로 남깁니다!!
+              화면 안에서 검수하고, oe 자산으로 남깁니다.
             </h1>
-            <p className="max-w-2xl text-pretty text-base leading-7 text-muted-foreground sm:text-lg">
+            <p className="max-w-2xl text-pretty text-base leading-7 text-muted-foreground sm:text-md">
               블루키 제품에서 사용할 UI 시스템을 만드는 작업 공간입니다. 컴포넌트를 실제 화면 맥락에서
-              검수하고, 확정된 결정을 oe 토큰과 컴포넌트로 남깁니다.
+              검수하고, 확정된 결정을 oe 토큰과 컴포넌트로 남깁니다. Bluekey Design System을 만듭니다.
             </p>
           </div>
           <div className="flex gap-2 lg:justify-end">

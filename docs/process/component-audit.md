@@ -17,7 +17,7 @@
 
 ## 작업 순서
 
-**진행 상황.** 1단계를 폼 요소 10개에서 끝냈다. 첫 항목인 워크벤치 중복 제목 제거와 제목 위계 통일은 폼 요소 10개에서 끝냈다. Badge와 Chip은 후순위라 중복 제목이 남아 있다. 워크벤치 머리에 있던 국문 설명은 registry 로 올렸고, 읽는 곳이 없어진 `description` 키가 워크벤치 여섯 곳에 남아 있어 각 컴포넌트를 손볼 때 함께 걷어낸다.
+**진행 상황.** 1단계를 폼 요소 10개에서 끝냈다. 첫 항목인 워크벤치 중복 제목 제거와 제목 위계 통일은 폼 요소 10개에서 끝냈다. Badge 는 `2026-09-08` 에 걷어냈고 Chip 은 새로 만들며 정리했다. 워크벤치 머리에 있던 국문 설명은 registry 로 올렸고, 읽는 곳이 없어진 `description` 키가 워크벤치 여섯 곳에 남아 있어 각 컴포넌트를 손볼 때 함께 걷어낸다.
 
 두 번째 항목인 명세 첫머리 정리도 끝냈다. 구현 경로를 제목 아래 메타 한 줄로 옮기고, 유래와 진행 상태와 Studio 도구 설명을 걷어냈다. 정보가 살아 있는 미결 항목 여덟 건은 [open-questions.md](open-questions.md)의 「컴포넌트」와 「Token candidate」로 옮겼다. `radio.md`의 Guidelines 문단은 실제 규칙과 Studio 예시 서술이 얽혀 있어 Radio 개별 순회로 넘겼다.
 
@@ -50,6 +50,7 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 **사용자가 완료라고 말하면 그 컴포넌트에 남은 확인 필요 사항을 브리핑한다.** 볼 곳은 세 군데다. [open-questions.md](open-questions.md)의 「컴포넌트」와 「Token candidate」, 해당 명세의 「현재 정의하지 않은 항목」, 그리고 명세 본문의 `확인 필요` 항목이다.
 
 - **Checkbox** — 문제없음으로 확인받았다.
+- **Chip** — 완료. 새로 만든 컴포넌트이므로 진행 내용은 아래 「Chip 진행 상황」에 있다. 명세에서 「확정 전 초안」 표기와 검수 화면 경로를 걷어냈다. 후순위 검수 7건 가운데 다섯은 해소되었고, `className` 명세 제외는 확정 정책 1번대로가 맞으며, 교체 Slot control 은 아래 이유로 공용 control 을 쓰지 않는다.
 - **Number Input** — 완료. `allowNegative` 기본값을 `true`에서 `false`로 바꿨다. 이 컴포넌트가 담당하는 수량·순서·비율에 음수가 필요하지 않으므로 예외를 명시하게 한다. Guidelines 절을 만들어 다섯 규칙을 적었다. Input과 나눠 쓰는 기준, 증감 버튼 위치, 음수 허용, 증감 단위, Prefix/Suffix다. 앞의 둘은 Do/Don't, 뒤의 셋은 Do/Don't 없이 나란히 놓는 2열 비교다.
   자리 구분(컴마)은 Number Input에 넣지 않기로 했다. `type="number"`가 값에 구분자를 담을 수 없고, `type="text"`로 바꾸면 키보드 화살표 증감과 native 범위 검증과 폼 제출값을 함께 잃는다. 금액은 기존대로 Input이 담당한다.
   이 결정과 반대로 `useGrouping` Property를 함께 넣어 두었던 것을 제거했다. 켜면 `type`이 `text`가 되고 `Input`에는 문자를 걸러내는 장치가 없어 숫자가 아닌 문자가 필드에 들어올 수 있었다. `number-input.test.tsx`에 native number type 유지, 숫자가 아닌 입력을 값으로 반영하지 않기, `allowNegative` 없이 0 아래로 내려가지 않기 세 건을 두어 이 자리를 고정했다.
@@ -76,7 +77,33 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 검토 중에 나왔으나 컴포넌트마다 흩어져 있어 한 번에 처리하는 편이 나은 항목이다.
 
-1. **Structure map 누락.** Anatomy 절이 있는 화면 열한 개 중 공용 `AnatomyStructureMap`을 쓰는 것은 다섯 개뿐이다. 있는 곳은 Checkbox·Combobox·Radio·Select Box·Switch이고, 없는 곳은 **Badge·Input·Input Button·Number Input·Select·Textarea** 여섯 개다. 요소의 중첩 관계를 글로 보여 주는 자리이므로 Anatomy가 있으면 함께 있어야 한다. 하나씩 검토하면서 지나쳤으므로 여섯 화면에 한 번에 추가한다.
+1. **Structure map 누락.** (Anatomy 좌표 정렬은 `2026-09-08`에 끝냈다. 위 절을 본다.) Anatomy 절이 있는 화면 열한 개 중 공용 `AnatomyStructureMap`을 쓰는 것은 다섯 개뿐이다. 있는 곳은 Checkbox·Combobox·Radio·Select Box·Switch이고, 없는 곳은 **Badge·Input·Input Button·Number Input·Select·Textarea** 여섯 개다. 요소의 중첩 관계를 글로 보여 주는 자리이므로 Anatomy가 있으면 함께 있어야 한다. 하나씩 검토하면서 지나쳤으므로 여섯 화면에 한 번에 추가한다.
+
+2. **크기 이름의 원본이 둘이다.** 같은 `xlarge` 를 Playground 의 선택 버튼은 `Xlarge` 로, Properties · Size 카드는 `XLarge · 48px` 로 부른다. 버튼은 `capitalize()` 로 첫 글자만 올려 만들고 카드는 문자열을 손으로 적기 때문이다. `small` 처럼 한 단어인 값은 두 방식의 결과가 같아서, `x` 가 붙은 XSmall 과 XLarge 에서만 표기가 갈린다.
+   기능에는 영향이 없고 화면에서도 눈에 잘 띄지 않지만, 크기 이름을 부르는 자리가 두 곳이라 한쪽만 고치면 그 화면이 다른 화면과 어긋난다. Input·Select·Number Input·Input Button·Chip 다섯 화면이 모두 같은 상태이므로 함께 처리한다.
+   고칠 방향은 크기 이름을 한 자리에서 소유하고 버튼과 카드가 그것을 읽게 하는 것이다. Chip 의 `sizeLabels` 상수가 그 형태에 가깝고 나머지 넷은 카드마다 문자열을 직접 적는다. 옮길 때 `Regular · 36px · Default` 처럼 카드에만 붙는 꼬리표를 어떻게 다룰지 함께 정해야 한다.
+
+## Anatomy 좌표 정렬
+
+`2026-09-08`에 Anatomy 번호선 전체를 손봤다. 작업 전에 실제 화면을 재어 보니 마커 안내선 85개 중 40개가 대상의 시각 중심에서 2px 넘게 빗나가 있었고 그중 17개는 40px 이상 벗어나 있었다. 범위 표시선 일곱 개도 길이나 세로 중심이 대상 사각형과 맞지 않았다. 좌표가 `left-0`·`right-[34px]` 같은 고정값이었고 공용 부품을 통합하며 실제 부품 크기가 바뀐 것이 원인이다.
+
+고정 좌표를 다시 계산하는 대신 마커가 대상을 참조해 스스로 자리를 잡도록 공용 컴포넌트를 바꿨다. 같은 이유로 다시 어긋나는 것을 막기 위해서다. 규칙은 `docs/system/studio.md`가 소유한다.
+
+- `AnatomyFrame`이 기준 영역을 만들고 그 안의 `AnatomyNumber`·`AnatomyBoundaryMarker`가 대상 요소를 실제로 재어 위치와 안내선 길이를 정한다. 좌표 계산은 `anatomy-placement.ts`가 순수 함수로 소유하고 `anatomy-placement.test.ts`가 20건을 검사한다.
+- 대상은 `data-slot` selector, 화면에 보이는 요소 명칭, 품고 있는 부품 이름 세 가지로 지정한다. 도식으로 그린 Anatomy에도 실제 구현과 같은 `data-slot` 이름을 붙였다.
+- 같은 방향의 마커는 프레임이 계산한 하나의 축에 정렬되고 안내선 길이만 달라진다. 축은 프레임 경계 바깥에 잡히므로 마커가 도식 위로 올라오지 않는다.
+- 글자만 담은 요소는 박스가 아니라 글자가 실제로 그려진 범위를 기준으로 잰다. `flex-1`로 늘어난 Input Button의 Value가 박스 중앙을 가리키던 문제가 이것으로 풀렸다.
+
+함께 정리한 것이 넷이다.
+
+1. **Container를 점 마커로 표시하던 세 곳**을 범위선으로 바꿨다. Badge와 Select Box의 Container, Select Box의 Content container다.
+2. **Combobox와 Select가 직접 그리던 범위 표시선**을 공용 `AnatomyBoundaryMarker`로 옮겼다. `working-context.md`가 판단을 미뤄 둔 항목이며, 대상 크기를 따라가는 방식이면 늘어나는 표시를 따로 지원할 필요가 없어서 공용으로 옮기는 쪽으로 정했다.
+3. **Input Button의 Anatomy에서 Prefix와 Suffix를 걷어냈다.** `input-button.md:24`가 「Clear button과 Prefix, Suffix는 제공하지 않는다」고 정했고 Property도 PR #11에서 제거했는데 Studio 범례와 마커에만 여섯 개로 남아 있었다. 넷으로 맞췄다.
+4. **`packages/ui/src/badge.tsx`에 `data-slot` 넷을 더했다.** Badge에만 이 표시가 하나도 없어 Anatomy가 실제 부품을 가리킬 수 없었다. 이 파일은 `2026-09-08`에 걷어냈으므로 새 Badge를 만들 때 같은 이름 규칙으로 다시 붙인다.
+
+Field가 Container 안쪽을 가리키는 기준도 함께 맞췄다. `input`처럼 한 줄 입력 요소는 박스가 Container 안쪽을 거의 다 채우기 때문에 번호선이 border 안쪽 면에서 멈춰, 입력 영역이 아니라 외곽선을 가리키는 것으로 읽혔다. 세로 범위를 글자가 앉는 한 줄로 좁혀 Prefix나 Label과 같은 자리에서 안내선이 출발하게 했다. 가로 기준은 Number Input이 입력 영역의 중심을, Input 화면이 값 글자의 중심을 가리켜 서로 다르지만 둘 다 Container 안쪽을 가리키므로 그대로 두기로 확인받았다.
+
+Select의 Group 범위선은 왼쪽에서 오른쪽으로 옮겼다. Trigger container·Popup·Group 세 범위선이 왼쪽에 층으로 쌓여 어느 영역을 가리키는지 읽히지 않았기 때문이다.
 
 ## Chip 진행 상황
 
@@ -88,15 +115,65 @@ Checkbox Playground 에서 Label on/off 토글과 종속 위계를 걷어냈다.
 
 1. **Filter 소제목 여섯 개에 시각 예제 붙이기.** 지금은 그룹 제목 아래에 조작 가능한 Filter bar 하나만 있고 소제목은 글로만 있다. 각 소제목 아래에 그 규칙만 보여 주는 시각이 붙는다.
 2. **Filter bar 의 gradient 다듬기.** 폭 24px 이 좁고 `opacity` 로 켜지는 방식이 자연스럽지 않다. 스크롤 정도에 따라 짙어지게 하는 편이 낫다.
-3. **Selection 쓰임 채우기.** 제목만 있다. 여러 값을 고르는 자리이며 전체 Click 을 사용한다.
-4. **Suggestion 쓰임 채우기.** 제목만 있다. 사용자에게 제안하는 항목이며 누르면 값이 채워진다.
-5. **Input 쓰임 채우기.** 제목만 있다. Combobox 처럼 고른 값을 계속 보여 주고 개별로 지우는 자리이며 Remove button 을 사용한다. Combobox 잔여 작업의 「선택 결과 영역 고도화」와 맞물린다.
-6. **정보 표시 쓰임 채우기.** 제목만 있다. 누를 수 없고 정보를 묶어 보여 주는 자리다. `onClick` 도 `onRemove` 도 없는 형태다.
-7. **네 쓰임의 공통 규칙 정리.** 쓰임마다 어느 동작을 쓰는지가 갈리므로, 그 표를 어디에 둘지 정한다. Guidelines 첫머리나 「역할과 경계」가 후보다.
-8. **경고 셋 정리.** 안 쓰는 `activeFilters` 상태와 `endDrag` 의 매개변수다.
-9. **Filter Bar 분리.** `open-questions.md` 의 미정 셋이 정해지면 `filter-bar.tsx` 로 옮기고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
-10. **Combobox 의 선택값 영역 높이 맞추기.** 24px Chip 이 사라져 `small` 32px 로 두었다. `max-h-20` 에 담기는 줄 수가 달라졌으므로 Combobox 작업에서 다시 잡는다.
-11. **Size 개수 확정.** 넷을 만들어 두었고 「3~4가지」라 했다. XLarge 48px 을 남길지 정한다.
+3. **경고 하나 정리.** `endDrag` 의 쓰지 않는 매개변수다. 안 쓰던 `activeFilters` 상태는 Selection 시각이 실제로 쓰게 되어 해소했다.
+4. **Filter Bar 분리.** `open-questions.md` 의 미정 셋이 정해지면 `filter-bar.tsx` 로 옮기고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
+5. **Combobox 의 선택값 영역 높이 맞추기.** 24px Chip 이 사라져 `small` 32px 로 두었다. `max-h-20` 에 담기는 줄 수가 달라졌으므로 Combobox 작업에서 다시 잡는다.
+6. **Size 개수 확정.** 다섯으로 확정했다. Input·Select·Combobox 가 제공하는 넷에 Suggestion 용 XSmall 28px 을 더한 것이다. 애초 「3~4가지」라 했고 28·32·36 셋으로 줄일지 검토했으나, Selection 이 폼 요소와 같은 페이지에서 그리고 같은 Field 안에서 쓰이므로 폼 요소의 단계를 모두 가져야 나란히 놓았을 때 높이를 맞출 수 있다는 이유로 남겼다. 공통 scale 의 XXSmall 24px 과 XXLarge 56px 은 폼 요소도 갖지 않으므로 제공하지 않는다.
+
+### 후순위 검수 7건의 결말
+
+`2026-09-04` 3중 대조에서 Chip 에 7건이 있었다. 다섯은 Chip 을 새로 만들면서 해소되었다. `ariaLabel` 이 명세에 들어갔고, 화면 범례의 Label 이 필수로 맞춰졌고, Property map 이 Guidelines 뒤로 갔고, 구현 경로와 진행 상태 표기가 정리되었다. `className` 을 명세 Properties 에 적지 않는 것은 확정 정책 1번대로가 맞다.
+
+**교체 Slot control 은 공용 `PlaygroundElementControl` 을 쓰지 않는다.** 그 control 은 `None / Icon / Image` 셋을 제공하는데 `chip.md` 는 「Leading element 와 Trailing element 에는 Icon 만 둔다」고 정한다. 공용 control 을 쓰면 컴포넌트가 지원하지 않는 값을 고를 수 있게 된다. `studio.md:42` 가 Playground 의 교체 Slot 을 세 유형으로 정하고 있어 두 규칙이 부딪히므로, 유형을 컴포넌트가 좁힐 수 있게 할지는 Playground control 규칙을 다시 볼 때 함께 정한다.
+
+### Guidelines 진행 상황
+
+`2026-09-08`에 Selection 과 Input 두 쓰임을 채웠다. 저장소에 명시된 근거만 사용했고, 근거가 없는 Suggestion 과 정보 표시는 손대지 않았다.
+
+Guidelines 첫머리에 다섯 쓰임의 동작을 대조하는 표를 두었다. `onClick` 과 `onRemove` 가 타입으로 갈려 함께 넘길 수 없으므로, 어느 쓰임인지 정한 뒤 조합하게 만드는 자리다. 확정 전인 두 쓰임은 「정하지 않았습니다」로 남겼다. 빈칸으로 두면 두지 않기로 정한 것과 구분되지 않는다.
+
+- **Selection** 규칙 셋이다. Content 너비로 흐르게 두기, 선택과 해제를 전체 Click 으로 받기, 비교가 필요하면 Select Box 로 넘기기다. 근거는 `select-box.md` 의 「역할과 경계」와 `select.md:99`, 그리고 `chip.md` 의 Properties 다.
+- **Input** 규칙 둘이다. 개별 제거는 Remove button 으로 받기, 담는 영역의 규칙은 Combobox 가 소유하기다. 근거는 `combobox.md:58`·`61`·`62` 다. Filter Bar 도 미정 셋이 정해지면 `filter-bar.tsx` 로 옮기고 Chip 쪽에 링크만 남기기로 이미 정해 두었으므로, Input 쪽은 소유자가 Combobox 로 이미 있어 처음부터 그렇게 두었다.
+
+각 그룹에 조작 가능한 시각 하나를 붙였다. Selection 은 여덟 키워드를 눌러 켜고 끄며 줄바꿈을 보이고, Input 은 네 값을 개별로 지운다. 다 지우면 되돌리는 수단을 두어 검수 화면을 새로 열지 않아도 되게 했다.
+
+**Selection 은 `rounded` 를 사용한다.** Input·Select·Number Input 과 같은 페이지에서 값을 고르는 자리이며 Field 에서 다루기도 하므로 모서리를 다른 컨트롤과 맞춘다는 것이 사용자가 준 이유다.
+
+규칙으로 적으면서 실제 값을 재어 보니 **Chip 의 `rounded` 가 8px, 컨트롤 Container 가 `rounded-lg`(10px) 로 2px 갈려 있었다.** 사용자가 8px 로 공통을 맞추기로 정했고, 그 결과 세 가지를 함께 처리했다.
+
+1. **컨트롤 공통 radius 를 토큰으로 만들었다.** `packages/tokens` 의 `RADII` 가 값의 단일 원본이고 `--radius-oe-control`(8px) 로 노출한다. Button·Input·Input Button·Number Input·Textarea·Select·Combobox 의 Container 와 Chip 의 `rounded` 가 이 토큰을 쓴다. 단계 이름을 각자 고르지 않고 컨트롤 전용 이름 하나를 공유하므로 컨트롤만 조정할 일이 생겨도 한 자리에서 끝난다. 기준은 `interaction.md` 의 「공통 Control Radius」가 소유한다.
+2. **radius scale 을 `packages/tokens` 로 옮겼다.** `--radius` 와 파생 값이 `apps/studio/src/app/globals.css` 에만 있어 공용 컨트롤이 Studio 밖으로 나가면 모서리가 달라지는 상태였다. 색 token 과 같은 자리로 옮겨 이관 후에도 같은 값이 나온다. `index.test.ts` 가 CSS 변수와 `RADII` 의 일치를 검사한다.
+3. **컨트롤이 같은 토큰을 쓰는지 검사한다.** `packages/ui/src/control-radius.test.tsx` 가 여섯 컨트롤을 함께 렌더해 확인한다. Chip 하나로 성립하는 동작은 새로 만든 `chip.test.tsx` 에 두었다.
+
+유지한 것은 카드형 선택지인 Select Box(14px), Trigger 로 여는 Popup, Tooltip, Message Bubble 과 첨부 카드(10px)다. 컨트롤과 나란히 놓이는 요소가 아니다.
+
+`2026-09-08`에 **Suggestion 과 정보 표시도 채웠다.** 사용자가 쓰임과 사례를 알려 주어 다섯 쓰임 전부가 규칙을 갖게 되었고, Guidelines 첫머리 표에서 「정하지 않았습니다」가 사라졌다.
+
+- **Suggestion** 은 다음 입력을 제안하는 자리다. 검색어 추천과 채팅방 안의 답변 추천이 사례다. 규칙 셋이며 누르면 값이 채워지게 하기, Label 만 두는 기본 형태를 쓰기, Active 를 사용하지 않기다. Label 만 두는 이유는 여러 개를 훑어 고르는 자리라 항목마다 아이콘이 붙으면 훑는 속도가 떨어지기 때문이고, Active 를 쓰지 않는 이유는 누르는 순간 값이 채워지고 역할이 끝나기 때문이다. 시각은 검색 입력과 추천 Chip 을 함께 두어 누르면 입력창에 값이 들어가는 것을 보인다.
+- **정보 표시** 는 여러 값을 나열해 각 값이 구분되어 읽히게 하는 자리다. 리뷰 관리 화면의 주문 메뉴가 사례다. 규칙 둘이며 누를 수도 지울 수도 없게 두기, 값이 여럿일 때 쓰기다.
+
+Badge 와의 경계는 여전히 남았고, 사용자가 방향을 정해 두었다. **Badge 를 검수한 뒤 정보 표시를 Badge 로 대체할 수 있으면 Chip 에서 그 쓰임을 걷어내는 쪽으로 검토한다.** 그러면 Chip 은 동작을 갖는 네 쓰임만 담당한다. 지금은 다섯 쓰임을 모두 적어 두었으므로, 걷어낼 때 명세와 Studio 화면의 그룹과 쓰임 표의 행을 함께 지운다. `open-questions.md` 에 이 방침을 적었다.
+
+**공통 Control Height 가 일곱 단계로 늘었다.** Suggestion 에 32px 보다 한 단계 작은 크기가 필요해지면서 사용자가 24·28·32·36·40·48·56px 체계를 정했다. `packages/tokens` 의 `CONTROL_HEIGHTS` 가 값을 소유하고 `--spacing-oe-control-*` 로 노출하며, `index.test.ts` 에 CSS 변수와 상수를 대조하는 검사를 새로 넣었다. 전에는 radius 만 그 검사를 갖고 있어서 높이는 한쪽만 바뀌어도 잡히지 않았다.
+
+`interaction.md` 의 「공통 Control Height」에 **모든 컴포넌트가 모든 단계를 제공하지는 않는다**는 것을 명시했다. 이 절은 쓸 수 있는 값의 목록이고 어느 컴포넌트가 어느 단계를 갖는지는 각 명세가 정한다. Chip 은 XSmall 부터 XLarge 까지 다섯을 제공한다.
+
+**Component 목록에서 「마지막 수정」을 걷어냈다.** `component-registry` 의 `updatedAt` 필드와 열세 항목의 값, 목록 카드의 `<time>` 표시, 형식 회귀 검사, `studio.md` 가 registry 소유로 적어 두었던 「수정일」 항목을 함께 지웠다. 카드의 `min-h-[104px]` 는 수정일 자리까지 계산한 값이어서 빈 공간이 남으므로 최소 높이를 걷어내 내용 높이에 맞췄다. 세 목록 화면 가운데 `density="compact"` 를 쓰는 Components 만 영향을 받는다.
+
+**Playground 에서 Label 을 끄면 Prefix 가 남아 Chip 이 찌그러지던 것을 고쳤다.** Label 이 없으면 `iconOnly` 가 되어 높이와 같은 정사각 폭을 쓰는데, 그 안에 Prefix 글자와 아이콘이 함께 들어가려 해서 넘쳤다. 두 층에서 막았다. 컴포넌트는 Icon only 일 때 Prefix 를 그리지 않고, Playground 는 Prefix control 을 Label 종속으로 옮겨 Label 을 끌 때 함께 끈다. Label 이 꺼진 동안에는 그 자리에 Leading element 를 유지하고 Prefix 를 쓰지 않는다는 안내를 둔다. `chip.test.tsx` 가 두 조합을 고정한다.
+
+XSmall 의 Label 은 공용 `text-oe-label` token 의 13px/16px 로 줄였다. 28px 상자에 14px 글자를 그대로 담으면 위아래 여유가 남지 않는다. 이 과정에서 글자 크기를 base 클래스에서 빼고 단계마다 명시하도록 바꿨다. Input 이 쓰는 방식과 같으며, base 와 variant 에 같은 속성이 겹치면 어느 쪽이 이길지 클래스 순서에 달리게 된다.
+
+**Guidelines 앞에 「모든 쓰임의 공통 규칙」 그룹을 만들었다.** 쓰임별 조합보다 공통 규칙이 앞에 와야 한다는 것이 사용자 판단이며, `studio.md:68` 의 「이미 이 컴포넌트를 쓰기로 정한 사람에게 먼저 필요한 것은 이 컴포넌트를 어떻게 쓰는지다」와도 맞는 순서다. 규칙 둘을 사용자가 정해 주었다.
+
+1. **Label 만 말줄임해 한 줄을 유지한다.** Chip 은 내부 콘텐츠를 감싸는 너비를 쓰되 담을 폭보다 넓어지면 Label 만 줄이고, Leading element·Prefix·Trailing element·Remove button 은 줄이지 않는다. 아이콘이 찌그러지거나 Remove button 을 누를 수 없게 되면 값을 지울 방법이 사라진다. 구현은 이미 그렇게 되어 있었고 `chip.test.tsx` 에 회귀 검사를 넣어 고정했다. `shrink-0` 을 빼거나 `truncate` 를 지우면 실패하는 것을 확인했다.
+2. **`circle` 이 기본이고 `rounded` 는 Selection 에서만 쓴다.** Selection 이 폼 요소와 나란히 놓이는 유일한 쓰임이므로 그 자리에서만 모서리를 맞출 이유가 있다.
+
+이로써 다섯 쓰임의 모양이 모두 정해져 쓰임 표에 「모양」 열을 더했다. Filter·Suggestion·Input·정보 표시가 `circle`, Selection 만 `rounded` 다. 표가 앞서 미뤄 두었던 항목이다.
+
+그룹이 둘로 늘어나면서 표에도 그룹 제목이 필요해졌다. 「쓰임마다 갈리는 것」을 붙였고, `studio.md` 의 `GuidelineGroupTitle` 설명이 「어느 쓰임에 대한 것인지를 말하는 자리」로만 되어 있어 쓰임과 무관한 묶음도 같은 단계를 쓴다는 것과 공통을 앞에 둔다는 것을 함께 적었다.
+
+공통 규칙 그룹에는 그룹 제목 아래 조작 시각을 두지 않고 각 규칙 제목 아래에 두 칸 비교만 두었다. 조작할 쓰임이 없기 때문이며 `studio.md` 에 그 예외를 적었다. 한 줄 유지 규칙은 왼쪽에 콘텐츠를 감싸는 짧은 값, 오른쪽에 디바이스 폭을 다 쓰는 긴 값을 놓아 Label 만 말줄임되고 아이콘과 Remove button 이 온전히 남는 것을 보인다. 두 칸의 값은 같은 주소 계열로 두어 길이만 다르게 했고, 실제 렌더에서 오른쪽 Chip 이 375px 을 채우고 Label 의 `scrollWidth` 가 `clientWidth` 를 넘는 것을 확인했다. 모양 규칙은 Circle 을 왼쪽, Rounded 를 오른쪽에 놓았다.
 
 ## Chip 잔여 작업
 
@@ -324,20 +401,9 @@ Properties 값과 Specification 수치, Anatomy는 불일치가 없었다.
 
 Properties와 Behavior는 불일치가 없었다.
 
-### Badge (10건)
+### Badge (10건) — 걷어냈다
 
-1. 명세는 `accent` tone을 「현재 fill 사례에 사용한다」(`badge.md:44`)고 했으나 화면의 fill 예시에 `accent`가 없다 — `badge-workbench.tsx:144`
-2. `className`이 명세에 없다 — `badge.tsx:11-13`
-3. 화면 Anatomy가 명세에 없는 `Container` 요소명을 도입한다 — `badge.md:15` 대 `badge-workbench.tsx:138`
-4. 명세는 `Chip`을 미래형으로 언급하나 구현의 기본 variant 판별자가 이미 `"chip"`이다 — `badge.md:52` 대 `badge.tsx:15-16`
-5. 명세가 나열한 섹션 목록과 실제 화면 섹션이 다르다 — `badge.md:15` 대 `badge-workbench.tsx:56`, `:90`, `:94`
-6. `badgeSections`에 본문에 있는 `Overview`와 `Future extension`이 빠져 있다 — `studio.md:54` 대 `badge-workbench.tsx:13`
-7. Dot Badge·Number Badge 탭에 Playground가 없다 — `studio.md:49` 대 `badge-workbench.tsx:14`
-8. 자산 유래 — `badge.md:5`
-9. 도구 설명과 「Studio 정보 구조」 절 전체 — `badge.md:3`, `:7-15`
-10. 진행 상태와 작업 절차 설명 — `badge.md:61`
-
-제목 위계는 셸까지 확인한 결과 기준과 일치했다.
+`2026-09-08`에 옛 Badge 구현과 검수 화면을 지우고 새로 만들기로 정했으므로 이 10건은 대상이 사라졌다. 지적의 절반이 「명세가 나열한 섹션과 실제 화면이 다르다」처럼 옛 화면 구조에 대한 것이었고, 나머지는 `chip` 이름 잔재와 명세의 과정 서술이었다. 새로 만들 때 지키는 기준은 `docs/system/components/badge.md` 가 소유한다.
 
 ### Message Bubble (8건)
 

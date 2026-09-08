@@ -7,7 +7,6 @@ export type AssetGroupItem = {
   href: string;
   /** 결정이 아직 확정되지 않은 자산에만 표시한다. 컴포넌트 등급이 아니라 결정의 확정 여부다. */
   status?: "Provisional";
-  updatedAt?: string;
 };
 
 /**
@@ -32,7 +31,7 @@ export function AssetGroupPage({ title, description, items, density = "default" 
         </header>
         <section aria-label={`${title} 목록`} className={`grid gap-3 ${compact ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "md:grid-cols-2"}`}>
           {items.map((item) => (
-            <Link key={item.href} href={item.href} className={`group flex flex-col justify-between border bg-background outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring ${compact ? "min-h-[104px] rounded-xl p-4" : "min-h-44 rounded-2xl p-5"}`}>
+            <Link key={item.href} href={item.href} className={`group flex flex-col justify-between border bg-background outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring ${compact ? "rounded-xl p-4" : "min-h-44 rounded-2xl p-5"}`}>
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="font-semibold tracking-tight">{item.title}</h2>
@@ -40,8 +39,7 @@ export function AssetGroupPage({ title, description, items, density = "default" 
                 </div>
                 {!compact ? <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p> : null}
               </div>
-              <div className={`flex items-center justify-between gap-3 ${compact ? "mt-3" : "mt-6"}`}>
-                {item.updatedAt ? <time dateTime={item.updatedAt.replaceAll(".", "-")} className="text-[11px] text-muted-foreground">마지막 수정 {item.updatedAt}</time> : <span />}
+              <div className={`flex items-center justify-end gap-3 ${compact ? "mt-3" : "mt-6"}`}>
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground">
                   열기
                   <RiArrowRightLine className="size-oe-icon-xsmall transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

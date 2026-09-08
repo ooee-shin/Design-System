@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { Input, NumberInput, type NumberInputProps } from "@ooee/ui";
-import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
 import { OnThisPage } from "@/components/component-detail-navigation";
@@ -263,14 +263,16 @@ function NumberInputAnatomy({ locale }: { locale: keyof typeof copy }) {
     <div className="col-span-full min-w-0">
       <AnatomySurface ariaLabel="Number Input anatomy" title="Number Input structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
-          <div className="relative mx-auto flex h-48 w-[34rem] items-center justify-center">
-            <div className="pointer-events-none w-60"><StudioNumberInput locale={locale} defaultValue={10} prefix="Prefix" suffix="Suffix" readOnly /></div>
-            <AnatomyBoundaryMarker number={1} side="left" connectorLength={92} boundaryLength={36} className="left-8 top-[5.4rem]" />
-            <AnatomyNumber number={2} className="left-[10rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
-            <AnatomyNumber number={3} className="left-[11.125rem] bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
-            <AnatomyNumber number={4} className="left-[19.1875rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
-            <AnatomyNumber number={5} className="right-48 bottom-4" lineClassName="bottom-5 left-2.5 h-14 w-px" />
-            <AnatomyNumber number={6} className="right-[10.3125rem] top-5" lineClassName="left-2.5 top-5 h-14 w-px" />
+          <div className="mx-auto flex w-[34rem] items-center justify-center py-24">
+            <AnatomyFrame className="pointer-events-none w-60" gap={40}>
+              <StudioNumberInput locale={locale} defaultValue={10} prefix="Prefix" suffix="Suffix" readOnly />
+              <AnatomyBoundaryMarker number={1} target="[data-slot=input-container]" side="left" connectorLength={60} />
+              <AnatomyNumber number={2} target="[data-slot=input-prefix]" side="top" />
+              <AnatomyNumber number={3} target="[data-slot=input]" side="bottom" />
+              <AnatomyNumber number={4} target="[data-slot=input-suffix]" side="top" />
+              <AnatomyNumber number={5} target="[data-slot=number-input-controls] > button:first-child" side="bottom" />
+              <AnatomyNumber number={6} target="[data-slot=number-input-controls] > button:last-child" side="top" />
+            </AnatomyFrame>
           </div>
         </div>
       </AnatomySurface>

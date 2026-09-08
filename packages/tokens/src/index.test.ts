@@ -11,15 +11,28 @@ import {
   createCoreSemanticCssVariables,
   CONTROL_HEIGHTS,
   ICON_SIZES,
+  RADII,
 } from "./index.ts";
 
 test("control heights expose the shared form and button size scale", () => {
   assert.deepEqual(CONTROL_HEIGHTS, {
+    xxsmall: 24,
+    xsmall: 28,
     small: 32,
     regular: 36,
     large: 40,
     xlarge: 48,
+    xxlarge: 56,
   });
+});
+
+test("every control height matches the css variable that exposes it", () => {
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  for (const [name, px] of Object.entries(CONTROL_HEIGHTS)) {
+    const found = css.match(new RegExp(`--spacing-oe-control-${name}:\\s*([0-9.]+)rem`));
+    assert.ok(found, `--spacing-oe-control-${name} 가 styles.css 에 없다`);
+    assert.equal(Number(found[1]) * 16, px, `--spacing-oe-control-${name} 의 값이 CONTROL_HEIGHTS 와 다르다`);
+  }
 });
 
 test("icon sizes expose the shared icon size scale", () => {
@@ -30,6 +43,29 @@ test("icon sizes expose the shared icon size scale", () => {
     large: 24,
     xlarge: 32,
   });
+});
+
+test("radius scale exposes one shared value for controls", () => {
+  assert.deepEqual(RADII, {
+    control: 8,
+    sm: 6,
+    md: 8,
+    lg: 10,
+    xl: 14,
+    "2xl": 18,
+    "3xl": 22,
+    "4xl": 26,
+  });
+});
+
+test("every radius step matches the css variable that exposes it", () => {
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  for (const [name, px] of Object.entries(RADII)) {
+    const variable = name === "control" ? "--radius-oe-control" : `--radius-${name}`;
+    const found = css.match(new RegExp(`${variable.replace("--", "--")}:\\s*([0-9.]+)rem`));
+    assert.ok(found, `${variable} 가 styles.css 에 없다`);
+    assert.equal(Number(found[1]) * 16, px, `${variable} 의 값이 RADII 와 다르다`);
+  }
 });
 
 test("brand palette normalizes the source and creates every documented step", () => {

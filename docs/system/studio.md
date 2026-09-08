@@ -16,7 +16,7 @@
 
 Studio 문서 설명은 국문을 유지한다. 언어를 선택하면 컴포넌트 Preview 안의 Label, Value, Placeholder, 제품 사례 문구, 접근 가능한 이름과 해당 범위의 `lang`을 함께 바꾼다. 구조 명칭이 아닌 실제 Component/Example 콘텐츠를 한 언어로 하드코딩하지 않는다. 전체 문서 번역은 국문 문서가 완료된 뒤 별도 작업으로 다룬다.
 
-Component catalog의 title, description, 수정일, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 목록 순서도 registry가 소유하며 title의 알파벳순으로 둔다. Component를 성격별로 묶는 분류는 아직 정의하지 않았고, 정하지 않은 분류로 순서를 만들면 없는 위계를 암시하게 되므로 분류가 정해질 때까지 알파벳순을 유지한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다.
+Component catalog의 title, description, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 목록 순서도 registry가 소유하며 title의 알파벳순으로 둔다. Component를 성격별로 묶는 분류는 아직 정의하지 않았고, 정하지 않은 분류로 순서를 만들면 없는 위계를 암시하게 되므로 분류가 정해질 때까지 알파벳순을 유지한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다.
 
 Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용한다. 제목 앞에는 Remix `RiBookOpenLine` 16px을 Tertiary foreground로 배치하고 제목은 14px Semibold, 아이콘과 제목 간격은 8px로 유지한다. 컴포넌트별 Workbench에서 같은 스타일을 다시 만들지 않는다.
 
@@ -57,8 +57,9 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
 - 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다.
 - 제목 위계는 페이지 제목 `text-3xl`, Section 제목 `text-xl`, Guidelines 그룹 제목 `text-lg`, Section 하위 그룹 제목과 Guidelines 규칙 제목 `text-sm`, 그룹 안 카드 라벨 `text-xs`를 사용한다. 그룹은 카드 묶음의 조건을, 카드 라벨은 그 한 칸이 무엇인지를 말하므로 두 층을 같은 크기로 쓰지 않는다. Guidelines 하위 주제 제목은 크기가 아니라 공용 `GuidelineTitle`의 아이콘으로 구분하므로 `text-sm`을 유지한다.
-- Guidelines 안에서 여러 규칙을 한 용도로 묶어야 하면 `text-lg`의 공용 `GuidelineGroupTitle`을 그 위에 둔다. 「Chip을 Filter로 사용하기」처럼 규칙 묶음이 어느 쓰임에 대한 것인지를 말하는 자리다. 아래 단계인 `GuidelineTitle`이 책 아이콘 16px을 쓰므로, 그룹 제목은 목록 아이콘 20px을 써서 두 층이 같은 표시를 갖지 않게 한다. 묶을 규칙이 하나뿐이면 이 단계를 만들지 않는다.
+- Guidelines 안에서 여러 규칙을 한 용도로 묶어야 하면 `text-lg`의 공용 `GuidelineGroupTitle`을 그 위에 둔다. 「Chip을 Filter로 사용하기」처럼 규칙 묶음이 어느 쓰임에 대한 것인지를 말하는 자리이며, 쓰임과 무관하게 늘 지키는 규칙을 묶을 때도 같은 단계를 사용한다. 쓰임이 여럿인 컴포넌트는 공통 규칙을 앞에 두고 쓰임별 조합을 그 뒤에 둔다. 이미 이 컴포넌트를 쓰기로 정한 사람에게 먼저 필요한 것은 어느 쓰임이든 지켜야 하는 것이다. 아래 단계인 `GuidelineTitle`이 책 아이콘 16px을 쓰므로, 그룹 제목은 목록 아이콘 20px을 써서 두 층이 같은 표시를 갖지 않게 한다. 묶을 규칙이 하나뿐이면 이 단계를 만들지 않는다.
 - 그룹 제목과 설명 바로 아래에는 그 쓰임을 직접 조작할 수 있는 시각 하나를 둔다. 규칙마다 붙는 시각은 그 아래 규칙 제목 밑에 둔다. 조작 가능한 시각을 규칙마다 반복하면 같은 화면을 여러 번 그리게 된다.
+- 쓰임과 무관한 공통 규칙 그룹에는 그룹 제목 아래 조작 시각을 두지 않는다. 조작할 쓰임이 없기 때문이며, 시각은 각 규칙 제목 아래에 두 칸 비교로 둔다. 두 칸은 Do와 Don't이거나 값의 길이나 모양처럼 나란히 놓고 견주는 쪽이다.
 - 문서에서 주요 Property로 언급한 Appearance, Style, Size, State, Layout, Element, Behavior 등은 각각 독립된 카드 또는 섹션에서 값과 차이를 확인할 수 있어야 한다.
 - Appearance, State, Size, Elements처럼 확인된 Property 범주가 명확하면 각각을 `Properties · Appearance` 같은 독립된 바깥 Section 카드로 만든다. 구체적인 범주를 다시 더 큰 포괄 카드 하나에 묶지 않는다.
 - Property Section의 직접 하위 제목과 카드는 해당 Property 값으로 구성한다. 예를 들어 Checkbox의 `Properties · Appearance`에서는 Rounded·Ghost가 직접 하위가 되며, 비교를 위한 Unchecked·Checked 상태는 각 Appearance 카드 내부에 배치한다. 비교 상태를 상위 그룹으로 만들어 Property 계층을 뒤집지 않는다.
@@ -81,6 +82,11 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - Anatomy Preview는 실제 컴포넌트를 그대로 사용하거나 정적 도식으로 그릴 수 있다. 그리는 경우에도 실제 컴포넌트와 다르게 보이면 안 되며 아이콘, 값, 선택 상태, 간격과 radius가 실제 렌더링과 일치해야 한다. 요소 이름을 컴포넌트 안에 넣지 않는다.
 - 번호 마커는 실제 요소를 밀지 않도록 컴포넌트 바깥에 배치하고 1px `oe-border-primary` 안내선으로 대상을 연결한다.
 - Text, Icon처럼 보이는 요소의 실제 클릭·터치 영역이 더 크더라도 번호선은 Hit area 중앙이 아니라 사용자가 화면에서 식별하는 글자 또는 아이콘의 시각 중심을 가리킨다. Container, Group, List 같은 묶음 영역만 별도 평행선으로 범위를 표시한다.
+- 번호 마커의 자리는 좌표를 손으로 적지 않고 가리킬 대상을 지정해 잡는다. 공용 `AnatomyFrame` 안에서 `AnatomyNumber`와 `AnatomyBoundaryMarker`가 대상 요소를 실제로 재어 위치와 안내선 길이를 정하므로, 예시 콘텐츠나 부품 크기가 바뀌어도 번호선이 대상에서 빗나가지 않는다. 대상은 구현이 이미 갖고 있는 `data-slot` selector를 우선 사용하고, 그런 표시가 없는 글자 요소는 화면에 보이는 요소 명칭으로, 묶음 영역은 품고 있는 부품 이름으로 지정한다. 도식으로 그리는 Anatomy에도 실제 구현과 같은 `data-slot` 이름을 붙여 무엇을 가리키는지 코드에서 읽히게 한다.
+- 같은 방향에 놓인 번호 마커는 하나의 축에 정렬하고 안내선 길이만 서로 다르게 한다. 대상마다 마커 높이가 몇 px씩 어긋나면 번호가 줄을 잃는다. 마커는 도식 바깥에 두어 실제 요소 위로 올라오지 않게 한다.
+- 글자만 담은 요소는 박스가 남은 공간까지 차지할 수 있으므로 번호선의 기준을 박스가 아니라 글자가 실제로 그려진 범위로 삼는다. `flex-1`이나 `block`으로 늘어난 Label과 Value가 여기에 해당한다.
+- Field는 Container 안쪽으로 들어가 글자 또는 글자가 놓이는 자리를 가리킨다. 한 줄 입력 요소는 박스가 Container 안쪽을 거의 다 채우므로 박스를 그대로 쓰면 번호선이 Container의 border에 닿아 끊긴 것처럼 보이고, 그러면 입력 영역이 아니라 외곽선을 가리키는 것으로 읽힌다. 세로 범위를 글자가 앉는 한 줄로 좁혀 Prefix나 Label 같은 다른 글자 요소와 같은 자리에서 안내선이 출발하게 한다.
+- 새 컴포넌트의 Anatomy도 같은 방식으로 만든다. 마커에 좌표 class를 직접 주거나 프레임 밖에 두거나 평행선을 `span`으로 그리면 `component-anatomy.test.ts`가 `pnpm check`에서 실패시킨다. 대상을 찾지 못한 마커는 화면에서 사라지므로 개발 중에는 어느 대상을 놓쳤는지 콘솔 경고로 알린다.
 - Anatomy 유형명, 시각 예제와 번호별 요소명 범례는 하나의 Neutral 회색 Surface 안에서 `유형명 → 시각 예제 → 범례` 순서로 구성한다. 범례를 같은 색의 별도 블록이나 회색 Anatomy 영역 밖의 흰 배경에 분리하지 않는다. Optional은 요소 이름 뒤에 옅은 위계로 표시한다.
 - 구조 설명이 더 필요하면 범례 아래 별도 텍스트 블록에 작성한다. 구조와 상태가 겹쳐 복잡해지면 Anatomy Preview를 둘 이상으로 분리한다.
 - 기본 요소와 Optional 요소가 한 Preview에서 같은 대상을 가리키는 것처럼 보이면 `Basic anatomy`와 `Extended anatomy`로 분리한다. Basic에는 최소 구조만 표시하고 Extended에는 Basic 번호를 반복하지 않는다. 여러 텍스트 요소를 감싸는 Content container처럼 단일 Label과 구분하기 어려운 그룹 요소는 Extended에서 Container 평행선으로 범위를 표시한다.
@@ -94,4 +100,6 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 평행선은 실제 Container의 높이 또는 너비 범위에 맞추되 외곽선과 붙이거나 겹치지 않는다.
 - Group, List처럼 여러 하위 요소를 묶는 영역도 같은 규칙을 사용한다. 번호는 묶음 바깥에 두고, 연결선은 실제 콘텐츠로 들어가지 않은 채 영역 높이 또는 너비만큼 그린 평행선에서 끝낸다.
 - `[` 또는 `]`처럼 끝이 꺾인 bracket 형태는 사용하지 않는다.
+- 평행선을 화면에 직접 그리지 않고 공용 `AnatomyBoundaryMarker`에 대상을 지정한다. 평행선의 길이는 대상의 실제 높이 또는 너비를 따라가고, 외곽선과의 간격과 연결선 길이만 화면 사정에 맞게 조정한다.
+- 같은 방향에 평행선이 여럿 겹쳐 어느 영역을 가리키는지 읽히지 않으면 그중 하나를 반대쪽으로 옮긴다. 간격만 벌려 층을 쌓으면 마커와 다른 안내선이 그 사이에 끼게 된다.
 

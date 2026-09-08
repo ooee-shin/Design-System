@@ -1,131 +1,117 @@
-import type { ReactNode } from "react";
+import { mergeProps } from "@base-ui/react/merge-props"
+import { useRender } from "@base-ui/react/use-render"
+import { cva } from "class-variance-authority"
 
-import { cn } from "./utils";
+import { cn } from "./utils"
 
-export type BadgeTone = "neutral" | "accent" | "warning" | "danger" | "success" | "info";
-export type BadgeAppearance = "tonal" | "solid" | "fill";
-export type BadgeColor = "slate" | "gray" | "zinc" | "neutral" | "stone" | "red" | "orange" | "amber" | "yellow" | "lime" | "green" | "emerald" | "teal" | "cyan" | "sky" | "blue" | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose";
-export type BadgeSize = "xsmall" | "small" | "medium";
-export type BadgeShape = "pill" | "rounded";
+export type BadgeTone = "brand" | "neutral" | "warning" | "danger" | "success" | "info" | "custom"
+export type BadgeVariant = "fill" | "tonal" | "outlined"
+export type BadgeColor =
+  | "slate" | "gray" | "zinc" | "neutral" | "stone"
+  | "red" | "orange" | "amber" | "yellow" | "lime"
+  | "green" | "emerald" | "teal" | "cyan" | "sky" | "blue"
+  | "indigo" | "violet" | "purple" | "fuchsia" | "pink" | "rose"
 
-type CommonProps = {
-  className?: string;
-};
+// shadcn base-nova 의 Badge 구조를 가져왔다. 그대로 둔 것은 아이콘이 붙는 변의 여백 보정,
+// `render` 로 다른 요소가 되는 방식, 아이콘 크기 고정이다.
+// 바꾼 것은 셋이다. 높이는 24px 하나이며 크기 variant 는 뒤에 더한다. 색은 shadcn token 대신
+// oe semantic token 만 쓰는데, Tailwind primitive 를 직접 참조하면 Light·Dark 조합을 컴포넌트가
+// 들고 있어야 하고 브랜드 seed 가 바뀔 때 따라가지 못하기 때문이다. 아이콘은 Label 앞에만
+// 붙으므로 여백 보정도 앞쪽만 남겼다.
+const badgeVariants = cva(
+  "group/badge inline-flex h-6 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 text-xs font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring has-data-[icon=inline-start]:pl-1.5 [&>svg]:pointer-events-none [&>svg]:size-3!",
+  {
+    variants: {
+      tone: {
+        brand: "",
+        neutral: "",
+        warning: "",
+        danger: "",
+        success: "",
+        info: "",
+        // custom 은 색 이름을 함께 받아야 하므로 클래스를 `customToneClass` 가 조립한다.
+        custom: "",
+      },
+      variant: {
+        fill: "",
+        tonal: "",
+        outlined: "",
+      },
+    },
+    compoundVariants: [
+      { tone: "brand", variant: "fill", class: "bg-oe-brand-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "brand", variant: "tonal", class: "bg-oe-brand-background-secondary text-oe-brand-foreground-primary" },
+      { tone: "brand", variant: "outlined", class: "border-[var(--brand-alpha-30)] text-oe-brand-foreground-primary" },
 
-type ChipProps = CommonProps & {
-  type?: "chip";
-  children: string;
-  color?: BadgeColor;
-  appearance?: "tonal" | "solid";
-  size?: BadgeSize;
-  shape?: BadgeShape;
-  leadingElement?: ReactNode;
-  trailingElement?: ReactNode;
-};
+      { tone: "neutral", variant: "fill", class: "bg-oe-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "neutral", variant: "tonal", class: "bg-oe-background-secondary text-oe-foreground-secondary" },
+      { tone: "neutral", variant: "outlined", class: "border-oe-border-bold-primary/30 text-oe-foreground-primary" },
 
-type NumberProps = CommonProps & {
-  type: "number";
-  tone?: BadgeTone;
-  appearance?: "tonal" | "fill";
-  value: number;
-  max?: number;
-  label: string;
-};
+      // 상태 tone 은 tokens 의 `statusFamily` 가 만든 semantic token 을 그대로 참조한다.
+      // accent 는 token 이 fill 하나뿐이고 그 색이 danger 와 같은 red 계열이라 여기서 뺐다.
+      // outlined 의 경계는 어느 tone 에서나 그 tone 색의 30% 알파다.
+      { tone: "warning", variant: "fill", class: "bg-oe-warning-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "warning", variant: "tonal", class: "bg-oe-warning-background-secondary text-oe-warning-foreground-primary" },
+      { tone: "warning", variant: "outlined", class: "border-oe-warning-border-primary/30 text-oe-warning-foreground-primary" },
 
-type DotProps = CommonProps & {
-  type: "dot";
-  tone?: BadgeTone;
-  appearance?: "tonal" | "fill";
-  outline?: boolean;
-  label: string;
-};
+      { tone: "danger", variant: "fill", class: "bg-oe-danger-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "danger", variant: "tonal", class: "bg-oe-danger-background-secondary text-oe-danger-foreground-primary" },
+      { tone: "danger", variant: "outlined", class: "border-oe-danger-border-primary/30 text-oe-danger-foreground-primary" },
 
-export type BadgeProps = ChipProps | NumberProps | DotProps;
+      { tone: "success", variant: "fill", class: "bg-oe-success-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "success", variant: "tonal", class: "bg-oe-success-background-secondary text-oe-success-foreground-primary" },
+      { tone: "success", variant: "outlined", class: "border-oe-success-border-primary/30 text-oe-success-foreground-primary" },
 
-const tonalClasses: Record<BadgeTone, string> = {
-  neutral: "bg-oe-background-secondary text-oe-foreground-secondary",
-  accent: "bg-oe-background-secondary text-oe-foreground-primary",
-  warning: "bg-oe-warning-background-primary text-oe-warning-foreground-primary",
-  danger: "bg-oe-danger-background-primary text-oe-danger-foreground-primary",
-  success: "bg-oe-success-background-primary text-oe-success-foreground-primary",
-  info: "bg-oe-info-background-primary text-oe-info-foreground-primary",
-};
-
-const fillClasses: Record<BadgeTone, string> = {
-  neutral: "bg-oe-background-bold-primary text-oe-foreground-inverse",
-  accent: "bg-oe-accent-background-bold-primary text-oe-foreground-inverse",
-  warning: "bg-oe-warning-background-bold-primary text-oe-foreground-inverse",
-  danger: "bg-oe-danger-background-bold-primary text-oe-foreground-inverse",
-  success: "bg-oe-success-background-bold-primary text-oe-foreground-inverse",
-  info: "bg-oe-info-background-bold-primary text-oe-foreground-inverse",
-};
-
-const chipColorClasses: Record<BadgeColor, { tonal: string; solid: string }> = {
-  slate: { tonal: "bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-200", solid: "bg-slate-600 text-white" },
-  gray: { tonal: "bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-200", solid: "bg-gray-600 text-white" },
-  zinc: { tonal: "bg-zinc-100 text-zinc-800 dark:bg-zinc-950 dark:text-zinc-200", solid: "bg-zinc-600 text-white" },
-  neutral: {
-    tonal: "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-100",
-    solid: "bg-neutral-600 text-white",
+      { tone: "info", variant: "fill", class: "bg-oe-info-background-bold-primary text-oe-foreground-inverse" },
+      { tone: "info", variant: "tonal", class: "bg-oe-info-background-secondary text-oe-info-foreground-primary" },
+      { tone: "info", variant: "outlined", class: "border-oe-info-border-primary/30 text-oe-info-foreground-primary" },
+    ],
+    defaultVariants: {
+      tone: "neutral",
+      variant: "tonal",
+    },
   },
-  stone: { tonal: "bg-stone-100 text-stone-800 dark:bg-stone-950 dark:text-stone-200", solid: "bg-stone-600 text-white" },
-  red: {
-    tonal: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
-    solid: "bg-red-600 text-white",
-  },
-  orange: { tonal: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200", solid: "bg-orange-600 text-white" },
-  amber: {
-    tonal: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200",
-    solid: "bg-amber-600 text-white",
-  },
-  yellow: {
-    tonal: "bg-yellow-100 text-yellow-900 dark:bg-yellow-950 dark:text-yellow-200",
-    solid: "bg-yellow-600 text-white",
-  },
-  lime: { tonal: "bg-lime-100 text-lime-900 dark:bg-lime-950 dark:text-lime-200", solid: "bg-lime-600 text-white" },
-  green: { tonal: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-200", solid: "bg-green-600 text-white" },
-  emerald: { tonal: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200", solid: "bg-emerald-600 text-white" },
-  teal: { tonal: "bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200", solid: "bg-teal-600 text-white" },
-  cyan: { tonal: "bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-200", solid: "bg-cyan-600 text-white" },
-  sky: { tonal: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200", solid: "bg-sky-600 text-white" },
-  blue: { tonal: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200", solid: "bg-blue-600 text-white" },
-  indigo: { tonal: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200", solid: "bg-indigo-600 text-white" },
-  violet: { tonal: "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200", solid: "bg-violet-600 text-white" },
-  purple: { tonal: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200", solid: "bg-purple-600 text-white" },
-  fuchsia: { tonal: "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-950 dark:text-fuchsia-200", solid: "bg-fuchsia-600 text-white" },
-  pink: { tonal: "bg-pink-100 text-pink-800 dark:bg-pink-950 dark:text-pink-200", solid: "bg-pink-600 text-white" },
-  rose: { tonal: "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200", solid: "bg-rose-600 text-white" },
-};
+)
 
-export function Badge(props: BadgeProps) {
-  const { appearance = "tonal", className } = props;
-  const tone = props.type === "dot" || props.type === "number" ? props.tone ?? "neutral" : "neutral";
-  const filled = appearance === "solid" || appearance === "fill";
-  const colorClass = filled ? fillClasses[tone] : tonalClasses[tone];
+// custom tone 은 semantic family 가 없는 색을 임시로 쓰는 자리이며, tokens 의 `statusFamily` 와
+// 같은 단계 규칙으로 Tailwind primitive 를 조립한다. 단계를 같게 두면 나중에 그 색을 semantic
+// family 로 올려도 화면의 색이 달라지지 않는다. 클래스를 문자열로 만들기 때문에 Tailwind 가
+// 소스에서 찾지 못하므로 `styles.css` 의 `@source inline` 이 해당 단계를 미리 생성한다.
+function customToneClass(color: BadgeColor, variant: BadgeVariant) {
+  const foreground = `text-${color}-800 dark:text-${color}-200`
 
-  if (props.type === "dot") {
-    return <span role="img" aria-label={props.label} className={cn("inline-block size-2.5 shrink-0 rounded-full", colorClass, props.outline && "ring-2 ring-oe-background-primary", className)} />;
-  }
-
-  if (props.type === "number") {
-    const displayValue = props.max !== undefined && props.value > props.max ? `${props.max}+` : props.value;
-    return <span aria-label={props.label} className={cn("inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums", colorClass, className)}>{displayValue}</span>;
-  }
-
-  const { color = "neutral", size = "medium", shape = "pill", appearance: chipAppearance = "tonal" } = props;
-  const leadingElement = props.leadingElement;
-  const trailingElement = props.trailingElement;
-  return (
-    <span className={cn(
-      "inline-flex items-center font-medium",
-      size === "xsmall" ? "h-4 gap-0.5 px-1.5 text-[10px] leading-none" : size === "small" ? "h-5 gap-0.5 px-1.5 text-[11px]" : "h-6 gap-1 px-2 text-xs",
-      shape === "pill" ? "rounded-full" : "rounded-[8px]",
-      chipColorClasses[color][chipAppearance],
-      className,
-    )}>
-      {leadingElement && <span className={cn("shrink-0", size === "xsmall" ? "[&_svg]:size-2.5" : size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{leadingElement}</span>}
-      <span>{props.children}</span>
-      {trailingElement && <span className={cn("shrink-0", size === "xsmall" ? "[&_svg]:size-2.5" : size === "small" ? "[&_svg]:size-3" : "[&_svg]:size-3.5")} aria-hidden="true">{trailingElement}</span>}
-    </span>
-  );
+  if (variant === "fill") return `bg-${color}-700 dark:bg-${color}-400 text-oe-foreground-inverse`
+  if (variant === "outlined") return `border-${color}-500/30 ${foreground}`
+  return `bg-${color}-100 dark:bg-${color}-900 ${foreground}`
 }
+
+// `color` 는 custom tone 에서만 뜻을 가지므로, 다른 tone 과 함께 쓰면 타입에서 걸리게 둔다.
+type BadgeToneProps =
+  | { tone?: Exclude<BadgeTone, "custom">; color?: never }
+  | { tone: "custom"; color: BadgeColor }
+
+export type BadgeProps = useRender.ComponentProps<"span"> & { variant?: BadgeVariant } & BadgeToneProps
+
+function Badge({ className, tone = "neutral", variant = "tonal", color, render, ...props }: BadgeProps) {
+  return useRender({
+    defaultTagName: "span",
+    props: mergeProps<"span">(
+      {
+        className: cn(
+          badgeVariants({ tone, variant }),
+          tone === "custom" ? customToneClass(color ?? "neutral", variant) : undefined,
+          className,
+        ),
+      },
+      props,
+    ),
+    render,
+    state: {
+      slot: "badge",
+      tone,
+      variant,
+    },
+  })
+}
+
+export { Badge, badgeVariants }

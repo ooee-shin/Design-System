@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { CheckboxField, Switch, SwitchField } from "@ooee/ui";
-import { AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { DeferredChoice, GuidelineList, GuideVisual, TargetArea, UsageComparison } from "@/components/component-guidelines";
 import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
@@ -147,12 +147,12 @@ export function SwitchWorkbench() {
           <div className="col-span-full grid gap-8">
             <div>
               <AnatomySurface ariaLabel="Switch anatomy" title="Switch structure" className="px-5">
-                <div className="relative mx-auto my-14 w-fit">
+                <AnatomyFrame className="mx-auto my-14">
                   <SwitchField defaultChecked label="Label" />
-                  <AnatomyNumber number={1} className="left-[9px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                  <AnatomyNumber number={2} className="left-4 -bottom-11" lineClassName="bottom-5 left-2.5 h-6 w-px" />
-                  <AnatomyNumber number={3} className="right-[7px] -top-11" lineClassName="left-2.5 top-5 h-6 w-px" />
-                </div>
+                  <AnatomyNumber number={1} target="[data-slot=switch]" side="top" />
+                  <AnatomyNumber number={2} target="[data-slot=switch-thumb]" side="bottom" />
+                  <AnatomyNumber number={3} target="text:Label" side="top" />
+                </AnatomyFrame>
               </AnatomySurface>
               <AnatomyLegend items={[{ name: "Track" }, { name: "Thumb" }, { name: "Label" }]} />
             </div>

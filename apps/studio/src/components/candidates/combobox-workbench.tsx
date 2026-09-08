@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { RiArrowDownSLine, RiSearchLine } from "@remixicon/react";
 import { CheckboxIndicator, Combobox, MultiCombobox, comboboxSearchContainerVariants, type ComboboxOption } from "@ooee/ui";
-import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -71,15 +71,16 @@ export function ComboboxWorkbench() {
           <div className="col-span-full grid gap-8">
             <div>
               <AnatomySurface ariaLabel="Combobox trigger anatomy" title="Trigger anatomy" className="px-5">
-                <div lang="en" className="relative mx-auto max-w-md px-8 py-14">
-                  <div className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm">
-                    <span className="flex-1 text-oe-foreground-secondary">Selected value / Placeholder</span>
-                    <RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" />
-                  </div>
-                  <AnatomyNumber number={1} className="left-0 top-16" lineClassName="left-5 top-2.5 h-px w-2" />
-                  <span aria-hidden="true" className="absolute left-7 top-14 h-9 w-px bg-oe-border-primary" />
-                  <AnatomyNumber number={2} className="left-[42%] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
-                  <AnatomyNumber number={3} className="right-[42px] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
+                <div lang="en" className="mx-auto max-w-md px-11 py-14">
+                  <AnatomyFrame className="w-full">
+                    <div data-slot="combobox-trigger" className="flex h-9 items-center gap-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm">
+                      <span className="flex-1 text-oe-foreground-secondary"><span data-slot="combobox-value">Selected value / Placeholder</span></span>
+                      <span data-slot="combobox-trigger-icon" className="flex items-center"><RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" /></span>
+                    </div>
+                    <AnatomyBoundaryMarker number={1} target="[data-slot=combobox-trigger]" side="left" connectorLength={8} clearance={8} />
+                    <AnatomyNumber number={2} target="[data-slot=combobox-value]" side="top" />
+                    <AnatomyNumber number={3} target="[data-slot=combobox-trigger-icon]" side="top" />
+                  </AnatomyFrame>
                 </div>
               </AnatomySurface>
               <AnatomyLegend items={[{ name: "Trigger container" }, { name: "Selected value / Placeholder" }, { name: "Trigger icon" }]} />
@@ -87,29 +88,29 @@ export function ComboboxWorkbench() {
 
             <div>
               <AnatomySurface ariaLabel="Combobox content anatomy" title="Content anatomy" className="px-5">
-                <div lang="en" className="relative mx-auto max-w-md px-8 py-14">
-                  <div className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 shadow-lg">
+                <div lang="en" className="mx-auto max-w-md px-11 py-14">
+                  <AnatomyFrame className="w-full">
+                  <div data-slot="combobox-popup" className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 shadow-lg">
                     <div className={comboboxSearchContainerVariants()}>
                       <RiSearchLine className="size-4 text-oe-foreground-tertiary" />
-                      <span className="text-sm text-oe-foreground-placeholder">Search input</span>
+                      <span className="text-sm text-oe-foreground-placeholder"><span data-slot="combobox-search">Search input</span></span>
                     </div>
-                    <div className="mt-2">
+                    <div data-slot="combobox-option-list" className="mt-2">
                       <div className="flex min-h-9 items-center gap-2 rounded-md px-2.5 text-sm">
                         <CheckboxIndicator />
                         <span className="flex-1">Option</span>
                       </div>
                       <div className="flex min-h-9 items-center gap-2 rounded-md px-2.5 text-sm text-oe-foreground-tertiary">
-                        <span className="grid size-4 place-items-center rounded border border-oe-border-primary bg-oe-background-primary" />
+                        <span data-slot="combobox-option-checkbox" className="grid size-4 place-items-center rounded border border-oe-border-primary bg-oe-background-primary" />
                         <span className="flex-1">Option</span>
                       </div>
                     </div>
                   </div>
-                  <AnatomyNumber number={4} className="left-0 top-16" lineClassName="left-5 top-2.5 h-px w-2" />
-                  <span aria-hidden="true" className="absolute bottom-14 left-7 top-14 w-px bg-oe-border-primary" />
-                  <AnatomyNumber number={5} className="left-[42%] top-4" lineClassName="left-2.5 top-5 h-8 w-px" />
-                  <AnatomyNumber number={6} className="right-0 top-[130px]" lineClassName="right-5 top-2.5 h-px w-2" />
-                  <span aria-hidden="true" className="absolute right-7 top-[104px] h-[72px] w-px bg-oe-border-primary" />
-                  <AnatomyNumber number={7} className="left-[32%] bottom-4" lineClassName="bottom-5 left-2.5 h-8 w-px" />
+                  <AnatomyBoundaryMarker number={4} target="[data-slot=combobox-popup]" side="left" connectorLength={8} clearance={8} />
+                  <AnatomyNumber number={5} target="[data-slot=combobox-search]" side="top" />
+                  <AnatomyBoundaryMarker number={6} target="[data-slot=combobox-option-list]" side="right" connectorLength={8} clearance={8} />
+                  <AnatomyNumber number={7} target="[data-slot=combobox-option-checkbox]" side="bottom" />
+                  </AnatomyFrame>
                 </div>
               </AnatomySurface>
               <AnatomyLegend start={4} items={[{ name: "Popup" }, { name: "Search input" }, { name: "Option list" }, { name: "Option / Checkbox" }]} />

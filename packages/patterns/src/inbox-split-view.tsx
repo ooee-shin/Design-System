@@ -10,7 +10,7 @@ import {
   RiTimeLine as Clock3,
 } from "@remixicon/react";
 
-import { Badge, Button, Input, MessageBubble, MessageComposer } from "@ooee/ui";
+import { Button, Input, MessageBubble, MessageComposer } from "@ooee/ui";
 import { cn } from "./utils";
 
 type Message = {
@@ -466,7 +466,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
                 <span className="flex min-w-13 shrink-0 flex-col items-end gap-1.5">
                   <span className="text-[11px] text-oe-foreground-tertiary">{thread.time}</span>
                   {thread.unreadCount > 0 && (
-                    <Badge type="number" value={thread.unreadCount} max={99} label={copy.unread(thread.unreadCount)} tone="accent" appearance="fill" />
+                    <span aria-label={copy.unread(thread.unreadCount)} className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums bg-oe-accent-background-bold-primary text-oe-foreground-inverse">{thread.unreadCount > 99 ? "99+" : thread.unreadCount}</span>
                   )}
                 </span>
               </button>

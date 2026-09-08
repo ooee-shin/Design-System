@@ -9,7 +9,6 @@ test("component registry is the single complete catalog for detail pages", () =>
   assert.equal(componentRegistry.length, 13);
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
   assert.equal(new Set(componentRegistry.map((item) => item.href)).size, componentRegistry.length);
-  componentRegistry.forEach((item) => assert.match(item.updatedAt, /^20\d{2}\.\d{2}\.\d{2}$/));
 });
 
 test("every registered page uses the common detail shell", () => {

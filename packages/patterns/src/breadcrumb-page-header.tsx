@@ -9,7 +9,7 @@ import {
   RiShareForwardLine,
 } from "@remixicon/react";
 
-import { Badge, Button } from "@ooee/ui";
+import { Button } from "@ooee/ui";
 import { cn } from "./utils";
 
 const tabs = [
@@ -82,7 +82,7 @@ export function BreadcrumbPageHeader({ locale = "ko" }: { locale?: "ko" | "en" }
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-semibold tracking-tight text-oe-foreground-primary">{activeCopy.title}</h1>
-                <Badge color="amber">{activeCopy.status}</Badge>
+                <span className="inline-flex h-6 items-center gap-1 rounded-full bg-amber-100 px-2 text-xs font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-200">{activeCopy.status}</span>
               </div>
               <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-oe-foreground-tertiary">
                 <span>{activeCopy.owner}</span>
@@ -147,7 +147,7 @@ export function BreadcrumbPageHeader({ locale = "ko" }: { locale?: "ko" | "en" }
                 >
                   {label}
                   {count !== undefined && (
-                    <Badge type="number" value={count} label={`${label} ${count}`} />
+                    <span aria-label={`${label} ${count}`} className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums bg-oe-background-secondary text-oe-foreground-secondary">{count}</span>
                   )}
                 </button>
               );

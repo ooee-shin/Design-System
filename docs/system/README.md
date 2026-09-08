@@ -69,9 +69,9 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 | 컴포넌트 | 문서 | 용도 |
 | --- | --- | --- |
-| Badge | [badge.md](components/badge.md) | Badge, Dot Badge와 Number Badge |
+| Badge | [badge.md](components/badge.md) | 새로 만드는 중이며 역할과 경계만 정해져 있다 |
 | Checkbox | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
-| Chip | [chip.md](components/chip.md) | Label 또는 Icon과 닫기 action으로 제거 가능한 항목을 표시 |
+| Chip | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |
 | Combobox | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
 | Input | [input.md](components/input.md) | 한 줄 입력 |
 | Input Button | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |

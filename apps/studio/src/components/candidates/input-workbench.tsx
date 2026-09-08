@@ -6,7 +6,7 @@ import { RiCalendarLine, RiCloseLine, RiEyeLine, RiEyeOffLine, RiLink, RiSearchL
 import { Input, InputButton, NumberInput } from "@ooee/ui";
 import { InputColorExample, InputCustomExamples } from "@/components/candidates/input-custom-examples";
 import { ColorSwatch } from "@/components/color-swatch";
-import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
@@ -363,23 +363,24 @@ function InputAnatomy() {
     <div className="col-span-full min-w-0">
       <AnatomySurface ariaLabel="Input anatomy" title="Input structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
-          <div className="relative mx-auto h-[22rem] w-[48rem] text-oe-foreground-secondary">
-            <AnatomyBoundaryMarker number={1} side="top" connectorLength={50} boundaryLength={536} className="left-[374px] top-[62px]" />
-            <AnatomyNumber number={2} className="left-[134px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
-            <AnatomyNumber number={3} className="left-[190px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
-            <AnatomyNumber number={4} className="left-[362px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
-            <AnatomyNumber number={5} className="left-[518px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
-            <AnatomyNumber number={6} className="left-[566px] top-[66px]" lineClassName="left-2.5 top-[28px] h-[78px] w-px" />
-            <AnatomyNumber number={7} className="left-[614px] top-[253px]" lineClassName="left-2.5 bottom-[28px] h-[55px] w-px" />
-
-            <div className="absolute left-[7.25rem] top-[9.5rem] grid h-14 w-[33.5rem] grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
-              <AnatomySwapSlot className="justify-self-center" />
-              <span className="text-oe-foreground-secondary">https://</span>
-              <span className="min-w-0 truncate text-oe-foreground-placeholder">example</span>
-              <span className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary"><RiCloseLine className="size-4" aria-hidden="true" /></span>
-              <span className="text-oe-foreground-secondary">.com</span>
-              <AnatomySwapSlot className="justify-self-center" />
-            </div>
+          <div className="mx-auto w-[48rem] py-28 text-oe-foreground-secondary">
+            <AnatomyFrame className="mx-auto w-[33.5rem]" gap={90}>
+              <div data-slot="input-container" className="grid h-14 w-full grid-cols-[2rem_4rem_minmax(8rem,1fr)_2rem_3rem_2rem] items-center gap-x-2 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary">
+                <span data-slot="input-leading" className="flex items-center justify-self-center"><AnatomySwapSlot /></span>
+                <span className="text-oe-foreground-secondary"><span data-slot="input-prefix">https://</span></span>
+                <span className="min-w-0 truncate text-oe-foreground-placeholder"><span data-slot="input">example</span></span>
+                <span data-slot="input-clear" className="flex size-6 items-center justify-center justify-self-center text-oe-foreground-tertiary"><RiCloseLine className="size-4" aria-hidden="true" /></span>
+                <span className="text-oe-foreground-secondary"><span data-slot="input-suffix">.com</span></span>
+                <span data-slot="input-trailing" className="flex items-center justify-self-center"><AnatomySwapSlot /></span>
+              </div>
+              <AnatomyBoundaryMarker number={1} target="[data-slot=input-container]" side="top" connectorLength={50} clearance={40} />
+              <AnatomyNumber number={2} target="[data-slot=input-leading]" side="top" />
+              <AnatomyNumber number={3} target="[data-slot=input-prefix]" side="top" />
+              <AnatomyNumber number={4} target="[data-slot=input]" side="bottom" />
+              <AnatomyNumber number={5} target="[data-slot=input-clear]" side="bottom" />
+              <AnatomyNumber number={6} target="[data-slot=input-suffix]" side="top" />
+              <AnatomyNumber number={7} target="[data-slot=input-trailing]" side="bottom" />
+            </AnatomyFrame>
           </div>
         </div>
       </AnatomySurface>

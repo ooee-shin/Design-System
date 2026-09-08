@@ -5,7 +5,7 @@ import { RiCupLine, RiFridgeLine, RiSnowyLine, RiWaterFlashLine } from "@remixic
 
 import { RadioField, RadioGroup, SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxSelectionMode } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
-import { AnatomyBoundaryMarker, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
@@ -170,17 +170,19 @@ export function SelectBoxWorkbench() {
           <div>
             <AnatomySurface ariaLabel="Select Box anatomy" title="Select Box structure" className="min-h-[290px]">
               <div className="absolute left-1/2 top-1/2 w-[min(72%,36rem)] -translate-x-1/2 -translate-y-1/2">
-                <div className="relative flex items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3">
-                  <AnatomySwapSlot className="shrink-0" />
-                  <span className="min-w-0 flex-1"><span className="block text-sm font-medium">Title</span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary">Description</span></span>
-                  <AnatomySwapSlot className="shrink-0" />
-                </div>
-                <AnatomyBoundaryMarker number={1} side="left" connectorLength={36} boundaryLength={96} className="-left-16 top-1/2 -translate-y-1/2" />
-                <AnatomyNumber number={2} className="left-3 -top-10" lineClassName="left-1/2 top-5 h-7 w-px" />
-                <AnatomyNumber number={3} className="left-[38%] -bottom-10" lineClassName="bottom-5 left-1/2 h-7 w-px" />
-                <AnatomyNumber number={4} className="left-[54%] -top-10" lineClassName="left-1/2 top-5 h-8 w-px" />
-                <AnatomyNumber number={5} className="left-[62%] -bottom-10" lineClassName="bottom-5 left-1/2 h-8 w-px" />
-                <AnatomyNumber number={6} className="-right-16 top-1/2 -translate-y-1/2" lineClassName="right-5 top-1/2 h-px w-11" />
+                <AnatomyFrame className="w-full" gap={44}>
+                  <div data-slot="select-box" className="flex items-center gap-3 rounded-xl border border-oe-border-secondary bg-oe-background-primary px-4 py-3">
+                    <span data-slot="select-box-leading-element" className="flex shrink-0 items-center"><AnatomySwapSlot /></span>
+                    <span data-slot="select-box-content" className="min-w-0 flex-1"><span className="block text-sm font-medium"><span data-slot="select-box-title">Title</span></span><span className="mt-0.5 block text-xs text-oe-foreground-tertiary"><span data-slot="select-box-description">Description</span></span></span>
+                    <span data-slot="select-box-trailing-element" className="flex shrink-0 items-center"><AnatomySwapSlot /></span>
+                  </div>
+                  <AnatomyBoundaryMarker number={1} target="[data-slot=select-box]" side="left" connectorLength={36} />
+                  <AnatomyNumber number={2} target="[data-slot=select-box-leading-element]" side="top" />
+                  <AnatomyBoundaryMarker number={3} target="[data-slot=select-box-content]" side="bottom" connectorLength={30} clearance={26} />
+                  <AnatomyNumber number={4} target="[data-slot=select-box-title]" side="top" />
+                  <AnatomyNumber number={5} target="[data-slot=select-box-description]" side="bottom" />
+                  <AnatomyNumber number={6} target="[data-slot=select-box-trailing-element]" side="right" />
+                </AnatomyFrame>
               </div>
             </AnatomySurface>
             <AnatomyLegend items={[{ name: "Container" }, { name: "Leading element", optional: true }, { name: "Content container" }, { name: "Title" }, { name: "Description", optional: true }, { name: "Trailing element", optional: true }]} />

@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { Input, RadioField, RadioGroup, Textarea } from "@ooee/ui";
-import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { GuidelineTitle } from "@/components/guideline-title";
@@ -281,13 +281,14 @@ function TextareaAnatomy() {
     <div className="col-span-full min-w-0">
       <AnatomySurface ariaLabel="Textarea anatomy" title="Textarea structure" className="px-5 pb-5 pt-12">
         <div className="overflow-x-auto">
-          <div className="relative mx-auto h-[18rem] w-[40rem] text-oe-foreground-secondary">
-            <AnatomyBoundaryMarker number={1} side="top" connectorLength={50} boundaryLength={448} className="left-[310px] top-[22px]" />
-            <AnatomyNumber number={2} className="left-[310px] top-[244px]" lineClassName="left-2.5 bottom-[26px] h-[72px] w-px" />
-
-            <div className="absolute left-24 top-28 h-[5.5rem] w-[28rem] overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 whitespace-pre-line text-oe-foreground-placeholder">
-              여러 줄 값을 입력하는 영역입니다.
-            </div>
+          <div className="mx-auto w-[40rem] py-20 text-oe-foreground-secondary">
+            <AnatomyFrame className="mx-auto w-[28rem]" gap={44}>
+              <div data-slot="textarea-container" className="h-[5.5rem] w-full overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-placeholder">
+                <div data-slot="textarea" className="h-full w-full whitespace-pre-line"><span>여러 줄 값을 입력하는 영역입니다.</span></div>
+              </div>
+              <AnatomyBoundaryMarker number={1} target="[data-slot=textarea-container]" side="top" connectorLength={24} clearance={20} />
+              <AnatomyNumber number={2} target="[data-slot=textarea]" side="bottom" />
+            </AnatomyFrame>
           </div>
         </div>
       </AnatomySurface>

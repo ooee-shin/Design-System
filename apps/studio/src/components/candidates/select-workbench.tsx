@@ -7,7 +7,7 @@ import Link from "next/link";
 import { MultiSelect, Select, type SelectOption, type SelectOptionGroup } from "@ooee/ui";
 import { AnatomySwapSlot } from "@/components/anatomy-swap-slot";
 import { GuidelineList as SharedGuidelineList, GuideVisual, UsageComparison as SharedUsageComparison } from "@/components/component-guidelines";
-import { AnatomyDescription, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
+import { AnatomyBoundaryMarker, AnatomyDescription, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomySurface } from "@/components/component-anatomy";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { DependentControlGroup, PlaygroundChoice as Choice, PlaygroundElementControl, PlaygroundElementGraphic, type PlaygroundElementValue } from "@/components/playground-element-control";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
@@ -370,23 +370,21 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
           { term: "Group", description: "관련 있는 Option을 묶는 단위입니다. Group label로 제목을 표시하며 Group 사이에는 Divider를 자동으로 배치합니다." },
         ]}
       >
-        <div role="img" aria-label="Select structure anatomy" className="relative mx-auto h-[19rem] w-[48rem]">
-          <div className="absolute left-40 top-12 w-[28rem]">
-            <div className="flex h-9 items-center gap-2.5 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><AnatomySwapSlot /><span className="min-w-0 flex-1 truncate">{options[0].label}</span><RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" /></div>
-            <div className="mt-1 rounded-lg border border-oe-border-primary bg-oe-background-primary p-1 shadow-lg">
-              <div className="p-1"><p className="px-2 py-1 text-[11px] font-medium text-oe-foreground-tertiary">{groupLabels[0]}</p><div className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm"><AnatomySwapSlot /><span>{options[0].label}</span></div><div className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm"><AnatomySwapSlot /><span>{options[1].label}</span></div></div>
+        <div className="mx-auto w-[48rem] py-16">
+          <AnatomyFrame className="mx-auto w-[28rem]" gap={{ top: 28, right: 28, left: 60 }}>
+            <div data-slot="select-trigger" className="flex h-9 items-center gap-2.5 rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 text-sm text-oe-foreground-primary"><AnatomySwapSlot /><span className="min-w-0 flex-1 truncate"><span data-slot="select-value">{options[0].label}</span></span><span data-slot="select-trigger-icon" className="flex items-center"><RiArrowDownSLine className="size-4 text-oe-foreground-tertiary" /></span></div>
+            <div data-slot="select-popup" className="mt-1 rounded-lg border border-oe-border-primary bg-oe-background-primary p-1 shadow-lg">
+              <div data-slot="select-group" className="p-1"><p className="px-2 py-1 text-[11px] font-medium text-oe-foreground-tertiary"><span data-slot="select-group-label">{groupLabels[0]}</span></p><div className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm"><AnatomySwapSlot /><span>{options[0].label}</span></div><div className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm"><AnatomySwapSlot /><span>{options[1].label}</span></div></div>
               <div className="my-1.5 h-px bg-oe-border-secondary" />
               <div className="p-1"><p className="px-2 py-1 text-[11px] font-medium text-oe-foreground-tertiary">{groupLabels[1]}</p><div className="flex min-h-8 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm"><AnatomySwapSlot /><span>{options[2].label}</span></div></div>
             </div>
-          </div>
-          <span aria-hidden="true" className="absolute left-[9.5rem] top-12 h-9 w-px bg-oe-border-primary" />
-          <span aria-hidden="true" className="absolute left-[9.5rem] top-[6.25rem] h-[6rem] w-px bg-oe-border-primary" />
-          <AnatomyNumber number={1} className="left-14 top-[3.5rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <AnatomyNumber number={2} className="left-[13.375rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
-          <AnatomyNumber number={3} className="right-[7.25rem] top-[3.5rem]" lineClassName="right-5 top-2.5 h-px w-8" />
-          <AnatomyNumber number={4} className="left-14 top-[6.25rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <AnatomyNumber number={5} className="left-14 top-[8.75rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <AnatomyNumber number={6} className="left-14 top-[12.75rem]" lineClassName="left-5 top-2.5 h-px w-[5.5rem]" />
+            <AnatomyBoundaryMarker number={1} target="[data-slot=select-trigger]" side="left" connectorLength={8} clearance={8} />
+            <AnatomyNumber number={2} target="[data-slot=select-value]" side="top" />
+            <AnatomyNumber number={3} target="[data-slot=select-trigger-icon]" side="right" />
+            <AnatomyBoundaryMarker number={4} target="[data-slot=select-popup]" side="left" connectorLength={8} clearance={8} />
+            <AnatomyBoundaryMarker number={5} target="[data-slot=select-group]" side="right" connectorLength={8} clearance={8} />
+            <AnatomyNumber number={6} target="[data-slot=select-group-label]" side="left" />
+          </AnatomyFrame>
         </div>
       </AnatomyPanel>
 
@@ -400,13 +398,14 @@ function SelectAnatomy({ options, groupLabels }: { options: SelectOption[]; grou
           { term: "Item description", description: "Label 아래에서 추가 정보를 설명하는 선택 요소입니다. Trigger의 선택값에는 표시하지 않습니다." },
         ]}
       >
-        <div role="img" aria-label="Select option anatomy" className="relative mx-auto h-[9rem] w-[48rem]">
-          <div className="absolute left-40 top-12 flex min-h-11 w-[28rem] items-start gap-2.5 rounded-md border border-oe-border-secondary bg-oe-background-primary px-2.5 py-1.5 text-sm"><AnatomySwapSlot className="self-center" /><span className="min-w-0 flex-1"><span className="block">{options[2].label}</span><span className="mt-0.5 block text-xs leading-4 text-oe-foreground-tertiary">{options[2].description}</span></span></div>
-          <span aria-hidden="true" className="absolute left-[9.5rem] top-12 h-[3.15rem] w-px bg-oe-border-primary" />
-          <AnatomyNumber number={1} className="left-14 top-[4rem]" lineClassName="left-5 top-2.5 h-px w-[4.75rem]" />
-          <AnatomyNumber number={2} className="left-[10.15rem] top-0" lineClassName="left-2.5 top-5 h-[2.75rem] w-px" />
-          <AnatomyNumber number={3} className="right-8 top-[3.375rem]" lineClassName="right-5 top-2.5 h-px w-[28rem]" />
-          <AnatomyNumber number={4} className="right-8 top-[4.625rem]" lineClassName="right-5 top-2.5 h-px w-[24rem]" />
+        <div className="mx-auto w-[48rem] py-16">
+          <AnatomyFrame className="mx-auto w-[28rem]" gap={{ top: 28, right: 28, left: 28 }}>
+            <div data-slot="select-option" className="flex min-h-11 w-full items-start gap-2.5 rounded-md border border-oe-border-secondary bg-oe-background-primary px-2.5 py-1.5 text-sm"><span data-slot="select-option-leading" className="flex items-center self-center"><AnatomySwapSlot /></span><span className="min-w-0 flex-1"><span className="block"><span data-slot="select-option-label">{options[2].label}</span></span><span className="mt-0.5 block text-xs leading-4 text-oe-foreground-tertiary"><span data-slot="select-option-description">{options[2].description}</span></span></span></div>
+            <AnatomyBoundaryMarker number={1} target="[data-slot=select-option]" side="left" connectorLength={8} clearance={8} />
+            <AnatomyNumber number={2} target="[data-slot=select-option-leading]" side="top" />
+            <AnatomyNumber number={3} target="[data-slot=select-option-label]" side="right" />
+            <AnatomyNumber number={4} target="[data-slot=select-option-description]" side="right" />
+          </AnatomyFrame>
         </div>
       </AnatomyPanel>
     </div>

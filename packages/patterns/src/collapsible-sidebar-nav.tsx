@@ -14,7 +14,6 @@ import {
   RiSpeedUpLine,
 } from "@remixicon/react";
 
-import { Badge } from "@ooee/ui";
 import { cn } from "./utils";
 
 const STORAGE_KEY = "ooee-collapsible-sidebar";
@@ -124,7 +123,7 @@ export function CollapsibleSidebarNav({ locale = "ko" }: { locale?: "ko" | "en" 
                             <Icon className="size-4 shrink-0" aria-hidden="true" />
                             {!collapsed && <span className="min-w-0 flex-1 truncate">{activeCopy[item.id]}</span>}
                             {!collapsed && "count" in item && (
-                              <Badge type="number" value={item.count} label={`${activeCopy[item.id]} ${item.count}`} tone={"danger" in item && item.danger ? "danger" : "neutral"} />
+                              <span aria-label={`${activeCopy[item.id]} ${item.count}`} className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none tabular-nums ${"danger" in item && item.danger ? "bg-oe-danger-background-primary text-oe-danger-foreground-primary" : "bg-oe-background-secondary text-oe-foreground-secondary"}`}>{item.count}</span>
                             )}
                           </button>
                         </li>

@@ -33,8 +33,8 @@
 
 - **`packages/patterns`와 `packages/tokens`에 자체 `tsconfig.json`과 `typecheck` script가 없다.** `pnpm -r typecheck`가 실제로는 `packages/ui`에서만 돈다. 두 패키지는 Studio 빌드에 얹혀서만 타입 검사되므로 단독 성립 여부를 확인할 수단이 없다.
 - **`packages/patterns`에 자동 테스트가 없다.** 현재 테스트는 `packages/ui` 5개, `packages/tokens` 1개, `apps/studio` 2개다.
-- **`packages/ui/src/badge.tsx`에 raw Tailwind 색상이 110곳 있다.** 공용 자산은 `oe` semantic token만 쓰는 것이 목표이므로 Badge 확정 전에 정규화한다.
 - **`apps/studio/src/app/globals.css`에 shadcn의 sidebar·chart token이 남아 있다.** Studio 화면이 아직 사용하며 공용 자산은 참조하지 않는다.
+- **radius scale의 원본 문서가 없다.** `2026-09-08`에 값 자체는 `packages/tokens`로 옮겨 `RADII`가 단일 원본이 되었고 컨트롤은 `--radius-oe-control`을 공유한다. 컨트롤 기준은 `interaction.md`의 「공통 Control Radius」가 소유하지만, `sm`부터 `4xl`까지의 단계를 어느 자리에 무슨 기준으로 쓰는지는 `docs/system/foundations/`에 문서가 없다. typography와 같은 상태다.
 
 ## 컴포넌트
 
