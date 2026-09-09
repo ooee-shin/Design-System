@@ -17,7 +17,7 @@ type RadioFieldProps = RadioProps & {
   bottomDescription?: React.ReactNode
   leadingElement?: React.ReactNode
   trailingElement?: React.ReactNode
-  layout?: "inline" | "block"
+  layout?: "hug" | "fill"
   flipped?: boolean
   radioClassName?: string
 }
@@ -59,23 +59,23 @@ function RadioGroup<Value = string>({ className, ...props }: RadioGroupProps<Val
   return <RadioGroupPrimitive className={cn(className)} {...props} />
 }
 
-function RadioFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, layout = "inline", flipped = false, radioClassName, className, disabled, readOnly, ...props }: RadioFieldProps) {
+function RadioFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, layout = "hug", flipped = false, radioClassName, className, disabled, readOnly, ...props }: RadioFieldProps) {
   const labelId = React.useId()
 
   return (
     <label className={cn(
       "flex min-h-oe-control-regular items-start gap-2 rounded-md bg-transparent px-2 py-2 transition-colors duration-[60ms]",
       !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:bg-oe-interaction-hover-subtle",
-      layout === "block" ? "w-full" : "w-fit",
+      layout === "fill" ? "w-full" : "w-fit",
       flipped && "flex-row-reverse",
       disabled && "cursor-not-allowed",
       className,
     )}>
       <Radio aria-labelledby={labelId} className={cn("mt-0.5", radioClassName)} disabled={disabled} readOnly={readOnly} {...props} />
-      <span className={cn("flex min-w-0 flex-col", layout === "block" && "flex-1")}>
+      <span className={cn("flex min-w-0 flex-col", layout === "fill" && "flex-1")}>
         <span className="flex min-w-0 items-start gap-2">
           {leadingElement ? <span data-slot="radio-leading" className="mt-0.5 shrink-0">{leadingElement}</span> : null}
-          <span className={cn("flex h-5 min-w-0 items-baseline gap-2 overflow-hidden", layout === "block" && !trailingElement && "flex-1")}>
+          <span className={cn("flex h-5 min-w-0 items-baseline gap-2 overflow-hidden", layout === "fill" && !trailingElement && "flex-1")}>
             <span id={labelId} className={cn("shrink-0 text-sm leading-5 font-normal text-oe-foreground-primary", disabled && "text-oe-foreground-disabled")}>{label}</span>
             {rightDescription ? <span className={cn("min-w-0 truncate whitespace-nowrap text-xs leading-5 text-oe-foreground-tertiary", disabled && "text-oe-foreground-disabled")}>{rightDescription}</span> : null}
           </span>

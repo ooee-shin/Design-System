@@ -32,7 +32,7 @@ Basic 번호는 반복하지 않고 Content container와 Optional 요소만 표�
 - `label`: Field의 필수 `ReactNode`
 - `rightDescription`, `bottomDescription`
 - `leadingElement`, `trailingElement`
-- `layout`: `inline | block`, 기본값 `inline`
+- `layout`: `hug | fill`, 기본값 `hug`. 값의 뜻은 [interaction.md](../interaction.md)의 「공통 너비 Layout」이 소유한다
 - `flipped`: Control을 Label의 왼쪽 또는 오른쪽에 배치
 - `indicatorClassName`, `radioClassName`: Indicator와 Control에 각각 적용하는 class다
 

@@ -1,6 +1,6 @@
 # 상호작용 규칙
 
-모든 공용 컴포넌트가 공유하는 Focus, Disabled, Read-only와 Layout 기본값이다.
+모든 공용 컴포넌트가 공유하는 Focus, Disabled, Read-only와 Style·Layout 기본값이다.
 
 ## Focus 선과 Ring
 
@@ -20,7 +20,9 @@ Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Foc
 
 ## Disabled
 
-Outline 형태의 공용 Form control과 선택 요소는 Disabled 상태에서도 외곽선을 제거하거나 배경과 구분되지 않는 색으로 바꾸지 않는다. 구조를 인지할 수 있도록 기본 Outline border를 유지하고, Disabled 위계는 foreground와 background 및 상호작용 제한으로 표현한다. Filled 형태는 별도 Border가 없는 기존 구조를 유지한다.
+Outline 형태의 공용 Form control과 선택 요소는 Disabled 상태에서도 외곽선을 제거하거나 배경과 구분되지 않는 색으로 바꾸지 않는다. 구조를 인지할 수 있도록 Outline border를 유지하고, Disabled 위계는 foreground와 background 및 상호작용 제한으로 표현한다. Filled 형태는 별도 Border가 없는 기존 구조를 유지한다.
+
+**남기는 것은 선이지 그 색이 아니다.** 경계에 tone 색을 쓰는 컴포넌트는 Disabled에서 그 색을 걷어내고 `oe-border-primary`로 바꾼다. 유채색 경계는 누를 수 있다는 신호이므로 꺼진 요소에 남기지 않으며, 바꾼 뒤의 모습이 Disabled Input과 같아 한 폼 안에 나란히 놓인 요소들이 함께 꺼져 보인다.
 
 Disabled는 선택값을 변경하지 않고 조작만 제한한다.
 
@@ -56,7 +58,18 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 
 `packages/ui/src/control-radius.test.tsx`가 컨트롤들이 같은 토큰을 쓰는지 검사하고, `packages/tokens/src/index.test.ts`가 토큰 값과 `RADII` 원본의 일치를 검사한다.
 
-## Style와 Layout 기본값
+## Style 기본값
 
 - `outline | filled` Style을 제공하는 Form control은 `outline`을 기본값으로 사용한다.
-- `fill | fixed` 너비 Layout을 지원하는 한 줄 Form control의 기본값은 `fill`이다. Checkbox·Radio처럼 별도의 `inline | block` Layout 체계를 가진 선택 요소에는 이 값을 억지로 적용하지 않는다.
+
+## 공통 너비 Layout
+
+너비를 다루는 Layout은 하나의 축이며 값은 셋이다. 각 명세는 이름을 새로 짓지 않고 이 절의 값을 쓰며, 어느 값을 제공하는지만 정한다.
+
+- `hug`: 내용에 맞춘 너비를 쓴다.
+- `fill`: 부모가 제공하는 너비를 채운다.
+- `fixed`: 함께 넘긴 값으로 너비를 고정하되 부모보다 넓어지지 않는다.
+
+**모든 컴포넌트가 세 값을 다 제공하지는 않는다.** 한 줄 Form control은 `hug`를 제공하지 않는다. 입력값에 따라 외곽 너비가 달라지면 같은 폼 안의 줄이 어긋나기 때문이며, 기본값은 `fill`이다. Textarea처럼 이 Property를 받지 않고 언제나 부모 너비를 채우는 컴포넌트도 있다. Button과 Checkbox·Radio는 `hug`가 기본값이고 `fixed`를 제공하지 않는다.
+
+`inline`과 `block`은 쓰지 않는다. CSS `display` 값과 이름이 겹치는데 뜻이 다르기 때문이다. 이 값들이 바꾸는 것은 `display`가 아니라 너비뿐이며, 전환해도 Control과 Label의 시작 위치는 그대로 유지된다. `packages/ui/src/layout-vocabulary.test.tsx`가 컴포넌트들이 같은 이름을 쓰는지 검사한다.
