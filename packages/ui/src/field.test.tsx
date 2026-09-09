@@ -253,3 +253,46 @@ test("Field warns when the injected id lands on nothing at all", () => {
   assert.match(warnings[0], /Input slot/)
 })
 
+
+test("Field puts a wider gap between the label and its right description", () => {
+  const view = render(
+    <Field label="관심 지역" rightDescription="최대 3개">
+      <Input />
+    </Field>,
+  )
+  const rightDescription = view.getByText("최대 3개")
+
+  assert.match(rightDescription.className, /ml-1/)
+})
+
+test("Field dims the label along with the control when it is disabled", () => {
+  const view = render(
+    <Field label="이름" disabled>
+      <Input />
+    </Field>,
+  )
+
+  assert.match(view.getByText("이름").className, /text-oe-foreground-disabled/)
+})
+
+test("Field colors the label with the error color while it shows an error message", () => {
+  const view = render(
+    <Field label="휴대폰 번호" errorMessage="번호를 다시 확인해 주세요">
+      <Input />
+    </Field>,
+  )
+
+  assert.match(view.getByText("휴대폰 번호").className, /text-oe-danger-foreground-secondary/)
+})
+
+test("Field keeps the disabled label dimmed even when an error message is present", () => {
+  const view = render(
+    <Field label="휴대폰 번호" disabled errorMessage="번호를 다시 확인해 주세요">
+      <Input />
+    </Field>,
+  )
+  const label = view.getByText("휴대폰 번호")
+
+  assert.match(label.className, /text-oe-foreground-disabled/)
+  assert.doesNotMatch(label.className, /text-oe-danger-foreground-secondary/)
+})

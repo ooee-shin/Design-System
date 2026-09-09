@@ -47,6 +47,11 @@ function Field({
   // 오류는 도움말을 대체한다. 둘이 함께 쌓이면 항목마다 Footer 높이가 달라져 폼의 수직
   // 리듬이 깨지고, 먼저 읽어야 하는 문구가 흐려진다.
   const invalid = Boolean(errorMessage)
+  const labelToneClassName = disabled
+    ? "text-oe-foreground-disabled"
+    : invalid
+      ? "text-oe-danger-foreground-secondary"
+      : "text-oe-foreground-primary"
   const message = errorMessage ?? helperText
   const describedBy = message ? messageId : undefined
 
@@ -94,21 +99,21 @@ function Field({
   const header = (
     <div data-slot="field-header" className="mb-0.5 flex min-w-0 items-center gap-1">
       {required ? (
-        <span aria-hidden="true" data-slot="field-requirement" className="shrink-0 text-sm leading-5 text-oe-danger-foreground-secondary">
+        <span aria-hidden="true" data-slot="field-requirement" className={cn("shrink-0 text-sm leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-danger-foreground-secondary")}>
           *
         </span>
       ) : null}
       {group ? (
-        <span id={labelId} data-slot="field-label" className="min-w-0 truncate text-sm font-medium leading-5 text-oe-foreground-primary">
+        <span id={labelId} data-slot="field-label" className={cn("min-w-0 truncate text-sm font-medium leading-5", labelToneClassName)}>
           {label}
         </span>
       ) : (
-        <label htmlFor={controlId} data-slot="field-label" className="min-w-0 truncate text-sm font-medium leading-5 text-oe-foreground-primary">
+        <label htmlFor={controlId} data-slot="field-label" className={cn("min-w-0 truncate text-sm font-medium leading-5", labelToneClassName)}>
           {label}
         </label>
       )}
       {rightDescription ? (
-        <span data-slot="field-right-description" className="min-w-0 truncate text-xs leading-5 text-oe-foreground-tertiary">
+        <span data-slot="field-right-description" className={cn("ml-1 min-w-0 truncate text-xs leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-foreground-tertiary")}>
           {rightDescription}
         </span>
       ) : null}
@@ -126,7 +131,7 @@ function Field({
         <p
           id={messageId}
           data-slot={invalid ? "field-error-message" : "field-helper-text"}
-          className={cn("min-w-0 text-xs leading-5", invalid ? "text-oe-danger-foreground-secondary" : "text-oe-foreground-tertiary")}
+          className={cn("min-w-0 text-xs leading-5", disabled ? "text-oe-foreground-disabled" : invalid ? "text-oe-danger-foreground-secondary" : "text-oe-foreground-tertiary")}
         >
           {message}
         </p>
@@ -136,7 +141,7 @@ function Field({
           data-slot="field-character-count"
           className={cn(
             "ml-auto shrink-0 text-xs leading-5 tabular-nums",
-            invalid ? "text-oe-danger-foreground-secondary" : "text-oe-foreground-tertiary",
+            disabled ? "text-oe-foreground-disabled" : invalid ? "text-oe-danger-foreground-secondary" : "text-oe-foreground-tertiary",
           )}
         >
           {characterCount.current}/{characterCount.max}
