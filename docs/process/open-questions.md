@@ -46,10 +46,14 @@
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
 - **Tab 컴포넌트** — 지금 서비스에 밑줄 Tab과 검정 Filled 형태의 Tab이 따로 쓰이고 있고, 후자를 Chip으로 합칠지 검토했다. 합치지 않기로 했다. Tab은 항상 하나가 켜져 있고 끌 수 없는 위치 표시이며 `role="tab"`과 방향키 이동을 갖는다. Chip은 여러 개를 켜고 끌 수 있고 아무것도 켜지지 않은 상태가 기본이다. 한 컴포넌트에 담으면 Property 하나가 키보드 동작과 필수 속성까지 바꾼다. Tab을 별도 컴포넌트로 만들 때 `underline`과 `filled` 두 모양을 갖게 하고, 검정 Filled는 그쪽으로 옮긴다. Chip의 Active는 brand alpha를 유지한다.
+- **ToggleButton 컴포넌트** — 즐겨찾기나 찜처럼 눌린 상태가 남는 아이콘 버튼의 자리다. Button은 실행하고 끝나고 ToggleButton은 표시가 남는다는 것으로 갈리며, 값을 고르는 Chip이나 위치를 가리키는 Tab과도 다르다. 활성 표현은 `2026-09-10`에 정했다. Ghost 같은 `variant`는 그대로 두고 아이콘의 `Fill` variant와 tone이 상태를 말한다. 켜졌다고 배경이 생기게 하지 않는데, `chip.md`가 Chip의 Active를 brand alpha 배경과 경계로 이미 정해 두어 배경을 쓰면 두 컴포넌트가 화면에서 같아 보이기 때문이다. `variant`는 만드는 사람이 자리에 맞게 고르는 축이므로 상태가 그것을 갈아치우지 않는다. 아이콘은 필수로 두어 켜짐이 언제나 색과 함께 모양 변화를 갖게 한다. 남은 것은 공개 API와 Studio 화면이다.
 - **Filter Bar의 남은 정책** — Chip을 Filter로 쓰는 규칙을 Chip 페이지에서 다듬는 중이다. 초기화의 자리(지금은 맨 앞), Label에 적용된 값을 담는 표기 방식, 적용 시점(누르는 즉시인지 열리는 필터에서 확정이 필요한지)을 정하지 않았다. 이 셋이 정해지면 `filter-bar.tsx`로 분리하고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
 - **Chip의 Disabled와 Color** — 제공하지 않기로 두었다. 필요한 사례가 확인되면 검토한다.
 - **Number Input과 Slider의 경계** — 넓은 범위를 탐색하는 Slider 사용 정책을 공식 Usage 규칙으로 확정하지 않았다.
 - **Input과 Textarea의 Filled 배경 전환** — Focus 선과 ring은 `has-[:focus-visible]`로 바꿨지만 Filled의 흰 배경 전환은 `focus-within`으로 두었다. `interaction.md:7`을 엄격히 보면 이것도 focus-visible 기준이어야 하는데, 마우스로 입력 중인 필드가 회색으로 남는 것이 어색하다. 나중에 검토한다.
+- **Style과 Size 값의 이름이 컴포넌트마다 다르다** — 세 가지가 어긋나 있다. 첫째, 채움 스타일의 값 이름이 Badge에서 `fill`·`tonal`·`outlined`이고 Input·Textarea·Input Button에서 `filled`·`outline`이다. Button이 `fill`·`outline`·`ghost`를 쓰면서 세 번째 조합이 되었다. 둘째, Checkbox의 `shape`에 `ghost`가 들어 있다. `vocabulary.md`는 `shape`을 `Square`·`Rounded`·`Circle(Pill)` 세 모양으로 정의하는데 `ghost`는 모양이 아니라 채움 여부를 뜻하므로 `variant`가 소유해야 할 값이다. 셋째, 같은 Size 단계 이름이 서로 다른 값을 가리킨다. Badge의 `small`은 20px이고 Chip의 `small`은 32px이다. Badge가 공통 Control Height를 따르지 않아 prop 이름을 `size`로 갈라 두었지만 단계 이름이 겹치는 것은 그대로다.
+
+이름을 하나로 맞추면 여러 컴포넌트의 공개 API가 함께 바뀌므로 1차 컴포넌트를 마친 뒤에 한 번에 처리한다. 모양 어휘 쪽은 이미 정리되어 있어서 `round`를 쓰는 곳은 없다. 너비 Layout은 `2026-09-09`에 `hug | fill | fixed` 한 축으로 정리했고 `interaction.md`의 「공통 너비 Layout」이 소유한다.
 - **Input의 Color input** — Color Picker 팝업이 완성되지 않아 예시 swatch에 클릭과 팝업 상호작용을 연결하지 않았다. 구현되면 직접 입력값과 팝업 선택값을 동기화하는 조합으로 검수한다.
 
 ## Token candidate
@@ -58,4 +62,5 @@
 
 - **Combobox 단일 선택 행 배경** — Brand alpha primitive `brand-alpha-08`
 - **Select Box 선택 표현** — Brand alpha 조합
+- **엑셀 액션 버튼의 색** — Button의 `custom` tone이 쓰는 Microsoft Excel 브랜드 그린이다. 팔레트 단계 규칙에 들어오지 않고 Light와 Dark에서 값을 뒤집지 않으므로 `button.tsx`가 로컬 값으로 갖는다. 외부 서비스를 가리키는 색이 두 번째로 필요해질 때 그 색들을 함께 다루는 방식을 정한다.
 - **Color swatch 경계** — 안쪽에 합성한 Black alpha 10%의 1px inset. Input Button의 선택 전용 Color picker와 Input의 Color input이 함께 쓴다
