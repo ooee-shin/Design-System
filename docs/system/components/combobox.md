@@ -79,4 +79,3 @@ Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContain
 - 선택 결과가 없는 Container의 별도 Empty state
 - Creatable option
 - Popup 최대 높이의 제품별 기준
-- Label, Helper text, Error message를 소유할 Field API

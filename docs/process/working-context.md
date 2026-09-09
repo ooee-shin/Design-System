@@ -31,7 +31,7 @@
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: Badge, Button, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - `packages/ui`: Badge, Button, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -55,7 +55,7 @@
   - Chat과 Inbox의 중복 모드·언어 control은 제거하고 Studio 공통 설정을 사용
   - 현재 언어 범위는 국문·영문이며 일문은 콘텐츠 검수 범위를 확장할 때 공통 설정에 추가
   - Studio 문서 설명은 국문을 유지하고 KO/EN 전환은 실제 Component Preview의 Label·Value·Placeholder·접근 가능한 이름과 `lang`에 적용. 전체 영문 문서는 국문 문서 완료 뒤 별도 검토
-  - Component catalog 메타데이터와 Similar/Works with 관계는 `component-registry`가 단일 원본이며 13개 상세 route는 공용 `ComponentDetailPage` shell을 사용
+  - Component catalog 메타데이터와 Similar/Works with 관계는 `component-registry`가 단일 원본이며 15개 상세 route는 공용 `ComponentDetailPage` shell을 사용
   - Component 상세 페이지의 기본 순서는 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map`. Anatomy는 모든 Properties보다 앞에 두고 우측 목차도 본문 순서를 따름
   - 화면 확정 검수에서 주요 Property가 각각 독립 카드/섹션으로 설명되는지 확인. Property map이나 Playground에만 있고 설명 카드가 없으면 자동 생성하지 않고 사용자에게 필요 여부를 질문. native 연결용 기술 속성은 시각 카드 대상에서 제외 가능
   - Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용. Remix `RiBookOpenLine` 16px Tertiary 아이콘과 14px Semibold 제목을 8px 간격으로 배치하며 컴포넌트별로 중복 구현하지 않음
@@ -91,6 +91,30 @@
   - 높이는 24px 하나이고 Tone 일곱과 Style 셋을 조합해 확인하며, Custom Tone에서만 22색 선택이 나타난다
   - 아이콘은 Label 앞에만 붙는다
   - Color는 왼쪽부터 Fill·Tonal·Outlined 세 열이며, 위쪽에 Tone 여섯, 아래쪽에 Custom 22색을 두고 행 이름은 왼쪽에만 붙인다
+- `/components/field`
+  - Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸. Seed Design Field의 Header·Input slot·Footer 세 층 구조를 참고했고 정한 것은 [field.md](../system/components/field.md)가 소유함
+  - Header 순서는 `Requirement → Label → Right description → Trailing element`이며 Trailing element만 오른쪽 끝으로 밀림. Seed가 `Suffix Slot`이라 부르는 자리이지만 `prefix`·`suffix`는 짧은 표기 자리라는 기존 구분 때문에 `trailingElement`로 이름을 바꿔 들임
+  - 필수는 `*`로만 표시하고, 텍스트는 선택사항을 강조할 때와 다중 선택의 개수를 알릴 때만 `rightDescription`에 씀. `관심 지역 선택 (최대 3개)`처럼 Label 안에 괄호로 넣지 않고 `label`과 `rightDescription`으로 쪼갬. Seed의 필수 비율 규칙은 들이지 않음
+  - Footer는 항목당 한 줄이며 왼쪽에 도움말과 오류, 오른쪽에 Character count. 오류가 있으면 도움말을 대체하고 Control에 `aria-invalid`를 주입함. Invalid는 별도 Property가 아님
+  - Error에서는 Label도 `oe-danger-foreground-secondary`로 바뀜. 오류가 어느 항목에서 났는지 Label에서 바로 읽히게 하기 위함
+  - Disabled에서는 Header와 Footer의 글자가 모두 `oe-foreground-disabled`로 바뀜. 필수 표시도 함께 흐려지며, Label 색은 Disabled가 Error보다 앞섬
+  - Header 간격은 필수 마크와 Label 사이 2px, Label과 Right description 사이 8px. 마크는 Label의 일부처럼 붙어 읽히고 Right description은 다른 위계라 떼어 놓음
+  - Field 결합은 대체로 모바일 폼이므로 한 줄 Control은 Large 40px 이상을 씀. Studio 예시의 Input·Select·Input Button을 Regular 36px에서 Large로 올렸으며, 크기는 Field가 아니라 각 Control의 `controlSize`가 소유해 Field가 강제하지 않음. Radio·Checkbox·Chip은 각자 자기 최소 높이를 소유하므로 대상이 아님
+  - Input slot에 들어가는 Control은 Input, Textarea, Select, Radio Group, Checkbox Group, Chip Group과 Date·Time을 여는 Input Button. Studio Properties 절은 이 순서로 한 줄에 하나씩 두고 Field를 가운데 정렬하며, 예시 내용은 `Label`·`Placeholder`·`Helper text`처럼 요소 이름을 씀. Playground는 국문·영문 전환 검수 대상이라 실제 문구를 유지함
+  - Chip Group은 공용 컴포넌트를 만들지 않고 Studio 예제에서 해결함. Chip을 Selection으로 쓰는 조합이며 [chip.md](../system/components/chip.md)의 Guidelines가 이미 그 쓰임을 소유함. Field의 Input slot이 세로 방향이라 가로 묶음이 필요한데, 조합을 지원하려고 컴포넌트를 늘리지 않고 예제가 `role="group"`을 가진 가로 묶음을 직접 만듦
+  - Input slot은 세 갈래. Control 하나면 `id`를 주입하고 Label이 `htmlFor`로 가리킴. `group`이고 자식이 하나면 Select Box Group처럼 자체 group을 가진 경우이므로 `aria-labelledby`만 주입함. `group`이고 자식이 여러 개면 Field가 `role="group"`을 직접 소유함
+  - Control을 `div`나 별도 컴포넌트로 감싸면 주입 대상을 잃어 연결이 끊기므로 개발 환경에서 경고를 띄움. `id`가 아무 곳에도 닿지 않은 경우와 닿았지만 Control이 아닌 경우를 나누어 알리며, 후자는 `LABELABLE_SELECTOR`로 판단함
+  - Fragment는 `isValidElement`를 통과하므로 그것만으로 Control 하나와 행 여러 개를 가를 수 없음. `children.type !== React.Fragment`를 함께 봄
+  - Field가 group을 소유할 때는 행들을 `data-slot="field-group"` 묶음으로 감쌈. Field의 세로 간격이 행 사이로 새면 Checkbox Group이 40px, Radio Group이 36px로 갈리고, `role="group"`이 Header와 Footer까지 품으면 그룹 범위가 실제 선택 항목보다 넓어짐
+  - Group의 행 사이 간격은 36px 유지. 별도 여백이 아니라 각 행의 최소 조작 높이가 수직 리듬을 만들기 때문이며 `checkbox.md`와 `radio.md`가 그 규칙을 소유함
+  - `characterCount`는 `{ current, max }`를 소비자가 넘김. Field가 값을 소유하지 않아 글자 수를 셀 수 없으며, Control의 이벤트를 가로채는 방식은 개발자 검토 항목으로 남김
+  - `Select`·`MultiSelect`·`Combobox`·`MultiCombobox`·`SelectBoxGroup` 다섯 개에 `id`와 `aria-describedby`를 추가하고 `ariaLabel`을 필수에서 선택으로 내림. Field가 이름을 소유하면 같은 문구를 두 번 적게 되기 때문. prop을 넓히고 필수를 푸는 변경이라 소비자 코드가 깨지지 않음
+  - `vocabulary.md`의 `Field` 정의를 폼 한 칸으로 바꾸고, `CheckboxField`·`RadioField`·`SwitchField`는 `Selection row`라는 별도 층으로 분리함. 한 단어가 두 층을 가리키던 상태를 해소한 것
+  - Studio 상세는 Playground·Anatomy·Properties(Header·Footer·Input slot)·Guidelines·Property map. Header와 Footer 절은 그 층만 보이게 나머지 직접 자식을 감춤
+  - Playground와 Input slot 절의 콘텐츠는 `studio.md`의 「Anatomy와 구조 검수용 Playground는 요소 명칭을 쓴다」에 따라 `Label`·`Placeholder`·`Helper text`·`Option 1~3`을 씀. 제품 맥락의 실제 문구는 Examples와 Usage가 담당하는데 Field에는 아직 그 절이 없어서, 국문·영문 전환 검수는 Examples를 만들 때 함께 다룸
+  - Properties · Header와 Footer 절은 오류 문구의 행동 지시형 같은 작성 규칙을 함께 보여야 해서 실제 문구를 유지함
+  - 아직 정하지 않은 것은 Label weight 두 단계, Footer 자리 예약, Label 가로 배치, `Fieldset`과 `Form` 층임
+
 - `/components/input`
   - shadcn과 Seed Design Text Input을 기준으로 정리한 공용 컴포넌트
   - Input과 Field의 책임을 분리하며 현재 Input만 구현
@@ -128,7 +152,6 @@
   - 현재 확인된 native 속성, 최소 높이 64px, content sizing과 기본 상태만 문서화
   - Focus/Error는 Input과 같은 단색 1px border + 외부 1px ring 구조를 사용
   - Input과 Textarea는 데스크톱 `On this page` rail 아래의 낮은 위계 Related 링크에서 서로 이동
-  - `/components/field`와 registry의 `Works with → Field` 관계는 제거한다. 아직 정의하지 않은 컴포넌트의 페이지를 미리 만들어 두지 않는다는 결정이며, 실제 컴포넌트인 `CheckboxField`·`RadioField`·`SwitchField`와 Field 구조 설명은 그대로 유지
   - 컴포넌트 상세 페이지는 데스크톱 우측의 sticky `On this page`에서 현재 섹션을 확인하고 바로 이동하며 좁은 검수 viewport에서는 숨김
   - 목차는 뎁스별 지그재그 경로 없이 단일 직선 rail을 사용하고, 화면의 활성 구간에 여러 섹션이 걸리면 모두 강조하며 활성 선의 위치와 높이를 300ms로 전환. rail과 항목 배경의 간격은 12px
 - `/components/number-input`
@@ -417,7 +440,7 @@ Anatomy 연결선 좌표와 범위 표시선 공용화는 `2026-09-08`에 끝냈
 2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Message Bubble이 남아 있으며 Message Bubble은 Anatomy·Properties·Property map 자체가 없다.
 3. Anatomy 시각 검수는 번호선과 Container 평행선까지 `2026-09-08`에 마쳤다. 열두 화면 전부가 대상을 참조해 자리를 잡으므로 좌표를 다시 확인할 일은 없다. 남은 것은 Surface 안쪽 Container의 배경과 border 규칙이며 위 「남은 작업」 2번이 그것이다.
 4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
-5. 현재 Anatomy가 없는 것은 MessageBubble이며 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Badge는 `2026-09-08`에 Container·Icon·Label 셋으로 Anatomy와 Structure map을 넣었다. Field는 페이지와 registry 관계를 제거했으므로 컴포넌트를 정의하기 전에는 페이지를 다시 만들지 않는다.
+5. 현재 Anatomy가 없는 것은 MessageBubble이며 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Badge는 `2026-09-08`에 Container·Icon·Label 셋으로 Anatomy와 Structure map을 넣었다. Field는 `2026-09-09`에 정의했으며 Anatomy와 Structure map을 함께 넣었다.
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.

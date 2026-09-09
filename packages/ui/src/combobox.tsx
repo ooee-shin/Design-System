@@ -25,7 +25,9 @@ type ComboboxProps = VariantProps<typeof comboboxTriggerVariants> & {
   placeholder?: string
   searchPlaceholder?: string
   emptyMessage?: string
-  ariaLabel: string
+  id?: string
+  ariaLabel?: string
+  "aria-describedby"?: string
   disabled?: boolean
   invalid?: boolean
   name?: string
@@ -50,7 +52,9 @@ function Combobox({
   placeholder = "Select an option",
   searchPlaceholder = "Search options",
   emptyMessage = "No options found.",
+  id,
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
   disabled = false,
   invalid = false,
   name,
@@ -74,7 +78,9 @@ function Combobox({
         data-slot="combobox-trigger"
         data-invalid={invalid ? "" : undefined}
         aria-invalid={invalid || undefined}
+        id={id}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
         className={cn(comboboxTriggerVariants({ variant, controlSize }), className)}
       >
         <span className="min-w-0 flex-1 truncate data-[placeholder]:text-oe-foreground-placeholder">
@@ -98,7 +104,9 @@ function MultiCombobox({
   placeholder = "Select options",
   searchPlaceholder = "Search options",
   emptyMessage = "No options found.",
+  id,
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
   selectedSummaryLabel = (firstLabel, remainingCount) => remainingCount > 0 ? `${firstLabel} +${remainingCount}` : firstLabel,
   selectAllLabel = "All",
   selectedSearchPlaceholder = "Search selected items",
@@ -136,7 +144,9 @@ function MultiCombobox({
           data-slot="combobox-trigger"
           data-invalid={invalid ? "" : undefined}
           aria-invalid={invalid || undefined}
+          id={id}
           aria-label={ariaLabel}
+          aria-describedby={ariaDescribedBy}
           className={cn(comboboxTriggerVariants({ variant, controlSize }), className)}
         >
           <span className="min-w-0 flex-1 truncate">
@@ -157,7 +167,7 @@ function MultiCombobox({
   )
 }
 
-function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, selectAllLabel, totalCount = 0, allSelected = false, someSelected = false, onToggleAll }: { ariaLabel: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; someSelected?: boolean; onToggleAll?: () => void }) {
+function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, selectAllLabel, totalCount = 0, allSelected = false, someSelected = false, onToggleAll }: { ariaLabel?: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; someSelected?: boolean; onToggleAll?: () => void }) {
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner align="start" sideOffset={4} className="z-50 w-[var(--anchor-width)] max-w-[var(--available-width)]">

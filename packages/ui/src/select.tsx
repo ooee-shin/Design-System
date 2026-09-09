@@ -35,7 +35,9 @@ type SelectProps = VariantProps<typeof selectionTriggerVariants> &
     defaultValue?: string | null
     onValueChange?: (value: string | null) => void
     placeholder?: string
-    ariaLabel: string
+    id?: string
+    ariaLabel?: string
+    "aria-describedby"?: string
     disabled?: boolean
     readOnly?: boolean
     invalid?: boolean
@@ -61,7 +63,9 @@ function Select({
   defaultValue,
   onValueChange,
   placeholder = "Select an option",
+  id,
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
   disabled = false,
   readOnly = false,
   invalid = false,
@@ -93,8 +97,10 @@ function Select({
         data-slot="select-trigger"
         data-invalid={invalid ? "" : undefined}
         data-layout={layout}
+        id={id}
         aria-invalid={invalid || undefined}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
         style={layout === "fixed" ? { width: fixedWidth } : undefined}
         className={cn(selectionTriggerVariants({ variant, controlSize }), layout === "fixed" && "max-w-full shrink-0", className)}
       >
@@ -137,7 +143,9 @@ function MultiSelect({
   defaultValue,
   onValueChange,
   placeholder = "Select options",
+  id,
   ariaLabel,
+  "aria-describedby": ariaDescribedBy,
   disabled = false,
   readOnly = false,
   invalid = false,
@@ -173,8 +181,10 @@ function MultiSelect({
         data-slot="select-trigger"
         data-invalid={invalid ? "" : undefined}
         data-layout={layout}
+        id={id}
         aria-invalid={invalid || undefined}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
         style={layout === "fixed" ? { width: fixedWidth } : undefined}
         className={cn(selectionTriggerVariants({ variant, controlSize }), layout === "fixed" && "max-w-full shrink-0", className)}
       >

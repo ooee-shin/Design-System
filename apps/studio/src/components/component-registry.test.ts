@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { componentRegistry, getComponentRelations } from "./component-registry";
 
 test("component registry is the single complete catalog for detail pages", () => {
-  assert.equal(componentRegistry.length, 14);
+  assert.equal(componentRegistry.length, 15);
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
   assert.equal(new Set(componentRegistry.map((item) => item.href)).size, componentRegistry.length);
 });
@@ -19,13 +19,17 @@ test("every registered page uses the common detail shell", () => {
   });
 });
 
-test("Field stays first in Works with and is clearly marked as planned", () => {
+test("Field stays first in Works with and resolves from the registry itself", () => {
+  const field = componentRegistry.find((item) => item.key === "field");
+  assert.ok(field);
+  assert.equal(field.href, "/components/field");
+
   for (const item of componentRegistry) {
     if (!item.worksWith?.includes("field")) continue;
     assert.equal(item.worksWith[0], "field");
     const relations = getComponentRelations(item.key);
     assert.equal(relations.worksWithItems[0]?.title, "Field");
-    assert.match(relations.worksWithItems[0]?.description ?? "", /준비 단계/);
+    assert.equal(relations.worksWithItems[0]?.description, field.description);
   }
 });
 

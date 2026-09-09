@@ -10,7 +10,7 @@
 - 항상 하나가 켜져 있고 끌 수 없는 위치 표시는 Chip이 아니라 Tab이 담당한다. Chip은 아무것도 켜지지 않은 상태가 기본이다.
 - 설명이나 시각 정보를 비교하며 고르는 카드형 선택지는 Select Box가 담당한다.
 - 다른 요소에 덧붙어 상태나 개수를 작게 표시하는 것은 [badge.md](badge.md)가 담당한다. Chip은 [interaction.md](../interaction.md)의 「공통 Control Height」를 따르므로 컨트롤과 나란히 놓이는 크기이며, Badge는 자기 크기 체계로 덧붙는다. 동작이 없는 정보 표시가 Chip에 남는 이유도 크기와 놓이는 자리가 컨트롤 쪽이기 때문이다.
-- Label, Helper text와 Error message는 별도 Field가 소유한다.
+- Label, Helper text와 Error message는 별도 Field가 소유하며 그 구조와 API는 [field.md](field.md)에 있다.
 
 ## Anatomy
 

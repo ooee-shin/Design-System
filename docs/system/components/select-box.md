@@ -12,7 +12,7 @@
 - Select처럼 Trigger와 Popup으로 접지 않으며 Chip처럼 짧은 키워드 너비에 맞춰 흐르지 않는다.
 - 짧은 Label을 밀도 있게 나열하는 전통적인 폼은 Radio 또는 Checkbox를 사용한다. 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때 Select Box를 사용한다.
 - Field 안에서 Input, Number Input, Checkbox Group, Radio Group과 같은 입력 위계로 사용할 수 있다.
-- Label, Helper text, Error message와 선택 개수 안내는 Field가 소유한다.
+- Label, Helper text, Error message와 선택 개수 안내는 Field가 소유한다. 선택 개수는 [field.md](field.md)의 `rightDescription`에 둔다.
 - Select Box 자체는 값을 선택할 뿐 즉시 Action을 실행하지 않는다. 저장, 확인 또는 다음 단계는 별도 Button이 담당한다.
 
 ## Anatomy

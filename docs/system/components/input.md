@@ -9,8 +9,7 @@
 ## 역할과 경계
 
 - `Input`은 Container, 실제 input field와 내부 선택 요소를 소유한다.
-- Label, Helper text와 Error message는 별도 `Field`가 소유한다.
-- Label, 도움말과 오류 문구는 별도 `Field`가 소유하며 Input 문서에서 그 API를 정의하지 않는다.
+- Label, Helper text와 Error message는 별도 `Field`가 소유하며 그 구조와 API는 [field.md](field.md)에 있다. Input 문서에서 다시 정의하지 않는다.
 
 ## Anatomy
 
@@ -94,7 +93,6 @@ Input에는 별도 `numeric` Property를 두지 않는다. 수량, 순서, 비�
 ## 현재 정의하지 않은 항목
 
 - Shape variant
-- Field API와 배치 규칙
 - Prefix/Suffix 콘텐츠 제한 정책
 - Input별 권장 Size 정책
 

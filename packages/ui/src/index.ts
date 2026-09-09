@@ -4,6 +4,7 @@ export { Button, buttonVariants } from "./button";
 export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTriggerVariants, type ComboboxOption, type ComboboxProps, type MultiComboboxProps } from "./combobox";
 export { Chip, type ChipProps, type ChipShape, type ChipSize, type ChipTone } from "./chip";
 export { Checkbox, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps } from "./checkbox";
+export { Field, type FieldCharacterCount, type FieldProps } from "./field";
 export { Input, inputContainerVariants, type InputProps } from "./input";
 export { InputButton, type InputButtonProps } from "./input-button";
 export { NumberInput, type NumberInputProps } from "./number-input";
