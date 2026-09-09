@@ -3,6 +3,7 @@ export type ComponentKey =
   | "checkbox"
   | "chip"
   | "combobox"
+  | "field"
   | "input"
   | "input-button"
   | "message-bubble"
@@ -20,7 +21,7 @@ export type ComponentRegistryItem = {
   description: string;
   href: `/components/${string}`;
   similar?: ComponentKey[];
-  worksWith?: Array<ComponentKey | "field">;
+  worksWith?: ComponentKey[];
 };
 
 export const componentRegistry: ComponentRegistryItem[] = [
@@ -28,6 +29,7 @@ export const componentRegistry: ComponentRegistryItem[] = [
   { key: "checkbox", title: "Checkbox", description: "목록이나 폼에서 항목의 선택 여부를 제어합니다. Control은 16px 단일 크기이며 20px Label 첫 줄 안에서 중앙 정렬됩니다. 선택 상태는 Brand 표현을 사용합니다.", href: "/components/checkbox", similar: ["radio"], worksWith: ["field", "combobox"] },
   { key: "chip", title: "Chip", description: "짧은 Label로 값 하나를 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지웁니다.", href: "/components/chip", similar: ["select-box"], worksWith: ["combobox"] },
   { key: "combobox", title: "Combobox", description: "Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택합니다.", href: "/components/combobox", worksWith: ["field", "input", "checkbox", "chip"] },
+  { key: "field", title: "Field", description: "Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸입니다. Control이 들어가는 Input slot은 Swap 영역이며 접근성 연결은 Field가 소유합니다.", href: "/components/field", worksWith: ["input", "textarea", "number-input", "input-button", "select", "combobox", "select-box", "checkbox", "radio", "switch"] },
   { key: "input", title: "Input", description: "한 줄 텍스트를 입력하는 컴포넌트입니다. Label, 도움말과 오류 문구는 Input 내부가 아니라 별도 Field가 담당합니다.", href: "/components/input", similar: ["input-button", "textarea", "number-input"], worksWith: ["field"] },
   { key: "input-button", title: "Input Button", description: "직접 입력하는 대신 달력, 주소 검색, 시간 선택과 같은 후속 화면을 여는 버튼입니다. Input과 같은 외관을 사용하지만 실제 역할과 HTML 요소는 Button입니다.", href: "/components/input-button", similar: ["input", "combobox"], worksWith: ["field"] },
   { key: "message-bubble", title: "Message Bubble", description: "발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action을 검수합니다.", href: "/components/message-bubble" },
@@ -50,8 +52,7 @@ export type RelatedComponentItem = { href: string; title: string; description: s
 
 export function getComponentRelations(key: ComponentKey) {
   const component = getComponent(key);
-  const resolve = (relation: ComponentKey | "field"): RelatedComponentItem => {
-    if (relation === "field") return { href: "/components/field", title: "Field", description: "Label, 도움말과 오류 문구를 Form control과 결합합니다. 현재 정의 준비 단계입니다." };
+  const resolve = (relation: ComponentKey): RelatedComponentItem => {
     const target = getComponent(relation);
     return { href: target.href, title: target.title, description: target.description };
   };

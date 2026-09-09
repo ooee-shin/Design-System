@@ -10,7 +10,7 @@
 - 달력, 주소 검색, 시간 선택처럼 직접 타이핑하지 않고 별도 UI에서 값을 정하는 경우에 사용한다.
 - 후속 Picker, Dialog, Bottom Sheet 또는 검색 화면의 종류와 선택 로직은 Input Button이 소유하지 않는다.
 - 정의된 옵션을 Popup 내부에서 직접 검색하고 선택하는 `Combobox`와는 역할을 구분한다.
-- Label, Helper text와 Error message는 별도 `Field`가 소유한다.
+- Label, Helper text와 Error message는 별도 `Field`가 소유하며 그 구조와 API는 [field.md](field.md)에 있다.
 
 ## Anatomy
 

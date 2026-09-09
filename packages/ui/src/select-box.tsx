@@ -22,7 +22,9 @@ type SelectBoxGroupProps = {
   trailingElement?: SelectBoxTrailingElement
   disabled?: boolean
   readOnly?: boolean
-  ariaLabel: string
+  ariaLabel?: string
+  "aria-labelledby"?: string
+  "aria-describedby"?: string
   className?: string
 }
 
@@ -58,6 +60,8 @@ function SelectBoxGroup({
   disabled = false,
   readOnly = false,
   ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   className,
 }: SelectBoxGroupProps) {
   const fallbackValue: SelectBoxGroupValue = selectionMode === "multiple" ? [] : ""
@@ -105,6 +109,8 @@ function SelectBoxGroup({
       {selectionMode === "single" ? (
         <RadioGroup
           aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
           value={typeof selectedValue === "string" ? selectedValue : ""}
           onValueChange={(nextValue) => updateValue(String(nextValue), true)}
           disabled={disabled}
@@ -115,7 +121,7 @@ function SelectBoxGroup({
           {children}
         </RadioGroup>
       ) : (
-        <div role="group" aria-label={ariaLabel} aria-disabled={disabled || undefined} className={groupClassName} style={groupStyle}>
+        <div role="group" aria-label={ariaLabel} aria-labelledby={ariaLabelledBy} aria-describedby={ariaDescribedBy} aria-disabled={disabled || undefined} className={groupClassName} style={groupStyle}>
           {children}
         </div>
       )}

@@ -6,6 +6,7 @@
 
 - **shadcn/ui** — 구현 기반이자 공급망
 - **Obra shadcn/ui Pro Kit** — 필요할 때 사용하는 품질 및 Figma 참고자료
+- **Seed Design** — Form 구조와 컴포넌트 경계를 참고하는 입력
 - **VibePrompt와 기타 외부 UI** — 화면과 제품 패턴을 발견하는 입력
 - **oe** — 검수 후 확정한 semantic token과 컴포넌트 규칙
 
@@ -36,6 +37,14 @@ shadcn token과 `oe` token을 영구적으로 함께 사용하는 것이 목표�
 
 Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구조를 판단할 때 필요한 범위에서 참고한다. Obra Pro 자료는 실행 필수 의존성이 아니며 repository에 포함하지 않는다.
 
+## Seed Design
+
+당근이 공개한 디자인 시스템이며 Form 구조와 컴포넌트 경계를 참고한다. 확인일은 `2026-09-09`이고 공개 문서를 참고자료로만 사용한다.
+
+- Text Input은 공용 Input의 구조와 상태를 정리할 때 참고했다.
+- Field는 Header·Input slot·Footer 세 층 구조, 오류가 도움말을 대체하는 규칙, Character count의 자리를 참고했다. Seed가 `Suffix Slot`이라고 부르는 Header 오른쪽 자리는 저장소가 이미 `prefix`·`suffix`를 짧은 표기 자리로 쓰고 있어 `trailingElement`로 바꿔 들였다. 화면의 필수 항목 비율에 따라 표기를 뒤집는 규칙과 Label weight 두 단계는 들이지 않았다.
+- Seed가 Field 위에 두는 `Fieldset`과 `Form` 층은 현재 범위에 넣지 않았다.
+
 ## VibePrompt 및 기타 외부 UI 자료
 
 화면과 제품 패턴을 발견하는 입력이다. 정보 구조, 레이아웃과 반응형 동작, 콘텐츠 조합, 제품 시나리오와 시각적 아이디어를 본다.
@@ -50,5 +59,6 @@ Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구�
 - [VibePrompt](https://vibeprompts.dev/)
 - [Obra shadcn/ui Pro](https://shadcn.obra.studio/products/obra-shadcn-ui-pro)
 - [Obra license](https://shadcn.obra.studio/license)
+- [Seed Design Field](https://seed-design.io/components/field)
 - [Atlassian Design Tokens](https://atlassian.design/foundations/tokens/design-tokens/)
 - [GitHub Primer Color Usage](https://www.primer.style/product/getting-started/foundations/color-usage/)

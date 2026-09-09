@@ -138,9 +138,8 @@ Scrollbar가 차지하는 공간은 언제나 확보한다. 스크롤이 생기�
 - Size property
 - 자동 높이의 최대값과 이후 스크롤 정책
 - 최대 높이 계산에 사용할 reserved layout space의 정확한 값
-- Character count의 기본 소유자는 이후 Field에서 정의한다. Textarea 내부 표시가 필요한 실제 사례가 확인되면 별도 배치 방식을 다시 검토한다.
-- Label, Helper text, Error message를 소유할 Field API
+- Textarea 내부에 Character count를 표시하는 배치다. 기본 소유자는 [field.md](field.md)의 Footer이며, 내부 표시가 필요한 실제 사례가 확인되면 다시 검토한다.
 
-Label, Helper text, Error message 조합은 별도 Field 컴포넌트가 소유한다.
+Label, Helper text, Error message와 Character count는 [field.md](field.md)가 소유한다.
 
 상세 페이지 우측의 `On this page`에서 현재 섹션을 확인하고 이동할 수 있다. Field와 Input은 rail 아래의 낮은 위계 Related 링크로 제공한다.

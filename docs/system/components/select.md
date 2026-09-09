@@ -11,7 +11,7 @@
 - 다중 선택 결과는 Trigger 한 줄에서 대표값과 나머지 개수 또는 전체 개수로 요약한다.
 - 선택 결과를 접어 둔다. 선택한 값을 계속 보면서 개별로 빼야 하면 Combobox를 사용한다. Combobox는 선택값 Container를 항상 표시하며 검색·삭제·편집, 전체 선택과 2-depth 탐색을 담당한다.
 - 선택지를 화면에 펼쳐 놓고 설명이나 시각 정보를 계속 비교해야 하면 Select Box를 사용한다.
-- Label, Helper text와 Error message는 이후 별도 Field가 소유한다.
+- Label, Helper text와 Error message는 별도 Field가 소유하며 그 구조와 API는 [field.md](field.md)에 있다.
 
 ## Anatomy · Select structure
 
@@ -107,7 +107,7 @@ Control height는 [interaction.md](../interaction.md)의 「공통 Control Heigh
 - 성격이나 정렬 기준이 다른 Option은 별도 Group으로 묶어 경계를 드러낸다.
 - Item label은 명사형으로 짧고 명확하게 작성하며 같은 목록에서 어휘, 길이와 톤을 일관되게 유지한다. 부연 정보는 Item description으로 분리한다.
 - Placeholder는 고를 값의 종류를 알 수 있게 작성하며 Field label을 그대로 반복하지 않는다. 문장이 아니라 `지역 선택`처럼 키워드로 쓴다. 한 줄 Control 안에서 문장은 잘리기 쉽고, 값이 채워지면 사라지는 문구에 존댓말 어미를 붙일 만큼의 자리가 없다. Input Button의 같은 규칙과 기준을 공유한다.
-- Field label을 통해 한 개를 고르는지 여러 개를 고르는지 안내한다. 선택 가능 개수가 정해져 있다면 `담당자 선택 (1명)`, `관심 지역 선택 (최대 3개)`처럼 Label에 함께 표시한다.
+- Field label을 통해 한 개를 고르는지 여러 개를 고르는지 안내한다. 선택 가능 개수가 정해져 있다면 Label 안에 괄호로 넣지 않고 [field.md](field.md)의 `rightDescription`에 `1명`, `최대 3개`처럼 표시한다.
 - 단일 선택에서 `없음`이 유효한 답이라면 이를 명시하는 Option을 제공하고 선택 완료로 처리한다. Item label은 `담당자 없음`처럼 질문의 핵심을 포함하며, 목록 처음이나 마지막의 별도 Group으로 분리한다.
 
 ## 현재 정의하지 않은 항목
@@ -118,4 +118,3 @@ Control height는 [interaction.md](../interaction.md)의 「공통 Control Heigh
 - 검색과 자유 입력
 - 모바일에서 별도 Bottom Sheet로 전환하는 정책
 - Popup 최대 높이의 제품별 기준
-- Field API

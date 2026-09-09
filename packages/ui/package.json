@@ -11,6 +11,7 @@
     "./combobox": "./src/combobox.tsx",
     "./chip": "./src/chip.tsx",
     "./checkbox": "./src/checkbox.tsx",
+    "./field": "./src/field.tsx",
     "./input": "./src/input.tsx",
     "./input-button": "./src/input-button.tsx",
     "./number-input": "./src/number-input.tsx",
