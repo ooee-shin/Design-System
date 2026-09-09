@@ -1,4 +1,5 @@
 export { Badge, BADGE_COLORS, badgeVariants, type BadgeColor, type BadgeProps, type BadgeSize, type BadgeTone, type BadgeVariant } from "./badge";
+export { NotificationBadge, type NotificationBadgeMax, type NotificationBadgeProps, type NotificationBadgeTone } from "./notification-badge";
 export { Button, buttonVariants } from "./button";
 export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTriggerVariants, type ComboboxOption, type ComboboxProps, type MultiComboboxProps } from "./combobox";
 export { Chip, type ChipProps, type ChipShape, type ChipSize, type ChipTone } from "./chip";

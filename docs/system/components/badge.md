@@ -26,6 +26,17 @@ Badge
 └─ Label
 ```
 
+## Properties
+
+- `tone`: `brand | neutral | warning | danger | success | info | custom`, 기본값 `neutral`
+- `variant`: `fill | tonal | outlined`, 기본값 `tonal`. Style 을 고르는 기준은 아래 Guidelines 의 「스타일 선택하기」에 있다
+- `size`: `small | medium`, 기본값 `small`. 20px 과 24px 이며 실제 값은 아래 Specification 에 있다
+- `color`: `BADGE_COLORS` 의 18색 중 하나. `tone="custom"` 에서만 뜻을 가지므로 다른 tone 과 함께 넘기면 타입에서 걸린다
+- `children`: Label 이다. 앞에 아이콘을 두려면 `data-icon="inline-start"` 를 붙인 요소를 Label 앞에 넣는다
+- `className`, `render`: `render` 로 다른 요소가 될 수 있지만 그것이 누르는 동작을 허용한다는 뜻은 아니다
+
+`@ooee/ui` 는 색 목록을 `BADGE_COLORS` 런타임 값으로 함께 내보낸다. Studio 와 문서가 같은 목록을 따로 적지 않게 하려는 것이다.
+
 ## 색
 
 - Tone 은 일곱이다. `brand`, `neutral`, 상태를 뜻하는 `warning`·`danger`·`success`·`info` 넷, 그리고 semantic family 가 없는 색을 쓰는 `custom` 이다. Style 은 `fill`·`tonal`·`outlined` 셋이며 모든 tone 이 셋을 모두 지원한다.
@@ -53,6 +64,21 @@ Badge
 - **`tonal` 배경은 Light 가 100 이지만 Dark 는 900 이 아니라 800 이다.** Studio 의 Dark Surface 가 `neutral-900` 이어서 Dark 배경을 900 으로 내리면 `neutral` 의 `tonal` 이 Surface 와 대비 1.00 이 되어 화면에서 사라진다. 회색 계열 전체가 1.37 이하로 내려가므로 Dark 만 한 단계 올려 둔다.
 - `color` 는 `tone="custom"` 에서만 뜻을 가지므로 다른 tone 과 함께 쓰면 타입에서 걸린다.
 - 클래스를 tone 과 단계로 조립하기 때문에 Tailwind 가 소스를 훑어서 찾지 못한다. `packages/ui/src/styles.css` 의 `@source inline` 이 위 표의 단계만 미리 생성하며, 단계를 바꾸면 그 선언도 함께 고친다.
+
+## Specification
+
+| 자리 | `small` | `medium` |
+| --- | --- | --- |
+| 높이 | 20px | 24px |
+| 좌우 여백 | 6px | 8px |
+| 아이콘이 붙는 변 | 4px | 6px |
+| 모서리 | 6px | 6px |
+| 글자 | 12px Medium | 12px Medium |
+| 아이콘 | 12px | 12px |
+
+- 모서리와 글자, 아이콘 크기는 두 단계가 함께 쓴다. 모양은 크기와 독립된 축이므로 두 크기를 나란히 놓아도 한 컴포넌트로 읽힌다.
+- 높이가 커지면 좌우 여백도 한 단계 올린다. 20px 에서 쓰던 6px 을 24px 에서 그대로 두면 글자가 위아래보다 좌우에서 더 붙어 보인다.
+- Label 은 줄바꿈하지 않는다. 길어지면 Badge 가 그만큼 넓어져 옆 요소를 밀어낸다.
 
 ## Guidelines
 
@@ -107,7 +133,7 @@ Badge
 - 사용자가 상태를 직관적으로 파악할 수 있도록 상태에 맞는 tone 을 쓴다. `warning`·`danger`·`success`·`info` 가 그 자리를 담당한다.
 - 상태를 색으로만 구별하지 않는다. 색을 구별하기 어려운 사용자에게도 읽히도록 Label 에 상태 이름을 함께 둔다.
 
-## 정하지 않은 항목
+## 현재 정의하지 않은 항목
 
 - **테마와 무관한 흰색 tone.** 어두운 화면이나 이미지 위에 얹는 자리에는 Light·Dark 어느 쪽에서도 흰색인 tone 이 필요하다. `oe-foreground-inverse` 는 Light 에서 `white`, Dark 에서 `neutral-950` 으로 뒤집히므로 그 자리에 맞지 않아 `inverse` tone 을 걷어냈다. 고정 흰색을 semantic token 으로 둘지, 아니면 그 자리를 Badge 가 담당하지 않을지 정한다.
 - 세 유형의 관계. Badge·Dot Badge·Number Badge 를 한 컴포넌트의 variant 로 둘지 나눌지 정하지 않았다. 옛 구현은 하나에 유니온으로 담았고 appearance 이름이 `solid` 와 `fill` 로 갈려 있었다.

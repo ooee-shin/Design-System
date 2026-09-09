@@ -384,6 +384,16 @@ pnpm visual --path /components/badge \
   --measure "[data-slot=badge]"
 ```
 
+### 2026-09-14 오전에 branch 방식을 논의한다
+
+개발자가 합류하면서 branch를 어떻게 나눌지 `2026-09-14` 월요일 오전에 논의한다. **그때까지는 지금 방식을 그대로 유지한다.** 규칙을 미리 고치면 논의 뒤에 다시 고치게 되고 그 사이에 문서와 실제가 또 어긋난다.
+
+개발자 제안은 `main` 기준으로 `dev_1`·`dev_2`를 만들어 사람마다 하나씩 쓰는 방식이다. 확인해 보니 지금까지 열린 pull request 13개가 전부 작업 단위 branch에서 왔으므로, 실제 관행은 이미 작업 단위이고 [git-workflow.md](git-workflow.md)의 「작업 branch를 따로 만들지 않는다」만 한 명 기준에 머물러 있다. 정할 항목과 현재 상태를 정리한 논의 자료는 <https://claude.ai/code/artifact/6a30a671-efdd-4a10-9a92-5ba00d0eaf54>에 있다.
+
+**논의에서 확인할 제약 둘.** `main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다(API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다). 그리고 `Quality` workflow가 `pull_request`와 `main` push에서만 돌므로 branch에 push만 하는 동안에는 검사가 돌지 않는다.
+
+정해지면 git-workflow.md의 「작업을 시작할 때」·「branch와 pull request를 사용하는 경우」와 AGENTS.md의 「여러 환경에서 이어서 작업할 때」를 한 번에 고친다.
+
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
 Badge의 `compoundVariants` 21개를 걷어내고, tone별 팔레트와 variant별 단계의 곱으로 색을 정하게 바꿨다. 결정과 단계표, 대비 수치는 [badge.md](../system/components/badge.md)의 「색」이 소유한다. 여기서는 다른 컴포넌트에도 걸리는 사항만 남긴다.

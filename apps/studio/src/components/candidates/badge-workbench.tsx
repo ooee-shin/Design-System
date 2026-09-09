@@ -104,6 +104,7 @@ const sections = [
   { id: "style", label: "Style" },
   { id: "color", label: "Color" },
   { id: "guidelines", label: "Guidelines" },
+  { id: "property-map", label: "Property map" },
 ];
 
 export function BadgeWorkbench() {
@@ -229,11 +230,30 @@ export function BadgeWorkbench() {
           </div>
         </Section>
 
+        <Section id="property-map" title="Property map" description="실제 Props와 기본값입니다. Color는 Tone이 Custom일 때만 뜻을 가지므로 다른 Tone과 함께 넘기면 타입에서 걸립니다.">
+          <div className="col-span-full overflow-x-auto">
+            <table className="w-full min-w-[38rem] text-left text-xs">
+              <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th></tr></thead>
+              <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
+                <MapRow property="tone" values="brand | neutral | warning | danger | success | info | custom" defaultValue="neutral" />
+                <MapRow property="variant" values="fill | tonal | outlined" defaultValue="tonal" />
+                <MapRow property="size" values="small (20px) | medium (24px)" defaultValue="small" />
+                <MapRow property="color" values="BADGE_COLORS 18색" defaultValue="undefined" />
+                <MapRow property="children" values="ReactNode (Label)" defaultValue="undefined" />
+                <MapRow property="className" values="string" defaultValue="undefined" />
+                <MapRow property="render" values="ReactElement | ComponentRenderFn" defaultValue="undefined" />
+              </tbody>
+            </table>
+          </div>
+        </Section>
+
       </div>
       <OnThisPage items={sections} componentKey="badge" />
     </div>
   );
 }
+
+function MapRow({ property, values, defaultValue }: { property: string; values: string; defaultValue: string }) { return <tr><td className="py-3 pr-4 font-mono text-[11px] text-oe-foreground-primary">{property}</td><td className="py-3 pr-4 font-mono text-[11px]">{values}</td><td className="py-3 font-mono text-[11px]">{defaultValue}</td></tr>; }
 
 function ColorGrid<T extends string>({ rows, renderBadge }: { rows: readonly T[]; renderBadge: (row: T, variant: BadgeVariant) => ReactNode }) {
   return (
