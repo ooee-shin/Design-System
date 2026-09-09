@@ -97,7 +97,7 @@ function Field({
   }, [controlId, group])
 
   const header = (
-    <div data-slot="field-header" className="mb-0.5 flex min-w-0 items-center gap-1">
+    <div data-slot="field-header" className="mb-0.5 flex min-w-0 items-center gap-0.5">
       {required ? (
         <span aria-hidden="true" data-slot="field-requirement" className={cn("shrink-0 text-sm leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-danger-foreground-secondary")}>
           *
@@ -113,7 +113,7 @@ function Field({
         </label>
       )}
       {rightDescription ? (
-        <span data-slot="field-right-description" className={cn("ml-1 min-w-0 truncate text-xs leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-foreground-tertiary")}>
+        <span data-slot="field-right-description" className={cn("ml-1.5 min-w-0 truncate text-xs leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-foreground-tertiary")}>
           {rightDescription}
         </span>
       ) : null}

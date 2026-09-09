@@ -30,7 +30,7 @@ Header와 Input slot 사이는 6px, Input slot과 Footer 사이는 4px이다. Fo
 
 - `label`: 필수 `ReactNode`다. 14px Medium `oe-foreground-primary`를 사용한다.
 - `required`: Boolean이며 기본값은 `false`다. `true`면 Label 앞에 `*`를 `oe-danger-foreground-secondary`로 표시하고 Input slot의 Control에 `required`를 주입한다.
-- `rightDescription`: 선택 `ReactNode`다. 12px `oe-foreground-tertiary`를 사용하고 좁아지면 말줄임한다. Label과의 간격은 8px이며 Header의 다른 요소보다 4px 넓다. Label과 한 덩어리로 붙어 읽히면 Label이 어디서 끝나는지 알기 어렵다.
+- `rightDescription`: 선택 `ReactNode`다. 12px `oe-foreground-tertiary`를 사용하고 좁아지면 말줄임한다. Label과의 간격은 8px이다. Label과 한 덩어리로 붙어 읽히면 Label이 어디서 끝나는지 알기 어렵다.
 - `trailingElement`: 선택 `ReactNode`다. Header 오른쪽 끝에 배치하며 어떤 컴포넌트가 오는지 Field가 정하지 않는다.
 
 Field에는 `prefix`와 `suffix`를 두지 않는다. 두 이름은 값의 의미를 보완하는 짧은 표기 자리이며 [input.md](input.md)가 그 구분을 소유한다. Header에 오는 것은 조작을 여는 요소이므로 `trailingElement`를 사용한다.
@@ -98,6 +98,14 @@ Label과 필수 표시, 도움말과 오류 문구는 Field가 소유한다. Con
 
 도움말과 오류 문구가 함께 있으면 오류만 보인다. 둘이 함께 쌓이면 항목마다 Footer 높이가 달라져 폼의 수직 리듬이 깨지고, 먼저 읽어야 하는 문구가 흐려진다. 오류 문구는 무엇을 해야 하는지 알리는 행동 지시형으로 쓴다.
 
+### 상태값을 따라가기
+
+Header와 Footer의 글자는 Input slot에 있는 Control의 상태를 따라간다. Control만 상태를 표현하고 Label을 기본 상태로 남기지 않는다.
+
+Disabled에서는 Label과 필수 표시, Right description과 Footer 문구가 모두 흐려진다. Label만 흐려지고 나머지가 그대로면 절반만 꺼진 것으로 보인다. Error에서는 Label이 오류 문구와 같은 색을 쓴다. 여러 항목이 놓인 폼에서 어느 항목에서 오류가 났는지 Label에서 바로 읽혀야 한다.
+
+두 상태가 겹치면 Disabled가 앞선다. 손댈 수 없는 항목에 고쳐야 한다는 표시를 남기면 사용자가 그 자리를 붙들게 된다.
+
 ### Control은 Large 이상을 쓰기
 
 Field와 결합해 쓰는 화면은 대체로 모바일 폼이다. 손가락으로 누르는 자리이므로 한 줄 Control은 Regular 36px이 아니라 Large 40px 이상을 쓴다. 크기는 Field가 아니라 각 Control의 `controlSize`가 소유하므로 Field가 강제하지 않는다. 데스크톱 관리자 화면처럼 밀도가 중요한 자리에서는 Regular를 쓸 수 있다.
@@ -113,7 +121,8 @@ Control 하나를 Input slot의 직접 자식으로 둔다. 여러 항목을 나
 - Label: 14px Medium, line-height 20px. 기본은 `oe-foreground-primary`이고 Error에서는 `oe-danger-foreground-secondary`, Disabled에서는 `oe-foreground-disabled`
 - Requirement: 14px, line-height 20px. 기본은 `oe-danger-foreground-secondary`이고 Disabled에서는 `oe-foreground-disabled`
 - Right description: 12px, line-height 20px, `oe-foreground-tertiary`. Disabled에서는 `oe-foreground-disabled`
-- Label ↔ Right description 간격: 8px. Header의 다른 요소 사이는 4px
+- Requirement ↔ Label 간격: 2px. 필수 마크는 Label의 일부처럼 붙어 읽혀야 한다
+- Label ↔ Right description 간격: 8px. Label과 다른 위계이므로 떼어 놓는다
 - Helper text: 12px, line-height 20px, `oe-foreground-tertiary`. Disabled에서는 `oe-foreground-disabled`
 - Error message: 12px, line-height 20px, `oe-danger-foreground-secondary`
 - Character count: 12px, line-height 20px, `tabular-nums`. 기본은 `oe-foreground-tertiary`이고 오류 상태에서는 `oe-danger-foreground-secondary`

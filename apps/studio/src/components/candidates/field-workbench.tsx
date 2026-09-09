@@ -69,6 +69,23 @@ const guidelines = [
     ],
   },
   {
+    title: "상태값을 따라가기",
+    items: [
+      "Header와 Footer의 글자는 Input slot에 있는 Control의 상태를 따라갑니다. Control만 상태를 표현하고 Label을 기본 상태로 남기지 않습니다.",
+      "Disabled에서는 Label과 필수 표시, Right description과 Footer 문구가 모두 흐려집니다. Label만 흐려지고 나머지가 그대로면 절반만 꺼진 것으로 보입니다.",
+      "Error에서는 Label이 오류 문구와 같은 색을 씁니다. 여러 항목이 놓인 폼에서 어느 항목에서 오류가 났는지 Label에서 바로 읽혀야 합니다.",
+      "두 상태가 겹치면 Disabled가 앞섭니다. 손댈 수 없는 항목에 고쳐야 한다는 표시를 남기면 사용자가 그 자리를 붙들게 됩니다.",
+    ],
+  },
+  {
+    title: "Control은 Large 이상을 쓰기",
+    items: [
+      "Field와 결합해 쓰는 화면은 대체로 모바일 폼입니다. 손가락으로 누르는 자리이므로 한 줄 Control은 Regular 36px이 아니라 Large 40px 이상을 씁니다.",
+      "크기는 Field가 아니라 각 Control의 controlSize가 소유하므로 Field가 강제하지 않습니다. 데스크톱 관리자 화면처럼 밀도가 중요한 자리에서는 Regular를 쓸 수 있습니다.",
+      "Radio와 Checkbox, Chip은 이 규칙의 대상이 아닙니다. 세 컴포넌트는 각자 자기 조작 영역과 최소 높이를 소유합니다.",
+    ],
+  },
+  {
     title: "Input slot에는 Control을 그대로 두기",
     items: [
       "Control 하나를 Input slot의 직접 자식으로 둡니다. Field가 그 자식에 id와 상태를 주입해 Label과 잇습니다.",

@@ -254,15 +254,17 @@ test("Field warns when the injected id lands on nothing at all", () => {
 })
 
 
-test("Field puts a wider gap between the label and its right description", () => {
+test("Field keeps the requirement mark tight to the label and the right description apart", () => {
   const view = render(
-    <Field label="관심 지역" rightDescription="최대 3개">
+    <Field label="관심 지역" required rightDescription="최대 3개">
       <Input />
     </Field>,
   )
-  const rightDescription = view.getByText("최대 3개")
+  const header = view.container.querySelector("[data-slot=field-header]")
 
-  assert.match(rightDescription.className, /ml-1/)
+  assert.ok(header)
+  assert.match(header.className, /gap-0\.5/)
+  assert.match(view.getByText("최대 3개").className, /ml-1\.5/)
 })
 
 test("Field dims the label along with the control when it is disabled", () => {

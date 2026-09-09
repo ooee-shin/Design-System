@@ -98,7 +98,7 @@
   - Footer는 항목당 한 줄이며 왼쪽에 도움말과 오류, 오른쪽에 Character count. 오류가 있으면 도움말을 대체하고 Control에 `aria-invalid`를 주입함. Invalid는 별도 Property가 아님
   - Error에서는 Label도 `oe-danger-foreground-secondary`로 바뀜. 오류가 어느 항목에서 났는지 Label에서 바로 읽히게 하기 위함
   - Disabled에서는 Header와 Footer의 글자가 모두 `oe-foreground-disabled`로 바뀜. 필수 표시도 함께 흐려지며, Label 색은 Disabled가 Error보다 앞섬
-  - Label과 Right description 사이는 8px이고 Header의 다른 요소 사이는 4px
+  - Header 간격은 필수 마크와 Label 사이 2px, Label과 Right description 사이 8px. 마크는 Label의 일부처럼 붙어 읽히고 Right description은 다른 위계라 떼어 놓음
   - Field 결합은 대체로 모바일 폼이므로 한 줄 Control은 Large 40px 이상을 씀. Studio 예시의 Input·Select·Input Button을 Regular 36px에서 Large로 올렸으며, 크기는 Field가 아니라 각 Control의 `controlSize`가 소유해 Field가 강제하지 않음. Radio·Checkbox·Chip은 각자 자기 최소 높이를 소유하므로 대상이 아님
   - Input slot에 들어가는 Control은 Input, Textarea, Select, Radio Group, Checkbox Group, Chip Group과 Date·Time을 여는 Input Button. Studio Properties 절은 이 순서로 한 줄에 하나씩 두고 Field를 가운데 정렬하며, 예시 내용은 `Label`·`Placeholder`·`Helper text`처럼 요소 이름을 씀. Playground는 국문·영문 전환 검수 대상이라 실제 문구를 유지함
   - Chip Group은 공용 컴포넌트를 만들지 않고 Studio 예제에서 해결함. Chip을 Selection으로 쓰는 조합이며 [chip.md](../system/components/chip.md)의 Guidelines가 이미 그 쓰임을 소유함. Field의 Input slot이 세로 방향이라 가로 묶음이 필요한데, 조합을 지원하려고 컴포넌트를 늘리지 않고 예제가 `role="group"`을 가진 가로 묶음을 직접 만듦
