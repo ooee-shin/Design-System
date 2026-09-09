@@ -15,6 +15,21 @@
 
 별도 Wrapper가 실제로 존재하지 않으면 `Control container`처럼 역할명 뒤에 Container를 덧붙이지 않는다. `Control` 또는 컴포넌트가 분명해야 할 때는 `Radio control`, `Checkbox control`처럼 쓴다. 원자 예시 제목은 실제 역할에 따라 `Control only`, `Indicator only`처럼 작성한다.
 
+## Form 구성 층
+
+폼은 네 층으로 구성된다. 어느 책임이 어디에 있는지를 이 구분이 정한다.
+
+| 층 | 담당 | 현재 자산 |
+| --- | --- | --- |
+| `Control` | 실제 입력과 값 변경을 담당한다 | Input, Textarea, Number Input, Input Button, Select, Combobox, Select Box, Radio, Checkbox, Switch, Chip |
+| `Field` | Header, Input slot과 Footer를 하나로 묶은 폼 한 칸이다 | Field |
+| `Fieldset` | 여러 Field를 한 섹션으로 묶는다 | 없음 |
+| `Form` | 값의 제출과 유효성 검증을 담당한다 | 없음 |
+
+`Fieldset`과 `Form`은 현재 제공하지 않는다. 이름을 여기에 적는 것은 제출과 검증이 Control이나 Field의 책임이 아님을 밝히기 위한 것이며 두 컴포넌트를 만들어 두었다는 뜻이 아니다. 그 일이 필요하면 native `<form>`과 화면 코드가 담당한다.
+
+첫 층의 이름은 `Control`이며 `Input`이라고 부르지 않는다. `Input`은 그 층에 속하는 컴포넌트 하나의 이름이고, Select와 Radio도 같은 층에 있다. 층 이름을 `Input`으로 두면 한 단어가 층과 컴포넌트를 함께 가리킨다.
+
 ## 업계 명칭 대응
 
 컴포넌트마다 업계에서 굳어진 Anatomy 명칭이 있으면 그 명칭을 쓰고 아래 대응표로 역할을 함께 밝힌다. 한 컴포넌트 안에서 두 이름을 섞어 쓰지 않는다.

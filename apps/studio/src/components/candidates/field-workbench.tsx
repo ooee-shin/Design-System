@@ -27,16 +27,18 @@ const genericOptions = [
 ];
 
 const slots = ["input", "textarea", "number-input", "select", "radio-group", "checkbox-group", "chip-group", "date", "time"] as const;
+// 라벨은 그 자리의 쓰임을 앞에 두고, 쓰임 이름과 실제 컴포넌트 이름이 다를 때만 괄호로
+// 컴포넌트를 밝힌다. 그러지 않으면 Date 자리에서 Date 라는 컴포넌트를 찾게 된다.
 const slotLabels: Record<(typeof slots)[number], string> = {
-  input: "Text Field",
+  input: "Text Field (Input)",
   textarea: "Textarea",
   "number-input": "Number Input",
   select: "Select",
   "radio-group": "Radio Group",
-  "checkbox-group": "Checkbox Group",
-  "chip-group": "Chip Group",
-  date: "Date",
-  time: "Time",
+  "checkbox-group": "Checkbox Group (Checkbox Field)",
+  "chip-group": "Chip Group (Chip)",
+  date: "Date (Input Button)",
+  time: "Time (Input Button)",
 };
 
 // Group 은 가리킬 Control 하나가 없으므로 Field 가 group 이름을 소유한다. Playground 에서 Slot 을

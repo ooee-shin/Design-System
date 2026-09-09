@@ -10,7 +10,7 @@ Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶
 - Label, Helper text와 Error message는 Field가 소유한다. Input, Textarea, Select 같은 Control은 값을 다루는 일만 하며 자기 Label을 갖지 않는다.
 - Field는 값을 소유하지 않는다. 값과 상태 변경은 Input slot의 Control이 갖고, Field는 그 Control에 접근성 속성과 상태만 주입한다.
 - `CheckboxField`·`RadioField`·`SwitchField`는 Field가 아니라 Control과 인라인 Label을 결합한 선택 행 하나다. 여러 행을 하나의 폼 항목으로 묶을 때 그 바깥을 Field가 감싼다. 두 층의 이름 구분은 [vocabulary.md](../vocabulary.md)가 소유한다.
-- 여러 Field를 묶는 `Fieldset`과 폼 전체의 제출·검증을 담당하는 `Form`은 현재 제공하지 않는다.
+- 폼의 네 구성 층인 `Control`·`Field`·`Fieldset`·`Form`은 [vocabulary.md](../vocabulary.md)의 「Form 구성 층」이 소유한다. Field 위의 `Fieldset`과 `Form`은 현재 제공하지 않으며, 제출과 유효성 검증은 Field의 책임이 아니다.
 
 ## Anatomy
 
