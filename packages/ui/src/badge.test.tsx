@@ -6,7 +6,9 @@ import test, { afterEach } from "node:test"
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
 
-import { Badge } from "./badge"
+import { readFileSync } from "node:fs"
+
+import { Badge, BADGE_COLORS } from "./badge"
 
 afterEach(() => {
   cleanup()
@@ -16,73 +18,170 @@ function badgeIn(container: HTMLElement) {
   return container.querySelector("[data-slot=badge]")
 }
 
-// docs/system/components/badge.md 는 Badge 가 자기 크기 체계를 쓰며 공통 Control Height 를
-// 따르지 않는다고 정한다. 첫 구현은 24px 하나이며 크기 variant 는 뒤에 더한다.
-test("a badge is 24px tall", () => {
-  const view = render(<Badge>Label</Badge>)
+// tone 별 프리미티브 팔레트다. brand 는 Tailwind 팔레트가 아니라 seed 에서 생성되므로
+// `--brand-{단계}` 를 참조한다. 단계 이름이 같기 때문에 brand 도 같은 규칙에 들어온다.
+const PALETTES = [
+  ["brand", (step: number) => `[var(--brand-${step})]`],
+  ["neutral", (step: number) => `neutral-${step}`],
+  ["warning", (step: number) => `amber-${step}`],
+  ["danger", (step: number) => `red-${step}`],
+  ["success", (step: number) => `green-${step}`],
+  ["info", (step: number) => `blue-${step}`],
+] as const
 
-  assert.ok(badgeIn(view.container)?.className.includes("h-6"), `24px 가 아니다: ${badgeIn(view.container)?.className}`)
+// variant 는 tone 색을 배경·글자·경계 중 어디에 어느 단계로 쓸지만 정한다. fill 배경은 600 이며
+// 글자는 어느 색에서나 white 다. WCAG 2.x 만 보면 600 에서 절반이 4.5:1 아래지만, 색조를 반영하는
+// APCA 로는 white 글자가 전부 60 을 넘고 뒤집으면 오히려 절반으로 떨어진다. 700 을 쓰면 대비는
+// 넉넉해지지만 amber·yellow·lime 이 황토색으로 읽힌다. 근거는 badge.md 의 「색」에 있다.
+// tonal 배경은 Light 가 100, Dark 가 800 으로 짝이 어긋난다. Dark 를 900 으로 내리면 Studio 의
+// Dark Surface 가 `neutral-900` 이라 neutral tonal 이 Surface 와 대비 1.00 이 되어 사라지기 때문이다.
+const STEP_RULE = {
+  fill: (color: (step: number) => string) => [`bg-${color(600)}`, "text-white"],
+  tonal: (color: (step: number) => string) => [`bg-${color(100)}`, `text-${color(800)}`, `dark:bg-${color(800)}`, `dark:text-${color(200)}`],
+  outlined: (color: (step: number) => string) => [`border-${color(500)}/30`, `text-${color(800)}`, `dark:text-${color(300)}`],
+} as const
+
+// docs/system/components/badge.md 는 Badge 가 자기 크기 체계를 쓰며 공통 Control Height 를
+// 따르지 않는다고 정한다. 단계는 20px 과 24px 둘이며, 덧붙는 표시이므로 작은 쪽을 기본값으로 둔다.
+const SIZE_RULE = {
+  small: { height: "h-5", padding: "px-1.5", iconSide: "has-data-[icon=inline-start]:pl-1" },
+  medium: { height: "h-6", padding: "px-2", iconSide: "has-data-[icon=inline-start]:pl-1.5" },
+} as const
+
+test("a badge is 20px tall by default", () => {
+  const className = badgeIn(render(<Badge>Label</Badge>).container)?.className ?? ""
+
+  assert.ok(className.includes("h-5"), `20px 가 아니다: ${className}`)
 })
 
-// 색은 oe semantic token 으로만 받는다. Tailwind primitive 를 직접 참조하면 Light·Dark 조합을
-// 컴포넌트가 들고 있어야 하고, 브랜드 seed 가 바뀔 때 따라가지 못한다.
-test("every tone and variant pair renders with oe tokens only", () => {
-  const tones = ["brand", "neutral"] as const
-  const variants = ["fill", "tonal", "outlined"] as const
+// 높이가 커지면 좌우 여백도 한 단계 올린다. 20px 에서 6px 이던 여백을 24px 에서 그대로 두면 글자가
+// 위아래보다 좌우에서 더 붙어 보인다. 아이콘이 붙는 변의 보정도 같은 폭으로 따라 올린다.
+test("each size carries its own height and side padding", () => {
+  for (const [size, rule] of Object.entries(SIZE_RULE)) {
+    cleanup()
+    const className = badgeIn(render(<Badge size={size as keyof typeof SIZE_RULE}>Label</Badge>).container)?.className ?? ""
 
-  for (const tone of tones) {
-    for (const variant of variants) {
+    for (const expected of [rule.height, rule.padding, rule.iconSide]) {
+      assert.ok(className.split(" ").includes(expected), `${size} 에 ${expected} 가 없다: ${className}`)
+    }
+  }
+})
+
+// 모양은 크기와 독립적인 축이다. 두 단계가 같은 6px 모서리를 쓰므로, 나란히 놓아도 한 컴포넌트의
+// 두 크기로 읽힌다.
+test("both sizes keep the same corner", () => {
+  for (const size of Object.keys(SIZE_RULE)) {
+    cleanup()
+    const className = badgeIn(render(<Badge size={size as keyof typeof SIZE_RULE}>Label</Badge>).container)?.className ?? ""
+
+    assert.ok(className.includes("rounded-sm"), `${size} 의 모서리가 6px 이 아니다: ${className}`)
+  }
+})
+
+// 색은 tone 별 팔레트와 variant 별 단계의 곱으로만 정한다. 세만틱 token 이름은 tone 마다 구간이
+// 달라서 21개 조합을 하나씩 적게 만들었고, 그래서 한 조합을 고쳐도 나머지 20개가 따라오지
+// 않았다. 단계로 내려가면 규칙 셋과 팔레트 일곱으로 줄고 예외가 남지 않는다.
+test("every tone and variant pair comes from one step rule", () => {
+  for (const [tone, color] of PALETTES) {
+    for (const [variant, rule] of Object.entries(STEP_RULE)) {
       cleanup()
-      const view = render(<Badge tone={tone} variant={variant}>Label</Badge>)
+      const view = render(<Badge tone={tone} variant={variant as keyof typeof STEP_RULE}>Label</Badge>)
       const badge = badgeIn(view.container)
 
       assert.ok(badge, `${tone}/${variant} 를 렌더하지 못했다`)
-      const raw = badge.className.match(/(bg|text|border)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black)-?[0-9]*/g)
-      assert.equal(raw, null, `${tone}/${variant} 가 raw 색을 쓴다: ${raw?.join(" ")}`)
+
+      for (const expected of rule(color)) {
+        assert.ok(badge.className.split(" ").includes(expected), `${tone}/${variant} 에 ${expected} 가 없다: ${badge.className}`)
+      }
     }
+  }
+})
+
+// 단계 규칙을 벗어나는 자리가 남아 있지 않아야 한다. 세만틱 token 을 하나라도 색으로 쓰면
+// 그 tone 만 다른 체계를 따르게 되어 21개를 다시 개별로 확인해야 한다.
+test("no tone falls back to a semantic color token", () => {
+  for (const [tone] of PALETTES) {
+    for (const variant of Object.keys(STEP_RULE)) {
+      cleanup()
+      const view = render(<Badge tone={tone} variant={variant as keyof typeof STEP_RULE}>Label</Badge>)
+      const leftover = (badgeIn(view.container)?.className ?? "").match(/(?:bg|text|border)-oe-[\w-]+/g)
+
+      assert.equal(leftover, null, `${tone}/${variant} 가 세만틱 token 을 쓴다: ${leftover?.join(" ")}`)
+    }
+  }
+})
+
+// 회색 계열은 `gray` 하나만 남긴다. Tailwind 의 회색 다섯은 Badge 크기에서 서로 구별되지 않고,
+// 회색이 필요한 자리는 `neutral` tone 이 이미 담당한다. 고르는 사람에게는 다섯 중 무엇을 쓸지가
+// 판단할 거리 없이 늘어난 선택지였다.
+test("the custom tone offers only one gray family", () => {
+  assert.ok(BADGE_COLORS.includes("gray"), "gray 가 없다")
+
+  for (const removed of ["slate", "zinc", "neutral", "stone"]) {
+    assert.ok(!(BADGE_COLORS as readonly string[]).includes(removed), `회색 계열 ${removed} 가 남아 있다`)
+  }
+})
+
+// 클래스를 tone 과 단계로 조립하므로 Tailwind 는 `@source inline` 선언만 보고 생성한다. 색을
+// 늘리거나 줄일 때 그 선언을 함께 고치지 않으면 화면에서 색이 빠진 채로 렌더된다.
+test("every palette the badge can render has its classes generated", () => {
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8")
+  const declared = new Set(
+    css.matchAll(/@source inline\("[\w:-]*\{([^}]+)\}/g).flatMap((match) => match[1].split(",")),
+  )
+
+  // neutral tone 은 `color` 로 고를 수 없지만 팔레트로는 쓰이므로 함께 있어야 한다.
+  for (const palette of [...BADGE_COLORS, "neutral"]) {
+    assert.ok(declared.has(palette), `${palette} 의 클래스를 생성하지 않는다`)
+  }
+
+  for (const palette of declared) {
+    assert.ok(
+      palette === "neutral" || (BADGE_COLORS as readonly string[]).includes(palette),
+      `쓰이지 않는 팔레트 ${palette} 를 생성한다`,
+    )
   }
 })
 
 test("the outlined variant shows its border and the filled ones do not", () => {
   const outlined = render(<Badge variant="outlined">Label</Badge>)
-  assert.ok(/border-(oe|\[var\(--brand-alpha)/.test(badgeIn(outlined.container)?.className ?? ""), "경계 색이 없다")
+  assert.ok(/border-\S+\/30/.test(badgeIn(outlined.container)?.className ?? ""), "경계 색이 없다")
 
   cleanup()
   const fill = render(<Badge variant="fill">Label</Badge>)
   assert.ok(badgeIn(fill.container)?.className.includes("border-transparent"), "채운 Badge 의 경계가 투명하지 않다")
 })
 
-// outlined 의 경계는 tone 색의 30% 알파다. 불투명한 한 단계를 쓰면 같은 색의 tonal 배경과
-// 경계가 서로 다른 밝기로 갈려 한 컴포넌트로 보이지 않는다. brand 는 HCT alpha ramp 의
-// `brand-alpha-30` 을 쓰고, 나머지 tone 은 그 tone 의 색에 30% 알파를 얹는다. neutral 은
-// `border-primary` 가 이미 옅은 단계라 30% 로 낮추면 사라지므로 진한 쪽을 기준으로 삼는다.
+// outlined 의 경계는 어느 tone 에서나 그 tone 색 500 단계의 30% 알파다. 불투명한 한 단계를 쓰면
+// 같은 색의 tonal 배경과 경계가 서로 다른 밝기로 갈려 한 컴포넌트로 보이지 않는다.
 test("the outlined border is the tone color at 30% alpha", () => {
-  const expected = [
-    ["brand", "border-[var(--brand-alpha-30)]"],
-    ["neutral", "border-oe-border-bold-primary/30"],
-    ["warning", "border-oe-warning-border-primary/30"],
-    ["danger", "border-oe-danger-border-primary/30"],
-    ["success", "border-oe-success-border-primary/30"],
-    ["info", "border-oe-info-border-primary/30"],
-  ] as const
-
-  for (const [tone, border] of expected) {
+  for (const [tone, color] of PALETTES) {
     cleanup()
     const view = render(<Badge tone={tone} variant="outlined">Label</Badge>)
     const className = badgeIn(view.container)?.className ?? ""
 
-    assert.ok(className.includes(border), `${tone} outlined 의 경계가 ${border} 가 아니다: ${className}`)
+    assert.ok(className.includes(`border-${color(500)}/30`), `${tone} outlined 의 경계가 500 단계의 30% 알파가 아니다: ${className}`)
   }
+})
+
+// 모양은 vocabulary.md 의 `Rounded` 다. Badge 는 interaction.md 의 「공통 Control Radius」 적용
+// 대상이 아니고 시스템에서 가장 작은 요소이므로, 컨트롤의 8px 이 아니라 한 단계 작은 6px 을 쓴다.
+// 20px 높이에서 8px 은 반지름이 높이의 40% 라 모서리가 거의 원호로 읽힌다.
+test("a badge is rounded, not a pill", () => {
+  const className = badgeIn(render(<Badge>Label</Badge>).container)?.className ?? ""
+
+  assert.ok(className.includes("rounded-sm"), `6px 모서리가 아니다: ${className}`)
+  assert.ok(!className.includes("rounded-full") && !className.includes("rounded-4xl"), `알약 모양이 남아 있다: ${className}`)
 })
 
 // 아이콘은 Label 앞에만 붙는다. Badge 는 누르는 동작이 없으므로 뒤쪽 아이콘이 가리킬 동작이
 // 없고, 지우기나 펼치기가 필요하면 Chip 이나 Button 이 담당한다. shadcn base-nova 가 두 변에
-// 두었던 여백 보정도 앞쪽만 남긴다.
+// 두었던 여백 보정도 앞쪽만 남긴다. 아이콘이 붙는 변은 한 단계 더 좁혀 4px 로 둔다.
 test("a badge trims the padding only on the leading side", () => {
   const view = render(<Badge>Label</Badge>)
   const className = badgeIn(view.container)?.className ?? ""
 
-  assert.ok(className.includes("has-data-[icon=inline-start]:pl-1.5"), "앞쪽 아이콘 여백 보정이 없다")
+  assert.ok(className.includes("has-data-[icon=inline-start]:pl-1"), "앞쪽 아이콘 여백 보정이 없다")
   assert.ok(!className.includes("inline-end"), `뒤쪽 아이콘 규칙이 남아 있다: ${className}`)
 })
 
@@ -102,45 +201,22 @@ test("fill and tonal are told apart by their background", () => {
   const tonal = render(<Badge tone="brand" variant="tonal">Label</Badge>)
   const tonalClass = badgeIn(tonal.container)?.className ?? ""
 
-  assert.ok(fillClass.includes("bg-oe-brand-background-bold-primary"), `fill 이 진한 배경을 쓰지 않는다: ${fillClass}`)
-  assert.ok(tonalClass.includes("bg-oe-brand-background-secondary"), `tonal 이 정해진 배경을 쓰지 않는다: ${tonalClass}`)
+  assert.ok(fillClass.includes("bg-[var(--brand-600)]"), `fill 이 600 단계 배경을 쓰지 않는다: ${fillClass}`)
+  assert.ok(tonalClass.includes("bg-[var(--brand-100)]"), `tonal 이 100 단계 배경을 쓰지 않는다: ${tonalClass}`)
 })
 
-// 상태를 나타내는 tone 은 oe semantic family 를 그대로 쓴다. accent 는 token 이 fill 하나뿐이고
-// 그 색이 danger 와 같은 red 계열이라 이번 범위에서 뺐다.
-test("each status tone renders with its own oe family", () => {
-  const pairs = [
-    ["warning", "oe-warning"],
-    ["danger", "oe-danger"],
-    ["success", "oe-success"],
-    ["info", "oe-info"],
-  ] as const
+// custom 은 semantic family 가 없는 색을 임시로 쓰는 자리다. 받은 색 이름만 팔레트로 바뀌고
+// 단계 규칙은 다른 tone 과 같으므로, 나중에 그 색을 정식 tone 으로 올려도 화면이 달라지지 않는다.
+test("a custom tone follows the same step rule with the color it is given", () => {
+  const color = (step: number) => `orange-${step}`
 
-  for (const [tone, family] of pairs) {
+  for (const [variant, rule] of Object.entries(STEP_RULE)) {
     cleanup()
-    const view = render(<Badge tone={tone}>Label</Badge>)
+    const view = render(<Badge tone="custom" color="orange" variant={variant as keyof typeof STEP_RULE}>Label</Badge>)
     const className = badgeIn(view.container)?.className ?? ""
 
-    assert.ok(className.includes(family), `${tone} 이 ${family} token 을 쓰지 않는다: ${className}`)
+    for (const expected of rule(color)) {
+      assert.ok(className.split(" ").includes(expected), `custom/${variant} 에 ${expected} 가 없다: ${className}`)
+    }
   }
-})
-
-// custom 은 색 이름을 받아 Tailwind primitive 를 단계 규칙대로 매핑한다. 규칙은 tokens 의
-// statusFamily 와 같게 두어, 같은 색을 semantic family 로 올릴 때 값이 달라지지 않게 한다.
-test("a custom tone maps a tailwind color with the same steps as a status family", () => {
-  const view = render(<Badge tone="custom" color="orange" variant="tonal">Label</Badge>)
-  const className = badgeIn(view.container)?.className ?? ""
-
-  assert.ok(className.includes("bg-orange-100"), `tonal 배경이 100 단계가 아니다: ${className}`)
-  assert.ok(className.includes("dark:bg-orange-900"), `dark tonal 배경이 900 단계가 아니다: ${className}`)
-  assert.ok(className.includes("text-orange-800"), `글자가 800 단계가 아니다: ${className}`)
-})
-
-test("a custom tone keeps the same step rule across variants", () => {
-  const fill = render(<Badge tone="custom" color="teal" variant="fill">Label</Badge>)
-  assert.ok(badgeIn(fill.container)?.className.includes("bg-teal-700"), "fill 배경이 700 단계가 아니다")
-
-  cleanup()
-  const outlined = render(<Badge tone="custom" color="teal" variant="outlined">Label</Badge>)
-  assert.ok(badgeIn(outlined.container)?.className.includes("border-teal-500/30"), "outlined 경계가 500 단계의 30% 알파가 아니다")
 })

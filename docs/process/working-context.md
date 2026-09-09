@@ -371,7 +371,11 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 
 화면을 재고 찍는 일은 `scripts/visual/inspect.mjs`가 소유한다. 그전에는 측정할 때마다 일회용 스크립트를 새로 썼고 한 세션에 26개가 쌓였다. 그 왕복이 컨텍스트를 밀어 올려 뒤로 갈수록 요청 하나가 느려졌다. 사용법은 AGENTS.md의 「화면 확정 검수」가 소유한다.
 
-`--sweep`은 Control 축을 곱해 모든 조합을 크롬 한 번으로 훑는다. Badge의 `tone` 7 × `variant` 3 = 21개 조합을 19초에 재는 것까지 확인했다. **다만 아직 커밋하지 않았다.** 이어서 할 때 `git status`로 `scripts/visual/inspect.mjs`를 먼저 확인한다.
+`--sweep`은 Control 축을 곱해 모든 조합을 크롬 한 번으로 훑는다. Badge의 `tone` 7 × `variant` 3 = 21개 조합을 19초에 재는 것까지 확인했다.
+
+**`--sweep`은 `--eval`을 무시한다.** 조합을 훑을 때는 `--measure`만 반영되므로, 대비처럼 임의 식으로 계산해야 하는 값은 `--click`으로 조합을 하나씩 지정해 따로 재야 한다. 훑기와 임의 식을 함께 쓸 수 있게 고칠지는 정하지 않았다.
+
+**zsh에서 `set -- $combo`로 조합을 쪼개면 클릭이 조용히 실패한다.** zsh는 인용하지 않은 변수를 단어로 나누지 않아 `--click "Fill Warning"`이 되고, 해당하는 button이 없어도 측정은 기본 상태의 컴포넌트를 그대로 재서 그럴듯한 숫자를 낸다. 반복문으로 조합을 훑을 때는 축마다 중첩 `for`를 쓰고, 측정식이 `data-tone`처럼 지금 상태를 함께 돌려주게 해서 클릭이 먹었는지 확인한다.
 
 ```bash
 pnpm visual --path /components/badge \
@@ -380,11 +384,21 @@ pnpm visual --path /components/badge \
   --measure "[data-slot=badge]"
 ```
 
-**사용자 확인을 기다리는 항목 — Badge의 `compoundVariants` 21개를 규칙으로 줄일 수 있는가.** 지금은 `tone` 7과 `variant` 3의 조합 21개가 하나도 파생되지 않고 `packages/ui/src/badge.tsx`에 전부 개별로 적혀 있다. 그래서 한 조합을 고쳐도 나머지 20개가 따라오지 않고 21번을 각각 화면에서 확인해야 한다. Badge 검수가 다른 컴포넌트보다 오래 걸리는 직접적인 이유다. 색을 tone별 token에서 끌어오고 variant는 그 token을 배경·글자·선 중 어디에 쓸지만 정하는 형태로 바꿀 수 있는지 검토한다. 줄이면 21번이 3번이 되지만 tone마다 예외가 필요한 자리가 있는지는 화면에서 먼저 봐야 하므로 사용자 판단이 필요하다.
+### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
+
+Badge의 `compoundVariants` 21개를 걷어내고, tone별 팔레트와 variant별 단계의 곱으로 색을 정하게 바꿨다. 결정과 단계표, 대비 수치는 [badge.md](../system/components/badge.md)의 「색」이 소유한다. 여기서는 다른 컴포넌트에도 걸리는 사항만 남긴다.
+
+- **세만틱 token 이름 대신 프리미티브 단계를 참조한다.** 이전 근거는 「프리미티브를 직접 참조하면 Light·Dark 조합을 컴포넌트가 들고 있어야 하고 브랜드 seed가 바뀔 때 따라가지 못한다」였는데, `--brand-{단계}`가 seed에서 생성되므로 뒤쪽 우려는 성립하지 않았다. 남는 비용은 Light·Dark 단계 쌍을 컴포넌트가 들고 있게 된다는 점 하나다. **이 전환을 다른 컴포넌트로 넓힐지는 정하지 않았다.** Badge는 tone 축이 있어서 조합이 21개로 불어난 컴포넌트이고, tone 축이 없는 컴포넌트는 세만틱 token으로도 조합이 파생되지 않는 문제가 없다.
+- **짙은 유채색 배경의 가독성은 WCAG 2.x 수치만으로 판단하지 않는다.** 2.x 대비는 상대 휘도만 계산해서 색조와 채도를 보지 않으므로, 짙은 유채색에 white 글자를 얹은 경우를 실제보다 낮게 평가한다. Badge `fill`은 600 단계에서 절반이 4.5:1 아래지만 APCA로는 전부 60을 넘고, 글자를 뒤집으면 오히려 절반으로 떨어진다. **다른 컴포넌트에서 같은 상황을 만나면 두 값을 함께 재고, 글자 극성은 색조가 아니라 배경 밝기로 정한다.** 계산 방법은 `scripts/visual/inspect.mjs --eval`로 캔버스에서 픽셀을 읽어 쓴다.
+- 단계를 고를 때는 눈대중으로 정하지 않고 위 「화면 검수 도구」로 대비를 재서 정한다. 색 계열마다 같은 단계 숫자가 같은 밝기로 보이지 않으므로, 수치와 화면을 함께 본다.
+- **Badge의 크기와 모양도 함께 바꿨다.** 높이는 `size` Property로 `small`(20px)·`medium`(24px) 두 단계가 되었고 기본값은 `small`이다. 모양은 알약에서 `Rounded` 6px로 바뀌었으며 좌우 여백이 단계별로 6px과 8px이다. 결정 근거는 badge.md의 「역할과 경계」에 있다. Studio에는 `Properties · Size` 카드를 추가했다. Property를 더하는 것은 non-breaking이지만 기본 높이가 24px에서 20px로 바뀌므로 기존 화면의 Badge가 작아진다.
+- **`BadgeColor`에서 회색 넷을 뺀 것은 breaking change다.** `slate`·`zinc`·`neutral`·`stone`을 지웠고 목록을 `BADGE_COLORS` 런타임 값으로 내보내 Studio가 같은 목록을 따로 적지 않게 했다. 공개 타입이 좁아지는 변경이라 [git-workflow.md](git-workflow.md)에 따라 별도 branch와 PR로 합친다. Checkbox의 `appearance` → `shape` 때와 같은 처리다.
+- Dark의 `tonal` 배경이 900에서 800으로 올라가, 회색 계열이 Studio의 Dark Surface(`neutral-900`)에 묻히던 미정 항목이 해소됐다. Surface를 `neutral-800`으로 두는 자리에서는 여전히 겹치며, 이 항목은 badge.md의 「정하지 않은 항목」에 남겨 두었다.
 
 ### 화면에서 확인이 밀린 항목
 
 - Checkbox의 Square 모양과 Radio·Checkbox의 컨트롤 그룹 순서.
+- checkbox.md 64행의 Trailing element 예시가 「Red tonal XSmall `NEW` Badge」로 적혀 있으나 `XSmall`은 Badge에 없는 이름이고, checkbox-workbench는 Badge 컴포넌트가 아니라 16px 알약을 직접 만들어 쓴다. Checkbox 확정 시점에 함께 정리한다.
 Anatomy 연결선 좌표와 범위 표시선 공용화는 `2026-09-08`에 끝냈다. Input Button의 Prefix·Suffix 마커, 공용 부품 통합 뒤의 좌표와 여백, Combobox 범위 표시선의 처리 방향이 여기에 있었다.
 
 ## 이전부터 이어지는 작업

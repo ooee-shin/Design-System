@@ -1,14 +1,24 @@
 /* 이 패키지의 컴포넌트가 쓰는 Tailwind 클래스를 소비자 빌드가 찾도록 스캔 경로를 함께 선언한다. */
 @source "./";
 
-/* Badge 의 custom tone 은 색 이름을 받아 클래스를 조립하므로 Tailwind 가 소스에서 찾지 못한다.
-   tokens 의 statusFamily 가 쓰는 단계만 미리 생성한다. fill 배경 700/400, tonal 배경 100/900,
-   글자 800/200, 경계 500 의 30% 알파다. */
-@source inline("bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,400,700,900}");
-@source inline("text-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{200,800}");
-@source inline("border-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-500/30");
-@source inline("dark:bg-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{400,900}");
-@source inline("dark:text-{slate,gray,zinc,neutral,stone,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-200");
+/* Badge 는 tone 별 팔레트와 variant 별 단계를 곱해 클래스를 조립하므로 Tailwind 가 소스에서
+   찾지 못한다. 그 단계만 미리 생성한다. fill 배경 600, tonal 배경 100/800, 글자 800/200,
+   outlined 글자 800/300, 경계 500 의 30% 알파다. Badge 의 단계 규칙을 바꾸면 여기도 함께 고친다.
+   `BADGE_COLORS` 의 색과 neutral tone 의 팔레트만 대상으로 둔다. 목록이 어긋나면 badge 테스트가 잡는다. */
+@source inline("bg-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,600}");
+@source inline("dark:bg-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-800");
+@source inline("text-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-800");
+@source inline("dark:text-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{200,300}");
+@source inline("border-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-500/30");
+
+/* brand 는 seed 에서 생성한 `--brand-{단계}` 를 참조하므로 팔레트 확장에 들어오지 않는다. */
+@source inline("bg-[var(--brand-100)]");
+@source inline("bg-[var(--brand-600)]");
+@source inline("dark:bg-[var(--brand-800)]");
+@source inline("text-[var(--brand-800)]");
+@source inline("dark:text-[var(--brand-200)]");
+@source inline("dark:text-[var(--brand-300)]");
+@source inline("border-[var(--brand-500)]/30");
 
 .oe-message-bubble-incoming {
   background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
