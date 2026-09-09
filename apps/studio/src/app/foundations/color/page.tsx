@@ -32,7 +32,7 @@ export default function ColorFoundationPage() {
             href="https://github.com/material-foundation/material-color-utilities"
             target="_blank"
             rel="noreferrer"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "self-start")}
+            className={cn(buttonVariants({ variant: "outline", tone: "neutral", controlSize: "small" }), "self-start")}
           >
             HCT library
             <ExternalLink data-icon="inline-end" />

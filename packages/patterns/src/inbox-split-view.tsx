@@ -423,9 +423,7 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
               {unreadCount}
             </span>
           )}
-          <Button variant="ghost" size="icon-sm" className="oe-hover-layer ml-auto text-oe-foreground-tertiary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.filter}>
-            <Filter />
-          </Button>
+          <Button variant="ghost" tone="neutral" controlSize="xsmall" className="ml-auto" aria-label={copy.filter} leadingIcon={<Filter />} />
         </div>
 
         <div className="relative px-4 pb-3">
@@ -485,21 +483,21 @@ export function InboxSplitView({ locale = "ko" }: { locale?: InboxLocale }) {
         <header className="flex items-start gap-3 border-b border-oe-border-secondary px-4 py-3.5 sm:px-6 sm:py-4">
           <Button
             variant="ghost"
-            size="icon-sm"
-            className="oe-hover-layer mt-0.5 hover:bg-transparent md:hidden focus-visible:ring-oe-focus-ring"
+            tone="neutral"
+            controlSize="xsmall"
+            className="mt-0.5 md:hidden"
             onClick={() => setMobileThreadOpen(false)}
             aria-label={copy.back}
-          >
-            <ArrowLeft />
-          </Button>
+            leadingIcon={<ArrowLeft />}
+          />
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-semibold">{selectedThread.subject}</h2>
             <p className="mt-0.5 truncate text-xs text-oe-foreground-secondary">{selectedThread.people}</p>
           </div>
           <div className="flex shrink-0 gap-1 text-oe-foreground-tertiary">
-            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.archive}><Archive /></Button>
-            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.snooze}><Clock3 /></Button>
-            <Button variant="ghost" size="icon-sm" className="oe-hover-layer hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring" aria-label={copy.more}><MoreHorizontal /></Button>
+            <Button variant="ghost" tone="neutral" controlSize="xsmall" aria-label={copy.archive} leadingIcon={<Archive />} />
+            <Button variant="ghost" tone="neutral" controlSize="xsmall" aria-label={copy.snooze} leadingIcon={<Clock3 />} />
+            <Button variant="ghost" tone="neutral" controlSize="xsmall" aria-label={copy.more} leadingIcon={<MoreHorizontal />} />
           </div>
         </header>
 

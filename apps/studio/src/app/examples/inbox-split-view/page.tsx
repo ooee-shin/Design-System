@@ -35,7 +35,7 @@ export default function InboxSplitViewPage() {
             href="https://vibeprompts.dev/dashboards/dashboards-inbox-split-view/"
             target="_blank"
             rel="noreferrer"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "self-start")}
+            className={cn(buttonVariants({ variant: "outline", tone: "neutral", controlSize: "small" }), "self-start")}
           >
             원본 보기
             <ExternalLink data-icon="inline-end" />

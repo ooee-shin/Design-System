@@ -122,7 +122,7 @@ export function ColorLab() {
                 className="font-mono uppercase"
                 aria-invalid={!validDraft}
               />
-              <Button type="button" variant="outline" onClick={() => updateDraft("#0073FF")}>
+              <Button type="button" variant="outline" tone="neutral" onClick={() => updateDraft("#0073FF")}>
                 초기화
               </Button>
               <Button type="button" onClick={() => applySeed(seed)} disabled={!validDraft || seed === appliedSeed}>

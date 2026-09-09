@@ -110,11 +110,11 @@ export default function Home() {
             </p>
           </div>
           <div className="flex gap-2 lg:justify-end">
-            <Link href="/components" className={cn(buttonVariants({ size: "lg" }))}>
+            <Link href="/components" className={cn(buttonVariants({ controlSize: "large" }))}>
               Components 보기
               <ArrowRight data-icon="inline-end" />
             </Link>
-            <Link href="/docs" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+            <Link href="/docs" className={cn(buttonVariants({ variant: "outline", tone: "neutral", controlSize: "large" }))}>
               Docs 보기
             </Link>
           </div>
