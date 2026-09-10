@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState, type ReactNode } from "react";
-import { RiArchiveFill, RiArchiveLine, RiBookmarkFill, RiBookmarkLine, RiFolderFill, RiFolderLine, RiHeartFill, RiHeartLine, RiNotification3Fill, RiNotification3Line, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
+import { RiBookmarkFill, RiBookmarkLine, RiHeartFill, RiHeartLine, RiNotification3Fill, RiNotification3Line, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -139,8 +139,6 @@ const copy = {
     search: "검색",
     notify: "알림",
     save: "저장",
-    archive: "보관",
-    collect: "모아 두기",
     good: "좋아요",
   },
   en: {
@@ -150,8 +148,6 @@ const copy = {
     search: "Search",
     notify: "Notify",
     save: "Save",
-    archive: "Archive",
-    collect: "Collect",
     good: "Like",
   },
 } as const;
@@ -358,15 +354,15 @@ export function ToggleButtonWorkbench() {
               description={[
                 "열려 있다는 것은 이 버튼만이 아니라 화면의 다른 부분까지 바뀌었다는 뜻입니다. 아이콘 하나로는 그 변화를 가리키지 못하므로 배경으로 한 단계 더 강조합니다.",
               ]}
-              doVisual={<div className={`${GUIDE_BOX} flex-col items-start gap-3`}><ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} /><SkeletonLine className="h-24 w-full rounded-xl" /></div>}
-              dontVisual={<div className={`${GUIDE_BOX} flex-col items-start gap-3`}><ToggleButton defaultPressed icon={<RiSearchLine />} activeIcon={<RiSearchFill />} aria-label={c.search} /><SkeletonLine className="h-24 w-full rounded-xl" /></div>}
+              doVisual={<GuideExample className="flex-col items-start gap-3"><ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} /><SkeletonLine className="h-24 w-full rounded-xl" /></GuideExample>}
+              dontVisual={<GuideExample className="flex-col items-start gap-3"><ToggleButton defaultPressed icon={<RiSearchLine />} activeIcon={<RiSearchFill />} aria-label={c.search} /><SkeletonLine className="h-24 w-full rounded-xl" /></GuideExample>}
             />
 
             <div>
               <GuidelineTitle>그 밖의 토글은 Ghost로 두되 강조가 약하면 Tonal 보기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="목록에 여럿 · Ghost">
-                  <div className={`${GUIDE_BOX} flex-col justify-center gap-3`}>
+                  <GuideExample className="flex-col justify-center gap-3">
                     {ROW_WIDTHS.map((width, index) => (
                       <span key={width} className="flex items-center justify-between gap-4">
                         <SkeletonLine className={`${SKELETON_TITLE} ${width}`} />
@@ -375,10 +371,10 @@ export function ToggleButtonWorkbench() {
                           : <ToggleButton controlSize="small" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />}
                       </span>
                     ))}
-                  </div>
+                  </GuideExample>
                 </GuideVisual>
                 <GuideVisual label="상세 화면에 하나 · Tonal">
-                  <div className={`${GUIDE_BOX} flex-col justify-center gap-4`}>
+                  <GuideExample className="flex-col justify-center gap-4">
                     <span className="flex items-center justify-between gap-4">
                       <SkeletonLine className={`${SKELETON_TITLE} w-1/2`} />
                       <ToggleButton variant="tonal" defaultPressed icon={<RiBookmarkFill />} aria-label={c.save} />
@@ -388,7 +384,7 @@ export function ToggleButtonWorkbench() {
                       <SkeletonLine className={`${SKELETON_BODY} w-full`} />
                       <SkeletonLine className={`${SKELETON_BODY} w-2/3`} />
                     </span>
-                  </div>
+                  </GuideExample>
                 </GuideVisual>
               </div>
               <GuidelineList items={[
@@ -406,8 +402,8 @@ export function ToggleButtonWorkbench() {
                 "색만으로 갈리는 상태는 색을 구별하기 어려운 사람에게 전달되지 않고, 옅은 배경 위에서는 누구에게나 흐려집니다.",
                 "Tonal에서는 아이콘이 하나이고 배경이 켜짐을 말합니다. 배경은 면적이 생기고 사라지는 변화이므로 색을 구별하기 어려워도 전달됩니다.",
               ]}
-              doVisual={<div className={`${GUIDE_BOX} items-center justify-center gap-8`}><ToggleButton controlSize="xlarge" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /><ToggleButton controlSize="xlarge" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /></div>}
-              dontVisual={<div className={`${GUIDE_BOX} items-center justify-center gap-8`}><ToggleButton controlSize="xlarge" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /><ToggleButton controlSize="xlarge" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /></div>}
+              doVisual={<GuideExample className="items-center justify-center gap-8"><ToggleButton controlSize="xlarge" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /><ToggleButton controlSize="xlarge" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /></GuideExample>}
+              dontVisual={<GuideExample className="items-center justify-center gap-8"><ToggleButton controlSize="xlarge" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /><ToggleButton controlSize="xlarge" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /></GuideExample>}
             />
 
             <UsageComparison
@@ -418,8 +414,8 @@ export function ToggleButtonWorkbench() {
                 "별의 노랑과 하트의 빨강은 사용자가 이미 알고 있는 색입니다. 그 색을 쓰면 켜졌다는 것을 글자 없이도 읽습니다.",
                 "고정처럼 관용색이 없는 토글과 영역을 여는 토글은 기본값 Brand를 씁니다.",
               ]}
-              doVisual={<PreviewLocaleScope className={`${GUIDE_BOX} items-center justify-center gap-8`}><ToggleButton controlSize="xlarge" tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="xlarge" tone="custom" color="like" defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className={`${GUIDE_BOX} items-center justify-center gap-8`}><ToggleButton controlSize="xlarge" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="xlarge" defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
+              doVisual={<GuideExample className="items-center justify-center gap-8"><ToggleButton controlSize="xlarge" tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="xlarge" tone="custom" color="like" defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></GuideExample>}
+              dontVisual={<GuideExample className="items-center justify-center gap-8"><ToggleButton controlSize="xlarge" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="xlarge" defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></GuideExample>}
             />
 
             <div>
@@ -444,11 +440,11 @@ export function ToggleButtonWorkbench() {
               doText="같은 대상에는 토글 하나만 둡니다."
               dontText="뜻이 겹치는 토글을 나란히 두지 않습니다."
               description={[
-                "저장과 보관과 모아 두기처럼 뜻이 겹치는 토글을 한 대상에 함께 두면 무엇이 어디에 남는지 알 수 없습니다.",
+                "즐겨찾기와 찜과 저장은 셋 다 나중에 다시 보려고 담아 두는 동작입니다. 한 대상에 함께 두면 무엇이 어디에 남는지 알 수 없습니다.",
                 "성격이 다른 토글이 함께 필요하면 아이콘으로 갈리는 것만으로 충분한지 먼저 봅니다.",
               ]}
-              doVisual={<div className={`${GUIDE_BOX} items-center justify-between gap-4`}><SkeletonLine className={`${SKELETON_TITLE} w-1/2`} /><ToggleButton icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></div>}
-              dontVisual={<div className={`${GUIDE_BOX} items-center justify-between gap-4`}><SkeletonLine className={`${SKELETON_TITLE} w-1/2`} /><span className="flex shrink-0 items-center gap-1"><ToggleButton icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /><ToggleButton icon={<RiArchiveLine />} activeIcon={<RiArchiveFill />} aria-label={c.archive} /><ToggleButton icon={<RiFolderLine />} activeIcon={<RiFolderFill />} aria-label={c.collect} /></span></div>}
+              doVisual={<GuideExample className="items-center justify-between gap-4"><SkeletonLine className={`${SKELETON_TITLE} w-1/2`} /><ToggleButton icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></GuideExample>}
+              dontVisual={<GuideExample className="items-center justify-between gap-4"><SkeletonLine className={`${SKELETON_TITLE} w-1/2`} /><span className="flex shrink-0 items-center gap-1"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="like" icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /><ToggleButton icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></span></GuideExample>}
             />
           </div>
         </Section>
@@ -506,3 +502,10 @@ function ColorGrid({ rows, render }: { rows: readonly ColorRow[]; render: (row: 
 function Example({ label, description, children }: { label: string; description?: string; children: ReactNode }) { return <div className="flex min-h-32 min-w-0 flex-col gap-3 rounded-xl border border-oe-border-secondary p-4"><div><p className="text-xs font-medium text-oe-foreground-primary">{label}</p>{description ? <p className="mt-1 text-[11px] leading-4 text-oe-foreground-tertiary">{description}</p> : null}</div><PreviewLocaleScope className="mt-auto">{children}</PreviewLocaleScope></div>; }
 
 function SkeletonLine({ className }: { className: string }) { return <span aria-hidden="true" className={cn("block shrink-0 rounded-full bg-oe-background-secondary", className)} />; }
+
+// Guidelines 의 시각 예제는 규칙을 보여 주는 도식이지 조작할 대상이 아니다. `inert` 로 포인터와
+// 키보드 초점을 함께 막아, 카드마다 놓인 토글 열여섯 개가 탭 순서에 끼어들지 않게 한다.
+// Playground 와 Properties 의 예시는 직접 눌러 확인하는 자리이므로 여기에 넣지 않는다.
+function GuideExample({ className, children }: { className?: string; children: ReactNode }) {
+  return <div inert className={cn(GUIDE_BOX, className)}>{children}</div>;
+}
