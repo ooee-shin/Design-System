@@ -131,16 +131,20 @@ function toggleButtonVariants({
   )
 }
 
+// 아이콘을 몇 개 받는지는 Style 이 정한다. Ghost 는 배경이 없어 아이콘의 색과 모양이 켜짐을
+// 말해야 하므로 `Fill` 을 함께 받고, Tonal 은 배경이 이미 켜짐을 말하므로 아이콘을 그대로 둔다.
+// Tonal 에서도 `activeIcon` 을 받게 두면 넘겨도 그려지지 않는 Property 가 생기므로 타입에서 막는다.
+type ToggleButtonIconProps =
+  | { variant?: "ghost"; icon: React.ReactNode; activeIcon: React.ReactNode }
+  | { variant: "tonal"; icon: React.ReactNode; activeIcon?: never }
+
 // Disabled 를 제공하지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않기 때문이며, Property 를
 // 남겨 두면 시각 표현이 없는 상태를 소비자가 넘길 수 있게 된다. 근거는 `toggle-button.md` 의
 // 「현재 정의하지 않은 항목」에 있다.
 export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className" | "disabled"> & {
-  variant?: ToggleButtonVariant
   controlSize?: ToggleButtonSize
-  icon: React.ReactNode
-  activeIcon: React.ReactNode
   className?: string
-} & ToggleButtonToneProps
+} & ToggleButtonIconProps & ToggleButtonToneProps
 
 function ToggleButton({
   className,
@@ -156,10 +160,11 @@ function ToggleButton({
   const hasLabel = children !== undefined && children !== null && children !== false
   const iconOnly = !hasLabel
 
-  // 켜짐과 꺼짐에서 서로 다른 아이콘을 그린다. Remix Icon 은 `RiStarLine` 과 `RiStarFill` 이
-  // 각각 다른 컴포넌트여서 컴포넌트가 스스로 `Fill` 로 바꿔 그릴 수단이 없기 때문에 둘을 모두
+  // Ghost 는 켜짐과 꺼짐에서 서로 다른 아이콘을 그린다. Remix Icon 은 `RiStarLine` 과 `RiStarFill`
+  // 이 각각 다른 컴포넌트여서 컴포넌트가 스스로 `Fill` 로 바꿔 그릴 수단이 없기 때문에 둘을 모두
   // 받는다. 둘을 동시에 그려 놓고 CSS 로 감추지 않는 이유는 화면 낭독기가 쓰지 않는 아이콘까지
   // 만나게 되기 때문이다. 그래서 상태를 `render` 로 받아 한쪽만 그린다.
+  // Tonal 은 배경이 이미 켜짐을 말하므로 어느 상태에서나 `icon` 하나를 그대로 그린다.
   return (
     <TogglePrimitive
       data-slot="toggle-button"
@@ -172,7 +177,7 @@ function ToggleButton({
       render={(renderProps, state) => (
         <button {...renderProps}>
           <span data-slot="toggle-button-icon" data-icon="inline-start" className="flex shrink-0 items-center">
-            {state.pressed ? activeIcon : icon}
+            {variant === "ghost" && state.pressed ? activeIcon : icon}
           </span>
           {hasLabel ? (
             <span data-slot="toggle-button-label" className="min-w-0 truncate">

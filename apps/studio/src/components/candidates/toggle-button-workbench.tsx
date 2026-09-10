@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiHeartFill, RiHeartLine, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
+import { RiHeartFill, RiHeartLine, RiPushpin2Fill, RiPushpin2Line, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -40,17 +40,18 @@ function toneProps(tone: ToneChoice, color: ToggleButtonColor) {
 // Style 과 색의 조합마다 실제로 쓰이는 자리가 정해져 있으므로 미리보기 아이콘도 그 자리를 따라
 // 바꾼다. 어느 조합에서나 별 하나를 그리면 Tonal 이 무엇을 알리는 Style 인지 화면에서 드러나지
 // 않는다. 자리의 뜻은 `toggle-button.md` 의 Guidelines 가 소유한다.
-const usages = {
-  "ghost-brand": { icon: <RiPushpin2Line />, activeIcon: <RiPushpin2Fill />, name: "Pin" },
-  "ghost-favorite": { icon: <RiStarLine />, activeIcon: <RiStarFill />, name: "Favorite" },
-  "ghost-like": { icon: <RiHeartLine />, activeIcon: <RiHeartFill />, name: "Wish" },
-  "tonal-brand": { icon: <RiSearchLine />, activeIcon: <RiSearchFill />, name: "Search" },
+// Tonal 은 아이콘 하나만 받으므로 `Fill` 짝을 두지 않는다.
+const ghostUsages = {
+  brand: { icon: <RiPushpin2Line />, activeIcon: <RiPushpin2Fill />, name: "Pin" },
+  favorite: { icon: <RiStarLine />, activeIcon: <RiStarFill />, name: "Favorite" },
+  like: { icon: <RiHeartLine />, activeIcon: <RiHeartFill />, name: "Wish" },
 } as const;
 
-function usageOf(variant: ToggleButtonVariant, tone: ToneChoice, color: ToggleButtonColor) {
-  if (variant === "tonal") return usages["tonal-brand"];
-  if (tone === "brand") return usages["ghost-brand"];
-  return color === "like" ? usages["ghost-like"] : usages["ghost-favorite"];
+const tonalUsage = { icon: <RiSearchLine />, name: "Search" } as const;
+
+function ghostUsageOf(tone: ToneChoice, color: ToggleButtonColor) {
+  if (tone === "brand") return ghostUsages.brand;
+  return color === "like" ? ghostUsages.like : ghostUsages.favorite;
 }
 
 // 높이는 `interaction.md` 의 공통 Control Height 를 따르므로 Control 라벨에 실제 값을 함께 적는다.
@@ -85,15 +86,14 @@ export function ToggleButtonWorkbench() {
   const [pressed, setPressed] = useState(false);
   const [label, setLabel] = useState(false);
 
-  const usage = usageOf(variant, tone, color);
+  const ghostUsage = ghostUsageOf(tone, color);
+  const usage = variant === "tonal" ? tonalUsage : ghostUsage;
 
+  // `variant` 마다 받는 아이콘 수가 다르므로 하나의 객체로 펼치지 않고 갈라서 넘긴다.
   const shared = {
-    variant,
     controlSize,
     pressed,
     onPressedChange: setPressed,
-    icon: usage.icon,
-    activeIcon: usage.activeIcon,
     "aria-label": label ? undefined : usage.name,
     children: label ? "Label" : undefined,
   };
@@ -105,7 +105,9 @@ export function ToggleButtonWorkbench() {
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <div lang="en" className="flex min-h-44 items-center justify-center rounded-xl bg-oe-background-primary p-5">
               <div className="flex w-full items-center justify-center">
-                <ToggleButton {...toneProps(tone, color)} {...shared} />
+                {variant === "tonal"
+                  ? <ToggleButton variant="tonal" tone="brand" icon={tonalUsage.icon} {...shared} />
+                  : <ToggleButton variant="ghost" {...toneProps(tone, color)} icon={ghostUsage.icon} activeIcon={ghostUsage.activeIcon} {...shared} />}
               </div>
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">

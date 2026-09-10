@@ -9,7 +9,7 @@ import userEvent from "@testing-library/user-event"
 
 import { RiStarFill, RiStarLine } from "@remixicon/react"
 
-import { ToggleButton, type ToggleButtonSize, type ToggleButtonVariant } from "./toggle-button"
+import { ToggleButton, type ToggleButtonSize } from "./toggle-button"
 
 afterEach(() => cleanup())
 
@@ -55,11 +55,20 @@ test("꺼짐에서는 icon 만 그리고 activeIcon 은 DOM 에 두지 않는다
   assert.equal(view.queryByTestId("on-icon"), null, "꺼짐인데 activeIcon 이 함께 그려졌다")
 })
 
-test("켜짐에서는 activeIcon 만 그린다", () => {
+test("Ghost 는 켜짐에서 activeIcon 만 그린다", () => {
   const { view } = renderToggle(<ToggleButton defaultPressed icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
 
   assert.ok(view.queryByTestId("on-icon"), "켜짐에서 activeIcon 이 그려지지 않았다")
   assert.equal(view.queryByTestId("off-icon"), null, "켜짐인데 icon 이 함께 그려졌다")
+})
+
+// Tonal 은 배경이 상태를 말하므로 아이콘까지 바꾸지 않는다. 배경과 모양이 함께 바뀌면 같은 것을
+// 두 번 말하게 되고, 아이콘이 자리를 가리키는 표시가 아니라 상태 표시로 읽힌다.
+test("Tonal 은 켜져도 아이콘 타입을 바꾸지 않는다", () => {
+  const { view } = renderToggle(<ToggleButton variant="tonal" defaultPressed icon={OFF_ICON} aria-label="검색" />)
+
+  assert.ok(view.queryByTestId("off-icon"), "Tonal 켜짐에서 icon 이 그려지지 않았다")
+  assert.equal(view.queryByTestId("on-icon"), null, "Tonal 켜짐인데 activeIcon 이 그려졌다")
 })
 
 test("누르면 aria-pressed 와 아이콘이 함께 바뀐다", async () => {
@@ -130,7 +139,7 @@ test("기본값은 ghost variant 와 brand tone 이며 data 속성으로 드러�
 // 배경도 tone 색도 갖지 않는다. 규칙은 `toggle-button.md` 의 「켜짐과 꺼짐」이 소유한다.
 test("꺼짐은 두 Style 이 같은 모습이며 배경도 tone 색도 없다", () => {
   const ghost = renderToggle(<ToggleButton icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
-  const tonal = renderToggle(<ToggleButton variant="tonal" icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
+  const tonal = renderToggle(<ToggleButton variant="tonal" icon={OFF_ICON} aria-label="즐겨찾기" />)
 
   assertHas(ghost.control.className, ["bg-transparent", "text-oe-foreground-tertiary", "hover:bg-neutral-100", "active:bg-neutral-200"], "Ghost 꺼짐")
   assertLacks(ghost.control.className, [`text-${brand(600)}`], "Ghost 꺼짐")
@@ -145,7 +154,7 @@ test("Ghost 켜짐은 배경 없이 tone 색 글자만 바뀐다", () => {
 })
 
 test("Tonal 은 켜질 때만 배경이 생긴다", () => {
-  const { control } = renderToggle(<ToggleButton variant="tonal" defaultPressed icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
+  const { control } = renderToggle(<ToggleButton variant="tonal" defaultPressed icon={OFF_ICON} aria-label="즐겨찾기" />)
 
   assertHas(control.className, [`bg-${brand(100)}`, `text-${brand(800)}`, `dark:bg-${brand(800)}`, `dark:text-${brand(200)}`], "Tonal 켜짐")
 })
@@ -162,11 +171,14 @@ test("custom tone 은 color 가 정한 고정 색을 켜짐에만 쓴다", () =>
   assert.equal(favorite.control.getAttribute("data-tone"), "custom")
 })
 
-test("Focus 는 경계가 없는 두 variant 모두 떨어진 ring 을 쓴다", () => {
-  for (const variant of ["ghost", "tonal"] as const satisfies readonly ToggleButtonVariant[]) {
-    const { control } = renderToggle(<ToggleButton variant={variant} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
+test("Focus 는 경계가 없는 두 Style 모두 떨어진 ring 을 쓴다", () => {
+  const views = [
+    renderToggle(<ToggleButton icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />),
+    renderToggle(<ToggleButton variant="tonal" icon={OFF_ICON} aria-label="검색" />),
+  ]
 
-    assertHas(control.className, ["focus-visible:ring-2", "focus-visible:ring-oe-focus-ring", "focus-visible:ring-offset-2"], `Focus ${variant}`)
+  for (const { control } of views) {
+    assertHas(control.className, ["focus-visible:ring-2", "focus-visible:ring-oe-focus-ring", "focus-visible:ring-offset-2"], "Focus")
   }
 })
 
