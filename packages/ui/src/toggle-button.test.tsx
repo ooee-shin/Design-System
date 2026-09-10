@@ -64,13 +64,15 @@ test("Ghost 는 켜짐에서 activeIcon 만 그린다", () => {
 
 // Tonal 은 배경이 상태를 말하므로 아이콘까지 바꾸지 않는다. 배경과 모양이 함께 바뀌면 같은 것을
 // 두 번 말하게 되고, 아이콘이 자리를 가리키는 표시가 아니라 상태 표시로 읽힌다.
-// Tonal 은 영역을 열어 둔 상태를 알리는 자리라 셀 대상이 없다. 언제나 아이콘 하나만 놓이므로
-// 모양도 언제나 정사각형이다.
-test("Tonal 은 count 를 받지 않으므로 언제나 정사각형이다", () => {
-  const { control } = renderToggle(<ToggleButton variant="tonal" icon={OFF_ICON} aria-label="검색" />)
+// Tonal 을 어느 자리에 쓸지는 권장이지 막는 규칙이 아니다. 배치에서 강조가 약하다고 판단하면
+// 개수를 세는 기능 토글에도 쓸 수 있으므로 `count` 와 Custom color 를 함께 받는다.
+test("Tonal 도 count 와 Custom color 를 받는다", () => {
+  const { control } = renderToggle(
+    <ToggleButton variant="tonal" tone="custom" color="like" defaultPressed count={128} icon={OFF_ICON} aria-label="찜" />,
+  )
 
-  assertHas(control.className, [SIZE_RULE.regular.square, "px-0"], "Tonal")
-  assert.equal(control.querySelector("[data-slot=toggle-button-count]"), null)
+  assert.equal(control.querySelector("[data-slot=toggle-button-count]")?.textContent, "128")
+  assertLacks(control.className, [SIZE_RULE.regular.square], "count 가 있는 Tonal")
 })
 
 test("Tonal 은 켜져도 아이콘 타입을 바꾸지 않는다", () => {

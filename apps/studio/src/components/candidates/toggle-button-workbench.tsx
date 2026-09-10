@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiHeartFill, RiHeartLine, RiPushpin2Fill, RiPushpin2Line, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
+import { RiHeartFill, RiHeartLine, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -37,21 +37,21 @@ function toneProps(tone: ToneChoice, color: ToggleButtonColor) {
   return { tone: "custom", color } as const;
 }
 
-// Style 과 색의 조합마다 실제로 쓰이는 자리가 정해져 있으므로 미리보기 아이콘도 그 자리를 따라
-// 바꾼다. 어느 조합에서나 별 하나를 그리면 Tonal 이 무엇을 알리는 Style 인지 화면에서 드러나지
-// 않는다. 자리의 뜻은 `toggle-button.md` 의 Guidelines 가 소유한다.
-// Tonal 은 아이콘 하나만 받으므로 `Fill` 짝을 두지 않는다.
-const ghostUsages = {
-  brand: { icon: <RiPushpin2Line />, activeIcon: <RiPushpin2Fill />, name: "Pin" },
+// 조합마다 실제로 쓰이는 자리가 정해져 있으므로 미리보기 아이콘도 그 자리를 따라 바꾼다. 어느
+// 조합에서나 별 하나를 그리면 Tonal 이 무엇을 알리는 Style 인지 화면에서 드러나지 않는다.
+// Tonal 과 Brand 는 영역을 여는 자리라 검색을 쓰고, Custom 은 두 Style 모두 그 색이 굳어진
+// 아이콘을 쓴다. 자리의 뜻은 `toggle-button.md` 의 Guidelines 가 소유한다.
+// Tonal 은 아이콘 하나만 받으므로 `Fill` 짝을 넘기지 않는다.
+const usages = {
+  pin: { icon: <RiPushpin2Line />, activeIcon: <RiPushpin2Fill />, name: "Pin" },
   favorite: { icon: <RiStarLine />, activeIcon: <RiStarFill />, name: "Favorite" },
   like: { icon: <RiHeartLine />, activeIcon: <RiHeartFill />, name: "Wish" },
+  search: { icon: <RiSearchLine />, activeIcon: <RiSearchFill />, name: "Search" },
 } as const;
 
-const tonalUsage = { icon: <RiSearchLine />, name: "Search" } as const;
-
-function ghostUsageOf(tone: ToneChoice, color: ToggleButtonColor) {
-  if (tone === "brand") return ghostUsages.brand;
-  return color === "like" ? ghostUsages.like : ghostUsages.favorite;
+function usageOf(variant: ToggleButtonVariant, tone: ToneChoice, color: ToggleButtonColor) {
+  if (tone === "custom") return color === "like" ? usages.like : usages.favorite;
+  return variant === "tonal" ? usages.search : usages.pin;
 }
 
 // 높이는 `interaction.md` 의 공통 Control Height 를 따르므로 Control 라벨에 실제 값을 함께 적는다.
@@ -87,8 +87,7 @@ export function ToggleButtonWorkbench() {
   const [showCount, setShowCount] = useState(false);
   const [count, setCount] = useState(128);
 
-  const ghostUsage = ghostUsageOf(tone, color);
-  const usage = variant === "tonal" ? tonalUsage : ghostUsage;
+  const usage = usageOf(variant, tone, color);
 
   // 숫자를 움직이는 것은 컴포넌트가 아니라 소비자다. 실제 개수는 서버가 갖고 있으므로 여기서도
   // 켜지면 하나 더하고 꺼지면 하나 빼서 다시 넘기는 방식을 그대로 보여 준다.
@@ -103,28 +102,29 @@ export function ToggleButtonWorkbench() {
     controlSize,
     pressed,
     onPressedChange: handlePressedChange,
+    count: showCount ? count : undefined,
     "aria-label": usage.name,
   };
 
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
       <div className="min-w-0 space-y-5">
-        <Section id="playground" title="🚩 Playground" description="Style과 Size, Tone과 켜짐 상태를 조합해 확인합니다. Ghost는 대상 자체의 상태를 남기는 자리이고 Tonal은 영역을 열어 둔 상태를 알리는 자리이므로, 조합을 바꾸면 그 자리에 실제로 쓰는 아이콘으로 함께 바뀝니다. 높이는 Button과 같은 공통 Control Height를 따르며, 미리보기의 버튼을 직접 눌러도 Pressed가 바뀝니다.">
+        <Section id="playground" title="🚩 Playground" description="Style과 Size, Tone과 켜짐 상태를 조합해 확인합니다. 조합마다 그 자리에 실제로 쓰는 아이콘으로 함께 바뀝니다. Ghost는 켜지면 아이콘이 Fill로 바뀌고 Tonal은 아이콘을 그대로 둔 채 배경이 생깁니다. Count를 켜면 누를 때마다 개수가 하나씩 오르내립니다. 높이는 Button과 같은 공통 Control Height를 따르며, 미리보기의 버튼을 직접 눌러도 Pressed가 바뀝니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <div lang="en" className="flex min-h-44 items-center justify-center rounded-xl bg-oe-background-primary p-5">
               <div className="flex w-full items-center justify-center">
                 {variant === "tonal"
-                  ? <ToggleButton variant="tonal" tone="brand" icon={tonalUsage.icon} {...shared} />
-                  : <ToggleButton variant="ghost" {...toneProps(tone, color)} icon={ghostUsage.icon} activeIcon={ghostUsage.activeIcon} count={showCount ? count : undefined} {...shared} />}
+                  ? <ToggleButton variant="tonal" {...toneProps(tone, color)} icon={usage.icon} {...shared} />
+                  : <ToggleButton variant="ghost" {...toneProps(tone, color)} icon={usage.icon} activeIcon={usage.activeIcon} {...shared} />}
               </div>
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
-                <ControlGroup label="Style">{variants.map((item) => <Choice key={item} active={variant === item} onClick={() => { setVariant(item); if (item === "tonal") setTone("brand"); }}>{capitalize(item)}</Choice>)}</ControlGroup>
+                <ControlGroup label="Style">{variants.map((item) => <Choice key={item} active={variant === item} onClick={() => setVariant(item)}>{capitalize(item)}</Choice>)}</ControlGroup>
                 <ControlGroup label="Size">{controlSizes.map((item) => <Choice key={item} active={controlSize === item} onClick={() => setControlSize(item)}>{sizeLabel[item]}</Choice>)}</ControlGroup>
                 <fieldset>
                   <legend className={`mb-2 ${SMALL_LABEL}`}>Tone</legend>
-                  <div className="flex flex-wrap gap-1.5">{(variant === "tonal" ? (["brand"] as const) : tones).map((item) => <Choice key={item} active={tone === item} onClick={() => setTone(item)}>{toneLabel[item]}</Choice>)}</div>
+                  <div className="flex flex-wrap gap-1.5">{tones.map((item) => <Choice key={item} active={tone === item} onClick={() => setTone(item)}>{toneLabel[item]}</Choice>)}</div>
                   {tone === "custom" ? (
                     <DependentControlGroup className="mt-3">
                       <span className={`mb-2 block ${SMALL_LABEL}`}>Color</span>
@@ -136,11 +136,9 @@ export function ToggleButtonWorkbench() {
               <ControlSection title="State">
                 <Toggle label="Pressed" value={pressed} onChange={setPressed} />
               </ControlSection>
-              {variant === "ghost" ? (
-                <ControlSection title="Elements">
-                  <Toggle label="Count" value={showCount} onChange={setShowCount} />
-                </ControlSection>
-              ) : null}
+              <ControlSection title="Elements">
+                <Toggle label="Count" value={showCount} onChange={setShowCount} />
+              </ControlSection>
             </div>
           </div>
         </Section>

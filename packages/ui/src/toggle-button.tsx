@@ -131,13 +131,16 @@ function toggleButtonVariants({
   )
 }
 
-// 무엇을 받는지는 Style 이 정한다. Ghost 는 배경이 없어 아이콘의 색과 모양이 켜짐을 말해야
-// 하므로 `Fill` 을 함께 받고, Tonal 은 배경이 이미 켜짐을 말하므로 아이콘을 그대로 둔다.
-// `count` 도 Ghost 만 받는다. Tonal 이 켜 두는 것은 열려 있는 영역이라 셀 대상이 없다.
-// 받아 두고 그리지 않으면 넘겨도 아무 일이 없는 Property 가 생기므로 타입에서 막는다.
+// 아이콘을 몇 개 받는지는 Style 이 정한다. Ghost 는 배경이 없어 아이콘의 색과 모양이 켜짐을
+// 말해야 하므로 `Fill` 을 함께 받고, Tonal 은 배경이 이미 켜짐을 말하므로 어느 상태에서나
+// `icon` 하나를 그대로 그린다. Tonal 에서 `activeIcon` 을 받아 두면 넘겨도 그려지지 않는
+// Property 가 되므로 타입에서 막는다.
+// 막는 것은 여기까지다. 어느 자리에 어느 Style 을 쓰는지는 `toggle-button.md` 의 Guidelines 가
+// 갖고, 그중 강조를 위해 Tonal 을 고르는 판단은 권장이라 타입으로 좁히지 않는다. 그래서
+// `count` 와 Custom color 는 두 Style 이 함께 받는다.
 type ToggleButtonStyleProps =
-  | { variant?: "ghost"; icon: React.ReactNode; activeIcon: React.ReactNode; count?: number }
-  | { variant: "tonal"; icon: React.ReactNode; activeIcon?: never; count?: never }
+  | { variant?: "ghost"; icon: React.ReactNode; activeIcon: React.ReactNode }
+  | { variant: "tonal"; icon: React.ReactNode; activeIcon?: never }
 
 // Disabled 를 제공하지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않기 때문이며, Property 를
 // 남겨 두면 시각 표현이 없는 상태를 소비자가 넘길 수 있게 된다. 근거는 `toggle-button.md` 의
@@ -149,6 +152,7 @@ type ToggleButtonStyleProps =
 // `onPressedChange` 에서 켜지면 하나 더하고 꺼지면 하나 빼서 `count` 로 다시 넘긴다.
 export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className" | "disabled" | "children"> & {
   controlSize?: ToggleButtonSize
+  count?: number
   className?: string
 } & ToggleButtonStyleProps & ToggleButtonToneProps
 
