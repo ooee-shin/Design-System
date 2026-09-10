@@ -33,6 +33,20 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "button-tones",
+    title: "삭제처럼 되돌릴 수 없는 액션은 Button 색으로 구분해요",
+    sections: [
+      {
+        heading: "색과 스타일이 서로 맞물려 있던 Button",
+        body: "예전에는 어떤 색을 쓸 수 있는지가 스타일에 따라 갈렸어요. 삭제에 쓰는 붉은 색은 outline에만 있어서, 삭제가 화면에서 가장 중요한 액션으로 서야 할 때는 채워진 brand 버튼을 그대로 썼어요. 엑셀로 내려받는 버튼처럼 색이 이미 정해진 자리도 컴포넌트 밖에서 색을 넣고 있었어요.",
+      },
+      {
+        heading: "뜻은 색으로, 강조는 스타일로 따로 정하기",
+        body: "[Button](/components/button)은 어떤 액션인지를 색으로, 얼마나 강조할지를 스타일로 따로 정해요. danger가 스타일과 따로 정해지기 때문에, 삭제는 채워진 버튼으로 가장 앞에 서도 붉은 색을 그대로 써요. 엑셀처럼 이미 굳어진 색은 custom 아래에 들여 컴포넌트가 관리하고, 다른 외부 서비스 색이 필요해지면 여기에 더해요.",
+      },
+    ],
+  },
+  {
     id: "badge-tones",
     title: "색이 아니라 뜻으로 Badge를 골라요",
     sections: [
