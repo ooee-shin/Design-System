@@ -381,7 +381,7 @@ export function ToggleButtonWorkbench() {
                   <div className={`${GUIDE_BOX} flex-col justify-center gap-4`}>
                     <span className="flex items-center justify-between gap-4">
                       <SkeletonLine className={`${SKELETON_TITLE} w-1/2`} />
-                      <ToggleButton variant="tonal" defaultPressed icon={<RiBookmarkLine />} aria-label={c.save} />
+                      <ToggleButton variant="tonal" defaultPressed icon={<RiBookmarkFill />} aria-label={c.save} />
                     </span>
                     <span className="flex flex-col gap-2">
                       <SkeletonLine className={`${SKELETON_BODY} w-full`} />
