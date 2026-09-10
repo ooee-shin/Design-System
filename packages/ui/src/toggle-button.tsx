@@ -18,7 +18,7 @@ export type ToggleButtonColor = (typeof TOGGLE_BUTTON_COLORS)[number]
 // 바뀌는지로 갈리는 ghost 와 tonal 둘만 둔다. Button 의 fill 은 배경이 이미 tone 색을 다 쓰고
 // 있어 켜짐을 표시할 자리가 남지 않고, outline 은 실제 쓰임이 확인되지 않았다.
 const BASE_CLASS =
-  "group/toggle-button inline-flex shrink-0 cursor-pointer items-center justify-center rounded-oe-control border font-medium whitespace-nowrap transition-[background-color,border-color,box-shadow,color] outline-none select-none disabled:cursor-not-allowed [&_svg]:pointer-events-none [&_svg]:shrink-0"
+  "group/toggle-button inline-flex shrink-0 cursor-pointer items-center justify-center rounded-oe-control border font-medium whitespace-nowrap transition-[background-color,border-color,box-shadow,color] outline-none select-none [&_svg]:pointer-events-none [&_svg]:shrink-0"
 
 const SIZE_CLASS: Record<ToggleButtonSize, string> = {
   xsmall: "h-oe-control-xsmall gap-1 px-2.5 text-sm [&_svg:not([class*='size-'])]:size-3",
@@ -94,12 +94,6 @@ const CUSTOM_ON_CLASS: Record<ToggleButtonColor, Record<ToggleButtonVariant, str
 // 바깥에 ring 을 그려 배경색과 무관하게 focus 위치가 보이게 한다.
 const DETACHED_FOCUS = "focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary"
 
-// Disabled 는 tone 색을 걷어내고 조작만 막는다. 세 상태에 짝을 하나씩 더 다는 이유는 Button 과
-// 같다. Hover 와 Pressed 는 그 회색을 다시 덮지 않도록, `dark:` 는 Tailwind 가 그 변형을
-// `disabled:` 보다 뒤에 배치하기 때문이다.
-const DISABLED_SURFACE =
-  "disabled:bg-oe-background-disabled disabled:text-oe-foreground-disabled disabled:hover:bg-oe-background-disabled disabled:active:bg-oe-background-disabled dark:disabled:bg-oe-background-disabled dark:disabled:text-oe-foreground-disabled dark:disabled:hover:bg-oe-background-disabled dark:disabled:active:bg-oe-background-disabled"
-
 function stateClass(variant: ToggleButtonVariant, tone: ToggleButtonTone, pressed: boolean, color?: ToggleButtonColor) {
   if (!pressed) return OFF_CLASS
   if (tone === "custom") return CUSTOM_ON_CLASS[color ?? "favorite"][variant]
@@ -134,11 +128,13 @@ function toggleButtonVariants({
     iconOnly ? SQUARE_CLASS[controlSize] : ICON_SIDE_CLASS[controlSize],
     stateClass(variant, tone, pressed, color),
     DETACHED_FOCUS,
-    DISABLED_SURFACE,
   )
 }
 
-export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className"> & {
+// Disabled 를 제공하지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않기 때문이며, Property 를
+// 남겨 두면 시각 표현이 없는 상태를 소비자가 넘길 수 있게 된다. 근거는 `toggle-button.md` 의
+// 「현재 정의하지 않은 항목」에 있다.
+export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className" | "disabled"> & {
   variant?: ToggleButtonVariant
   controlSize?: ToggleButtonSize
   icon: React.ReactNode

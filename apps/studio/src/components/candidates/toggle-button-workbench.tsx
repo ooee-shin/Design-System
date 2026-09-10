@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiHeartFill, RiHeartLine, RiPushpinFill, RiPushpinLine, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
+import { RiHeartFill, RiHeartLine, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -41,7 +41,7 @@ function toneProps(tone: ToneChoice, color: ToggleButtonColor) {
 // 바꾼다. 어느 조합에서나 별 하나를 그리면 Tonal 이 무엇을 알리는 Style 인지 화면에서 드러나지
 // 않는다. 자리의 뜻은 `toggle-button.md` 의 Guidelines 가 소유한다.
 const usages = {
-  "ghost-brand": { icon: <RiPushpinLine />, activeIcon: <RiPushpinFill />, name: "Pin" },
+  "ghost-brand": { icon: <RiPushpin2Line />, activeIcon: <RiPushpin2Fill />, name: "Pin" },
   "ghost-favorite": { icon: <RiStarLine />, activeIcon: <RiStarFill />, name: "Favorite" },
   "ghost-like": { icon: <RiHeartLine />, activeIcon: <RiHeartFill />, name: "Wish" },
   "tonal-brand": { icon: <RiSearchLine />, activeIcon: <RiSearchFill />, name: "Search" },
@@ -83,7 +83,6 @@ export function ToggleButtonWorkbench() {
   const [color, setColor] = useState<ToggleButtonColor>("favorite");
   const [controlSize, setControlSize] = useState<ToggleButtonSize>("regular");
   const [pressed, setPressed] = useState(false);
-  const [disabled, setDisabled] = useState(false);
   const [label, setLabel] = useState(false);
 
   const usage = usageOf(variant, tone, color);
@@ -91,7 +90,6 @@ export function ToggleButtonWorkbench() {
   const shared = {
     variant,
     controlSize,
-    disabled,
     pressed,
     onPressedChange: setPressed,
     icon: usage.icon,
@@ -127,7 +125,6 @@ export function ToggleButtonWorkbench() {
               </ControlSection>
               <ControlSection title="State">
                 <Toggle label="Pressed" value={pressed} onChange={setPressed} />
-                <Toggle label="Disabled" value={disabled} onChange={setDisabled} />
               </ControlSection>
               <ControlSection title="Elements">
                 <Toggle label="Label" value={label} onChange={setLabel} />
@@ -143,7 +140,7 @@ export function ToggleButtonWorkbench() {
                 <AnatomyFrame>
                   <span data-slot="toggle-button" className={TOGGLE_DIAGRAM}>
                     <span data-slot="toggle-button-icon" className="flex shrink-0 items-center">
-                      <RiPushpinLine aria-hidden="true" />
+                      <RiPushpin2Line aria-hidden="true" />
                     </span>
                     <span data-slot="toggle-button-label" className="block truncate">Label</span>
                   </span>

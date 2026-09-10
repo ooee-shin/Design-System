@@ -16,7 +16,7 @@
 
 ## Anatomy
 
-1. Container: 모든 내부 요소와 hover/pressed/focus/disabled 시각 상태를 감싼다.
+1. Container: 모든 내부 요소와 hover/pressed/focus 시각 상태를 감싼다.
 2. Icon: 필수 요소다.
 3. Label: 선택 요소다.
 
@@ -35,7 +35,7 @@ Button과 달리 아이콘이 붙는 변은 언제나 앞쪽 하나다. 켜고 �
 - `controlSize` (Size): `xsmall | small | regular | large | xlarge`, 기본값 `regular`
 - `children`: Label. 없으면 높이와 같은 너비를 가진 정사각형이 되며 `aria-label`이 필수다.
 - `pressed`, `defaultPressed`, `onPressedChange`: 켜짐 상태. Base UI `Toggle`의 이름과 동작을 그대로 쓴다.
-- State: Default, Pressed, Hover, Focus visible, Disabled
+- State: Default, Pressed, Hover, Focus visible
 
 Button이 갖는 값 중 다섯을 두지 않는다. `variant`의 `fill`은 배경이 이미 tone 색을 다 쓰고 있어 켜짐을 표시할 자리가 남지 않고, `outline`은 실제 쓰임이 확인되지 않았다. `tone`의 `danger`는 「되돌릴 수 없는 액션」이라는 뜻을 이미 갖고 있는데 ToggleButton은 다시 눌러 되돌리는 컨트롤이라 뜻이 어긋난다. `tone`의 `neutral`도 두지 않는다. 꺼짐이 이미 중립이므로 켜짐까지 무채색이면 색이 상태를 말하지 못하고 아이콘 모양만 남는다. `layout`의 `fill`도 두지 않는다. 아이콘 하나가 늘어난 폭을 채울 이유가 없다.
 
@@ -78,11 +78,9 @@ Button의 엑셀 색과 같은 자리이며 `toggle-button.tsx`가 로컬 값으
 
 관용색이 굳어지지 않은 토글은 기본값 `brand`를 쓴다. Custom은 목록에 있는 색만 고를 수 있으므로 새로운 관용색이 필요해지면 먼저 목록에 들인다. Custom 꺼짐은 다른 tone과 같은 중립이며, 고정 색은 켜짐에만 나온다.
 
-## Focus와 Disabled
+## Focus
 
 두 Style 모두 보이는 경계가 없으므로 [interaction.md](../interaction.md)의 유형 3을 쓴다. 2px 간격을 두고 바깥에 2px ring을 그려 배경색과 무관하게 focus 위치가 보이게 한다.
-
-Disabled는 켜짐과 꺼짐 모두 배경을 `oe-background-disabled`로, 글자를 `oe-foreground-disabled`로 바꿔 tone 색을 걷어낸다. 세 상태에 짝을 하나씩 더 다는 이유는 Button과 같으며 [button.md](button.md)의 「Focus와 Disabled」에 있다.
 
 ## Guidelines
 
@@ -132,8 +130,9 @@ Label이 없으면 화면에 읽을 글자가 남지 않으므로 `aria-label`�
 
 ## 현재 정의하지 않은 항목
 
+- Disabled 상태. `disabled` Property도 두지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않고, 그릴 수 있다는 것 자체가 누를 수 있다는 뜻이다
 - Loading 상태
-- Read only 상태. 조작만 막는 자리는 Disabled가 담당한다
+- Read only 상태. 조작만 막는 자리가 없으므로 담당할 상태도 없다
 - Invalid 상태. 검증 대상이 되는 값이 없다
 - 켜짐과 꺼짐 사이의 전환 애니메이션
 - 여러 ToggleButton을 하나로 묶는 Toggle group

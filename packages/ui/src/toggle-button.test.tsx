@@ -170,9 +170,15 @@ test("Focus 는 경계가 없는 두 variant 모두 떨어진 ring 을 쓴다", 
   }
 })
 
-test("Disabled 는 tone 색을 걷어내고 누를 수 없게 한다", () => {
-  const { control } = renderToggle(<ToggleButton disabled defaultPressed icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
+// Disabled 를 제공하지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않기 때문이며, 꺼진 모습을
+// 남겨 두면 소비자가 `disabled` 를 넘길 자리가 있는 것으로 읽는다.
+test("Disabled 를 제공하지 않으므로 꺼진 모습의 표현도 두지 않는다", () => {
+  for (const pressed of [false, true]) {
+    const { control } = renderToggle(
+      <ToggleButton defaultPressed={pressed} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />,
+    )
 
-  assert.equal((control as HTMLButtonElement).disabled, true)
-  assertHas(control.className, ["disabled:bg-oe-background-disabled", "disabled:text-oe-foreground-disabled", "dark:disabled:text-oe-foreground-disabled"], "Disabled")
+    const disabledClasses = control.className.split(" ").filter((item) => item.includes("disabled:"))
+    assert.deepEqual(disabledClasses, [], `Disabled 표현이 남아 있다: ${disabledClasses.join(" ")}`)
+  }
 })
