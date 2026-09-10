@@ -33,6 +33,34 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "badge-tones",
+    title: "색이 아니라 뜻으로 Badge를 골라요",
+    sections: [
+      {
+        heading: "색과 스타일로만 구분되던 Badge",
+        body: "Badge는 정보를 표시하는 자리였지만 구분 기준은 색과 스타일뿐이었어요. 어떤 뜻에 어떤 색을 쓸지는 화면마다 다시 판단해야 했고, 같은 뜻이 화면마다 다른 색으로 보이기도 했어요. 색을 고르는 일이 매번 새로 생겨서, 뜻이 같다는 것을 화면에서 알아보기 어려웠어요.",
+      },
+      {
+        heading: "뜻을 이름으로 정하고, 뜻이 없는 색은 custom으로 두기",
+        body: "[Badge](/components/badge)는 info, warning, success, danger처럼 뜻을 이름으로 정하고, 이름을 고르면 색이 따라오기 때문에 뜻이 있는 자리에서는 색을 고를 일이 없어요. 뜻과 관계없이 색만 필요한 경우는 custom으로 빼고, 색을 직접 고르는 것은 custom에서만 열려요. 스타일은 뜻이 아니라 놓이는 자리에 따라 고르는 축이므로 그대로 남겨 뒀어요. 색을 직접 정해야 하는 자리가 custom 하나로 드러나서, 나중에 이 자리에 뜻이 생기면 어디를 바꿔야 하는지도 바로 보여요.",
+      },
+    ],
+  },
+  {
+    id: "notification-badge",
+    title: "붙어서 알리는 표시는 Notification Badge가 담당해요",
+    sections: [
+      {
+        heading: "뜻을 고르는 자리에 담을 수 없던 알림",
+        body: "Badge가 뜻으로 고르도록 정리되면서, 알림 표시는 담을 자리가 없어졌어요. 알림은 어떤 뜻인지가 아니라 무언가 생겼다는 사실을 알리고, 혼자 서지 않고 아이콘·버튼·메뉴에 붙어서 위치와 정렬이 붙는 요소에 따라 달라져요. 마침 개수 없이 있다는 것만 알리는 점 표시를 따로 추가할 예정이었는데, 그대로 두면 하는 일과 붙는 방식이 같은 컴포넌트가 둘로 나뉠 수 있었어요.",
+      },
+      {
+        heading: "개수와 점을 한 컴포넌트의 형태로 두기",
+        body: "[Notification Badge](/components/notification-badge)는 다른 요소에 붙어 새 소식이 있다는 것을 알리는 표시예요. 그 안에서 개수를 보여주는 형태와 점만 찍는 형태로 갈려요. 개수를 알려줘야 할 때는 개수 형태, 있다는 사실만 알려도 될 때는 점 형태를 써요. 개수가 0 이하면 아무것도 그리지 않기 때문에 화면에서 조건을 따로 걸지 않아도 돼요.",
+      },
+    ],
+  },
+  {
     id: "toggle-button",
     title: "Button은 Action에만 쓰도록, 상태를 나타내는 버튼은 ToggleButton으로 나눴어요",
     sections: [
