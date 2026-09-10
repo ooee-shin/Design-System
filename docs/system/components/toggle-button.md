@@ -10,7 +10,7 @@
 - 눌러서 실행하고 끝나는 자리는 [button.md](button.md)가 담당한다. 두 컴포넌트를 가르는 것은 누른 뒤에 버튼 자체에 남는 표시가 있는지 여부다.
 - 목록을 걸러 낼 조건을 고르는 자리는 [chip.md](chip.md)가 담당한다. Chip이 켜고 끄는 것은 화면 전체에 적용되는 조건이고, ToggleButton이 켜고 끄는 것은 그 버튼이 붙어 있는 대상 하나의 상태다.
 - 설정 화면에서 기능을 켜고 끄는 자리는 [switch.md](switch.md)가 담당한다. Switch는 Label과 짝을 이루어 Field 안에 놓이는 폼 컨트롤이고 ToggleButton은 대상 옆에 놓이는 아이콘 버튼이다.
-- 항상 하나가 켜져 있고 끌 수 없는 위치 표시는 Tab이 담당한다. Tab을 별도 컴포넌트로 두기로 한 근거는 [open-questions.md](../../process/open-questions.md)에 있다.
+- 항상 하나가 켜져 있고 끌 수 없는 위치 표시는 Tab이 담당한다. Tab은 `role="tab"`과 방향키 이동을 갖는 별도 컴포넌트이며 아직 시스템에 없다.
 - 높이와 모서리 값은 [interaction.md](../interaction.md)의 「공통 Control Height」와 「공통 Control Radius」가 소유한다. 이 문서는 어느 단계를 제공하는지만 정한다.
 - 아이콘의 `Line`과 `Fill` 선택 규칙은 [icon.md](../foundations/icon.md)가 소유한다.
 
@@ -89,7 +89,7 @@ Hover와 Pressed는 어느 Style에서나 배경을 한 단계씩 진하게 밟�
 
 `favorite`의 노랑과 `like`의 빨강은 위 단계 규칙에 들어오지 않는다. Tailwind 팔레트도 seed에서 생성한 값도 아니고, 별과 하트가 그 색으로 굳어져 있어 브랜드를 바꿔도 함께 움직이면 안 되는 고정 색이기 때문이다.
 
-Button의 엑셀 색과 같은 자리이며 `toggle-button.tsx`가 로컬 값으로 갖는다. 승격 여부는 [open-questions.md](../../process/open-questions.md)의 token candidate가 갖는다.
+Button의 엑셀 색과 같은 자리이며 `toggle-button.tsx`가 로컬 값으로 갖는다. 공용 semantic token으로 올리지 않았다. 밖에서 굳어진 색이 반복해서 필요해지면 그때 함께 다룬다.
 
 관용색이 굳어지지 않은 토글은 기본값 `brand`를 쓴다. Custom은 목록에 있는 색만 고를 수 있으므로 새로운 관용색이 필요해지면 먼저 목록에 들인다. Custom 꺼짐은 다른 tone과 같은 중립이며, 고정 색은 켜짐에만 나온다.
 
