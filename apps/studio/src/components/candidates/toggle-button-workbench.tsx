@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiStarFill, RiStarLine } from "@remixicon/react";
+import { RiHeartFill, RiHeartLine, RiPushpinFill, RiPushpinLine, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -37,6 +37,22 @@ function toneProps(tone: ToneChoice, color: ToggleButtonColor) {
   return { tone: "custom", color } as const;
 }
 
+// Style 과 색의 조합마다 실제로 쓰이는 자리가 정해져 있으므로 미리보기 아이콘도 그 자리를 따라
+// 바꾼다. 어느 조합에서나 별 하나를 그리면 Tonal 이 무엇을 알리는 Style 인지 화면에서 드러나지
+// 않는다. 자리의 뜻은 `toggle-button.md` 의 Guidelines 가 소유한다.
+const usages = {
+  "ghost-brand": { icon: <RiPushpinLine />, activeIcon: <RiPushpinFill />, name: "Pin" },
+  "ghost-favorite": { icon: <RiStarLine />, activeIcon: <RiStarFill />, name: "Favorite" },
+  "ghost-like": { icon: <RiHeartLine />, activeIcon: <RiHeartFill />, name: "Wish" },
+  "tonal-brand": { icon: <RiSearchLine />, activeIcon: <RiSearchFill />, name: "Search" },
+} as const;
+
+function usageOf(variant: ToggleButtonVariant, tone: ToneChoice, color: ToggleButtonColor) {
+  if (variant === "tonal") return usages["tonal-brand"];
+  if (tone === "brand") return usages["ghost-brand"];
+  return color === "like" ? usages["ghost-like"] : usages["ghost-favorite"];
+}
+
 // 높이는 `interaction.md` 의 공통 Control Height 를 따르므로 Control 라벨에 실제 값을 함께 적는다.
 // 어느 단계를 골랐는지가 Button 과 나란히 놓는 판단의 근거이기 때문이다.
 const sizeLabel: Record<ToggleButtonSize, string> = {
@@ -70,22 +86,24 @@ export function ToggleButtonWorkbench() {
   const [disabled, setDisabled] = useState(false);
   const [label, setLabel] = useState(false);
 
+  const usage = usageOf(variant, tone, color);
+
   const shared = {
     variant,
     controlSize,
     disabled,
     pressed,
     onPressedChange: setPressed,
-    icon: <RiStarLine />,
-    activeIcon: <RiStarFill />,
-    "aria-label": label ? undefined : "Favorite",
+    icon: usage.icon,
+    activeIcon: usage.activeIcon,
+    "aria-label": label ? undefined : usage.name,
     children: label ? "Label" : undefined,
   };
 
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
       <div className="min-w-0 space-y-5">
-        <Section id="playground" title="🚩 Playground" description="Style과 Size, Tone과 켜짐 상태를 조합해 확인합니다. 높이는 Button과 같은 공통 Control Height를 따릅니다. 미리보기의 버튼을 직접 눌러도 Pressed가 바뀝니다.">
+        <Section id="playground" title="🚩 Playground" description="Style과 Size, Tone과 켜짐 상태를 조합해 확인합니다. Ghost는 대상 자체의 상태를 남기는 자리이고 Tonal은 영역을 열어 둔 상태를 알리는 자리이므로, 조합을 바꾸면 그 자리에 실제로 쓰는 아이콘으로 함께 바뀝니다. 높이는 Button과 같은 공통 Control Height를 따르며, 미리보기의 버튼을 직접 눌러도 Pressed가 바뀝니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(14rem,1fr)_16rem]">
             <div lang="en" className="flex min-h-44 items-center justify-center rounded-xl bg-oe-background-primary p-5">
               <div className="flex w-full items-center justify-center">
@@ -94,11 +112,11 @@ export function ToggleButtonWorkbench() {
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
-                <ControlGroup label="Style">{variants.map((item) => <Choice key={item} active={variant === item} onClick={() => setVariant(item)}>{capitalize(item)}</Choice>)}</ControlGroup>
+                <ControlGroup label="Style">{variants.map((item) => <Choice key={item} active={variant === item} onClick={() => { setVariant(item); if (item === "tonal") setTone("brand"); }}>{capitalize(item)}</Choice>)}</ControlGroup>
                 <ControlGroup label="Size">{controlSizes.map((item) => <Choice key={item} active={controlSize === item} onClick={() => setControlSize(item)}>{sizeLabel[item]}</Choice>)}</ControlGroup>
                 <fieldset>
                   <legend className={`mb-2 ${SMALL_LABEL}`}>Tone</legend>
-                  <div className="flex flex-wrap gap-1.5">{tones.map((item) => <Choice key={item} active={tone === item} onClick={() => setTone(item)}>{toneLabel[item]}</Choice>)}</div>
+                  <div className="flex flex-wrap gap-1.5">{(variant === "tonal" ? (["brand"] as const) : tones).map((item) => <Choice key={item} active={tone === item} onClick={() => setTone(item)}>{toneLabel[item]}</Choice>)}</div>
                   {tone === "custom" ? (
                     <DependentControlGroup className="mt-3">
                       <span className={`mb-2 block ${SMALL_LABEL}`}>Color</span>
@@ -125,7 +143,7 @@ export function ToggleButtonWorkbench() {
                 <AnatomyFrame>
                   <span data-slot="toggle-button" className={TOGGLE_DIAGRAM}>
                     <span data-slot="toggle-button-icon" className="flex shrink-0 items-center">
-                      <RiStarLine aria-hidden="true" />
+                      <RiPushpinLine aria-hidden="true" />
                     </span>
                     <span data-slot="toggle-button-label" className="block truncate">Label</span>
                   </span>
