@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { componentRegistry, getComponentRelations } from "./component-registry";
 
 test("component registry is the single complete catalog for detail pages", () => {
-  assert.equal(componentRegistry.length, 16);
+  assert.equal(componentRegistry.length, 17);
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
   assert.equal(new Set(componentRegistry.map((item) => item.href)).size, componentRegistry.length);
 });

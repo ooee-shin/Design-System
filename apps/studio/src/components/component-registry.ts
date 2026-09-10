@@ -14,7 +14,8 @@ export type ComponentKey =
   | "select"
   | "select-box"
   | "switch"
-  | "textarea";
+  | "textarea"
+  | "toggle-button";
 
 export type ComponentRegistryItem = {
   key: ComponentKey;
@@ -26,10 +27,10 @@ export type ComponentRegistryItem = {
 };
 
 export const componentRegistry: ComponentRegistryItem[] = [
-  { key: "badge", title: "Badge", description: "다른 요소에 덧붙어 상태나 개수를 표시합니다. 새로 만드는 중이며 지금은 Playground만 있습니다.", href: "/components/badge", similar: ["chip", "notification-badge"] },
-  { key: "button", title: "Button", description: "액션을 실행하는 버튼입니다. 폼 요소와 같은 공통 Control Height를 사용하며, 새로 만드는 중이라 지금은 Playground와 Anatomy만 있습니다.", href: "/components/button", similar: ["input-button", "chip"] },
+  { key: "badge", title: "Badge", description: "다른 요소에 덧붙어 상태나 개수를 표시합니다. 누르는 동작이 없어 Hover와 Pressed 표시를 갖지 않습니다.", href: "/components/badge", similar: ["chip", "notification-badge"] },
+  { key: "button", title: "Button", description: "액션을 실행하는 버튼입니다. 폼 요소와 같은 공통 Control Height를 사용하며 Style·Tone·Size와 아이콘 자리를 조합해 씁니다.", href: "/components/button", similar: ["input-button", "chip", "toggle-button"] },
   { key: "checkbox", title: "Checkbox", description: "목록이나 폼에서 항목의 선택 여부를 제어합니다. Control은 16px 단일 크기이며 20px Label 첫 줄 안에서 중앙 정렬됩니다. 선택 상태는 Brand 표현을 사용합니다.", href: "/components/checkbox", similar: ["radio"], worksWith: ["field", "combobox"] },
-  { key: "chip", title: "Chip", description: "짧은 Label로 값 하나를 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지웁니다.", href: "/components/chip", similar: ["select-box"], worksWith: ["combobox"] },
+  { key: "chip", title: "Chip", description: "짧은 Label로 값 하나를 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지웁니다.", href: "/components/chip", similar: ["select-box", "toggle-button"], worksWith: ["combobox"] },
   { key: "combobox", title: "Combobox", description: "Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택합니다.", href: "/components/combobox", worksWith: ["field", "input", "checkbox", "chip"] },
   { key: "field", title: "Field", description: "Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸입니다. Control이 들어가는 Input slot은 Swap 영역이며 접근성 연결은 Field가 소유합니다.", href: "/components/field", worksWith: ["input", "textarea", "number-input", "input-button", "select", "combobox", "select-box", "checkbox", "radio", "switch"] },
   { key: "input", title: "Input", description: "한 줄 텍스트를 입력하는 컴포넌트입니다. Label, 도움말과 오류 문구는 Input 내부가 아니라 별도 Field가 담당합니다.", href: "/components/input", similar: ["input-button", "textarea", "number-input"], worksWith: ["field"] },
@@ -42,6 +43,7 @@ export const componentRegistry: ComponentRegistryItem[] = [
   { key: "select-box", title: "Select Box", description: "정의된 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 입력 컴포넌트입니다.", href: "/components/select-box", similar: ["select", "chip", "radio", "checkbox"], worksWith: ["field"] },
   { key: "switch", title: "Switch", description: "독립적인 설정이나 기능을 즉시 켜고 끄는 컴포넌트입니다. 24px Control이 기본값입니다.", href: "/components/switch", similar: ["checkbox"], worksWith: ["field"] },
   { key: "textarea", title: "Textarea", description: "여러 줄 텍스트를 입력하는 컴포넌트입니다. Input과 같은 Style과 State를 사용하며 Leading과 Trailing element는 지원하지 않습니다.", href: "/components/textarea", similar: ["input", "number-input"], worksWith: ["field"] },
+  { key: "toggle-button", title: "Toggle Button", description: "즐겨찾기나 찜처럼 누른 표시가 화면에 남는 아이콘 버튼입니다. Ghost는 켜지면 아이콘이 Fill로 바뀌고, Tonal은 아이콘을 그대로 둔 채 배경이 생깁니다.", href: "/components/toggle-button", similar: ["button", "chip", "switch"] },
 ];
 
 export function getComponent(key: ComponentKey) {

@@ -55,7 +55,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 
 - 기본 정보 흐름은 `Overview → Playground → Anatomy → Properties → Examples/Usage → Property map` 순서다.
 - Component 상세 페이지의 첫 번째 Tab 진입점은 `Playground로 바로 이동` skip link다. 이 링크는 `#studio-preview`를 focus target으로 사용하고, 다음 Tab에서 Playground의 첫 실제 Control로 이동해야 한다. 전역 Studio 설정을 건너뛰기 위해 양수 `tabIndex`로 순서를 재작성하지 않는다.
-- 신규 컴포넌트의 첫 Studio 초안은 `Playground`만 만든다. Anatomy, Properties, Examples/Usage, Guidelines와 Property map은 Playground 검수 후 사용자가 명시적으로 다음 단계를 요청할 때 추가한다. 이 제한은 Studio 문서 범위에 대한 것이며 공용 package 구현, 접근성 및 자동 테스트는 처음부터 함께 검증한다.
+- 신규 컴포넌트의 Studio 화면은 `Playground`, `Anatomy`와 Structure map까지 먼저 만든다. Properties, Examples/Usage, Guidelines와 Property map은 그 화면을 검수한 뒤 사용자가 다음 단계를 요청할 때 추가한다. 이 순서는 Studio 화면 범위에 대한 것이며 공용 package 구현, 접근성과 자동 테스트는 처음부터 함께 검증한다.
 - Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
 - 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다.

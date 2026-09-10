@@ -196,7 +196,7 @@ export function CheckboxWorkbench() {
           </div>
         </Section>
 
-        <Section id="guidelines" title="Guidelines" description="Checkbox를 구성하고 배치할 때 적용하는 기준의 첫 번째 초안입니다.">
+        <Section id="guidelines" title="Guidelines" description="Checkbox를 구성하고 배치할 때 적용하는 기준입니다.">
           <div className="col-span-full grid gap-10">
             <div>
               <GuidelineTitle>Target area 확보하기</GuidelineTitle>

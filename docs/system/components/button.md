@@ -73,7 +73,7 @@ Fill과 Tonal의 경계를 투명으로 두는 이유는 같은 자리에서 Sty
 
 Hover와 Pressed는 어느 Style에서나 배경을 한 단계씩 진하게 밟는다. Light는 100에서 200, 300으로 내려가고 Dark는 800에서 700, 600으로 올라가 방향이 서로 반대다. Fill은 600에서 700, 800으로 내려간다. Outline과 Ghost는 정지 상태에 배경이 없으므로 같은 사다리를 한 칸 늦게 밟아 Hover에서 100, Pressed에서 200을 쓴다. Outline과 Ghost는 경계 말고는 색이 같으므로 한 자리에서 둘을 바꿔 달아도 글자 색과 Hover가 달라지지 않는다.
 
-`custom` tone의 엑셀 색은 이 단계 규칙에 들어오지 않는다. Tailwind 팔레트도 seed에서 생성한 값도 아니고 Microsoft가 정한 고정 색이기 때문이다. 그래서 Fill의 600단계만 그 실제 값 `#217346`이며 나머지 단계는 같은 색조에서 밝기만 옮겨 위 규칙에 태울 수 있게 만든 값이다. Fill은 Light와 Dark에서 값을 뒤집지 않는다. 테마에 따라 색이 달라지면 엑셀로 읽히지 않기 때문이며, 뒤집히는 것은 배경이 옅은 나머지 셋의 색조뿐이다. 이 값들의 승격 여부는 [open-questions.md](../../process/open-questions.md)의 token candidate가 갖는다.
+`custom` tone의 엑셀 색은 이 단계 규칙에 들어오지 않는다. Tailwind 팔레트도 seed에서 생성한 값도 아니고 Microsoft가 정한 고정 색이기 때문이다. 그래서 Fill의 600단계만 그 실제 값 `#217346`이며 나머지 단계는 같은 색조에서 밝기만 옮겨 위 규칙에 태울 수 있게 만든 값이다. Fill은 Light와 Dark에서 값을 뒤집지 않는다. 테마에 따라 색이 달라지면 엑셀로 읽히지 않기 때문이며, 뒤집히는 것은 배경이 옅은 나머지 셋의 색조뿐이다. 이 값들은 공용 semantic token으로 올리지 않았다.
 
 ## Focus와 Disabled
 

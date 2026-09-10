@@ -60,7 +60,7 @@ Radio는 Checkbox와 마찬가지로 Label 외에 선택을 이해하는 데 필
 
 ## Guidelines
 
-Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 기준은 첫 번째 초안이다.
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 ### Target area 확보하기
 

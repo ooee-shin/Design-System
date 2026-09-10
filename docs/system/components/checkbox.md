@@ -25,7 +25,7 @@ Basic 구조는 반복해 번호를 표시하지 않는다. 단일 Label과 범�
 
 원자적인 `Checkbox`는 Control만 제공한다. `CheckboxField`는 Label, 선택적 Description과 Leading/Trailing element를 결합한다.
 
-`CheckboxIndicator`는 Checkbox의 16px 비상호작용 시각 base다. Checked, Indeterminate와 Disabled 표현을 소유하고 `Checkbox`가 이를 내부에서 사용한다. Combobox Option처럼 상위 컴포넌트가 이미 선택 동작을 소유하는 경우에는 상호작용 가능한 Checkbox를 중첩하지 않고 `CheckboxIndicator`만 재사용한다. 값 변경, Focus와 키보드 동작은 이를 사용하는 상위 컴포넌트가 담당한다. 이 사용 가이드는 현재 첫 번째 초안이다.
+`CheckboxIndicator`는 Checkbox의 16px 비상호작용 시각 base다. Checked, Indeterminate와 Disabled 표현을 소유하고 `Checkbox`가 이를 내부에서 사용한다. Combobox Option처럼 상위 컴포넌트가 이미 선택 동작을 소유하는 경우에는 상호작용 가능한 Checkbox를 중첩하지 않고 `CheckboxIndicator`만 재사용한다. 값 변경, Focus와 키보드 동작은 이를 사용하는 상위 컴포넌트가 담당한다.
 
 Checkbox와 Label 전체를 카드형 Surface로 묶는 Container 변형은 제공하지 않는다. 짧은 항목을 밀도 있게 나열할 때는 `CheckboxField`를 사용하고, 설명이나 시각 정보가 포함된 선택지를 넓은 조작 영역에서 비교할 때는 Multiple selection의 `SelectBox`를 사용한다.
 

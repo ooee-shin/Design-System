@@ -48,7 +48,7 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 
 ## Guidelines
 
-Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 기준은 첫 번째 초안이며 「역할과 경계」에서 확정한 문장을 사용자 관점의 규칙으로 다시 쓴 것이다.
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다. 아래 기준은 「역할과 경계」의 문장을 고르는 사람의 행동으로 다시 쓴 것이다.
 
 ### 설명이나 시각 정보가 있는 선택지에 사용하기
 
