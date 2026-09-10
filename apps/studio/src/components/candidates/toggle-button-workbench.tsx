@@ -84,18 +84,26 @@ export function ToggleButtonWorkbench() {
   const [color, setColor] = useState<ToggleButtonColor>("favorite");
   const [controlSize, setControlSize] = useState<ToggleButtonSize>("regular");
   const [pressed, setPressed] = useState(false);
-  const [label, setLabel] = useState(false);
+  const [showCount, setShowCount] = useState(false);
+  const [count, setCount] = useState(128);
 
   const ghostUsage = ghostUsageOf(tone, color);
   const usage = variant === "tonal" ? tonalUsage : ghostUsage;
 
+  // 숫자를 움직이는 것은 컴포넌트가 아니라 소비자다. 실제 개수는 서버가 갖고 있으므로 여기서도
+  // 켜지면 하나 더하고 꺼지면 하나 빼서 다시 넘기는 방식을 그대로 보여 준다.
+  function handlePressedChange(next: boolean) {
+    setPressed(next);
+    setCount((current) => current + (next ? 1 : -1));
+  }
+
+  // 숫자는 그 버튼이 무엇을 켜는지 말해 주지 못하므로 `aria-label` 은 count 가 있어도 함께 넘긴다.
   // `variant` 마다 받는 아이콘 수가 다르므로 하나의 객체로 펼치지 않고 갈라서 넘긴다.
   const shared = {
     controlSize,
     pressed,
-    onPressedChange: setPressed,
-    "aria-label": label ? undefined : usage.name,
-    children: label ? "Label" : undefined,
+    onPressedChange: handlePressedChange,
+    "aria-label": usage.name,
   };
 
   return (
@@ -107,7 +115,7 @@ export function ToggleButtonWorkbench() {
               <div className="flex w-full items-center justify-center">
                 {variant === "tonal"
                   ? <ToggleButton variant="tonal" tone="brand" icon={tonalUsage.icon} {...shared} />
-                  : <ToggleButton variant="ghost" {...toneProps(tone, color)} icon={ghostUsage.icon} activeIcon={ghostUsage.activeIcon} {...shared} />}
+                  : <ToggleButton variant="ghost" {...toneProps(tone, color)} icon={ghostUsage.icon} activeIcon={ghostUsage.activeIcon} count={showCount ? count : undefined} {...shared} />}
               </div>
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
@@ -128,37 +136,39 @@ export function ToggleButtonWorkbench() {
               <ControlSection title="State">
                 <Toggle label="Pressed" value={pressed} onChange={setPressed} />
               </ControlSection>
-              <ControlSection title="Elements">
-                <Toggle label="Label" value={label} onChange={setLabel} />
-              </ControlSection>
+              {variant === "ghost" ? (
+                <ControlSection title="Elements">
+                  <Toggle label="Count" value={showCount} onChange={setShowCount} />
+                </ControlSection>
+              ) : null}
             </div>
           </div>
         </Section>
 
-        <Section id="anatomy" title="Anatomy" description="ToggleButton을 구성하는 실제 요소와 문서에서 사용하는 명칭입니다. 아이콘은 필수이며 Label은 선택입니다.">
+        <Section id="anatomy" title="Anatomy" description="ToggleButton을 구성하는 실제 요소와 문서에서 사용하는 명칭입니다. 아이콘은 필수이며 Count는 선택입니다.">
           <div className="col-span-full min-w-0">
             <AnatomySurface ariaLabel="ToggleButton anatomy" title="ToggleButton structure" className="px-5 pb-5 pt-12">
               <div lang="en" className="flex h-36 items-center justify-center">
                 <AnatomyFrame>
                   <span data-slot="toggle-button" className={TOGGLE_DIAGRAM}>
                     <span data-slot="toggle-button-icon" className="flex shrink-0 items-center">
-                      <RiPushpin2Line aria-hidden="true" />
+                      <RiHeartLine aria-hidden="true" />
                     </span>
-                    <span data-slot="toggle-button-label" className="block truncate">Label</span>
+                    <span data-slot="toggle-button-count" className="block truncate tabular-nums">128</span>
                   </span>
                   <AnatomyBoundaryMarker number={1} target="[data-slot=toggle-button]" side="left" connectorLength={36} />
                   <AnatomyNumber number={2} target="[data-slot=toggle-button-icon]" side="bottom" />
-                  <AnatomyNumber number={3} target="[data-slot=toggle-button-label]" side="top" />
+                  <AnatomyNumber number={3} target="[data-slot=toggle-button-count]" side="top" />
                 </AnatomyFrame>
               </div>
             </AnatomySurface>
-            <AnatomyLegend items={[{ name: "Container" }, { name: "Icon" }, { name: "Label", optional: true }]} />
+            <AnatomyLegend items={[{ name: "Container" }, { name: "Icon" }, { name: "Count", optional: true }]} />
 
             <div className="mt-4">
               <AnatomyStructureMap lines={[
                 { name: "ToggleButton" },
                 { prefix: "├─ ", name: "Icon" },
-                { prefix: "└─ ", name: "Label", optional: true },
+                { prefix: "└─ ", name: "Count", optional: true },
               ]} />
             </div>
           </div>

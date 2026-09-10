@@ -64,6 +64,15 @@ test("Ghost 는 켜짐에서 activeIcon 만 그린다", () => {
 
 // Tonal 은 배경이 상태를 말하므로 아이콘까지 바꾸지 않는다. 배경과 모양이 함께 바뀌면 같은 것을
 // 두 번 말하게 되고, 아이콘이 자리를 가리키는 표시가 아니라 상태 표시로 읽힌다.
+// Tonal 은 영역을 열어 둔 상태를 알리는 자리라 셀 대상이 없다. 언제나 아이콘 하나만 놓이므로
+// 모양도 언제나 정사각형이다.
+test("Tonal 은 count 를 받지 않으므로 언제나 정사각형이다", () => {
+  const { control } = renderToggle(<ToggleButton variant="tonal" icon={OFF_ICON} aria-label="검색" />)
+
+  assertHas(control.className, [SIZE_RULE.regular.square, "px-0"], "Tonal")
+  assert.equal(control.querySelector("[data-slot=toggle-button-count]"), null)
+})
+
 test("Tonal 은 켜져도 아이콘 타입을 바꾸지 않는다", () => {
   const { view } = renderToggle(<ToggleButton variant="tonal" defaultPressed icon={OFF_ICON} aria-label="검색" />)
 
@@ -96,31 +105,40 @@ test("pressed 를 넘기면 값을 그대로 따르고 onPressedChange 로 알�
   assert.equal(control.getAttribute("aria-pressed"), "false", "controlled 인데 컴포넌트가 스스로 상태를 바꿨다")
 })
 
-test("Label 이 없으면 정사각형이 되고 있으면 아이콘 변의 여백을 내린다", () => {
+test("count 가 없으면 정사각형이 되고 있으면 아이콘 변의 여백을 내린다", () => {
   const iconOnly = renderToggle(<ToggleButton icon={OFF_ICON} activeIcon={ON_ICON} aria-label="즐겨찾기" />)
-  const withLabel = renderToggle(<ToggleButton icon={OFF_ICON} activeIcon={ON_ICON}>좋아요</ToggleButton>)
+  const withCount = renderToggle(<ToggleButton count={128} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="좋아요" />)
 
   assertHas(iconOnly.control.className, [SIZE_RULE.regular.square, "px-0"], "아이콘만 있는 ToggleButton")
   assertLacks(iconOnly.control.className, [SIZE_RULE.regular.padding], "아이콘만 있는 ToggleButton")
-  assert.equal(iconOnly.control.querySelector("[data-slot=toggle-button-label]"), null)
+  assert.equal(iconOnly.control.querySelector("[data-slot=toggle-button-count]"), null)
 
-  assertHas(withLabel.control.className, [SIZE_RULE.regular.padding, SIZE_RULE.regular.leading], "Label 이 있는 ToggleButton")
-  assertLacks(withLabel.control.className, [SIZE_RULE.regular.square], "Label 이 있는 ToggleButton")
-  assert.equal(withLabel.control.querySelector("[data-slot=toggle-button-label]")?.textContent, "좋아요")
+  assertHas(withCount.control.className, [SIZE_RULE.regular.padding, SIZE_RULE.regular.leading], "count 가 있는 ToggleButton")
+  assertLacks(withCount.control.className, [SIZE_RULE.regular.square], "count 가 있는 ToggleButton")
+  assert.equal(withCount.control.querySelector("[data-slot=toggle-button-count]")?.textContent, "128")
 })
 
-test("아이콘은 언제나 Label 앞에 놓이고 자리를 스스로 표시한다", () => {
-  const { control } = renderToggle(<ToggleButton icon={OFF_ICON} activeIcon={ON_ICON}>좋아요</ToggleButton>)
+// 0 은 falsy 이므로 값이 있는지로 판단하면 사라진다. 아무도 누르지 않았다는 것과 개수를 세지
+// 않는다는 것은 다른 뜻이므로 0 은 그린다.
+test("count 가 0 이어도 자리를 지키고 숫자를 그린다", () => {
+  const { control } = renderToggle(<ToggleButton count={0} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="좋아요" />)
+
+  assert.equal(control.querySelector("[data-slot=toggle-button-count]")?.textContent, "0")
+  assertLacks(control.className, [SIZE_RULE.regular.square], "count 가 0 인 ToggleButton")
+})
+
+test("아이콘은 언제나 count 앞에 놓이고 자리를 스스로 표시한다", () => {
+  const { control } = renderToggle(<ToggleButton count={12} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="좋아요" />)
 
   const slots = [...control.children].map((child) => child.getAttribute("data-slot"))
-  assert.deepEqual(slots, ["toggle-button-icon", "toggle-button-label"])
+  assert.deepEqual(slots, ["toggle-button-icon", "toggle-button-count"])
   assert.equal(control.querySelector("[data-slot=toggle-button-icon]")?.getAttribute("data-icon"), "inline-start")
 })
 
 for (const [size, rule] of Object.entries(SIZE_RULE) as [ToggleButtonSize, (typeof SIZE_RULE)[ToggleButtonSize]][]) {
   test(`controlSize ${size} 는 Button 과 같은 높이·여백·글자·아이콘 단계를 쓴다`, () => {
     const { control } = renderToggle(
-      <ToggleButton controlSize={size} icon={OFF_ICON} activeIcon={ON_ICON}>좋아요</ToggleButton>,
+      <ToggleButton controlSize={size} count={128} icon={OFF_ICON} activeIcon={ON_ICON} aria-label="좋아요" />,
     )
 
     assertHas(control.className, [rule.height, rule.padding, rule.gap, rule.leading, rule.text, rule.icon], `controlSize ${size}`)

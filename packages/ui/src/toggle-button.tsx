@@ -28,8 +28,8 @@ const SIZE_CLASS: Record<ToggleButtonSize, string> = {
   xlarge: "h-oe-control-xlarge gap-1.5 px-5 text-base [&_svg:not([class*='size-'])]:size-5",
 }
 
-// 아이콘이 붙는 변은 여백을 한 단계 내린다. 아이콘은 글자보다 시각 무게가 가벼워 같은 여백을
-// 주면 그쪽이 더 벌어져 보인다. 아이콘은 언제나 Label 앞에 하나만 놓이므로 Button 과 달리
+// 아이콘이 붙는 변은 여백을 한 단계 내린다. 아이콘은 숫자보다 시각 무게가 가벼워 같은 여백을
+// 주면 그쪽이 더 벌어져 보인다. 아이콘은 언제나 count 앞에 하나만 놓이므로 Button 과 달리
 // 뒤쪽 변의 보정은 두지 않는다.
 const ICON_SIDE_CLASS: Record<ToggleButtonSize, string> = {
   xsmall: "has-data-[icon=inline-start]:pl-2",
@@ -39,7 +39,7 @@ const ICON_SIDE_CLASS: Record<ToggleButtonSize, string> = {
   xlarge: "has-data-[icon=inline-start]:pl-4",
 }
 
-// Label 이 없으면 좌우 여백을 지우고 높이와 같은 너비를 준다. 즐겨찾기와 찜이 이 모양을 쓴다.
+// count 가 없으면 좌우 여백을 지우고 높이와 같은 너비를 준다. 고정과 즐겨찾기가 이 모양을 쓴다.
 const SQUARE_CLASS: Record<ToggleButtonSize, string> = {
   xsmall: "w-oe-control-xsmall px-0",
   small: "w-oe-control-small px-0",
@@ -131,20 +131,26 @@ function toggleButtonVariants({
   )
 }
 
-// 아이콘을 몇 개 받는지는 Style 이 정한다. Ghost 는 배경이 없어 아이콘의 색과 모양이 켜짐을
-// 말해야 하므로 `Fill` 을 함께 받고, Tonal 은 배경이 이미 켜짐을 말하므로 아이콘을 그대로 둔다.
-// Tonal 에서도 `activeIcon` 을 받게 두면 넘겨도 그려지지 않는 Property 가 생기므로 타입에서 막는다.
-type ToggleButtonIconProps =
-  | { variant?: "ghost"; icon: React.ReactNode; activeIcon: React.ReactNode }
-  | { variant: "tonal"; icon: React.ReactNode; activeIcon?: never }
+// 무엇을 받는지는 Style 이 정한다. Ghost 는 배경이 없어 아이콘의 색과 모양이 켜짐을 말해야
+// 하므로 `Fill` 을 함께 받고, Tonal 은 배경이 이미 켜짐을 말하므로 아이콘을 그대로 둔다.
+// `count` 도 Ghost 만 받는다. Tonal 이 켜 두는 것은 열려 있는 영역이라 셀 대상이 없다.
+// 받아 두고 그리지 않으면 넘겨도 아무 일이 없는 Property 가 생기므로 타입에서 막는다.
+type ToggleButtonStyleProps =
+  | { variant?: "ghost"; icon: React.ReactNode; activeIcon: React.ReactNode; count?: number }
+  | { variant: "tonal"; icon: React.ReactNode; activeIcon?: never; count?: never }
 
 // Disabled 를 제공하지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않기 때문이며, Property 를
 // 남겨 두면 시각 표현이 없는 상태를 소비자가 넘길 수 있게 된다. 근거는 `toggle-button.md` 의
 // 「현재 정의하지 않은 항목」에 있다.
-export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className" | "disabled"> & {
+// 아이콘 옆에 두는 것은 자유 문구가 아니라 개수다. 이 버튼이 켜고 끄는 것은 그 대상 하나의
+// 상태이고, 옆에 붙는 숫자는 같은 상태를 켠 사람이 몇인지를 말한다. 문구를 받게 두면 아이콘이
+// 이미 말하고 있는 것을 글자로 한 번 더 적는 자리가 생긴다.
+// 숫자를 움직이는 것은 이 컴포넌트가 아니라 소비자다. 실제 개수는 서버가 갖고 있으므로,
+// `onPressedChange` 에서 켜지면 하나 더하고 꺼지면 하나 빼서 `count` 로 다시 넘긴다.
+export type ToggleButtonProps = Omit<TogglePrimitive.Props, "color" | "render" | "className" | "disabled" | "children"> & {
   controlSize?: ToggleButtonSize
   className?: string
-} & ToggleButtonIconProps & ToggleButtonToneProps
+} & ToggleButtonStyleProps & ToggleButtonToneProps
 
 function ToggleButton({
   className,
@@ -154,11 +160,13 @@ function ToggleButton({
   color,
   icon,
   activeIcon,
-  children,
+  count,
   ...props
 }: ToggleButtonProps) {
-  const hasLabel = children !== undefined && children !== null && children !== false
-  const iconOnly = !hasLabel
+  // 0 은 falsy 이므로 값이 있는지로 판단하면 사라진다. 아무도 누르지 않았다는 것과 개수를 세지
+  // 않는다는 것은 다른 뜻이므로 0 도 그린다.
+  const hasCount = count !== undefined
+  const iconOnly = !hasCount
 
   // Ghost 는 켜짐과 꺼짐에서 서로 다른 아이콘을 그린다. Remix Icon 은 `RiStarLine` 과 `RiStarFill`
   // 이 각각 다른 컴포넌트여서 컴포넌트가 스스로 `Fill` 로 바꿔 그릴 수단이 없기 때문에 둘을 모두
@@ -179,9 +187,9 @@ function ToggleButton({
           <span data-slot="toggle-button-icon" data-icon="inline-start" className="flex shrink-0 items-center">
             {variant === "ghost" && state.pressed ? activeIcon : icon}
           </span>
-          {hasLabel ? (
-            <span data-slot="toggle-button-label" className="min-w-0 truncate">
-              {children}
+          {hasCount ? (
+            <span data-slot="toggle-button-count" className="min-w-0 truncate tabular-nums">
+              {count}
             </span>
           ) : null}
         </button>
