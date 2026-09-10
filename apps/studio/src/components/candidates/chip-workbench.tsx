@@ -46,7 +46,7 @@ const sections = [
 
 const copy = {
   ko: {
-    description: "선택한 값이나 필터 항목을 한 줄 Container로 표시하는 컴포넌트입니다. 확정 전 초안이므로 현재는 Playground만 제공합니다.",
+    description: "선택한 값이나 필터 항목을 한 줄 Container로 표시하는 컴포넌트입니다.",
     label: "Label",
     prefix: "Prefix",
     ariaLabel: "Chip",

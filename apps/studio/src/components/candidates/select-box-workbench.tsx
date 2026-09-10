@@ -277,7 +277,7 @@ export function SelectBoxWorkbench() {
           </div>
         </Section>
 
-        <Section id="guidelines" title="Guidelines" description="Select Box를 고르고 항목을 구성할 때 적용하는 기준의 첫 번째 초안입니다.">
+        <Section id="guidelines" title="Guidelines" description="Select Box를 고르고 항목을 구성할 때 적용하는 기준입니다.">
           <div className="grid gap-8">
             <div>
               <GuidelineTitle>설명이나 시각 정보가 있는 선택지에 사용하기</GuidelineTitle>
@@ -401,7 +401,7 @@ export function SelectBoxWorkbench() {
           </div>
         </Section>
 
-        <Section id="property-map" title="Property map" description="현재 구현에서 확인되는 Property와 허용 값입니다. Select Box의 API와 선택 표현은 검수용 초안이며 문서 규칙으로 확정하지 않았습니다.">
+        <Section id="property-map" title="Property map" description="실제 Props와 허용 값입니다.">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[44rem] text-left text-xs">
               <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2 font-medium">Property</th><th className="py-2 font-medium">Values</th><th className="py-2 font-medium">Default</th><th className="py-2 font-medium">Status</th></tr></thead>

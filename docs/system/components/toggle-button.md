@@ -99,7 +99,7 @@ Button의 엑셀 색과 같은 자리이며 `toggle-button.tsx`가 로컬 값으
 
 ## Guidelines
 
-Studio 화면에 Guidelines 절을 만들 때 소제목을 여기와 동일하게 유지한다. 지금 Studio 화면에는 Playground와 Anatomy만 있다.
+Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 ### 누른 표시가 화면에 남는 자리에만 쓰기
 

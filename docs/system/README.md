@@ -65,25 +65,29 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 ## Component
 
-현재 13개 컴포넌트가 상세 문서를 갖는다.
+각 컴포넌트의 상세 문서는 다음과 같다.
 
 | 컴포넌트 | 문서 | 용도 |
 | --- | --- | --- |
-| Badge | [badge.md](components/badge.md) | 새로 만드는 중이며 역할과 경계만 정해져 있다 |
+| Badge | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
+| Button | [button.md](components/button.md) | 누르면 실행되는 액션 |
 | Checkbox | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
 | Chip | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |
 | Combobox | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
+| Field | [field.md](components/field.md) | Label, 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸 |
 | Input | [input.md](components/input.md) | 한 줄 입력 |
 | Input Button | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
 | Message Bubble | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
+| Notification Badge | [notification-badge.md](components/notification-badge.md) | 아이콘·버튼·메뉴에 붙어 새 알림이나 읽지 않은 수를 표시 |
 | Number Input | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
 | Radio | [radio.md](components/radio.md) | 여러 항목 중 하나를 선택 |
 | Select | [select.md](components/select.md) | 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택 |
 | Select Box | [select-box.md](components/select-box.md) | 상세 정보를 펼쳐 놓고 비교하며 하나 이상의 값을 선택 |
 | Switch | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
 | Textarea | [textarea.md](components/textarea.md) | 여러 줄 입력 |
+| Toggle Button | [toggle-button.md](components/toggle-button.md) | 누른 표시가 화면에 남는 아이콘 버튼 |
 
-`packages/ui`는 위 외에 `Button`, `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공하며 아직 상세 문서가 없다.
+`packages/ui`는 위 외에 `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공한다.
 
 모든 공용 컴포넌트는 `className`을 받아 바깥 요소에 class를 덧붙일 수 있다. 내부 요소를 따로 스타일링해야 하는 컴포넌트는 `containerClassName`, `indicatorClassName`처럼 대상을 앞에 붙인 추가 Property를 가지며 그 이름은 각 컴포넌트 문서에 적는다. 개별 문서의 `Properties`는 시각과 동작을 결정하는 Property만 다루므로 `className` 자체는 나열하지 않는다.
 
