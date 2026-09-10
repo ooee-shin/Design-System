@@ -13,6 +13,7 @@ export { Radio, RadioField, RadioGroup, type RadioFieldProps, type RadioGroupPro
 export { MultiSelect, Select, selectionTriggerVariants, type MultiSelectProps, type SelectOption, type SelectOptionGroup, type SelectProps } from "./select";
 export { SelectBox, SelectBoxGroup, type SelectBoxColumns, type SelectBoxGroupProps, type SelectBoxProps, type SelectBoxSelectionMode, type SelectBoxTrailingElement } from "./select-box";
 export { Switch, SwitchField, type SwitchFieldProps, type SwitchProps } from "./switch";
+export { ToggleButton, TOGGLE_BUTTON_COLORS, toggleButtonVariants, type ToggleButtonColor, type ToggleButtonProps, type ToggleButtonSize, type ToggleButtonTone, type ToggleButtonVariant } from "./toggle-button";
 export { Textarea, textareaContainerVariants, type TextareaProps } from "./textarea";
 export { MessageBubble, TypingIndicator, type MessageDeliveryState, type MessageDirection } from "./message-bubble";
 export { MessageComposer, type MessageComposerProps } from "./message-composer";

@@ -31,7 +31,7 @@
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: Badge, Button, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - `packages/ui`: Badge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -380,7 +380,7 @@ Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 �
 
 Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking change라 PR로 처리해 끝냈다.
 
-**바로 다음은 ToggleButton이다.** 즐겨찾기나 찜처럼 눌린 상태가 남는 아이콘 버튼이며 지금 시스템에 소유자가 없다. 활성 표현은 이미 정했고 남은 것은 공개 API와 Studio 화면이다. 정한 것과 그 이유는 [open-questions.md](open-questions.md)의 「ToggleButton 컴포넌트」에 있다.
+**ToggleButton은 `2026-09-10`에 만들었다.** 즐겨찾기나 찜처럼 눌린 상태가 남는 아이콘 버튼이며 구현·Studio 화면·명세를 함께 두었다. 공개 API와 켜짐 표현은 [toggle-button.md](../system/components/toggle-button.md)가 소유한다. `variant`는 배경이 없는 Ghost와 배경이 있는 Tonal 둘이고, 꺼짐은 어느 tone에서나 중립이며 켜짐에서만 색이 나온다. 별의 노랑과 하트의 빨강은 `tone="custom"`과 `color`로 꺼내는 고정 색이라 token candidate에 올려 두었다.
 
 ### 남은 작업
 

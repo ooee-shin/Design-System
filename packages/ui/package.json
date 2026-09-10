@@ -21,6 +21,7 @@
     "./select-box": "./src/select-box.tsx",
     "./switch": "./src/switch.tsx",
     "./textarea": "./src/textarea.tsx",
+    "./toggle-button": "./src/toggle-button.tsx",
     "./message-bubble": "./src/message-bubble.tsx",
     "./message-composer": "./src/message-composer.tsx",
     "./message-attachment": "./src/message-attachment.tsx"

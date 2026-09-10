@@ -43,6 +43,13 @@
 @source inline("dark:active:bg-[var(--brand-600)]");
 @source inline("dark:active:bg-[var(--brand-700)]");
 
+/* ToggleButton 은 Button 과 같은 사다리를 쓰지만 Ghost 켜짐의 글자에 600 단계를 더 쓴다. 배경을
+   두지 않는 Style 이라 글자와 아이콘만으로 켜짐을 말해야 하고, Button 의 Label 이 쓰는 800 은
+   유채색이 거의 남지 않아 브랜드 색으로 켜졌다는 것이 읽히지 않기 때문이다. tone 은 brand 와
+   custom 둘뿐이고, custom color 의 노랑과 빨강은 조립하지 않고 `toggle-button.tsx` 에 그대로
+   적으므로 Tailwind 가 그 파일에서 찾는다. */
+@source inline("text-[var(--brand-600)]");
+
 .oe-message-bubble-incoming {
   background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
   color: var(--oe-message-incoming-foreground, var(--oe-foreground-primary));
