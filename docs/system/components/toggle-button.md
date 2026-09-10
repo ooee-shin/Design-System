@@ -97,6 +97,12 @@ Button의 엑셀 색과 같은 자리이며 `toggle-button.tsx`가 로컬 값으
 
 두 Style 모두 보이는 경계가 없으므로 [interaction.md](../interaction.md)의 유형 3을 쓴다. 2px 간격을 두고 바깥에 2px ring을 그려 배경색과 무관하게 focus 위치가 보이게 한다.
 
+## 갖지 않는 상태
+
+Disabled, Read only와 Invalid는 이 컴포넌트에 없다. 아직 정하지 않은 것이 아니라 성립하지 않는 상태다.
+
+Disabled는 `disabled` Property도 두지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않으며, 그려져 있다는 것 자체가 누를 수 있다는 뜻이다. Read only는 조작만 막는 자리가 없으므로 담당할 상태가 없고, Invalid는 검증 대상이 되는 값이 없다.
+
 ## Guidelines
 
 Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
@@ -158,10 +164,7 @@ Tonal에서는 아이콘이 하나이고 배경이 켜짐을 말한다. 배경�
 
 ## 현재 정의하지 않은 항목
 
-- Disabled 상태. `disabled` Property도 두지 않는다. 켤 수 없는 자리에는 이 버튼을 그리지 않고, 그릴 수 있다는 것 자체가 누를 수 있다는 뜻이다
 - Loading 상태
-- Read only 상태. 조작만 막는 자리가 없으므로 담당할 상태도 없다
-- Invalid 상태. 검증 대상이 되는 값이 없다
 - 큰 개수의 축약. `999+`처럼 자릿수를 줄이는 규칙을 정하지 않았다
 - 켜짐과 꺼짐 사이의 전환 애니메이션
 - 여러 ToggleButton을 하나로 묶는 Toggle group

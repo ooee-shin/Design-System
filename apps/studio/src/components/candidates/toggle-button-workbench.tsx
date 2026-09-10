@@ -311,8 +311,8 @@ export function ToggleButtonWorkbench() {
               <ToggleButton variant="tonal" defaultPressed className={DETACHED_FOCUS} icon={<RiSearchLine />} aria-label={c.search} />
             </div>
           </Example>
-          <Example label="현재 정의 없음" description="지금 구현과 정책에 없는 상태입니다. Disabled를 두지 않는 것은 켤 수 없는 자리에 이 버튼을 그리지 않기 때문입니다.">
-            <GuidelineList className="" items={["Disabled", "Loading", "Read only", "Invalid"]} />
+          <Example label="현재 정의 없음" description="아직 정하지 않은 상태입니다. Disabled, Read only와 Invalid는 이 컴포넌트가 갖지 않습니다. 켤 수 없는 자리에는 그리지 않고, 검증 대상이 되는 값도 없습니다.">
+            <GuidelineList className="" items={["Loading"]} />
           </Example>
         </Section>
 
