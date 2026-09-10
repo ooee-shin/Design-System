@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState, type ReactNode } from "react";
-import { RiBookmarkFill, RiBookmarkLine, RiHeartFill, RiHeartLine, RiNotification3Fill, RiNotification3Line, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine } from "@remixicon/react";
+import { RiArchiveFill, RiArchiveLine, RiBookmarkFill, RiBookmarkLine, RiFolderFill, RiFolderLine, RiHeartFill, RiHeartLine, RiNotification3Fill, RiNotification3Line, RiPushpin2Fill, RiPushpin2Line, RiSearchFill, RiSearchLine, RiStarFill, RiStarLine, RiThumbUpFill, RiThumbUpLine } from "@remixicon/react";
 import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type ToggleButtonSize, type ToggleButtonVariant } from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
@@ -126,6 +126,9 @@ const copy = {
     search: "검색",
     notify: "알림",
     save: "저장",
+    archive: "보관",
+    collect: "모아 두기",
+    good: "좋아요",
     searchArea: "검색어를 입력하세요",
     postA: "주간 리포트 초안",
     postB: "촬영 일정 정리",
@@ -138,6 +141,9 @@ const copy = {
     search: "Search",
     notify: "Notify",
     save: "Save",
+    archive: "Archive",
+    collect: "Collect",
+    good: "Like",
     searchArea: "Type to search",
     postA: "Weekly report draft",
     postB: "Shoot schedule",
@@ -260,27 +266,27 @@ export function ToggleButtonWorkbench() {
           {controlSizes.map((item) => (
             <Example key={item} label={sizeCardLabel[item]}>
               <div className="flex flex-wrap items-center gap-1.5">
-                <ToggleButton controlSize={item} icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                <ToggleButton controlSize={item} defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                <ToggleButton controlSize={item} defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} />
+                <ToggleButton controlSize={item} icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
+                <ToggleButton controlSize={item} defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
+                <ToggleButton controlSize={item} defaultPressed count={128} icon={<RiThumbUpLine />} activeIcon={<RiThumbUpFill />} aria-label={c.good} />
               </div>
             </Example>
           ))}
         </Section>
 
-        <Section id="color" title="Properties · Color" description="tone 셋과 Style 둘의 조합이며, 각 칸의 왼쪽이 꺼짐이고 오른쪽이 켜짐입니다. 꺼짐은 어느 tone에서나 같은 중립이고 켜짐에서만 색이 갈립니다.">
+        <Section id="color" title="Properties · Color" description="tone 셋과 Style 둘의 조합이며, 각 칸의 왼쪽이 꺼짐이고 오른쪽이 켜짐입니다. 색만 견주는 자리이므로 아이콘은 관용색이 없는 핀으로 고정했습니다. 꺼짐은 어느 tone에서나 같은 중립이고 켜짐에서만 색이 갈립니다.">
           <div lang="en" className="col-span-full min-w-0 overflow-x-auto">
             <ColorGrid rows={colorRows} render={(row, rowVariant) => (
               <div className="flex items-center gap-1">
                 {rowVariant === "tonal" ? (
                   <>
-                    <ToggleButton variant="tonal" {...rowProps(row)} icon={<RiStarLine />} aria-label="Favorite" />
-                    <ToggleButton variant="tonal" {...rowProps(row)} defaultPressed icon={<RiStarLine />} aria-label="Favorite" />
+                    <ToggleButton variant="tonal" {...rowProps(row)} icon={<RiPushpin2Line />} aria-label="Pin" />
+                    <ToggleButton variant="tonal" {...rowProps(row)} defaultPressed icon={<RiPushpin2Line />} aria-label="Pin" />
                   </>
                 ) : (
                   <>
-                    <ToggleButton {...rowProps(row)} icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label="Favorite" />
-                    <ToggleButton {...rowProps(row)} defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label="Favorite" />
+                    <ToggleButton {...rowProps(row)} icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label="Pin" />
+                    <ToggleButton {...rowProps(row)} defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label="Pin" />
                   </>
                 )}
               </div>
@@ -290,17 +296,17 @@ export function ToggleButtonWorkbench() {
 
         <Section id="state" title="Properties · State" description="Default, Pressed와 Focus visible입니다. Hover와 Pressed 하이라이트는 각 카드에서 직접 눌러 확인합니다.">
           <Example label="Default" description="아직 켜지 않은 상태입니다. 배경도 tone 색도 없습니다.">
-            <ToggleButton icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
+            <ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
           </Example>
           <Example label="Pressed" description="Ghost는 아이콘이 Fill로 바뀌고, Tonal은 아이콘을 그대로 둔 채 배경이 생깁니다.">
             <div className="flex flex-wrap items-center gap-1.5">
-              <ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
+              <ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
               <ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} />
             </div>
           </Example>
           <Example label="Focus visible" description="간격을 두고 바깥에 ring을 그립니다. 두 Style 모두 보이는 경계가 없어 같은 유형을 씁니다.">
             <div className="flex flex-wrap items-center gap-1.5">
-              <ToggleButton className={DETACHED_FOCUS} icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
+              <ToggleButton className={DETACHED_FOCUS} icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
               <ToggleButton variant="tonal" defaultPressed className={DETACHED_FOCUS} icon={<RiSearchLine />} aria-label={c.search} />
             </div>
           </Example>
@@ -312,7 +318,7 @@ export function ToggleButtonWorkbench() {
         <Section id="elements" title="Properties · Elements" description="아이콘은 필수이고 Count는 선택입니다. Ghost는 꺼짐과 켜짐 두 아이콘을 받고 Tonal은 하나만 받습니다.">
           <Example label="아이콘만" description="높이와 같은 너비를 가진 정사각형이 됩니다.">
             <div className="flex flex-wrap items-center gap-1.5">
-              <ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
+              <ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
               <ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
               <ToggleButton defaultPressed icon={<RiNotification3Line />} activeIcon={<RiNotification3Fill />} aria-label={c.notify} />
               <ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} />
@@ -320,9 +326,9 @@ export function ToggleButtonWorkbench() {
           </Example>
           <Example label="Count 함께" description="숫자는 언제나 아이콘 뒤에 놓입니다.">
             <div className="flex flex-wrap items-center gap-1.5">
-              <ToggleButton count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} />
-              <ToggleButton defaultPressed count={129} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} />
-              <ToggleButton count={0} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} />
+              <ToggleButton count={128} icon={<RiThumbUpLine />} activeIcon={<RiThumbUpFill />} aria-label={c.good} />
+              <ToggleButton defaultPressed count={129} icon={<RiThumbUpLine />} activeIcon={<RiThumbUpFill />} aria-label={c.good} />
+              <ToggleButton count={0} icon={<RiThumbUpLine />} activeIcon={<RiThumbUpFill />} aria-label={c.good} />
             </div>
           </Example>
         </Section>
@@ -360,8 +366,8 @@ export function ToggleButtonWorkbench() {
                       <span key={title} className="flex items-center justify-between gap-3">
                         <span className="truncate text-xs text-oe-foreground-secondary">{title}</span>
                         {index === 1
-                          ? <ToggleButton controlSize="small" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                          : <ToggleButton controlSize="small" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />}
+                          ? <ToggleButton controlSize="small" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
+                          : <ToggleButton controlSize="small" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />}
                       </span>
                     ))}
                   </PreviewLocaleScope>
@@ -371,7 +377,7 @@ export function ToggleButtonWorkbench() {
                     <span className="block h-10 rounded-lg bg-oe-background-secondary" aria-hidden="true" />
                     <span className="flex items-center justify-between gap-3">
                       <span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span>
-                      <ToggleButton variant="tonal" defaultPressed count={128} icon={<RiHeartLine />} aria-label={c.like} />
+                      <ToggleButton variant="tonal" defaultPressed count={128} icon={<RiThumbUpLine />} aria-label={c.good} />
                     </span>
                   </PreviewLocaleScope>
                 </GuideVisual>
@@ -391,8 +397,8 @@ export function ToggleButtonWorkbench() {
                 "색만으로 갈리는 상태는 색을 구별하기 어려운 사람에게 전달되지 않고, 옅은 배경 위에서는 누구에게나 흐려집니다.",
                 "Tonal에서는 아이콘이 하나이고 배경이 켜짐을 말합니다. 배경은 면적이 생기고 사라지는 변화이므로 색을 구별하기 어려워도 전달됩니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /><ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /><ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /><ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Line />} aria-label={c.pin} /></PreviewLocaleScope>}
             />
 
             <UsageComparison
@@ -429,11 +435,11 @@ export function ToggleButtonWorkbench() {
               doText="같은 대상에는 토글 하나만 둡니다."
               dontText="뜻이 겹치는 토글을 나란히 두지 않습니다."
               description={[
-                "즐겨찾기와 찜과 저장을 한 대상에 함께 두면 무엇이 어디에 저장되는지 알 수 없습니다.",
+                "저장과 보관과 모아 두기처럼 뜻이 겹치는 토글을 한 대상에 함께 두면 무엇이 어디에 남는지 알 수 없습니다.",
                 "성격이 다른 토글이 함께 필요하면 아이콘으로 갈리는 것만으로 충분한지 먼저 봅니다.",
               ]}
-              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><ToggleButton controlSize="small" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
-              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><span className="flex shrink-0 items-center gap-0.5"><ToggleButton controlSize="small" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="small" icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /><ToggleButton controlSize="small" icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></span></PreviewLocaleScope>}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><ToggleButton controlSize="small" icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><span className="flex shrink-0 items-center gap-0.5"><ToggleButton controlSize="small" icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /><ToggleButton controlSize="small" icon={<RiArchiveLine />} activeIcon={<RiArchiveFill />} aria-label={c.archive} /><ToggleButton controlSize="small" icon={<RiFolderLine />} activeIcon={<RiFolderFill />} aria-label={c.collect} /></span></PreviewLocaleScope>}
             />
           </div>
         </Section>
