@@ -33,6 +33,25 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "field",
+    title: "라벨과 안내 문구를 Field가 맡아, 폼 한 칸을 한 곳에서 다뤄요",
+    sections: [
+      {
+        heading: "화면마다 새로 만들던 라벨과 안내 문구",
+        body: "예전에는 입력 요소만 있고, 그 위에 붙는 라벨과 아래에 붙는 도움말·오류 문구는 화면마다 새로 만들었어요. 라벨과 입력 요소를 이어서 화면 읽기 도구에 이름을 알려주는 연결도 그때마다 직접 적어야 했어요. Select처럼 이름을 속성으로 한 번 더 받는 컴포넌트에서는 같은 문구를 두 곳에 적었어요.",
+      },
+      {
+        heading: "폼 한 칸을 Field 하나로 묶기",
+        body: "[Field](/components/field)는 라벨과 필수 표시, 도움말과 오류 문구를 함께 가지고, 가운데에는 입력 요소가 갈아 끼워지는 자리를 둬요. Input과 Textarea, Select는 물론이고 여러 개를 고르는 묶음까지 이 자리에 그대로 들어가요. 라벨과 입력 요소를 잇는 연결은 Field가 만들기 때문에 화면에서는 따로 적지 않아요. 입력 요소는 값을 다루는 일만 맡고 자기 라벨을 갖지 않아요.",
+      },
+      {
+        heading: "폼을 이루는 네 층을 나눈 기준",
+        body: "Field를 두면서 폼을 이루는 층에 Control, Field, Fieldset, Form이라는 이름을 붙였어요. 값을 다루는 일은 Control이, 폼 한 칸을 묶는 일은 Field가 맡아요. 여러 칸을 묶는 Fieldset과 제출·유효성 검증을 맡는 Form은 아직 만들지 않았다는 것까지 함께 적어서, 제출과 검증이 Field의 책임이 아니라는 점을 분명히 했어요.",
+      },
+    ],
+    caption: "이름이 비슷한 CheckboxField와 RadioField, SwitchField는 Field가 아니에요. 체크박스나 라디오 옆에 라벨을 나란히 붙인 한 줄이고, 그런 줄을 여러 개 묶어 하나의 폼 항목으로 만들 때 그 바깥을 Field가 감싸요.",
+  },
+  {
     id: "select-box",
     title: "별도 액션 없이 비교할 수 있는 Select Box를 추가했어요",
     sections: [
