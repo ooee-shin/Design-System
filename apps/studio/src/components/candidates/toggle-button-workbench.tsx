@@ -373,11 +373,15 @@ export function ToggleButtonWorkbench() {
                   </PreviewLocaleScope>
                 </GuideVisual>
                 <GuideVisual label="상세 화면에 하나 · Tonal">
-                  <PreviewLocaleScope className="flex w-full flex-col gap-2">
-                    <span className="block h-10 rounded-lg bg-oe-background-secondary" aria-hidden="true" />
-                    <span className="flex items-center justify-between gap-3">
+                  <PreviewLocaleScope className="flex w-full flex-col gap-3">
+                    <span className="flex items-start justify-between gap-3">
                       <span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span>
-                      <ToggleButton variant="tonal" defaultPressed count={128} icon={<RiThumbUpLine />} aria-label={c.good} />
+                      <ToggleButton variant="tonal" defaultPressed icon={<RiBookmarkLine />} aria-label={c.save} />
+                    </span>
+                    <span className="flex flex-col gap-1.5" aria-hidden="true">
+                      <span className="block h-2 w-full rounded-full bg-oe-background-secondary" />
+                      <span className="block h-2 w-full rounded-full bg-oe-background-secondary" />
+                      <span className="block h-2 w-2/3 rounded-full bg-oe-background-secondary" />
                     </span>
                   </PreviewLocaleScope>
                 </GuideVisual>
