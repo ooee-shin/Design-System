@@ -2,7 +2,7 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 시스템 정의는 `docs/system/`, 제작 절차와 근거는 `docs/process/`, 작업 운영 규칙은 루트 `AGENTS.md`를 확인한다.
 
-마지막 내용 점검: `2026-09-07`
+마지막 내용 점검: `2026-09-10`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -209,10 +209,10 @@
   - State Workbench는 Focus visible까지 포함하며 Error/Invalid는 Unchecked Danger border와 Checked Brand/Danger 우선순위 결정 전까지 미정
   - Checkbox Focus visible은 본체에서 2px 떨어진 2px `oe-focus-ring` 사용
   - 원자적인 Checkbox control과 Label·선택적 Description을 결합하는 CheckboxField를 분리
-  - CheckboxField는 독립적으로 표시할 수 있는 `rightDescription`과 `bottomDescription` optional slot을 제공하며 Layout은 개발 API 기준 `inline | block`을 지원
+  - CheckboxField는 독립적으로 표시할 수 있는 `rightDescription`과 `bottomDescription` optional slot을 제공하며 Layout은 개발 API 기준 `hug | fill`을 지원
   - Label·Right Description 첫 행은 20px 고정 높이, Right Description은 단일 행 truncate로 처리. Bottom Description은 상단 행 아래에서 Leading element와 같은 왼쪽 시작점을 사용
   - Light/Dark `oe-foreground-tertiary`는 `neutral-500`을 사용
-  - `inline | block`은 display를 바꾸지 않고 너비만 fit-content/100%로 변경해 전환 시 위치를 유지
+  - `hug | fill`은 display를 바꾸지 않고 너비만 fit-content/100%로 변경해 전환 시 위치를 유지
   - CheckboxField는 Regular form 36px 최소 행 높이에 정렬
   - CheckboxField와 RadioField의 전체 조작 영역 배경은 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover 중에만 `oe-interaction-hover-subtle`(Light black 3%, Dark white 5%)로 표시. 기본·선택·Disabled·Read only 비Hover 상태는 투명하고 Disabled와 Read only는 Hover·Pressed 반응을 제공하지 않음
   - Checkbox와 Radio의 Field에는 현재 크기·위치가 변하는 Pressed motion을 적용하지 않음. Control 상태색과 Field Hover만 유지하며 전체 축소 효과는 모바일 공통 Motion 체계를 정할 때 다른 조작 요소와 함께 일괄 검수 예정
@@ -285,7 +285,7 @@
 - 이미지와 Color swatch처럼 콘텐츠 자체가 배경색을 갖는 값의 경계는 Neutral border를 바깥에 두지 않고 내부 Black alpha layer를 중첩한다. Input Button의 Color picker 예시는 현재 1px inset `black 10%`를 token candidate 값으로 사용하며, 실제 이미지 사례와 함께 강도를 재검수한 뒤 semantic token 승격 여부를 결정한다.
 - Outline 형태의 Form control과 선택 요소는 Disabled에서도 기본 외곽선을 유지한다. Disabled 상태는 foreground·background 위계와 상호작용 제한으로 표현하며 Outline 구조를 배경에 섞이게 만들지 않는다. 현재 Input·Number Input·Textarea·Combobox·Checkbox·Radio에 적용한다.
 - `outline | filled` Style을 제공하는 모든 Form control은 `outline`을 기본값으로 사용한다. 공용 컴포넌트 API, Studio Playground 초기값과 Property 문서의 Default를 동일하게 유지한다.
-- `fill | fixed` 너비 Layout을 지원하는 한 줄 Form control은 공용 API와 Studio Playground 모두 `fill`을 기본값으로 사용한다. Input·Number Input은 Fill이 기본이고, Textarea·Combobox는 기본적으로 부모 너비를 채운다. Checkbox·Radio의 별도 `inline | block` 체계에는 적용하지 않는다.
+- `fill | fixed` 너비 Layout을 지원하는 한 줄 Form control은 공용 API와 Studio Playground 모두 `fill`을 기본값으로 사용한다. Input·Number Input은 Fill이 기본이고, Textarea·Combobox는 기본적으로 부모 너비를 채운다. Checkbox·Radio는 같은 축에서 `hug`를 기본값으로 쓴다.
 
 ## 아직 Provisional인 결정
 
@@ -362,6 +362,10 @@ Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 �
 
 `2026-09-08`에 **Badge의 색과 아이콘 자리를 정했다.** 옛 구현과 검수 화면을 걷어낸 뒤 24px 하나로 다시 만들었고, Tone은 `brand`·`neutral`·상태 넷·`custom` 일곱이며 Style은 `fill`·`tonal`·`outlined` 셋이다. `outlined`의 경계는 어느 Tone에서나 그 Tone 색의 30% 알파를 쓴다. `custom`은 semantic family가 없는 색을 Tailwind primitive 22색에서 받고, 단계 규칙을 tokens의 `statusFamily`와 같게 두어 나중에 그 색을 semantic family로 올려도 화면의 색이 달라지지 않게 했다. 아이콘은 Label 앞에만 붙이고 뒤쪽 아이콘은 걷어냈다. 정한 것과 그 이유는 [badge.md](../system/components/badge.md)가 소유한다.
 
+`2026-09-09`에 **Button을 새로 만들었다.** 저장소에 손대지 않은 shadcn base-nova Button 이 들어와 있었고, 그것을 쓰던 여덟 자리가 전부 `className` 으로 `oe-*` 색을 덮어쓰고 있었다. 구조는 남기고 색·크기·아이콘 규칙을 ooee 것으로 교체하면서 그 우회를 걷어냈다. Tone 은 `brand`·`neutral`·`danger`·`custom` 넷이고 Style 은 `fill`·`tonal`·`outline`·`ghost` 넷이며, 높이는 `interaction.md` 의 공통 Control Height 중 다섯 단계를 쓴다. 색의 단계 규칙은 Badge 와 같게 두었고 Badge 가 갖지 않는 Hover 와 Pressed 만 더 갖는다. tone 색은 fill 뿐 아니라 outline 과 ghost 에서도 따라가므로, 도구 모음의 아이콘 버튼처럼 중립으로 읽혀야 하는 자리는 `tone="neutral"` 을 밝혀 적는다. 아이콘은 `children` 에 섞지 않고 `leadingIcon`·`trailingIcon` 으로 받으며, Label 을 넘기지 않으면 정사각형 아이콘 버튼이 된다. 정한 것과 그 이유는 [button.md](../system/components/button.md)가 소유하며, Guidelines 일곱 꼭지도 그 문서와 Studio 화면이 같은 제목을 쓴다.
+
+`custom` tone 이 지금 제공하는 값은 엑셀 하나다. 특정 외부 서비스를 가리키는 고정 색이라 팔레트 단계 규칙에 들어오지 않고 Light 와 Dark 에서 값을 뒤집지 않으므로, `pipeline.md` 대로 `button.tsx` 가 로컬 값으로 갖고 [open-questions.md](open-questions.md)가 token candidate 로 기록한다. 같은 파일에 Style 과 Size 값의 이름이 컴포넌트마다 다르다는 항목도 함께 적었다.
+
 **한번에 몰아서 할 작업**도 [component-audit.md](component-audit.md)에 있다. Anatomy가 있는 열한 화면 중 여섯 곳에 Structure map이 없다.
 
 `2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 **폼 요소 10개의 84건을 모두 처리했다.** 결과와 확정한 정책, 단계별 진행 상황은 [component-audit.md](component-audit.md)에 있다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건은 사용자가 시작한다고 말할 때 착수한다.
@@ -376,6 +380,8 @@ Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 �
 
 Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking change라 PR로 처리해 끝냈다.
 
+**바로 다음은 ToggleButton이다.** 즐겨찾기나 찜처럼 눌린 상태가 남는 아이콘 버튼이며 지금 시스템에 소유자가 없다. 활성 표현은 이미 정했고 남은 것은 공개 API와 Studio 화면이다. 정한 것과 그 이유는 [open-questions.md](open-questions.md)의 「ToggleButton 컴포넌트」에 있다.
+
 ### 남은 작업
 
 1. **Combobox의 미선택 체크박스 2개.** Anatomy 예시에서 두 Option이 모두 미선택 체크박스로 보인다. 하나는 공용 `CheckboxIndicator`이고 다른 하나는 도식으로 그린 사각형이라 시각이 거의 같다. 선택된 상태를 하나 두어 무엇을 보여 주는 예시인지 드러내야 한다. 좌표가 아니라 예시 내용의 문제다.
@@ -384,7 +390,8 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 4. **Badge를 새로 만든다.** 옛 구현과 검수 화면은 `2026-09-08`에 걷어냈고, 같은 날 역할과 경계에 이어 색과 아이콘 자리까지 정했다. 남은 것은 세 유형의 관계, 모양 어휘, 테마와 무관한 흰색 tone이며 [badge.md](../system/components/badge.md)가 소유한다. 옛 Badge 를 쓰던 일곱 자리는 `packages/patterns` 세 파일과 Studio workbench 세 파일에 하드코딩해 두었고, 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. 어느 자리를 새 Badge 로 되돌릴지는 사용자가 화면에서 직접 확인한다.
 5. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 6. **Chip 확정 후 Combobox 잔여 작업.** Combobox 도 후순위로 옮긴다. Select 와의 경계를 다시 정하면서 남은 다섯 항목이 Chip 디자인에 달려 있기 때문이다. Chip 은 후순위 안에서 먼저 처리한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다. Combobox 쪽 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
-7. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
+7. **Button 의 미정 항목.** `2026-09-10`에 화면 확정 검수까지 끝냈다. Studio 화면은 Playground 부터 Property map 까지 열 개 절을 갖췄다. `button.md` 의 「현재 정의하지 않은 항목」에 Loading·Read only·Invalid 상태, Button group, link 형태와 아이콘 전용 버튼의 Tooltip 정책이 있다. Ghost 는 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다.
+8. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
 
 각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 

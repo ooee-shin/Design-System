@@ -94,15 +94,13 @@ export function BreadcrumbPageHeader({ locale = "ko" }: { locale?: "ko" | "en" }
             </div>
 
             <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end" aria-label="Record actions">
-              <Button variant="outline" size="lg" onClick={() => setLastAction(activeCopy.feedback.duplicate)} className="oe-hover-layer border-oe-border-secondary bg-oe-background-primary text-oe-foreground-secondary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring">
-                <RiFileCopyLine data-icon="inline-start" />
+              <Button variant="outline" tone="neutral" controlSize="large" onClick={() => setLastAction(activeCopy.feedback.duplicate)} leadingIcon={<RiFileCopyLine />}>
                 {activeCopy.duplicate}
               </Button>
-              <Button variant="outline" size="lg" onClick={() => setLastAction(activeCopy.feedback.share)} className="oe-hover-layer border-oe-border-secondary bg-oe-background-primary text-oe-foreground-secondary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring">
-                <RiShareForwardLine data-icon="inline-start" />
+              <Button variant="outline" tone="neutral" controlSize="large" onClick={() => setLastAction(activeCopy.feedback.share)} leadingIcon={<RiShareForwardLine />}>
                 {activeCopy.share}
               </Button>
-              <Button size="lg" onClick={() => setLastAction(activeCopy.feedback.publish)} className="oe-hover-layer bg-oe-background-bold-primary px-4 text-oe-foreground-inverse hover:bg-oe-background-bold-primary focus-visible:ring-oe-focus-ring">
+              <Button controlSize="large" onClick={() => setLastAction(activeCopy.feedback.publish)}>
                 {activeCopy.publish}
               </Button>
               <Popover.Root>

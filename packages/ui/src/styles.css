@@ -20,6 +20,29 @@
 @source inline("dark:text-[var(--brand-300)]");
 @source inline("border-[var(--brand-500)]/30");
 
+/* Button 도 같은 방식으로 조립하지만 Badge 가 갖지 않는 Hover 와 Pressed 단계를 더 쓴다. 어느
+   variant 에서나 배경을 한 단계씩 진하게 밟으므로 Light 는 200/300, Dark 는 700/600 이 필요하다.
+   tone 은 brand·neutral·danger 셋이라 팔레트는 neutral 과 red 만 대상이며, Button 의 단계 규칙을
+   바꾸면 여기도 함께 고친다. custom tone 의 엑셀 색은 조립하지 않고 `button.tsx` 에 그대로 적으므로
+   Tailwind 가 그 파일에서 찾는다. */
+@source inline("bg-{neutral,red}-200");
+@source inline("hover:bg-{neutral,red}-{100,200,700}");
+@source inline("active:bg-{neutral,red}-{200,300,800}");
+@source inline("dark:hover:bg-{neutral,red}-{700,800}");
+@source inline("dark:active:bg-{neutral,red}-{600,700}");
+
+@source inline("bg-[var(--brand-200)]");
+@source inline("hover:bg-[var(--brand-100)]");
+@source inline("hover:bg-[var(--brand-200)]");
+@source inline("hover:bg-[var(--brand-700)]");
+@source inline("active:bg-[var(--brand-200)]");
+@source inline("active:bg-[var(--brand-300)]");
+@source inline("active:bg-[var(--brand-800)]");
+@source inline("dark:hover:bg-[var(--brand-700)]");
+@source inline("dark:hover:bg-[var(--brand-800)]");
+@source inline("dark:active:bg-[var(--brand-600)]");
+@source inline("dark:active:bg-[var(--brand-700)]");
+
 .oe-message-bubble-incoming {
   background-color: var(--oe-message-incoming-background, var(--oe-background-secondary));
   color: var(--oe-message-incoming-foreground, var(--oe-foreground-primary));

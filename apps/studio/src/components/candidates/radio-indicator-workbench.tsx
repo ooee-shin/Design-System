@@ -37,7 +37,7 @@ export function RadioIndicatorWorkbench() {
   const [showRightDescription, setShowRightDescription] = useState(false);
   const [showBottomDescription, setShowBottomDescription] = useState(false);
   const [flipped, setFlipped] = useState(false);
-  const [layout, setLayout] = useState<"inline" | "block">("inline");
+  const [layout, setLayout] = useState<"hug" | "fill">("hug");
 
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
@@ -52,7 +52,7 @@ export function RadioIndicatorWorkbench() {
             </PreviewLocaleScope>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
-                <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
+                <Control label="Layout"><Choice active={layout === "hug"} onClick={() => setLayout("hug")}>Hug</Choice><Choice active={layout === "fill"} onClick={() => setLayout("fill")}>Fill</Choice></Control>
                 <Toggle label="Flipped" value={flipped} onChange={setFlipped} />
               </ControlSection>
               <ControlSection title="State">
@@ -123,12 +123,12 @@ export function RadioIndicatorWorkbench() {
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-xs font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
-            <RadioGroup className="mt-4 max-w-md"><RadioField value="leading" layout="block" label={<span className="font-medium">{c.leadingLabel}</span>} bottomDescription={c.leadingBottom} leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} /></RadioGroup>
+            <RadioGroup className="mt-4 max-w-md"><RadioField value="leading" layout="fill" label={<span className="font-medium">{c.leadingLabel}</span>} bottomDescription={c.leadingBottom} leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} /></RadioGroup>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-xs font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
-            <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="block" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<span className="inline-flex h-4 items-center gap-0.5 rounded-full bg-red-100 px-1.5 text-[10px] font-medium leading-none text-red-800 dark:bg-red-950 dark:text-red-200">NEW</span>} /></RadioGroup>
+            <RadioGroup className="mt-4 max-w-md"><RadioField value="trailing" layout="fill" label={<span className="font-medium">{c.trailingLabel}</span>} bottomDescription={c.trailingBottom} trailingElement={<span className="inline-flex h-4 items-center gap-0.5 rounded-full bg-red-100 px-1.5 text-[10px] font-medium leading-none text-red-800 dark:bg-red-950 dark:text-red-200">NEW</span>} /></RadioGroup>
           </div>
         </Section>
 
@@ -156,7 +156,7 @@ export function RadioIndicatorWorkbench() {
               <h4 className="text-sm font-semibold text-oe-foreground-primary">Vertical · Block</h4>
               <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">각 항목이 부모 너비를 채우며 36px 최소 행 높이로 이어집니다.</p>
               <RadioGroup defaultValue="vertical-b" className="mt-3 grid" aria-label="Vertical radio layout">
-                {["A", "B", "C"].map((suffix) => <RadioField key={suffix} value={`vertical-${suffix.toLowerCase()}`} layout="block" label={`${c.label} ${suffix}`} />)}
+                {["A", "B", "C"].map((suffix) => <RadioField key={suffix} value={`vertical-${suffix.toLowerCase()}`} layout="fill" label={`${c.label} ${suffix}`} />)}
               </RadioGroup>
             </div>
           </div>
@@ -168,7 +168,7 @@ export function RadioIndicatorWorkbench() {
               <GuidelineTitle>Target area 확보하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="16px Control"><TargetArea label="36px" className="min-h-9 min-w-48"><RadioGroup defaultValue="target-a"><RadioField value="target-a" label={c.label} /></RadioGroup></TargetArea></GuideVisual>
-                <GuideVisual label="Row composition"><TargetArea label="48px" className="min-h-12 w-full"><RadioGroup defaultValue="target-row" className="w-full"><RadioField value="target-row" label={c.label} layout="block" /></RadioGroup></TargetArea></GuideVisual>
+                <GuideVisual label="Row composition"><TargetArea label="48px" className="min-h-12 w-full"><RadioGroup defaultValue="target-row" className="w-full"><RadioField value="target-row" label={c.label} layout="fill" /></RadioGroup></TargetArea></GuideVisual>
               </div>
               <GuidelineList items={["16px Control만 보이더라도 RadioField는 최소 36px 높이의 조작 영역을 확보합니다.", "목록이나 행과 결합하면 Control만이 아니라 Label을 포함한 전체 RadioField를 선택 영역으로 사용합니다."]} />
             </div>
@@ -233,7 +233,7 @@ export function RadioIndicatorWorkbench() {
 
         <Section id="property-map" title="Property map" description="현재 구현된 Base UI Radio 속성과 ooee Field 범위입니다.">
           <div className="col-span-full overflow-x-auto"><table className="w-full min-w-[38rem] text-left text-xs"><thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="py-2">Property</th><th>Values</th><th>Default</th></tr></thead><tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
-            <MapRow property="value" values="string" defaultValue="required" /><MapRow property="disabled" values="false | true" defaultValue="false" /><MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="required" values="false | true" defaultValue="false" /><MapRow property="label" values="ReactNode (Field)" defaultValue="required" /><MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="layout" values="inline | block (Field only)" defaultValue="inline" /><MapRow property="flipped" values="false | true" defaultValue="false" />
+            <MapRow property="value" values="string" defaultValue="required" /><MapRow property="disabled" values="false | true" defaultValue="false" /><MapRow property="readOnly" values="false | true" defaultValue="false" /><MapRow property="required" values="false | true" defaultValue="false" /><MapRow property="label" values="ReactNode (Field)" defaultValue="required" /><MapRow property="rightDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" /><MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="trailingElement" values="ReactNode" defaultValue="undefined" /><MapRow property="layout" values="hug | fill (Field only)" defaultValue="hug" /><MapRow property="flipped" values="false | true" defaultValue="false" />
           </tbody></table></div>
         </Section>
       </div>

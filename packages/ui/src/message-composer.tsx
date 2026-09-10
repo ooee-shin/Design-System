@@ -30,11 +30,11 @@ export function MessageComposer({ value, onValueChange, onSubmit, placeholder, a
           className="min-h-16 resize-none bg-transparent text-oe-foreground-primary caret-oe-foreground-primary placeholder:text-oe-foreground-tertiary"
         />
         <div className="flex items-center justify-between px-2.5 pb-2">
-          <Button type="button" variant="ghost" size="sm" className="oe-hover-layer text-oe-foreground-tertiary hover:bg-transparent hover:text-oe-foreground-primary focus-visible:ring-oe-focus-ring">
-            <Paperclip data-icon="inline-start" />{attachLabel}
+          <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<Paperclip />}>
+            {attachLabel}
           </Button>
-          <Button type="submit" size="sm" disabled={!value.trim()} className="oe-hover-layer bg-oe-background-bold-primary text-oe-foreground-inverse hover:bg-oe-background-bold-primary focus-visible:ring-oe-focus-ring disabled:bg-oe-background-disabled disabled:text-oe-foreground-disabled disabled:opacity-100">
-            <Send data-icon="inline-start" />{sendLabel}
+          <Button type="submit" controlSize="small" disabled={!value.trim()} leadingIcon={<Send />}>
+            {sendLabel}
           </Button>
         </div>
       </div>

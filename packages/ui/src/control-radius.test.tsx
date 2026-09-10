@@ -6,6 +6,7 @@ import test, { afterEach } from "node:test"
 import React from "react"
 import { cleanup, render } from "@testing-library/react"
 
+import { Button } from "./button"
 import { Chip } from "./chip"
 import { Combobox } from "./combobox"
 import { Input } from "./input"
@@ -28,6 +29,7 @@ function radiusClassOf(element: Element | null) {
 }
 
 const controls: Array<[string, () => React.ReactElement, string]> = [
+  ["Button", () => <Button>Label</Button>, "[data-slot=button]"],
   ["Input", () => <Input aria-label="값" />, "[data-slot=input-container]"],
   ["Textarea", () => <Textarea aria-label="값" />, "[data-slot=textarea-container]"],
   ["Select", () => <Select ariaLabel="값" options={[{ value: "a", label: "A" }]} />, "[data-slot=select-trigger]"],

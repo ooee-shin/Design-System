@@ -40,7 +40,7 @@ export function CheckboxWorkbench() {
   const [showBottomDescription, setShowBottomDescription] = useState(false);
   const [isParent, setIsParent] = useState(false);
   const [flipped, setFlipped] = useState(false);
-  const [layout, setLayout] = useState<"inline" | "block">("inline");
+  const [layout, setLayout] = useState<"hug" | "fill">("hug");
   const [shape, setShape] = useState<"square" | "rounded" | "ghost">("rounded");
   const [selectedAssets, setSelectedAssets] = useState<Array<"indicator" | "pdf">>(["indicator", "pdf"]);
 
@@ -56,7 +56,7 @@ export function CheckboxWorkbench() {
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
               <ControlSection title="Appearance">
                 <Control label="Shape"><Choice active={shape === "square"} onClick={() => setShape("square")}>Square</Choice><Choice active={shape === "rounded"} onClick={() => setShape("rounded")}>Rounded</Choice><Choice active={shape === "ghost"} onClick={() => { setShape("ghost"); setDisabled(false); setIndeterminate(false); }}>Ghost</Choice></Control>
-                <Control label="Layout"><Choice active={layout === "inline"} onClick={() => setLayout("inline")}>Inline</Choice><Choice active={layout === "block"} onClick={() => setLayout("block")}>Block</Choice></Control>
+                <Control label="Layout"><Choice active={layout === "hug"} onClick={() => setLayout("hug")}>Hug</Choice><Choice active={layout === "fill"} onClick={() => setLayout("fill")}>Fill</Choice></Control>
                 <Toggle label="Flipped" value={flipped} onChange={setFlipped} />
               </ControlSection>
               <ControlSection title="State">
@@ -146,14 +146,14 @@ export function CheckboxWorkbench() {
             <p className="text-xs font-medium text-oe-foreground-primary">Leading element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 앞의 Swap 영역입니다. 아래 Remix 아이콘은 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
-              <CheckboxField layout="block" label={<span className="font-medium">이벤트 알림 받기</span>} bottomDescription="새로운 이벤트와 혜택 소식을 받을 수 있습니다." leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} />
+              <CheckboxField layout="fill" label={<span className="font-medium">이벤트 알림 받기</span>} bottomDescription="새로운 이벤트와 혜택 소식을 받을 수 있습니다." leadingElement={<RiNotification3Line className="size-oe-icon-small text-oe-foreground-secondary" aria-hidden="true" />} />
             </div>
           </div>
           <div className="col-span-full rounded-xl border border-oe-border-secondary p-4">
             <p className="text-xs font-medium text-oe-foreground-primary">Trailing element</p>
             <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">텍스트 Content 뒤의 Swap 영역입니다. 아래 Badge는 배치 가능한 콘텐츠 예시이며 고정 요소가 아닙니다.</p>
             <div className="mt-4 max-w-md">
-              <CheckboxField layout="block" label={<span className="font-medium">자동 분배</span>} bottomDescription="설정한 규칙과 조건에 따라 담당자 또는 팀에게 자동 분배됩니다." trailingElement={<span className="inline-flex h-4 items-center gap-0.5 rounded-full bg-red-100 px-1.5 text-[10px] font-medium leading-none text-red-800 dark:bg-red-950 dark:text-red-200">NEW</span>} />
+              <CheckboxField layout="fill" label={<span className="font-medium">자동 분배</span>} bottomDescription="설정한 규칙과 조건에 따라 담당자 또는 팀에게 자동 분배됩니다." trailingElement={<span className="inline-flex h-4 items-center gap-0.5 rounded-full bg-red-100 px-1.5 text-[10px] font-medium leading-none text-red-800 dark:bg-red-950 dark:text-red-200">NEW</span>} />
             </div>
           </div>
         </Section>
@@ -190,7 +190,7 @@ export function CheckboxWorkbench() {
               <h4 className="text-sm font-semibold text-oe-foreground-primary">Vertical · Block</h4>
               <p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">각 항목이 부모 너비를 채우며 36px 최소 행 높이로 이어집니다.</p>
               <fieldset className="-ml-2 mt-3 grid" aria-label="Vertical checkbox layout">
-                {["A", "B", "C"].map((suffix, index) => <CheckboxField key={suffix} defaultChecked={index === 1} layout="block" label={`${c.label} ${suffix}`} />)}
+                {["A", "B", "C"].map((suffix, index) => <CheckboxField key={suffix} defaultChecked={index === 1} layout="fill" label={`${c.label} ${suffix}`} />)}
               </fieldset>
             </div>
           </div>
@@ -202,7 +202,7 @@ export function CheckboxWorkbench() {
               <GuidelineTitle>Target area 확보하기</GuidelineTitle>
               <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
                 <GuideVisual label="16px Control"><TargetArea label="36px" className="min-h-9 min-w-48"><CheckboxField label={c.label} /></TargetArea></GuideVisual>
-                <GuideVisual label="Row composition"><TargetArea label="48px" className="min-h-12 w-full"><CheckboxField label={c.label} layout="block" /></TargetArea></GuideVisual>
+                <GuideVisual label="Row composition"><TargetArea label="48px" className="min-h-12 w-full"><CheckboxField label={c.label} layout="fill" /></TargetArea></GuideVisual>
               </div>
               <GuidelineList items={["16px Indicator만 보이더라도 CheckboxField는 최소 36px 높이의 조작 영역을 확보합니다.", "목록이나 행과 결합하면 Indicator만이 아니라 Label을 포함한 전체 CheckboxField를 선택 영역으로 사용합니다."]} />
             </div>
@@ -270,7 +270,7 @@ export function CheckboxWorkbench() {
                 <MapRow property="bottomDescription" values="ReactNode" defaultValue="undefined" />
                 <MapRow property="leadingElement" values="ReactNode" defaultValue="undefined" />
                 <MapRow property="trailingElement" values="ReactNode" defaultValue="undefined" />
-                <MapRow property="layout" values="inline | block (Field only)" defaultValue="inline" />
+                <MapRow property="layout" values="hug | fill (Field only)" defaultValue="hug" />
                 <MapRow property="flipped" values="false | true" defaultValue="false" />
                 <MapRow property="readOnly" values="false | true" defaultValue="false" />
                 <MapRow property="required" values="false | true" defaultValue="false" />

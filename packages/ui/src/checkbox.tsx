@@ -58,7 +58,7 @@ type CheckboxFieldProps = CheckboxProps & {
   leadingElement?: React.ReactNode
   trailingElement?: React.ReactNode
   isParent?: boolean
-  layout?: "inline" | "block"
+  layout?: "hug" | "fill"
   flipped?: boolean
   checkboxClassName?: string
 }
@@ -103,7 +103,7 @@ function Checkbox({ className, indeterminate = false, shape = "rounded", disable
   )
 }
 
-function CheckboxFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, isParent = false, layout = "inline", flipped = false, checkboxClassName, className, disabled, readOnly, shape = "rounded", ...props }: CheckboxFieldProps) {
+function CheckboxFieldBase({ label, rightDescription, bottomDescription, leadingElement, trailingElement, isParent = false, layout = "hug", flipped = false, checkboxClassName, className, disabled, readOnly, shape = "rounded", ...props }: CheckboxFieldProps) {
   const effectiveDisabled = shape !== "ghost" ? disabled : false
   const labelId = React.useId()
 
@@ -111,16 +111,16 @@ function CheckboxFieldBase({ label, rightDescription, bottomDescription, leading
     <label className={cn(
       "flex min-h-oe-control-regular items-start gap-2 rounded-md bg-transparent px-2 py-2 transition-colors duration-[60ms]",
       !readOnly && "[&:not(:has([data-slot=checkbox][data-disabled])):hover]:bg-oe-interaction-hover-subtle",
-      layout === "block" ? "w-full" : "w-fit",
+      layout === "fill" ? "w-full" : "w-fit",
       flipped && "flex-row-reverse",
       effectiveDisabled && "cursor-not-allowed",
       className,
     )}>
       <Checkbox aria-labelledby={labelId} className={cn("mt-0.5", checkboxClassName)} disabled={effectiveDisabled} readOnly={readOnly} shape={shape} {...props} />
-      <span className={cn("flex min-w-0 flex-col", layout === "block" && "flex-1") }>
+      <span className={cn("flex min-w-0 flex-col", layout === "fill" && "flex-1") }>
         <span className="flex min-w-0 items-start gap-2">
           {leadingElement ? <span data-slot="checkbox-leading" className="mt-0.5 shrink-0">{leadingElement}</span> : null}
-          <span className={cn("flex h-5 min-w-0 items-baseline gap-2 overflow-hidden", layout === "block" && !trailingElement && "flex-1") }>
+          <span className={cn("flex h-5 min-w-0 items-baseline gap-2 overflow-hidden", layout === "fill" && !trailingElement && "flex-1") }>
             <span id={labelId} className={cn("shrink-0 text-sm leading-5 text-oe-foreground-primary", isParent ? "font-semibold" : "font-normal", effectiveDisabled && "text-oe-foreground-disabled")}>{label}</span>
             {rightDescription ? <span className={cn("min-w-0 truncate whitespace-nowrap text-xs leading-5 text-oe-foreground-tertiary", effectiveDisabled && "text-oe-foreground-disabled")}>{rightDescription}</span> : null}
           </span>

@@ -1,5 +1,6 @@
 export type ComponentKey =
   | "badge"
+  | "button"
   | "checkbox"
   | "chip"
   | "combobox"
@@ -26,6 +27,7 @@ export type ComponentRegistryItem = {
 
 export const componentRegistry: ComponentRegistryItem[] = [
   { key: "badge", title: "Badge", description: "다른 요소에 덧붙어 상태나 개수를 표시합니다. 새로 만드는 중이며 지금은 Playground만 있습니다.", href: "/components/badge", similar: ["chip", "notification-badge"] },
+  { key: "button", title: "Button", description: "액션을 실행하는 버튼입니다. 폼 요소와 같은 공통 Control Height를 사용하며, 새로 만드는 중이라 지금은 Playground와 Anatomy만 있습니다.", href: "/components/button", similar: ["input-button", "chip"] },
   { key: "checkbox", title: "Checkbox", description: "목록이나 폼에서 항목의 선택 여부를 제어합니다. Control은 16px 단일 크기이며 20px Label 첫 줄 안에서 중앙 정렬됩니다. 선택 상태는 Brand 표현을 사용합니다.", href: "/components/checkbox", similar: ["radio"], worksWith: ["field", "combobox"] },
   { key: "chip", title: "Chip", description: "짧은 Label로 값 하나를 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지웁니다.", href: "/components/chip", similar: ["select-box"], worksWith: ["combobox"] },
   { key: "combobox", title: "Combobox", description: "Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택합니다.", href: "/components/combobox", worksWith: ["field", "input", "checkbox", "chip"] },
