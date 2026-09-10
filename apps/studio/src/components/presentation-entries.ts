@@ -33,6 +33,20 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "chip",
+    title: "따로 만들던 표시를 Chip으로 정의하고 다섯 역할로 나눴어요",
+    sections: [
+      {
+        heading: "역할마다 따로 만들던 표시",
+        body: "예전에는 값이나 조건을 짧게 보여 주는 표시를 역할마다 따로 만들었어요. 하나의 컴포넌트로 정의된 적이 없어서, 같은 모양이 여러 자리에 있어도 서로 다른 것으로 만들어졌어요.",
+      },
+      {
+        heading: "Chip으로 정의하고 다섯 역할로 나누기",
+        body: "[Chip](/components/chip)을 하나의 컴포넌트로 정의하고, 쓰이는 자리를 Filter와 Selection, Suggestion, Input과 정보 표시 다섯 역할로 나눴어요. 역할마다 어떤 모양을 쓰고 눌렀을 때 무엇이 되는지, 지우기 버튼을 두는지를 정해 뒀어요. 어느 역할인지 먼저 정하면 나머지는 따라오기 때문에 자리마다 다시 판단하지 않아도 돼요.",
+      },
+    ],
+  },
+  {
     id: "field",
     title: "라벨과 안내 문구를 Field가 맡아, 폼 한 칸을 한 곳에서 다뤄요",
     sections: [
@@ -50,20 +64,6 @@ export const presentationEntries: PresentationEntry[] = [
       },
     ],
     caption: "이름이 비슷한 CheckboxField와 RadioField, SwitchField는 Field가 아니에요. 체크박스나 라디오 옆에 라벨을 나란히 붙인 한 줄이고, 그런 줄을 여러 개 묶어 하나의 폼 항목으로 만들 때 그 바깥을 Field가 감싸요.",
-  },
-  {
-    id: "chip",
-    title: "따로 만들던 표시를 Chip으로 정의하고 다섯 역할로 나눴어요",
-    sections: [
-      {
-        heading: "역할마다 따로 만들던 표시",
-        body: "예전에는 값이나 조건을 짧게 보여 주는 표시를 역할마다 따로 만들었어요. 하나의 컴포넌트로 정의된 적이 없어서, 같은 모양이 여러 자리에 있어도 서로 다른 것으로 만들어졌어요.",
-      },
-      {
-        heading: "Chip으로 정의하고 다섯 역할로 나누기",
-        body: "[Chip](/components/chip)을 하나의 컴포넌트로 정의하고, 쓰이는 자리를 Filter와 Selection, Suggestion, Input과 정보 표시 다섯 역할로 나눴어요. 역할마다 어떤 모양을 쓰고 눌렀을 때 무엇이 되는지, 지우기 버튼을 두는지를 정해 뒀어요. 어느 역할인지 먼저 정하면 나머지는 따라오기 때문에 자리마다 다시 판단하지 않아도 돼요.",
-      },
-    ],
   },
   {
     id: "select-box",
