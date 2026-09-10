@@ -33,6 +33,20 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "toggle-button",
+    title: "Button은 Action에만 쓰도록, 상태를 나타내는 버튼은 ToggleButton으로 나눴어요",
+    sections: [
+      {
+        heading: "겉모습이 같아 한 버튼으로 쓰이던 두 가지 역할",
+        body: "한 번 누르면 끝나는 버튼과, 대상의 상태를 나타내는 버튼은 겉모습이 같아요. 그래서 같은 버튼을 토글로도 쓰면서 켜졌을 때의 모습을 자리마다 따로 손봤어요. 켜짐을 어떻게 보일지가 컴포넌트에 정의되어 있지 않아서 같은 켜짐이라도 화면마다 갈렸어요.",
+      },
+      {
+        heading: "성격에 따라 두 가지 Style로 나누기",
+        body: "[ToggleButton](/components/toggle-button)을 별도 컴포넌트로 만들고, 토글의 성격에 따라 Ghost와 Tonal 두 Style로 나눴어요. 즐겨찾기나 찜처럼 그 항목에만 상태가 남는 자리는 Ghost를 쓰고, 검색 영역을 여는 것처럼 화면이 함께 바뀌는 자리는 Tonal을 쓰도록 가이드에 적어 뒀어요. [Button](/components/button)은 눌러서 실행하고 끝나는 Action에만 쓰면 되니까 어느 쪽을 고를지가 분명해졌어요. 크기와 여백은 두 컴포넌트가 같은 값을 쓰기 때문에 도구 모음에서 같은 줄에 놓아도 어긋나지 않아요.",
+      },
+    ],
+  },
+  {
     id: "chip",
     title: "따로 만들던 표시를 Chip으로 정의하고 다섯 역할로 나눴어요",
     sections: [
