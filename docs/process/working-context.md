@@ -387,7 +387,7 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 1. **Combobox의 미선택 체크박스 2개.** Anatomy 예시에서 두 Option이 모두 미선택 체크박스로 보인다. 하나는 공용 `CheckboxIndicator`이고 다른 하나는 도식으로 그린 사각형이라 시각이 거의 같다. 선택된 상태를 하나 두어 무엇을 보여 주는 예시인지 드러내야 한다. 좌표가 아니라 예시 내용의 문제다.
 2. **Anatomy 안 흰색 내부 Container 5곳.** `studio.md:67`은 Anatomy 회색 Surface 안에서 실제 화면이나 컴포넌트를 감싸는 Container에 흰색 `oe-background-primary`와 옅은 Neutral border를 쓰라고 정한다. 어느 다섯 곳이 이 규칙과 다른지 화면에서 확인한다.
 3. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio Playground·Properties·문서를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
-4. **Badge를 새로 만든다.** 옛 구현과 검수 화면은 `2026-09-08`에 걷어냈고, 같은 날 역할과 경계에 이어 색과 아이콘 자리까지 정했다. 남은 것은 세 유형의 관계, 모양 어휘, 테마와 무관한 흰색 tone이며 [badge.md](../system/components/badge.md)가 소유한다. 옛 Badge 를 쓰던 일곱 자리는 `packages/patterns` 세 파일과 Studio workbench 세 파일에 하드코딩해 두었고, 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. 어느 자리를 새 Badge 로 되돌릴지는 사용자가 화면에서 직접 확인한다.
+4. **Badge를 새로 만든다.** 옛 구현과 검수 화면은 `2026-09-08`에 걷어냈고, 같은 날 역할과 경계에 이어 색과 아이콘 자리까지 정했다. 남은 것은 모양 어휘와 테마와 무관한 흰색 tone이며 [badge.md](../system/components/badge.md)가 소유한다. 세 유형의 관계는 Notification Badge가 점과 개수 두 형태를 갖게 되면서 정해졌으므로 `2026-09-10`에 미정 목록에서 지웠다. 옛 Badge 를 쓰던 일곱 자리는 `packages/patterns` 세 파일과 Studio workbench 세 파일에 하드코딩해 두었고, 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. 어느 자리를 새 Badge 로 되돌릴지는 사용자가 화면에서 직접 확인한다.
 5. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 6. **Chip 확정 후 Combobox 잔여 작업.** Combobox 도 후순위로 옮긴다. Select 와의 경계를 다시 정하면서 남은 다섯 항목이 Chip 디자인에 달려 있기 때문이다. Chip 은 후순위 안에서 먼저 처리한다. Combobox 의 선택값 Container 가 Chip 을 렌더링하므로 Chip 디자인이 바뀌면 Container 를 두 번 만들게 된다. Combobox 쪽 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
 7. **Button 의 미정 항목.** `2026-09-10`에 화면 확정 검수까지 끝냈다. Studio 화면은 Playground 부터 Property map 까지 열 개 절을 갖췄다. `button.md` 의 「현재 정의하지 않은 항목」에 Loading·Read only·Invalid 상태, Button group, link 형태와 아이콘 전용 버튼의 Tooltip 정책이 있다. Ghost 는 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다.
@@ -395,7 +395,9 @@ Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking chang
 
 각 컴포넌트를 검수하며 해당 `docs/system/components/*.md` 본문도 함께 정리한다. Guidelines의 서술형 문장은 「언제 이 컴포넌트를 쓰고 언제 다른 것을 쓰는가」가 드러나는 형태로 고친다. 낮은 모델의 에이전트가 이 문서만 보고 코드를 생성하는 것이 목표 사용처다.
 
-`Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 다섯 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
+`Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열한 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
+
+`2026-09-10`에 **여섯 꼭지를 더했다.** 화면 순서로 Button, Badge, Notification Badge, ToggleButton, Chip, Field다. **배열 순서는 항목을 더한 시점 기준이며 그 항목이 다루는 컴포넌트를 언제 작업했는지가 아니다.** 여러 장을 한 번에 더할 때는 읽는 순서로 정하므로, 원인과 결과로 갈리는 Badge와 Notification Badge는 Badge를 위에 두었다. Textarea와 Number Input은 꼭지로 세우지 않았다. 작업의 대부분이 규격이거나 이미 있는 판단을 한 번 더 적용한 것이기 때문이다.
 
 ### 2026-09-08 화면 검수 도구
 
