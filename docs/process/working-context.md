@@ -380,6 +380,8 @@ Chip에서 Filter로 쓰는 규칙을 다듬는 중이며 Filter Bar가 별도 �
 
 Checkbox의 `appearance` → `shape` 변경과 `square` 복원은 breaking change라 PR로 처리해 끝냈다.
 
+**바로 다음은 ToggleButton이다.** 즐겨찾기나 찜처럼 눌린 상태가 남는 아이콘 버튼이며 지금 시스템에 소유자가 없다. 활성 표현은 이미 정했고 남은 것은 공개 API와 Studio 화면이다. 정한 것과 그 이유는 [open-questions.md](open-questions.md)의 「ToggleButton 컴포넌트」에 있다.
+
 ### 남은 작업
 
 1. **Combobox의 미선택 체크박스 2개.** Anatomy 예시에서 두 Option이 모두 미선택 체크박스로 보인다. 하나는 공용 `CheckboxIndicator`이고 다른 하나는 도식으로 그린 사각형이라 시각이 거의 같다. 선택된 상태를 하나 두어 무엇을 보여 주는 예시인지 드러내야 한다. 좌표가 아니라 예시 내용의 문제다.
