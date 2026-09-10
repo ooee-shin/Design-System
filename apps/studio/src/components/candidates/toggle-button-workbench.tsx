@@ -6,7 +6,7 @@ import { TOGGLE_BUTTON_COLORS, ToggleButton, type ToggleButtonColor, type Toggle
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
-import { GuidelineGroupTitle, GuidelineTitle } from "@/components/guideline-title";
+import { GuidelineTitle } from "@/components/guideline-title";
 import { OnThisPage } from "@/components/component-detail-navigation";
 import { PreviewLocaleScope } from "@/components/preview-locale-scope";
 import { DependentControlGroup, PlaygroundChoice as Choice } from "@/components/playground-element-control";
@@ -102,24 +102,6 @@ function rowProps(row: ColorRow) {
   return { tone: "custom", color: row } as const;
 }
 
-// Style 은 켜짐을 어디까지 드러내는지로 갈린다. 고르는 사람이 자리마다 어느 것을 쓸지 판단할 수
-// 있어야 하므로 쓰는 자리와 주의를 나눠 두고, 문구는 toggle-button.md 의 Guidelines 와 같은
-// 내용으로 유지한다.
-const styleGuidance = [
-  {
-    variant: "ghost",
-    label: "Ghost · Default",
-    place: "켜 두는 것이 그 대상 자체에 남는 상태인 자리입니다. 항목 고정, 즐겨찾기와 찜이 여기에 해당합니다.",
-    caution: "배경이 있는 화면 위나 요소가 빽빽한 자리에서는 아이콘 하나가 묻힙니다. 그럴 때는 같은 기능이어도 Tonal을 봅니다.",
-  },
-  {
-    variant: "tonal",
-    label: "Tonal",
-    place: "레이어나 영역을 열어 둔 상태를 알리는 자리입니다. 검색 영역을 여는 버튼이 여기에 해당하며, 강조가 필요한 다른 토글도 쓸 수 있습니다.",
-    caution: "옅은 배경이 Surface와 겹치면 Container가 보이지 않습니다. 배경색이 있는 자리에서는 켜짐이 드러나는지 확인합니다.",
-  },
-] as const satisfies readonly { variant: ToggleButtonVariant; label: string; place: string; caution: string }[];
-
 // Focus 는 pointer 로 재현되지 않으므로 실제 Focus 에서 걸리는 것과 같은 표시를 class 로 얹는다.
 // 값은 `toggle-button.tsx` 의 상수와 같아야 한다.
 const DETACHED_FOCUS = "ring-2 ring-oe-focus-ring ring-offset-2 ring-offset-oe-background-primary";
@@ -145,7 +127,9 @@ const copy = {
     notify: "알림",
     save: "저장",
     searchArea: "검색어를 입력하세요",
-    filterNew: "신규",
+    postA: "주간 리포트 초안",
+    postB: "촬영 일정 정리",
+    postC: "예산 검토 요청",
   },
   en: {
     favorite: "Favorite",
@@ -155,7 +139,9 @@ const copy = {
     notify: "Notify",
     save: "Save",
     searchArea: "Type to search",
-    filterNew: "New",
+    postA: "Weekly report draft",
+    postB: "Shoot schedule",
+    postC: "Budget review",
   },
 } as const;
 
@@ -256,23 +242,18 @@ export function ToggleButtonWorkbench() {
         </Section>
 
         <Section id="style" title="Properties · Style" description="Ghost와 Tonal 둘을 제공하며 기본값은 Ghost입니다. 각 카드의 왼쪽이 꺼짐이고 오른쪽이 켜짐입니다. 둘은 꺼짐에서 같은 모습이고 켜졌을 때 무엇까지 바뀌는지로 갈립니다.">
-          {styleGuidance.map(({ variant: item, label: cardLabel }) => (
-            <Example key={item} label={cardLabel}>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {item === "tonal" ? (
-                  <>
-                    <ToggleButton variant="tonal" icon={<RiSearchLine />} aria-label={c.search} />
-                    <ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} />
-                  </>
-                ) : (
-                  <>
-                    <ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
-                    <ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
-                  </>
-                )}
-              </div>
-            </Example>
-          ))}
+          <Example label="Ghost · Default" description="켜지면 아이콘이 Fill로 바뀌고 색이 함께 바뀝니다.">
+            <div className="flex flex-wrap items-center gap-6">
+              <ToggleButton icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
+              <ToggleButton defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} />
+            </div>
+          </Example>
+          <Example label="Tonal" description="켜지면 옅은 배경이 생기고 아이콘은 그대로 둡니다.">
+            <div className="flex flex-wrap items-center gap-6">
+              <ToggleButton variant="tonal" icon={<RiSearchLine />} aria-label={c.search} />
+              <ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} />
+            </div>
+          </Example>
         </Section>
 
         <Section id="size" title="Properties · Size" description="XSmall부터 XLarge까지 다섯 단계를 제공하며 기본값은 Regular입니다. 값은 interaction.md의 공통 Control Height를 따르며 Button과 같은 단계입니다.">
@@ -346,151 +327,114 @@ export function ToggleButtonWorkbench() {
           </Example>
         </Section>
 
-        <Section id="guidelines" title="Guidelines" description="이 컴포넌트를 쓸 자리인지 가리는 조건, 어느 Style을 고르는지, 그리고 어느 자리에서나 지키는 규칙을 정리합니다.">
+        <Section id="guidelines" title="Guidelines" description="이 컴포넌트를 쓸 자리인지 가리는 조건, 어느 Style을 고르는지, 그리고 어느 자리에서나 지키는 규칙입니다.">
           <div className="col-span-full grid min-w-0 gap-8 [&>*]:min-w-0">
             <div>
-              <GuidelineGroupTitle>어느 자리에 ToggleButton을 쓰는지 가리기</GuidelineGroupTitle>
-              <div className="mt-4">
-                <GuidelineTitle>누른 표시가 화면에 남는 자리에만 쓰기</GuidelineTitle>
-                <GuidelineList items={[
-                  "누른 뒤에도 켜진 상태가 남아 다시 눌러야 꺼지는 자리에 씁니다. 즐겨찾기, 찜, 알림 받기와 고정이 여기에 해당합니다.",
-                  "눌러서 실행하고 끝나는 자리에는 Button을 씁니다. 저장, 제출, 내려받기처럼 누른 뒤 버튼에 남는 표시가 없으면 그쪽입니다.",
-                  "목록을 걸러 낼 조건을 고르는 자리에는 Chip을 씁니다. 켠 것이 값으로 남아 다른 컨트롤과 함께 하나의 조건을 만들면 그쪽입니다. ToggleButton이 켜고 끄는 것은 그 버튼이 붙어 있는 대상 하나의 상태입니다.",
-                  "설정 화면에서 기능을 켜고 끄는 자리에는 Switch를 씁니다. Switch는 Label과 짝을 이루어 Field 안에 놓이는 폼 컨트롤이고, ToggleButton은 대상 옆에 놓이는 아이콘 버튼입니다.",
-                  "항상 하나가 켜져 있고 끌 수 없는 위치 표시는 Tab이 담당합니다.",
-                ]} />
-              </div>
+              <GuidelineTitle>누른 표시가 화면에 남는 자리에만 쓰기</GuidelineTitle>
+              <GuidelineList items={[
+                "누른 뒤에도 켜진 상태가 남아 다시 눌러야 꺼지는 자리에 씁니다.",
+                "눌러서 실행하고 끝나면 Button입니다. 누른 뒤 버튼에 남는 표시가 없기 때문입니다.",
+                "켠 것이 목록을 걸러 낼 값으로 남으면 Chip입니다. ToggleButton이 켜고 끄는 것은 대상 하나의 상태입니다.",
+                "Label과 짝을 이루어 폼 안에 놓이면 Switch입니다.",
+                "항상 하나가 켜져 있고 끌 수 없으면 Tab입니다.",
+              ]} />
             </div>
 
+            <UsageComparison
+              title="레이어나 영역을 여는 토글에는 Tonal 쓰기"
+              doText="영역을 열어 두는 토글은 Tonal로 둡니다."
+              dontText="영역을 열어 두는 토글을 Ghost로 두지 않습니다."
+              description={[
+                "열려 있다는 것은 이 버튼만이 아니라 화면의 다른 부분까지 바뀌었다는 뜻입니다. 아이콘 하나로는 그 변화를 가리키지 못하므로 배경으로 한 단계 더 강조합니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="flex w-full flex-col items-center gap-2"><ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} /><span className="w-full rounded-oe-control border border-oe-border-primary px-2.5 py-1.5 text-[11px] text-oe-foreground-tertiary">{c.searchArea}</span></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full flex-col items-center gap-2"><ToggleButton defaultPressed icon={<RiSearchLine />} activeIcon={<RiSearchFill />} aria-label={c.search} /><span className="w-full rounded-oe-control border border-oe-border-primary px-2.5 py-1.5 text-[11px] text-oe-foreground-tertiary">{c.searchArea}</span></PreviewLocaleScope>}
+            />
+
             <div>
-              <GuidelineGroupTitle>어느 Style을 고르는지 가리기</GuidelineGroupTitle>
-              <p className="mt-2 text-sm leading-6 text-oe-foreground-secondary">둘은 켜짐이 어디까지 드러나는지로 갈립니다. tone은 강조의 세기를 바꾸지 않고 켜짐의 색만 정합니다.</p>
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[40rem] text-left text-xs">
-                  <thead className="border-b border-oe-border-secondary text-oe-foreground-tertiary"><tr><th className="w-40 py-2 font-medium">스타일</th><th className="py-2 font-medium">쓰는 자리</th><th className="py-2 font-medium">주의</th></tr></thead>
-                  <tbody className="divide-y divide-oe-border-secondary text-oe-foreground-secondary">
-                    {styleGuidance.map(({ variant: item, label: rowLabel, place, caution }) => (
-                      <tr key={item}>
-                        <td className="py-3 pr-4 align-top">
-                          <div className="font-medium text-oe-foreground-primary">{rowLabel}</div>
-                          <PreviewLocaleScope className="mt-1.5 flex items-center gap-1">
-                            {item === "tonal"
-                              ? <><ToggleButton variant="tonal" controlSize="xsmall" icon={<RiSearchLine />} aria-label={c.search} /><ToggleButton variant="tonal" controlSize="xsmall" defaultPressed icon={<RiSearchLine />} aria-label={c.search} /></>
-                              : <><ToggleButton controlSize="xsmall" icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /><ToggleButton controlSize="xsmall" defaultPressed icon={<RiPushpin2Line />} activeIcon={<RiPushpin2Fill />} aria-label={c.pin} /></>}
-                          </PreviewLocaleScope>
-                        </td>
-                        <td className="py-3 pr-4 align-top leading-5">{place}</td>
-                        <td className="py-3 align-top leading-5">{caution}</td>
-                      </tr>
+              <GuidelineTitle>그 밖의 토글은 Ghost로 두되 강조가 약하면 Tonal 보기</GuidelineTitle>
+              <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
+                <GuideVisual label="목록에 여럿 · Ghost">
+                  <PreviewLocaleScope className="flex w-full flex-col gap-1.5">
+                    {[c.postA, c.postB, c.postC].map((title, index) => (
+                      <span key={title} className="flex items-center justify-between gap-3">
+                        <span className="truncate text-xs text-oe-foreground-secondary">{title}</span>
+                        {index === 1
+                          ? <ToggleButton controlSize="small" tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
+                          : <ToggleButton controlSize="small" tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />}
+                      </span>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="mt-6">
-                <GuidelineTitle>레이어나 영역을 여는 토글에는 Tonal 쓰기</GuidelineTitle>
-                <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                  <GuideVisual label="Tonal · 권장">
-                    <PreviewLocaleScope className="flex w-full flex-col items-center justify-center gap-2">
-                      <ToggleButton variant="tonal" defaultPressed icon={<RiSearchLine />} aria-label={c.search} />
-                      <span className="w-40 rounded-oe-control border border-oe-border-primary px-2.5 py-1.5 text-[11px] text-oe-foreground-tertiary">{c.searchArea}</span>
-                    </PreviewLocaleScope>
-                  </GuideVisual>
-                  <GuideVisual label="Ghost">
-                    <PreviewLocaleScope className="flex w-full flex-col items-center justify-center gap-2">
-                      <ToggleButton defaultPressed icon={<RiSearchLine />} activeIcon={<RiSearchFill />} aria-label={c.search} />
-                      <span className="w-40 rounded-oe-control border border-oe-border-primary px-2.5 py-1.5 text-[11px] text-oe-foreground-tertiary">{c.searchArea}</span>
-                    </PreviewLocaleScope>
-                  </GuideVisual>
-                </div>
-                <GuidelineList items={[
-                  "켜 두는 것이 레이어나 영역을 열어 둔 상태라면 Tonal을 씁니다. 열려 있다는 것은 이 버튼만이 아니라 화면의 다른 부분까지 바뀌었다는 뜻이므로 아이콘만으로 말하지 않고 배경으로 한 단계 더 강조합니다.",
-                  "이쪽은 지키는 규칙입니다. 영역을 열어 두고 아이콘만 바꾸면 화면이 왜 달라졌는지 그 버튼에서 읽히지 않습니다.",
-                ]} />
-              </div>
-
-              <div className="mt-6">
-                <GuidelineTitle>그 밖의 토글은 Ghost로 두되 강조가 약하면 Tonal 보기</GuidelineTitle>
-                <div className="mt-3 grid gap-3 @min-[720px]:grid-cols-2">
-                  <GuideVisual label="목록에 여럿 · Ghost">
-                    <PreviewLocaleScope className="flex w-full items-center justify-center gap-1">
-                      <ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                      <ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                      <ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} />
-                    </PreviewLocaleScope>
-                  </GuideVisual>
-                  <GuideVisual label="강조가 약한 자리 · Tonal">
-                    <PreviewLocaleScope className="flex w-full items-center justify-center gap-1.5">
+                  </PreviewLocaleScope>
+                </GuideVisual>
+                <GuideVisual label="상세 화면에 하나 · Tonal">
+                  <PreviewLocaleScope className="flex w-full flex-col gap-2">
+                    <span className="block h-10 rounded-lg bg-oe-background-secondary" aria-hidden="true" />
+                    <span className="flex items-center justify-between gap-3">
+                      <span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span>
                       <ToggleButton variant="tonal" tone="custom" color="like" defaultPressed count={128} icon={<RiHeartLine />} aria-label={c.like} />
-                    </PreviewLocaleScope>
-                  </GuideVisual>
-                </div>
-                <GuidelineList items={[
-                  "켜 두는 것이 그 대상 자체에 남는 상태라면 Ghost로 시작합니다. 상태는 그 항목에 붙어 있고 화면의 나머지는 그대로이므로 아이콘의 색과 모양이면 충분합니다.",
-                  "막는 규칙은 아닙니다. 실제로 배치해 보고 그 자리에서 강조가 약하다고 판단하면 같은 기능에도 Tonal을 씁니다. 배경이 있는 화면 위나 요소가 빽빽한 자리에서는 아이콘 하나가 묻히기 때문입니다.",
-                  "켜졌다고 Style이 바뀌지 않습니다. 자리에 맞게 고른 Style은 두 상태에서 그대로 유지합니다.",
-                ]} />
+                    </span>
+                  </PreviewLocaleScope>
+                </GuideVisual>
               </div>
+              <GuidelineList items={[
+                "상태가 그 항목에 붙어 있고 화면의 나머지는 그대로이면 Ghost로 시작합니다.",
+                "막는 규칙은 아닙니다. 배치해 보고 강조가 약하면 같은 기능에도 Tonal을 씁니다. 배경이 있는 화면 위나 요소가 빽빽한 자리에서는 아이콘 하나가 묻힙니다.",
+                "켜졌다고 Style이 바뀌지 않습니다. 자리에 맞게 고른 Style은 두 상태에서 그대로 유지합니다.",
+              ]} />
+            </div>
+
+            <UsageComparison
+              title="켜짐을 색과 모양으로 함께 말하기"
+              doText="Line과 Fill로 짝을 이루는 아이콘을 넘깁니다."
+              dontText="꺼짐과 켜짐에 같은 아이콘을 넘기지 않습니다."
+              description={[
+                "색만으로 갈리는 상태는 색을 구별하기 어려운 사람에게 전달되지 않고, 옅은 배경 위에서는 누구에게나 흐려집니다.",
+                "Tonal에서는 아이콘이 하나이고 배경이 켜짐을 말합니다. 배경은 면적이 생기고 사라지는 변화이므로 색을 구별하기 어려워도 전달됩니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /></PreviewLocaleScope>}
+            />
+
+            <UsageComparison
+              title="즐겨찾기와 찜에는 Custom color 쓰기"
+              doText="별에는 Favorite, 하트에는 Like를 지정합니다."
+              dontText="관용색이 굳어진 아이콘에 Brand를 그대로 두지 않습니다."
+              description={[
+                "별의 노랑과 하트의 빨강은 사용자가 이미 알고 있는 색입니다. 그 색을 쓰면 켜졌다는 것을 글자 없이도 읽습니다.",
+                "고정처럼 관용색이 없는 토글과 영역을 여는 토글은 기본값 Brand를 씁니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="like" defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-center gap-6"><ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton defaultPressed count={128} icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
+            />
+
+            <div>
+              <GuidelineTitle>개수는 소비자가 움직이기</GuidelineTitle>
+              <GuidelineList items={[
+                "onPressedChange에서 켜지면 하나 더하고 꺼지면 하나 빼서 count로 다시 넘깁니다.",
+                "컴포넌트가 스스로 더하지 않는 이유는 실제 개수를 서버가 갖고 있기 때문입니다. 서버가 이미 나를 세어 두었다면 두 번 세게 됩니다.",
+                "0은 그립니다. 세지 않는 자리는 count를 넘기지 않아 정사각형이 됩니다.",
+              ]} />
             </div>
 
             <div>
-              <GuidelineGroupTitle>어느 자리에서나 지키기</GuidelineGroupTitle>
-              <div className="mt-4 grid gap-8">
-                <UsageComparison
-                  title="켜짐을 색과 모양으로 함께 말하기"
-                  doText="Line과 Fill로 짝을 이루는 아이콘을 넘깁니다."
-                  dontText="꺼짐과 켜짐에 같은 아이콘을 넘기지 않습니다."
-                  description={[
-                    "Ghost에서는 icon에 Line, activeIcon에 같은 아이콘의 Fill을 넘깁니다. 그러면 켜짐이 색과 모양을 함께 갖습니다.",
-                    "둘에 같은 아이콘을 넘기면 색만 남습니다. 색만으로 갈리는 상태는 색을 구별하기 어려운 사람에게 전달되지 않고, 옅은 배경 위에서는 누구에게나 흐려집니다.",
-                    "Tonal에서는 아이콘이 하나이고 배경이 켜짐을 말합니다. 배경은 색만이 아니라 면적이 생기고 사라지는 변화이므로 색을 구별하기 어려워도 전달됩니다.",
-                  ]}
-                  doVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
-                  dontVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarLine />} aria-label={c.favorite} /></PreviewLocaleScope>}
-                />
-
-                <UsageComparison
-                  title="즐겨찾기와 찜에는 Custom color 쓰기"
-                  doText="별에는 Favorite, 하트에는 Like를 지정합니다."
-                  dontText="관용색이 굳어진 아이콘에 Brand를 그대로 두지 않습니다."
-                  description={[
-                    "별의 노랑과 하트의 빨강은 사용자가 이미 알고 있는 색입니다. tone=\"custom\"과 color로 그 색을 꺼내면 켜졌다는 것을 글자 없이도 읽을 수 있습니다.",
-                    "그 밖의 토글은 기본값 Brand를 씁니다. 고정처럼 관용색이 없는 토글과 영역을 여는 토글이 여기에 해당합니다.",
-                  ]}
-                  doVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton tone="custom" color="favorite" defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="like" defaultPressed icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
-                  dontVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton defaultPressed icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton defaultPressed icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /></PreviewLocaleScope>}
-                />
-
-                <div>
-                  <GuidelineTitle>개수는 소비자가 움직이기</GuidelineTitle>
-                  <GuidelineList items={[
-                    "count는 그리는 숫자일 뿐이고 숫자를 움직이는 것은 이 컴포넌트가 아닙니다. onPressedChange에서 켜지면 하나 더하고 꺼지면 하나 빼서 count로 다시 넘깁니다.",
-                    "컴포넌트가 스스로 더하지 않는 이유는 실제 개수를 서버가 갖고 있기 때문입니다. 서버가 이미 나를 세어 두었다면 두 번 세게 됩니다.",
-                    "0은 그립니다. 아무도 누르지 않았다는 것과 개수를 세지 않는다는 것은 다른 뜻이며, 세지 않는 자리는 count를 넘기지 않아 정사각형이 됩니다.",
-                  ]} />
-                </div>
-
-                <div>
-                  <GuidelineTitle>언제나 접근 가능한 이름 주기</GuidelineTitle>
-                  <GuidelineList items={[
-                    "aria-label로 그 버튼이 무엇을 켜고 끄는지 전달합니다. count가 있어도 마찬가지입니다. 숫자는 몇 명인지만 말하고 무엇을 세고 있는지는 말해 주지 못합니다.",
-                    "이름은 켜짐과 꺼짐에서 같은 것을 씁니다. 「즐겨찾기」와 「즐겨찾기 해제」를 오가면 지금 상태와 누르면 일어날 일이 뒤섞입니다. 상태는 aria-pressed가 이미 전달하고 있습니다.",
-                  ]} />
-                </div>
-
-                <UsageComparison
-                  title="한 대상에 하나만 두기"
-                  doText="같은 대상에는 토글 하나만 둡니다."
-                  dontText="뜻이 겹치는 토글을 나란히 두지 않습니다."
-                  description={[
-                    "즐겨찾기와 찜처럼 뜻이 겹치는 토글을 한 대상에 함께 두면 무엇이 어디에 저장되는지 알 수 없습니다.",
-                    "성격이 다른 토글이 함께 필요하면 아이콘으로 갈리는 것만으로 충분한지 먼저 봅니다. 갈리지 않으면 개수를 함께 두거나 자리를 나눕니다.",
-                  ]}
-                  doVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
-                  dontVisual={<PreviewLocaleScope className="flex items-center justify-center gap-1.5"><ToggleButton tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton tone="custom" color="like" icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /><ToggleButton icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></PreviewLocaleScope>}
-                />
-              </div>
+              <GuidelineTitle>언제나 접근 가능한 이름 주기</GuidelineTitle>
+              <GuidelineList items={[
+                "aria-label로 그 버튼이 무엇을 켜고 끄는지 전달합니다. 숫자는 몇 명인지만 말합니다.",
+                "이름은 켜짐과 꺼짐에서 같은 것을 씁니다. 지금 상태는 aria-pressed가 이미 전달하고 있습니다.",
+              ]} />
             </div>
+
+            <UsageComparison
+              title="한 대상에 하나만 두기"
+              doText="같은 대상에는 토글 하나만 둡니다."
+              dontText="뜻이 겹치는 토글을 나란히 두지 않습니다."
+              description={[
+                "즐겨찾기와 찜과 저장을 한 대상에 함께 두면 무엇이 어디에 저장되는지 알 수 없습니다.",
+                "성격이 다른 토글이 함께 필요하면 아이콘으로 갈리는 것만으로 충분한지 먼저 봅니다.",
+              ]}
+              doVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><ToggleButton controlSize="small" tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /></PreviewLocaleScope>}
+              dontVisual={<PreviewLocaleScope className="flex w-full items-center justify-between gap-3"><span className="truncate text-xs text-oe-foreground-secondary">{c.postA}</span><span className="flex shrink-0 items-center gap-0.5"><ToggleButton controlSize="small" tone="custom" color="favorite" icon={<RiStarLine />} activeIcon={<RiStarFill />} aria-label={c.favorite} /><ToggleButton controlSize="small" tone="custom" color="like" icon={<RiHeartLine />} activeIcon={<RiHeartFill />} aria-label={c.like} /><ToggleButton controlSize="small" icon={<RiBookmarkLine />} activeIcon={<RiBookmarkFill />} aria-label={c.save} /></span></PreviewLocaleScope>}
+            />
           </div>
         </Section>
 
