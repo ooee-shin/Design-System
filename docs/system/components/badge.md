@@ -136,6 +136,5 @@ Badge
 ## 현재 정의하지 않은 항목
 
 - **테마와 무관한 흰색 tone.** 어두운 화면이나 이미지 위에 얹는 자리에는 Light·Dark 어느 쪽에서도 흰색인 tone 이 필요하다. `oe-foreground-inverse` 는 Light 에서 `white`, Dark 에서 `neutral-950` 으로 뒤집히므로 그 자리에 맞지 않아 `inverse` tone 을 걷어냈다. 고정 흰색을 semantic token 으로 둘지, 아니면 그 자리를 Badge 가 담당하지 않을지 정한다.
-- 세 유형의 관계. Badge·Dot Badge·Number Badge 를 한 컴포넌트의 variant 로 둘지 나눌지 정하지 않았다. 옛 구현은 하나에 유니온으로 담았고 appearance 이름이 `solid` 와 `fill` 로 갈려 있었다.
 - **Surface 가 800 단계인 자리의 회색 `tonal`.** `tonal` 의 Dark 배경이 800 단계이므로 Studio 의 Dark Surface(`neutral-900`, 측정값 23,23,23)와는 구분되지만, Surface 를 `neutral-800` 으로 두는 자리에서는 `neutral` tone 과 `custom` 의 `gray` 가 Surface 와 겹쳐 Container 가 보이지 않는다. Surface 단계를 제한할지, 그 자리에서는 `outlined` 를 쓰게 안내할지 정한다.
 - 모양 어휘. `square` 가 없다. [vocabulary.md](../vocabulary.md)의 공통 모양 어휘를 어디까지 적용할지 정한다.
