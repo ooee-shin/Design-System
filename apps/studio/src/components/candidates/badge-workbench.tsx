@@ -34,7 +34,7 @@ const stylePreviewTones = ["brand", "success", "danger"] as const satisfies read
 // Style 카드와 Guidelines 표가 같은 원본을 읽어 두 곳의 설명이 갈라지지 않게 한다.
 const styleGuidance = [
   { variant: "fill", label: "Fill", place: "배경이 복잡하거나 이미지 위에 Badge가 겹치는 자리입니다. 배경이 Tone 색으로 채워져 글자가 뒤쪽 그림에 닿지 않습니다.", caution: "여러 개를 나란히 두면 서로 경쟁해 목록이 읽히지 않습니다. 글자 대비가 결정적인 자리에서도 피합니다. 배경이 600단계라 밝은 색조에서 WCAG 2.x 대비가 4.5:1 아래입니다." },
-  { variant: "tonal", label: "Tonal · Default", place: "반복되는 구조입니다. 목록이나 표에서 항목마다 상태를 붙이는 자리가 여기에 해당하며, 과하게 강조된 Badge가 주는 시각적 부담이 없습니다.", caution: "배경색이 있는 자리에는 권장하지 않습니다. 배경이 Light에서 100단계, Dark에서 800단계로 옅어 Surface 색과 겹치면 Container가 보이지 않습니다." },
+  { variant: "tonal", label: "Tonal · Default", place: "반복되는 구조입니다. 목록이나 표에서 항목마다 상태를 붙이는 자리가 여기에 해당하며, 과하게 강조된 Badge가 주는 시각적 부담이 없습니다.", caution: "Light에서 neutral-100처럼 옅은 색을 Surface로 두는 자리에는 쓰지 않습니다. 배경이 같은 100단계라 Container가 보이지 않으며 그 자리는 Outlined를 씁니다. Dark는 배경이 알파라 Surface 단계와 무관하게 보입니다." },
   { variant: "outlined", label: "Outlined", place: "중간 정도의 주목도가 필요한 본문과 상세 화면입니다. 배경을 채우지 않으므로 주변 색을 덜 건드립니다.", caution: "배경이 복잡한 자리에서는 글자가 뒤쪽 그림에 그대로 닿습니다. 그 자리는 Fill이 담당합니다." },
 ] as const satisfies readonly { variant: BadgeVariant; label: string; place: string; caution: string }[]
 

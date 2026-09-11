@@ -41,7 +41,7 @@ Badge
 
 - Tone 은 일곱이다. `brand`, `neutral`, 상태를 뜻하는 `warning`·`danger`·`success`·`info` 넷, 그리고 semantic family 가 없는 색을 쓰는 `custom` 이다. Style 은 `fill`·`tonal`·`outlined` 셋이며 모든 tone 이 셋을 모두 지원한다.
 - **색은 tone 별 팔레트와 Style 별 단계의 곱으로만 정한다.** tone 은 어느 팔레트를 쓸지만 정하고, Style 은 그 팔레트의 어느 단계를 배경·글자·경계에 쓸지만 정한다. 그래서 조합 21개를 하나씩 적지 않고 단계 규칙 셋과 팔레트 일곱으로 관리하며, 한 단계를 고치면 21개가 함께 따라온다. 처음에는 oe semantic token 이름을 tone 마다 따로 적었는데, token 이름의 family 구간이 tone 마다 달라 조합이 하나도 파생되지 않았고 한 조합을 고쳐도 나머지 20개가 그대로 남았다.
-- 팔레트는 `brand` 가 `--brand-{단계}`, `neutral` 이 `neutral`, 상태 tone 넷이 각각 `amber`·`red`·`green`·`blue`, `custom` 이 받은 색 이름이다. brand 는 seed 에서 생성되지만 단계 이름이 Tailwind 팔레트와 같으므로 같은 규칙에 들어온다. 그 대신 Light·Dark 단계 쌍을 컴포넌트가 들고 있게 되며, 이 쌍은 tokens 의 `statusFamily` 가 짝을 반전하는 방향을 따른다. `tonal` 배경만 짝이 어긋나는데, 그 이유는 아래 대비 항목에 있다.
+- 팔레트는 `brand` 가 `--brand-{단계}`, `neutral` 이 `neutral`, 상태 tone 넷이 각각 `amber`·`red`·`green`·`blue`, `custom` 이 받은 색 이름이다. brand 는 seed 에서 생성되지만 단계 이름이 Tailwind 팔레트와 같으므로 같은 규칙에 들어온다. 그 대신 Light·Dark 단계 쌍을 컴포넌트가 들고 있게 되며, 이 쌍은 tokens 의 `statusFamily` 가 짝을 반전하는 방향을 따른다. `tonal` 배경만 단계 쌍이 아니라 알파로 갈리며, 그 이유는 아래 항목에 있다.
 - **`outlined` 의 경계는 어느 tone 에서나 그 tone 색 500 단계의 30% 알파다.** 불투명한 한 단계를 쓰면 같은 색의 `tonal` 배경과 경계가 서로 다른 밝기로 갈려 한 컴포넌트로 보이지 않는다. brand 도 `--brand-500` 에 30% 알파를 얹어 예외를 두지 않는다.
 - `accent` 는 tone 으로 두지 않았다. token 이 `background-bold-primary` 하나뿐이라 세 Style 을 만들 수 없고, 그 색이 `danger` 와 같은 red 계열이라 Badge 안에서 두 tone 을 구별할 수 없기 때문이다.
 - `custom` 은 `color` 로 Tailwind primitive 18색 중 하나를 받으며, 목록은 `@ooee/ui` 가 `BADGE_COLORS` 로 내보낸다. 단계 규칙이 다른 tone 과 같으므로, 같은 색을 나중에 정식 tone 으로 올려도 화면의 색이 달라지지 않는다.
@@ -51,7 +51,7 @@ Badge
 | --- | --- | --- |
 | `fill` 배경 | 600 | 600 |
 | `fill` 글자 | `white` | `white` |
-| `tonal` 배경 | 100 | 800 |
+| `tonal` 배경 | 100 | 300 의 20% 알파 |
 | `tonal` 글자 | 800 | 200 |
 | `outlined` 경계 | 500 의 30% 알파 | 500 의 30% 알파 |
 | `outlined` 글자 | 800 | 300 |
@@ -60,8 +60,9 @@ Badge
 - **600 에서 WCAG 2.x 값이 4.5:1 아래인 색이 절반이지만, 색조를 반영하는 APCA 로는 전부 60 을 넘는다.** WCAG 2.x 는 상대 휘도만 계산하고 색조와 채도를 보지 않아, 짙은 유채색에 white 글자를 얹은 경우를 실제 가독성보다 낮게 평가한다. white 글자의 APCA 는 `yellow` 60.8 부터 `violet` 83 까지이고, 같은 배경에서 글자를 그 색의 950 으로 뒤집으면 21.6~43.6 으로 절반 수준으로 떨어진다. 그래서 600 배경에서는 뒤집지 않고 white 를 쓴다.
 - **글자 극성을 뒤집는 기준은 색조가 아니라 배경의 밝기다.** 밝은 노랑 배경(300 단계 부근)에서는 어두운 글자가 맞고, 600 처럼 짙은 단계에서는 white 가 맞다. 참고로 당근의 Badge 는 노랑만 뒤집는데, 그 배경을 재보면 249,215,105 로 300 단계에 해당하는 밝은 노랑이며 주황(3.12)과 빨강(3.88)은 뒤집지 않고 white 를 유지한다.
 - APCA 의 글자 크기 표는 12px 에 60~64 보다 높은 값을 원하므로 `yellow`·`lime`·`amber`·`green` 은 통과 대역의 얕은 쪽에 있다. 글자 가독성이 결정적인 자리에서는 `fill` 대신 `tonal` 이나 `outlined` 를 쓴다.
-- `tonal` 글자를 700 으로 두면 100 배경에서 `amber` 4.52, `green` 4.50 으로 기준에 겨우 걸치므로 800 을 쓴다. `tonal` 의 최저 대비는 Light 6.36·Dark 5.70(amber), `outlined` 는 7.09(amber)다.
-- **`tonal` 배경은 Light 가 100 이지만 Dark 는 900 이 아니라 800 이다.** Studio 의 Dark Surface 가 `neutral-900` 이어서 Dark 배경을 900 으로 내리면 `neutral` 의 `tonal` 이 Surface 와 대비 1.00 이 되어 화면에서 사라진다. 회색 계열 전체가 1.37 이하로 내려가므로 Dark 만 한 단계 올려 둔다.
+- `tonal` 글자를 700 으로 두면 100 배경에서 `amber` 4.52, `green` 4.50 으로 기준에 겨우 걸치므로 800 을 쓴다. `tonal` 의 최저 대비는 Light 6.36(amber)·Dark 8.01, `outlined` 는 7.09(amber)다.
+- **Dark 의 `tonal` 배경은 불투명한 단계가 아니라 300 의 20% 알파다.** 불투명한 단계를 쓰면 그 단계를 Surface 로 두는 자리에서 배경이 겹쳐 Container 가 사라진다. 800 이던 때는 Dark Surface 가 `neutral-800` 인 자리에서 `neutral` 과 `custom` 의 `gray` 가 대비 1.00 이 되어 보이지 않았다. 알파는 어느 Surface 위에서나 그 색을 밝히는 쪽으로 얹히므로, Surface 단계를 제한하지 않아도 배경이 사라지지 않는다. 실제로 재보면 Dark 의 `tonal` 24 종이 Surface 와 1.50~1.70 으로, 회색 계열까지 같은 폭 안에 들어온다.
+- **알파의 밑 단계는 500 이 아니라 300 이다.** 같은 20% 에서 500 은 tone 마다 옅어지는 정도가 갈려 `amber` 1.62 와 `red` 1.30 으로 벌어지지만, 300 은 1.52~1.68 로 모인다. 불투명한 800 을 쓰던 때에 유채색이 2.13~2.53 이고 회색이 1.00~1.22 로 갈리던 것도 같은 이유이며, 알파로 바꾸면서 함께 해소됐다.
 - `color` 는 `tone="custom"` 에서만 뜻을 가지므로 다른 tone 과 함께 쓰면 타입에서 걸린다.
 - 클래스를 tone 과 단계로 조립하기 때문에 Tailwind 가 소스를 훑어서 찾지 못한다. `packages/ui/src/styles.css` 의 `@source inline` 이 위 표의 단계만 미리 생성하며, 단계를 바꾸면 그 선언도 함께 고친다.
 
@@ -89,7 +90,7 @@ Badge
 | 스타일 | 쓰는 자리 | 주의 |
 | --- | --- | --- |
 | `fill` | 배경이 복잡하거나 이미지 위에 Badge 가 겹치는 자리다. 배경이 tone 색으로 채워져 글자가 뒤쪽 그림에 닿지 않는다. | 여러 개를 나란히 두면 서로 경쟁해 목록이 읽히지 않는다. 글자 대비가 결정적인 자리에서도 피한다. 배경이 600 단계라 밝은 색조에서 WCAG 2.x 대비가 4.5:1 아래다. |
-| `tonal` (기본값) | 반복되는 구조다. 목록이나 표에서 항목마다 상태를 붙이는 자리가 여기에 해당하며, 과하게 강조된 Badge 가 주는 시각적 부담이 없다. | 배경색이 있는 자리에는 권장하지 않는다. 배경이 Light 에서 100 단계, Dark 에서 800 단계로 옅어 Surface 색과 겹치면 Container 가 보이지 않는다. |
+| `tonal` (기본값) | 반복되는 구조다. 목록이나 표에서 항목마다 상태를 붙이는 자리가 여기에 해당하며, 과하게 강조된 Badge 가 주는 시각적 부담이 없다. | Light 에서 `neutral-100` 처럼 옅은 색을 Surface 로 두는 자리에는 쓰지 않는다. 배경이 같은 100 단계라 Container 가 보이지 않는다. 그 자리는 `outlined` 를 쓴다. Dark 는 배경이 알파라 Surface 단계와 무관하게 보인다. |
 | `outlined` | 중간 정도의 주목도가 필요한 본문과 상세 화면이다. 배경을 채우지 않으므로 주변 색을 덜 건드린다. | 배경이 복잡한 자리에서는 글자가 뒤쪽 그림에 그대로 닿는다. 그 자리는 `fill` 이 담당한다. |
 
 대비 수치의 근거는 위 「색」의 대비 항목에 있다.
@@ -135,6 +136,5 @@ Badge
 
 ## 현재 정의하지 않은 항목
 
-- **테마와 무관한 흰색 tone.** 어두운 화면이나 이미지 위에 얹는 자리에는 Light·Dark 어느 쪽에서도 흰색인 tone 이 필요하다. `oe-foreground-inverse` 는 Light 에서 `white`, Dark 에서 `neutral-950` 으로 뒤집히므로 그 자리에 맞지 않아 `inverse` tone 을 걷어냈다. 고정 흰색을 semantic token 으로 둘지, 아니면 그 자리를 Badge 가 담당하지 않을지 정한다.
-- **Surface 가 800 단계인 자리의 회색 `tonal`.** `tonal` 의 Dark 배경이 800 단계이므로 Studio 의 Dark Surface(`neutral-900`, 측정값 23,23,23)와는 구분되지만, Surface 를 `neutral-800` 으로 두는 자리에서는 `neutral` tone 과 `custom` 의 `gray` 가 Surface 와 겹쳐 Container 가 보이지 않는다. Surface 단계를 제한할지, 그 자리에서는 `outlined` 를 쓰게 안내할지 정한다.
-- 모양 어휘. `square` 가 없다. [vocabulary.md](../vocabulary.md)의 공통 모양 어휘를 어디까지 적용할지 정한다.
+- **테마와 무관한 흰색 tone 을 두지 않는다.** 어두운 화면이나 이미지 위에 얹는 자리에는 Light·Dark 어느 쪽에서도 흰색인 tone 이 필요하지만, 그 자리를 요구하는 화면이 아직 없다. `oe-foreground-inverse` 는 Light 에서 `white`, Dark 에서 `neutral-950` 으로 뒤집혀 대신 쓸 수 없으므로 `inverse` tone 은 걷어냈다. 실제 화면에서 필요해질 때 그때 tone 을 늘린다.
+- **모양은 `Rounded` 하나이며 `square` 를 두지 않는다.** [vocabulary.md](../vocabulary.md)의 공통 모양 어휘 중 Badge 가 쓰는 것은 6px 모서리 하나다. 덧붙는 표시라 같은 화면에 여러 개가 놓이므로, 모양을 고르게 하면 고르는 사람이 판단할 거리 없이 축만 늘어난다.
