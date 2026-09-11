@@ -59,9 +59,10 @@ function paletteStep(palette: string, step: number) {
 // fill 배경은 600 이다. 700 은 WCAG 2.x 대비가 넉넉하지만 amber·yellow·lime 이 황토색으로 읽혀
 // tone 이 뜻하는 색을 잃는다. 600 에서 2.x 값이 4.5:1 아래인 색이 절반이지만, 색조를 반영하는
 // APCA 로는 white 글자가 전부 60 을 넘고 글자를 950 으로 뒤집으면 21.6~43.6 으로 떨어진다.
-// 그래서 어느 색에서나 white 를 쓴다. 근거와 수치는 badge.md 의 「색」에 있다. tonal 배경은 Light 가 100,
-// Dark 가 800 으로 짝이 어긋난다. Dark 를 900 으로 내리면 Studio 의 Dark Surface 가 `neutral-900`
-// 이라 neutral tonal 이 Surface 와 대비 1.00 이 되어 사라지기 때문이다.
+// 그래서 어느 색에서나 white 를 쓴다. 근거와 수치는 badge.md 의 「색」에 있다. tonal 배경은 Light 가
+// 불투명한 100 이고 Dark 는 300 의 20% 알파다. Dark 에서 불투명한 단계를 쓰면 Surface 가 같은
+// 단계인 자리에서 배경이 겹쳐 Container 가 사라진다. 알파는 어느 Surface 위에서나 그 색을 밝히는
+// 쪽으로 얹히므로 Surface 단계를 제한하지 않아도 된다.
 // 클래스를 문자열로 조립하므로 Tailwind 가 소스에서 찾지 못한다. 여기서 쓰는 단계는
 // `styles.css` 의 `@source inline` 이 미리 생성한다. 단계를 바꾸면 그쪽도 함께 고친다.
 function toneClass(palette: string, variant: BadgeVariant) {
@@ -69,7 +70,7 @@ function toneClass(palette: string, variant: BadgeVariant) {
 
   if (variant === "fill") return `bg-${color(600)} text-white`
   if (variant === "outlined") return `border-${color(500)}/30 text-${color(800)} dark:text-${color(300)}`
-  return `bg-${color(100)} text-${color(800)} dark:bg-${color(800)} dark:text-${color(200)}`
+  return `bg-${color(100)} text-${color(800)} dark:bg-${color(300)}/20 dark:text-${color(200)}`
 }
 
 // `color` 는 custom tone 에서만 뜻을 가지므로, 다른 tone 과 함께 쓰면 타입에서 걸리게 둔다.

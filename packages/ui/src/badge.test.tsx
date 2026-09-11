@@ -33,11 +33,11 @@ const PALETTES = [
 // 글자는 어느 색에서나 white 다. WCAG 2.x 만 보면 600 에서 절반이 4.5:1 아래지만, 색조를 반영하는
 // APCA 로는 white 글자가 전부 60 을 넘고 뒤집으면 오히려 절반으로 떨어진다. 700 을 쓰면 대비는
 // 넉넉해지지만 amber·yellow·lime 이 황토색으로 읽힌다. 근거는 badge.md 의 「색」에 있다.
-// tonal 배경은 Light 가 100, Dark 가 800 으로 짝이 어긋난다. Dark 를 900 으로 내리면 Studio 의
-// Dark Surface 가 `neutral-900` 이라 neutral tonal 이 Surface 와 대비 1.00 이 되어 사라지기 때문이다.
+// tonal 배경은 Light 가 불투명한 100 이고 Dark 는 300 의 20% 알파다. Dark 에서 불투명한 단계를
+// 쓰면 같은 단계를 Surface 로 두는 자리에서 배경이 겹쳐 Container 가 사라진다.
 const STEP_RULE = {
   fill: (color: (step: number) => string) => [`bg-${color(600)}`, "text-white"],
-  tonal: (color: (step: number) => string) => [`bg-${color(100)}`, `text-${color(800)}`, `dark:bg-${color(800)}`, `dark:text-${color(200)}`],
+  tonal: (color: (step: number) => string) => [`bg-${color(100)}`, `text-${color(800)}`, `dark:bg-${color(300)}/20`, `dark:text-${color(200)}`],
   outlined: (color: (step: number) => string) => [`border-${color(500)}/30`, `text-${color(800)}`, `dark:text-${color(300)}`],
 } as const
 

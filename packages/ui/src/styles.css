@@ -2,11 +2,12 @@
 @source "./";
 
 /* Badge 는 tone 별 팔레트와 variant 별 단계를 곱해 클래스를 조립하므로 Tailwind 가 소스에서
-   찾지 못한다. 그 단계만 미리 생성한다. fill 배경 600, tonal 배경 100/800, 글자 800/200,
-   outlined 글자 800/300, 경계 500 의 30% 알파다. Badge 의 단계 규칙을 바꾸면 여기도 함께 고친다.
+   찾지 못한다. 그 단계만 미리 생성한다. fill 배경 600, tonal 배경은 Light 가 100 이고 Dark 가
+   300 의 20% 알파, 글자 800/200, outlined 글자 800/300, 경계 500 의 30% 알파다. Badge 의 단계
+   규칙을 바꾸면 여기도 함께 고친다.
    `BADGE_COLORS` 의 색과 neutral tone 의 팔레트만 대상으로 둔다. 목록이 어긋나면 badge 테스트가 잡는다. */
 @source inline("bg-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{100,600}");
-@source inline("dark:bg-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-800");
+@source inline("dark:bg-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-300/20");
 @source inline("text-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-800");
 @source inline("dark:text-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-{200,300}");
 @source inline("border-{gray,neutral,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose}-500/30");
@@ -14,7 +15,7 @@
 /* brand 는 seed 에서 생성한 `--brand-{단계}` 를 참조하므로 팔레트 확장에 들어오지 않는다. */
 @source inline("bg-[var(--brand-100)]");
 @source inline("bg-[var(--brand-600)]");
-@source inline("dark:bg-[var(--brand-800)]");
+@source inline("dark:bg-[var(--brand-300)]/20");
 @source inline("text-[var(--brand-800)]");
 @source inline("dark:text-[var(--brand-200)]");
 @source inline("dark:text-[var(--brand-300)]");
@@ -26,12 +27,14 @@
    바꾸면 여기도 함께 고친다. custom tone 의 엑셀 색은 조립하지 않고 `button.tsx` 에 그대로 적으므로
    Tailwind 가 그 파일에서 찾는다. */
 @source inline("bg-{neutral,red}-200");
+@source inline("dark:bg-{neutral,red}-800");
 @source inline("hover:bg-{neutral,red}-{100,200,700}");
 @source inline("active:bg-{neutral,red}-{200,300,800}");
 @source inline("dark:hover:bg-{neutral,red}-{700,800}");
 @source inline("dark:active:bg-{neutral,red}-{600,700}");
 
 @source inline("bg-[var(--brand-200)]");
+@source inline("dark:bg-[var(--brand-800)]");
 @source inline("hover:bg-[var(--brand-100)]");
 @source inline("hover:bg-[var(--brand-200)]");
 @source inline("hover:bg-[var(--brand-700)]");
