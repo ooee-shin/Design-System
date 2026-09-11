@@ -365,7 +365,7 @@
 
 `Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열한 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
-AppHeader는 아직 꼭지로 세우지 않았다. 세울지는 [presentation.md](presentation.md)의 절차대로 사용자에게 확인받은 뒤에 정한다.
+**꼭지로 세우지 않기로 한 작업이 셋 있다.** AppHeader는 전할 만한 것이 시각 세부에 그쳐 판단으로 남길 내용이 아니다. Textarea와 Number Input은 작업의 대부분이 규격이거나 이미 있는 판단을 한 번 더 적용한 것이다. 세 건 모두 사용자가 확인한 결정이므로 다시 판단하지 않는다.
 
 ### 2026-09-08 화면 검수 도구
 
