@@ -342,7 +342,7 @@
 
 **이 절은 각 문서가 소유한 결정을 다시 적지 않는다.** 컴포넌트의 공개 API와 시각·접근성 결정은 `docs/system/components/*.md`가, 토큰과 공통 규칙은 `docs/system/`의 해당 문서가, 아직 정하지 못한 것은 [open-questions.md](open-questions.md)가, 검토 항목의 세부는 [component-audit.md](component-audit.md)가 갖는다. 여기에는 지금 어디까지 왔고 다음에 무엇을 하는지만 남긴다.
 
-**새로 만든 컴포넌트 다섯.** Chip(`2026-09-08`), Badge(`2026-09-08`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`)다. 구현·Studio 화면·명세를 함께 두었다. AppHeader는 `main`에서 뻗은 `feature/app-header` branch에 있으며 아직 `main`에 합치지 않았다.
+**새로 만든 컴포넌트 다섯.** Chip(`2026-09-08`), Badge(`2026-09-08`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`)다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `main`에서 뻗은 `feature/app-header` branch에 있으며 아직 `main`에 합치지 않았다.
 
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
@@ -403,7 +403,9 @@ Badge의 `compoundVariants` 21개를 걷어내고, tone별 팔레트와 variant�
 - 단계를 고를 때는 눈대중으로 정하지 않고 위 「화면 검수 도구」로 대비를 재서 정한다. 색 계열마다 같은 단계 숫자가 같은 밝기로 보이지 않으므로, 수치와 화면을 함께 본다.
 - **Badge의 크기와 모양도 함께 바꿨다.** 높이는 `size` Property로 `small`(20px)·`medium`(24px) 두 단계가 되었고 기본값은 `small`이다. 모양은 알약에서 `Rounded` 6px로 바뀌었으며 좌우 여백이 단계별로 6px과 8px이다. 결정 근거는 badge.md의 「역할과 경계」에 있다. Studio에는 `Properties · Size` 카드를 추가했다. Property를 더하는 것은 non-breaking이지만 기본 높이가 24px에서 20px로 바뀌므로 기존 화면의 Badge가 작아진다.
 - **`BadgeColor`에서 회색 넷을 뺀 것은 breaking change다.** `slate`·`zinc`·`neutral`·`stone`을 지웠고 목록을 `BADGE_COLORS` 런타임 값으로 내보내 Studio가 같은 목록을 따로 적지 않게 했다. 공개 타입이 좁아지는 변경이라 [git-workflow.md](git-workflow.md)에 따라 별도 branch와 PR로 합친다. Checkbox의 `appearance` → `shape` 때와 같은 처리다.
-- Dark의 `tonal` 배경이 900에서 800으로 올라가, 회색 계열이 Studio의 Dark Surface(`neutral-900`)에 묻히던 미정 항목이 해소됐다. Surface를 `neutral-800`으로 두는 자리에서는 여전히 겹치며, 이 항목은 badge.md의 「정하지 않은 항목」에 남겨 두었다.
+- **`2026-09-11`에 Dark의 `tonal` 배경을 불투명한 800 단계에서 300의 20% 알파로 바꿨다.** 불투명한 단계는 그 단계를 Surface로 두는 자리에서 배경이 겹쳐 사라지므로, Surface 단계를 제한하는 대신 배경 쪽을 알파로 바꿨다. 알파는 어느 Surface 위에서나 그 색을 밝히는 쪽으로 얹힌다. 회색이 `neutral-800` 표면에서 1.00이던 것이 1.65가 되었고, 유채색은 2.13~2.53에서 1.50~1.70으로 내려가 Dark에서 배경이 세다는 지적도 함께 해소됐다. 밑 단계를 500이 아니라 300으로 둔 이유는 같은 알파에서 tone 사이의 편차가 가장 좁기 때문이며, 수치는 badge.md의 「색」이 소유한다.
+- **같은 전환을 Button에 적용할지는 정하지 않았다.** Button의 `tonal`도 Dark에서 불투명한 800을 쓰고 Badge와 단계 규칙을 공유하기로 해 두었으므로, 지금은 두 컴포넌트의 Dark `tonal`이 서로 다르다. Button은 Hover와 Pressed가 800→700→600으로 진해지는 사다리를 갖고 있어 알파로 옮기면 그 사다리도 함께 다시 정해야 한다. [open-questions.md](open-questions.md)에 두었다.
+- **Light의 `tonal`은 그대로 불투명한 100이라 같은 겹침이 남아 있다.** `oe-background-secondary`가 Light에서 `neutral-100`이므로 그 표면 위의 `neutral` tonal은 대비 1.00이다. Dark를 고친 뒤로 Light가 더 약한 쪽이 되었고(흰 표면에서도 1.07~1.23), 지금은 그 자리에 `outlined`를 쓰라는 안내만 badge.md의 Guidelines에 있다.
 
 ### 화면에서 확인이 밀린 항목
 
