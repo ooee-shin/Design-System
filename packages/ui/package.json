@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles.css",
+    "./app-header": "./src/app-header.tsx",
     "./badge": "./src/badge.tsx",
     "./button": "./src/button.tsx",
     "./combobox": "./src/combobox.tsx",

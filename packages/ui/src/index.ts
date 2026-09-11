@@ -1,3 +1,4 @@
+export { AppHeader, type AppHeaderTitleAlign, type AppHeaderProps } from "./app-header";
 export { Badge, BADGE_COLORS, badgeVariants, type BadgeColor, type BadgeProps, type BadgeSize, type BadgeTone, type BadgeVariant } from "./badge";
 export { NotificationBadge, type NotificationBadgeMax, type NotificationBadgeProps, type NotificationBadgeTone } from "./notification-badge";
 export { Button, BUTTON_COLORS, buttonVariants, type ButtonColor, type ButtonLayout, type ButtonProps, type ButtonSize, type ButtonTone, type ButtonVariant } from "./button";
