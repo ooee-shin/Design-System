@@ -53,9 +53,7 @@ Seed Checkbox의 Label과 Shape 구조를 참고해 OOEE 컴포넌트로 대응�
 
 CheckboxField의 전체 조작 영역은 항상 투명하며 선택 여부와 관계없이 값 변경이 가능한 Field의 Hover에만 옅은 `oe-interaction-hover-subtle`을 사용한다. 선택 상태는 Indicator의 Brand 표현으로 전달하고 Disabled와 Read only Field는 Hover 반응을 제공하지 않는다.
 
-Checkbox Group 위에 보이는 질문이나 제목은 Field의 전체 조작 영역이 아니라 실제 Checkbox Indicator의 왼쪽 시작점에 맞춘다. 화면 또는 Surface의 20px 바깥 여백과 제목 시작점은 그대로 유지하고, CheckboxField의 8px 내부 조작 여백은 Field를 왼쪽으로 8px 보정해 바깥 방향으로 확보한다.
-
-**이 보정은 Group만의 규칙이 아니다.** CheckboxField가 Indicator의 왼쪽 시작점을 다른 요소와 맞춰야 하는 자리라면 단독으로 쓸 때도 같은 8px을 바깥으로 보정한다. Group의 제목이 그 사례 중 하나이고, 같은 폼 안에서 Input이나 Button과 왼쪽 끝을 맞추는 자리도 같다. **여백 자체를 없애지 않는다.** 그 8px은 장식이 아니라 행의 조작 영역이므로, 지우면 한 화면의 정렬을 맞추려고 모든 화면에서 누를 수 있는 영역을 깎게 된다. 맞출 기준이 없는 자리에서는 보정하지 않는다.
+Checkbox Group 위에 보이는 질문이나 제목은 Field의 전체 조작 영역이 아니라 실제 Checkbox Indicator의 왼쪽 시작점에 맞춘다. 화면 또는 Surface의 20px 바깥 여백과 제목 시작점은 그대로 유지하고, CheckboxField의 8px 내부 조작 여백은 Group의 Field 배열을 왼쪽으로 8px 보정해 바깥 방향으로 확보한다. 단독 CheckboxField에는 이 Group 보정을 적용하지 않는다.
 
 `hug`와 `fill`은 모두 같은 flex layout을 유지한다. `hug`는 `fit-content`, `fill`은 `width: 100%`에 해당하며 전환 시 Checkbox와 Label의 시작 위치가 바뀌지 않는다. Right와 Bottom Description은 각각 독립적인 optional slot이며 동시에 사용할 수 있다. Label과 Right Description의 첫 행은 20px 고정 높이이며 Right Description은 한 줄로 표시하고 넘치면 줄임 처리한다. Bottom Description은 상단 행 아래에 배치하고 Leading element와 같은 왼쪽 시작점을 사용한다. Right Description 유무와 관계없이 Bottom Description의 시작 위치와 control 정렬은 바뀌지 않는다.
 
