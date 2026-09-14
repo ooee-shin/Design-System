@@ -11,9 +11,15 @@
 
 import Image from "next/image"
 
-import { RiSideBarLine } from "@remixicon/react"
+import {
+  RiLogoutBoxRLine,
+  RiNotification3Line,
+  RiOrganizationChart,
+  RiSettings3Line,
+  RiSideBarLine,
+} from "@remixicon/react"
 
-import { ToggleButton } from "@ooee/ui"
+import { Button, ToggleButton } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -36,6 +42,18 @@ const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 149, height: 28 
 // 로고의 대체 텍스트는 환경설정이 소유하는 시스템명이다. 실제 값이 붙기 전까지 어디서 오는
 // 값인지 그대로 적는다. 관리자 로그인 화면과 같은 처리다.
 const SYSTEM_NAME = "{환경설정 시스템명}";
+
+// 로그인한 사람의 표시는 인증이 소유하는 값이다. 실제 값이 붙기 전까지 어디서 오는 값인지 그대로
+// 적는다.
+const SIGNED_IN_AS = "{로그인 사용자}";
+
+// 헤더 오른쪽의 Utility 다. 화면과 상관없이 어디서나 같은 자리에 서는 전역 기능이며, 누르면
+// 무엇이 열리는지는 아직 정하지 않았다.
+const UTILITIES = [
+  { key: "notification", name: "알림", icon: RiNotification3Line },
+  { key: "settings", name: "설정", icon: RiSettings3Line },
+  { key: "organization", name: "조직도", icon: RiOrganizationChart },
+] as const;
 
 export default function Page() {
   return (
@@ -63,6 +81,18 @@ export default function Page() {
             />
           </a>
           <SidebarToggle />
+
+          {/* 여기부터 오른쪽이 Utility 다. 가운데를 비워 두어 왼쪽의 이동 장치와 갈라 놓는다. */}
+          <div className="ml-auto flex items-center gap-1">
+            {UTILITIES.map((utility) => (
+              <UtilityButton key={utility.key} name={utility.name} icon={utility.icon} />
+            ))}
+
+            <span className="mx-2 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
+
+            <span className="text-sm text-oe-foreground-secondary">{SIGNED_IN_AS}</span>
+            <UtilityButton name="로그아웃" icon={RiLogoutBoxRLine} />
+          </div>
         </header>
 
         {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 56px 아래에서
@@ -94,6 +124,31 @@ export default function Page() {
  * 그 자리를 대신한다. 툴팁의 문구와 접근 가능한 이름은 같은 말을 쓴다. 다르게 두면 보는 사람과
  * 낭독기로 듣는 사람이 서로 다른 말을 만난다.
  */
+/**
+ * Utility 의 아이콘 버튼이다. 글자가 없으므로 이름은 툴팁과 접근 가능한 이름이 함께 갖는다.
+ * 누르면 무엇이 열리는지는 아직 정하지 않았다.
+ */
+function UtilityButton({ name, icon: Icon }: { name: string; icon: typeof RiSideBarLine }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            variant="ghost"
+            tone="neutral"
+            controlSize="small"
+            aria-label={name}
+            leadingIcon={<Icon />}
+          />
+        }
+      />
+      <TooltipContent side="bottom" align="center">
+        {name}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 function SidebarToggle() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
