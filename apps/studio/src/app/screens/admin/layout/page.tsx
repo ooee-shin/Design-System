@@ -24,7 +24,7 @@ import {
   RiSettings3Line,
 } from "@remixicon/react"
 
-import { Badge, Button, NotificationBadge, Radio, RadioGroup, ToggleButton } from "@ooee/ui"
+import { Badge, Button, NotificationBadge, Radio, RadioGroup } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -160,9 +160,9 @@ function AdminHeader() {
 }
 
 /**
- * 사이드 내비게이션을 접고 펴는 버튼이다. 접힌 동안에는 켜진 모습으로 서서, 지금 내비게이션이
- * 숨어 있다는 것을 버튼 자신이 말한다. 블록이 준 `SidebarTrigger` 는 누르는 동작만 갖고 상태를
- * 드러내지 않으므로 공용 `ToggleButton` 으로 바꿨다.
+ * 좌측 메뉴를 접고 펴는 버튼이다. 레일이 서 있는지 아닌지가 화면에 그대로 드러나므로 버튼이
+ * 눌림 상태를 따로 말하지 않는다. 그래서 `ToggleButton` 이 아니라 그냥 버튼이고, 상태는 이름과
+ * 툴팁의 문구만 바뀐다.
  *
  * 아이콘만 있는 버튼이라 무엇을 하는 버튼인지 글자로 확인할 자리가 없다. 그래서 가리키면 툴팁이
  * 그 자리를 대신한다. 툴팁의 문구와 접근 가능한 이름은 같은 말을 쓴다. 다르게 두면 보는 사람과
@@ -338,12 +338,12 @@ function SidebarToggle() {
       <Tooltip>
         <TooltipTrigger
           render={
-            <ToggleButton
-              variant="tonal"
+            <Button
+              variant="ghost"
+              tone="neutral"
               controlSize="xsmall"
-              icon={<RiMenuLine className="size-oe-icon-small" aria-hidden="true" />}
-              pressed={collapsed}
-              onPressedChange={toggleSidebar}
+              leadingIcon={<RiMenuLine className="size-oe-icon-small" aria-hidden="true" />}
+              onClick={toggleSidebar}
               aria-label={label}
             />
           }
