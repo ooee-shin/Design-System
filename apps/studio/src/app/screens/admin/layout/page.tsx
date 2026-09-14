@@ -204,7 +204,7 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   {
     name: "라벨 B",
     vars: {
-      "--sidebar": "var(--brand-900)",
+      "--sidebar": "var(--brand-950)",
       "--sidebar-foreground": "var(--color-neutral-50)",
       "--sidebar-border": "var(--color-neutral-800)",
       "--sidebar-accent": "var(--color-neutral-800)",
