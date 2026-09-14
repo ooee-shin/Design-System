@@ -78,15 +78,24 @@ test("제품 화면은 카탈로그의 프레임을 쓰지 않는다", () => {
   }
 });
 
-// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 대신 각 화면이 돌아가는 링크를
+// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 대신 앱 화면이 돌아가는 링크를
 // 스스로 갖는다.
+//
+// 관리자는 예외다. 뷰포트를 전부 쓰는 화면이라 바닥에 고정된 링크가 실제 화면 요소를 가려서,
+// 무엇을 보고 있는지 확인하는 일을 방해한다. 앱 화면은 모바일 뷰가 가운데에 서고 좌우가 비므로
+// 링크가 그 빈 자리에 놓인다.
 test("Studio 내비게이션은 제품 화면에서 물러난다", () => {
   const navigation = read("apps/studio/src/components/studio-navigation.tsx");
   assert.match(navigation, /\/screens/);
 
-  for (const screen of SCREENS) {
+  for (const screen of APPS) {
     const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
     assert.match(source, /ScreenExitLink/, `${screen} 에 Studio 로 돌아가는 링크가 없다`);
+  }
+
+  for (const path of ["admin/layout", "admin/test", "admin/login"]) {
+    const source = read(`apps/studio/src/app/screens/${path}/page.tsx`);
+    assert.doesNotMatch(source, /ScreenExitLink/, `${path} 이 화면을 가리는 고정 링크를 두고 있다`);
   }
 });
 

@@ -22,6 +22,11 @@
 
 정식 ooee 자산에서 유지할 수 있는 것은 primitive 동작, 접근성 구조, event 처리, component composition, CVA variant 구조와 ref 처리다. 반면 shadcn color token, raw Tailwind color, 시각적 variant, spacing과 radius, 컴포넌트 API는 ooee 기준으로 변환한다.
 
+블록으로 들여온 것은 다음과 같다.
+
+- **sidebar-02** — 관리자 레이아웃의 출발점으로 들여왔다. 확인일은 `2026-09-14`이며 출처는 [sidebar-02](https://ui.shadcn.com/blocks/sidebar#sidebar-02)다. `apps/studio/src/components/candidates/`에 받았고 `/screens/admin/layout`이 그것을 쓴다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤되는 구조, 접히는 메뉴 그룹, 상단 바의 여닫기 버튼과 Breadcrumb의 자리를 본다. 아직 `oe` 토큰으로 바꾸지 않은 2단계 상태이며 메뉴 내용도 원본의 영문 그대로다. 저장소의 `components.json` style이 `base-nova`이므로 Radix가 아니라 Base UI 기반 코드가 내려왔다.
+  - 받은 코드에서 두 가지를 고쳤다. CLI가 `cn`을 npm 패키지에서 가져오도록 적어 주어서 저장소의 `@/lib/utils`를 가리키게 바꿨고, 함께 내려온 `use-mobile.ts`가 effect 안에서 곧바로 setState를 호출해 저장소의 eslint가 error로 막으므로 `useSyncExternalStore`로 바꿨다. 둘 다 동작은 원본과 같다.
+
 shadcn token과 `oe` token을 영구적으로 함께 사용하는 것이 목표가 아니다. shadcn token의 의미와 사용처를 분석한 뒤 정식 자산에서는 `oe`로 정규화한다. shadcn update를 oe에 자동 덮어쓰지 않으며 화면 실험에서 차이를 검수한 뒤 선별적으로 반영한다.
 
 ## Obra shadcn/ui Pro Kit

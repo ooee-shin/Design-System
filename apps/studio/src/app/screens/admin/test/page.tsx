@@ -1,4 +1,4 @@
-import { ScreenExitLink, ScreenPlaceholder } from "@/components/screens/screen-chrome";
+import { ScreenPlaceholder } from "@/components/screens/screen-chrome";
 
 /**
  * 관리자 화면은 뷰포트를 전부 쓴다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤되는
@@ -21,8 +21,6 @@ export default function AdminScreenPage() {
           <ScreenPlaceholder name="Content" className="min-h-[160vh]" />
         </main>
       </div>
-
-      <ScreenExitLink backTo="/screens/admin" label="관리자" />
     </div>
   );
 }

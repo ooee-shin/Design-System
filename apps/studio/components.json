@@ -13,9 +13,9 @@
   "iconLibrary": "remixicon",
   "rtl": false,
   "aliases": {
-    "components": "@/components",
+    "components": "@/components/candidates",
     "utils": "@/lib/utils",
-    "ui": "@/components/ui",
+    "ui": "@/components/candidates",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
