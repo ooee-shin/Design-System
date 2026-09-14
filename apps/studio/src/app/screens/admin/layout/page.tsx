@@ -18,10 +18,10 @@ import Image from "next/image"
 
 import {
   RiLogoutBoxRLine,
+  RiMenuLine,
   RiNotification3Line,
   RiOrganizationChart,
   RiSettings3Line,
-  RiSideBarLine,
 } from "@remixicon/react"
 
 import { Badge, Button, NotificationBadge, Radio, RadioGroup, ToggleButton } from "@ooee/ui"
@@ -66,84 +66,97 @@ export default function Page() {
   const style = SIDEBAR_STYLES.find((item) => item.name === styleName) ?? SIDEBAR_STYLES[0];
 
   return (
-    // 헤더가 위에서 전체 너비를 차지하고, 그 아래를 사이드 내비게이션과 본문이 나눈다. 원본은
-    // 사이드가 화면 높이를 전부 쓰고 헤더가 그 오른쪽에만 서는 구조였다.
+    // 좌측 메뉴가 화면 높이를 전부 쓰고, 그 오른쪽에서 헤더와 본문이 위아래로 나뉜다. 헤더를 가로
+    // 전체에 두면 흰 헤더와 짙은 레일이 맞붙어 한 화면이 위아래로 잘려 보인다.
     //
-    // 헤더의 여닫기 버튼이 사이드 내비게이션의 상태를 읽으므로 provider 가 헤더까지 감싼다.
     // 툴팁은 열림과 닫힘을 한 곳에서 관리해야 하므로 Provider 가 화면을 감싼다.
     <TooltipProvider>
       {/* 관리자는 `lg`(1024px)까지만 대응한다. 그보다 좁아지면 화면을 다시 짜지 않고 가로로
-          스크롤한다. 규칙은 `quality.md` 가 갖는다. */}
-      <SidebarProvider className="min-w-[1024px] flex-col">
-        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-oe-border-secondary bg-oe-background-primary px-4">
-          {/* 헤더의 가장 왼쪽은 로고 자리이고, 누르면 첫 화면으로 돌아간다. 그 화면은 아직 만들지
-              않았으므로 블록이 쓰는 것과 같은 자리 표시 링크를 둔다. 링크의 이름은 이미지의 대체
-              텍스트가 갖는다. */}
-          <a href="#" className="mr-2 shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
-            <Image
-              src={MAIN_LOGO.src}
-              width={MAIN_LOGO.width}
-              height={MAIN_LOGO.height}
-              alt={SYSTEM_NAME}
-              priority
-              className="h-7 w-auto"
-            />
-          </a>
-          <SidebarToggle />
-
-          {/* 여기부터 오른쪽이 Utility 다. 가운데를 비워 두어 왼쪽의 이동 장치와 갈라 놓는다. */}
-          <div className="ml-auto flex items-center gap-1">
-            {/* 세 버튼은 같은 성격이라 서로 붙여 하나의 덩이로 읽히게 한다. */}
-            <div className="flex items-center">
-              {UTILITIES.map((utility) => (
-                <UtilityButton
-                  key={utility.key}
-                  name={utility.name}
-                  icon={utility.icon}
-                  unread={"unread" in utility ? utility.unread : undefined}
-                />
-              ))}
-            </div>
-
-            <span className="mx-2 h-4 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
-
-            {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
-            <span className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-oe-foreground-primary">{SIGNED_IN.name}</span>
-              <span className="text-xs text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
-              {/* 글자와 가운데를 맞추면 배지가 위로 올라 보이고, 2px 을 내리면 이번에는 내려가
-                  보인다. 그 사이인 1px 로 둔다. 여백 대신 옮기는 이유는, 가운데 정렬이 여백만큼
-                  다시 끌어올려 절반만 내려가기 때문이다. */}
-              <Badge tone="neutral" variant="outlined" className="translate-y-px">
-                {SIGNED_IN.role}
-              </Badge>
-            </span>
-            <UtilityButton name="로그아웃" icon={RiLogoutBoxRLine} />
+          스크롤한다. 규칙은 `quality.md` 가 갖는다.
+          
+          좌측 메뉴의 글자색은 사이드바의 가장 바깥 요소가 정하므로, 스타일 변수를 그보다 위에
+          얹어야 안쪽까지 따라온다. 고른 줄의 색도 스타일이 바꿀 수 있도록 변수로 둔다. */}
+      <SidebarProvider
+        className="min-w-[1024px]"
+        style={{
+          "--menu-active-bg": "var(--oe-brand-background-secondary)",
+          "--menu-active-fg": "var(--oe-brand-foreground-primary)",
+          ...style.vars,
+        } as React.CSSProperties}
+      >
+        {/* 여닫기 버튼은 화면에 하나뿐이고 왼쪽 맨 위 한 자리를 지킨다. 레일 안과 헤더 안에
+            따로 두면 접을 때 하나가 사라지고 다른 하나가 생겨서, 유지되는 것이 아니라 새로
+            만들어지는 것처럼 보인다. */}
+        <SidebarToggle />
+        <AppSidebar />
+        <SidebarInset className="min-h-0">
+          <AdminHeader />
+          <div className="flex flex-1 flex-col gap-6 p-6">
+            <SidebarStyleSetting value={styleName} onChange={setStyleName} />
           </div>
-        </header>
-
-        {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 56px 아래에서
-            시작해 창 바닥까지 선다. */}
-        <div
-          className="flex w-full min-h-0 flex-1"
-          style={{
-            // 좌측 메뉴의 글자색은 사이드바의 가장 바깥 요소가 정하므로, 변수를 그보다 위에
-            // 얹어야 안쪽까지 따라온다. 고른 줄의 색도 스타일이 바꿀 수 있도록 변수로 둔다.
-            "--menu-active-bg": "var(--oe-brand-background-secondary)",
-            "--menu-active-fg": "var(--oe-brand-foreground-primary)",
-            ...style.vars,
-          } as React.CSSProperties}
-        >
-          <AppSidebar className="top-14 bottom-0 h-auto" />
-          <SidebarInset className="min-h-0">
-            <div className="flex flex-1 flex-col gap-6 p-6">
-              <SidebarStyleSetting value={styleName} onChange={setStyleName} />
-            </div>
-          </SidebarInset>
-        </div>
+        </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
-  )
+  );
+}
+
+/**
+ * 본문 위의 헤더다. 좌측 메뉴가 접혀 있을 때만 여닫기 버튼을 자기 왼쪽에 들인다. 펼쳐져 있을
+ * 때는 그 버튼이 레일의 머리에 있고, 접히면 레일과 함께 사라지므로 같은 좌표를 헤더가 이어받는다.
+ */
+function AdminHeader() {
+  const { state } = useSidebar();
+
+  return (
+    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-oe-border-secondary bg-oe-background-primary px-4">
+      {/* 접히면 헤더가 왼쪽 끝까지 늘어난다. 그 자리는 고정된 여닫기 버튼이 쓰므로 그만큼 비운다. */}
+      {state === "collapsed" ? <span className="w-9 shrink-0" aria-hidden="true" /> : null}
+
+      {/* 로고는 그 버튼의 오른쪽에 서고, 누르면 첫 화면으로 돌아간다. 그 화면은 아직 만들지
+          않았으므로 블록이 쓰는 것과 같은 자리 표시 링크를 둔다. 링크의 이름은 이미지의 대체
+          텍스트가 갖는다. */}
+      <a href="#" className="mr-2 shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
+        <Image
+          src={MAIN_LOGO.src}
+          width={MAIN_LOGO.width}
+          height={MAIN_LOGO.height}
+          alt={SYSTEM_NAME}
+          priority
+          className="h-7 w-auto"
+        />
+      </a>
+
+      {/* 여기부터 오른쪽이 Utility 다. 가운데를 비워 두어 왼쪽과 갈라 놓는다. */}
+      <div className="ml-auto flex items-center gap-1">
+        {/* 세 버튼은 같은 성격이라 서로 붙여 하나의 덩이로 읽히게 한다. */}
+        <div className="flex items-center">
+          {UTILITIES.map((utility) => (
+            <UtilityButton
+              key={utility.key}
+              name={utility.name}
+              icon={utility.icon}
+              unread={"unread" in utility ? utility.unread : undefined}
+            />
+          ))}
+        </div>
+
+        <span className="mx-2 h-4 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
+
+        {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
+        <span className="flex items-center gap-2 text-sm">
+          <span className="font-medium text-oe-foreground-primary">{SIGNED_IN.name}</span>
+          <span className="text-xs text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
+          {/* 글자와 가운데를 맞추면 배지가 위로 올라 보이고, 2px 을 내리면 이번에는 내려가
+              보인다. 그 사이인 1px 로 둔다. 여백 대신 옮기는 이유는, 가운데 정렬이 여백만큼
+              다시 끌어올려 절반만 내려가기 때문이다. */}
+          <Badge tone="neutral" variant="outlined" className="translate-y-px">
+            {SIGNED_IN.role}
+          </Badge>
+        </span>
+        <UtilityButton name="로그아웃" icon={RiLogoutBoxRLine} />
+      </div>
+    </header>
+  );
 }
 
 /**
@@ -287,7 +300,7 @@ function UtilityButton({
   unread,
 }: {
   name: string;
-  icon: typeof RiSideBarLine;
+  icon: typeof RiMenuLine;
   unread?: number;
 }) {
   return (
@@ -318,22 +331,27 @@ function SidebarToggle() {
   const label = collapsed ? "좌측 메뉴 열기" : "좌측 메뉴 닫기";
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <ToggleButton
-            variant="tonal"
-            controlSize="xsmall"
-            icon={<RiSideBarLine className="size-oe-icon-small" aria-hidden="true" />}
-            pressed={collapsed}
-            onPressedChange={toggleSidebar}
-            aria-label={label}
-          />
-        }
-      />
-      <TooltipContent side="bottom" align="center">
-        {label}
-      </TooltipContent>
-    </Tooltip>
+    // 펼쳐져 있으면 레일 위에, 접혀 있으면 헤더 위에 놓이므로 글자색이 그 바닥을 따라간다.
+    <span
+      className={`fixed top-0 left-0 z-30 flex h-14 items-center px-4 ${collapsed ? "text-oe-foreground-secondary" : "text-sidebar-foreground"}`}
+    >
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <ToggleButton
+              variant="tonal"
+              controlSize="xsmall"
+              icon={<RiMenuLine className="size-oe-icon-small" aria-hidden="true" />}
+              pressed={collapsed}
+              onPressedChange={toggleSidebar}
+              aria-label={label}
+            />
+          }
+        />
+        <TooltipContent side="bottom" align="center">
+          {label}
+        </TooltipContent>
+      </Tooltip>
+    </span>
   );
 }
