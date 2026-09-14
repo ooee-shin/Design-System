@@ -20,8 +20,9 @@ export function ScreenExitLink({ backTo, label, className }: { backTo: string; l
     <Link
       href={backTo}
       className={cn(
-        // 왼쪽 아래는 Next.js 개발 표시가 쓰는 자리라 겹친다.
-        "fixed right-3 bottom-3 z-[60] inline-flex items-center gap-1.5 rounded-full border border-oe-border-primary bg-oe-background-primary/90 px-3 py-1.5 text-[11px] font-medium text-oe-foreground-secondary backdrop-blur",
+        // Next.js 개발 표시가 왼쪽 아래 20px 지점에 36px 정사각으로 서 있다. 그 위 56px 에서
+        // 시작하게 두어 겹치지 않게 한다.
+        "fixed bottom-16 left-3 z-[60] inline-flex items-center gap-1.5 rounded-full border border-oe-border-primary bg-oe-background-primary/90 px-3 py-1.5 text-[11px] font-medium text-oe-foreground-secondary backdrop-blur",
         "hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
         className,
       )}
