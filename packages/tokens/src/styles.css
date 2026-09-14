@@ -15,6 +15,7 @@
   --oe-foreground-primary: var(--color-neutral-950);
   --oe-foreground-secondary: var(--color-neutral-700);
   --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-subtle: var(--color-neutral-400);
   --oe-foreground-placeholder: var(--color-neutral-400);
   --oe-foreground-disabled: var(--color-neutral-400);
   --oe-foreground-inverse: var(--color-white);
@@ -70,6 +71,7 @@
   --oe-foreground-primary: var(--color-neutral-50);
   --oe-foreground-secondary: var(--color-neutral-300);
   --oe-foreground-tertiary: var(--color-neutral-500);
+  --oe-foreground-subtle: var(--color-neutral-600);
   --oe-foreground-placeholder: var(--color-neutral-500);
   --oe-foreground-disabled: var(--color-neutral-600);
   --oe-foreground-inverse: var(--color-neutral-950);
@@ -149,6 +151,7 @@
   --color-oe-foreground-primary: var(--oe-foreground-primary);
   --color-oe-foreground-secondary: var(--oe-foreground-secondary);
   --color-oe-foreground-tertiary: var(--oe-foreground-tertiary);
+  --color-oe-foreground-subtle: var(--oe-foreground-subtle);
   --color-oe-foreground-placeholder: var(--oe-foreground-placeholder);
   --color-oe-foreground-disabled: var(--oe-foreground-disabled);
   --color-oe-foreground-inverse: var(--oe-foreground-inverse);

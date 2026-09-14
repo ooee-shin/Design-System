@@ -20,7 +20,7 @@ Tailwind에 없는 브랜드 팔레트가 필요하면 `brand-*` scale을 추가
 - `oe` prefix는 semantic token에만 사용한다. Tailwind 및 생성된 색상 palette는 primitive이며 `oe` prefix를 붙이지 않는다.
 - Neutral role은 이름에서 생략한다. 일반 surface는 Neutral이며 Brand와 status는 명시된 role에서만 사용한다.
 - `primary`, `secondary`는 색상 이름이 아니라 같은 property/role 안의 강조 위계다.
-- `tertiary`는 실제 용례가 확인된 Neutral foreground에만 사용하며 다른 property/role로 자동 확장하지 않는다.
+- `tertiary`는 실제 용례가 확인된 Neutral foreground에만 사용하며 다른 property/role로 자동 확장하지 않는다. 그보다 약한 단계가 필요하면 위계 번호를 늘리지 않고 `subtle`처럼 뜻을 담은 이름을 쓴다.
 
 ## Neutral semantic token
 
@@ -28,6 +28,7 @@ Tailwind에 없는 브랜드 팔레트가 필요하면 `brand-*` scale을 추가
 oe-foreground-primary
 oe-foreground-secondary
 oe-foreground-tertiary
+oe-foreground-subtle
 oe-foreground-disabled
 oe-foreground-inverse
 oe-foreground-inverse-secondary
@@ -58,6 +59,10 @@ oe-focus-ring
 Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다. Light Neutral background는 primary에서 secondary 순으로 어두워지며, Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다. `border-primary`는 비교적 명확한 외곽이나 컨트롤 경계, `border-secondary`는 내부의 약한 divider로 정의한다.
 
 `foreground-tertiary`는 leading icon, timestamp와 더 약한 메타 정보의 실제 용례가 확인되어 사용한다.
+
+**중립 foreground의 위계는 `tertiary`에서 끝난다.** `subtle`은 그 줄을 잇는 네 번째 칸이 아니라, `tertiary`보다 약한 단계가 국소적으로 필요한 자리에만 쓰는 이름이다. 번호를 이어 붙이면 다른 property와 role에도 같은 칸을 만들려는 압력이 생기므로 위계 이름을 늘리지 않는다. 현재 매핑은 Light `neutral-400`, Dark `neutral-600`이며 BottomNavigation이 선택되지 않은 항목의 아이콘을 라벨보다 낮출 때 쓴다.
+
+`subtle`은 `oe-foreground-disabled`와 값이 같지만 합치지 않는다. `disabled`는 꺼져서 조작할 수 없는 요소를 뜻하고 `subtle`은 켜져 있으나 위계가 낮은 요소를 뜻한다. 값이 같아도 역할이 다르면 하나로 묶지 않는다.
 
 Placeholder는 실제 입력값과 명확히 구분하기 위해 전용 `oe-foreground-placeholder`를 사용한다. 현재 매핑은 Light `neutral-400`, Dark `neutral-500`이며 실제 입력값은 `oe-foreground-primary`를 유지한다.
 

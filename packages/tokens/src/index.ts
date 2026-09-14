@@ -73,6 +73,7 @@ export const CORE_SEMANTIC_TOKENS: readonly SemanticTokenDefinition[] = [
   semantic("neutral", "oe-foreground-primary", "neutral-950", "neutral-50"),
   semantic("neutral", "oe-foreground-secondary", "neutral-700", "neutral-300"),
   semantic("neutral", "oe-foreground-tertiary", "neutral-500", "neutral-500"),
+  semantic("neutral", "oe-foreground-subtle", "neutral-400", "neutral-600"),
   semantic("neutral", "oe-foreground-placeholder", "neutral-400", "neutral-500"),
   semantic("neutral", "oe-foreground-disabled", "neutral-400", "neutral-600"),
   semantic("neutral", "oe-foreground-inverse", "white", "neutral-950"),
