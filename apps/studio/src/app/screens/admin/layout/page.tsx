@@ -157,32 +157,13 @@ function SidebarStyleSetting() {
     <section className="flex w-fit flex-col gap-3">
       <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">좌측 메뉴 스타일</h2>
       <RadioGroup
-        className="flex gap-3"
+        className="grid w-max min-w-full grid-flow-col auto-cols-fr gap-3"
         value={style}
         onValueChange={(value) => setStyle(String(value))}
         aria-label="좌측 메뉴 스타일"
       >
         {SIDEBAR_STYLES.map((name) => (
-          // 한 장이 통째로 고르는 자리다. 이름이 label 안에 있으므로 Radio 는 그 이름을 그대로
-          // 자기 이름으로 갖는다.
-          <label
-            key={name}
-            className="flex w-44 cursor-pointer flex-col gap-2 rounded-lg border border-oe-border-secondary p-2 transition-colors has-[[aria-checked=true]]:border-oe-brand-border-primary has-[[aria-checked=true]]:bg-oe-brand-background-secondary"
-          >
-            {/* 라벨 A 는 Radio 명세의 「콘텐츠 결합 예시」에 있는 밝은 모드 미리보기를 그대로
-                가져왔다. 나머지 둘은 무엇이 다른지 정해지면 그 그림이 들어간다. */}
-            {name === SIDEBAR_STYLES[0] ? (
-              <LightStylePreview />
-            ) : (
-              <span className="flex aspect-[4/3] items-center justify-center rounded border border-dashed border-oe-border-primary text-[11px] text-oe-foreground-tertiary">
-                미리보기
-              </span>
-            )}
-            <span className="flex items-center gap-2 px-1">
-              <Radio value={name} />
-              <span className="text-sm text-oe-foreground-primary">{name}</span>
-            </span>
-          </label>
+          <StyleOptionCard key={name} value={name} label={name} />
         ))}
       </RadioGroup>
     </section>
@@ -190,8 +171,40 @@ function SidebarStyleSetting() {
 }
 
 /**
- * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 보여 주는 밝은 모드 미리보기다. 좌측 띠와
- * 본문, 그 안의 막대 셋으로 화면의 얼개만 그린다.
+ * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 보여 주는 카드를 그대로 가져왔다. 고른 카드는
+ * 미리보기 둘레에 브랜드 색 테두리가 생기고, 카드 자체의 바탕은 바뀌지 않는다.
+ */
+function StyleOptionCard({ value, label }: { value: string; label: string }) {
+  const labelId = `sidebar-style-${value}`;
+
+  return (
+    <label className="relative grid cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
+      <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
+        {/* 라벨 A 는 그 예시의 두 번째 카드인 밝은 모드 미리보기를 쓴다. 나머지 둘은 무엇이
+            다른지 정해지면 그 그림이 들어간다. */}
+        {value === SIDEBAR_STYLES[0] ? (
+          <LightStylePreview />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="flex h-24 w-full items-center justify-center rounded-lg border border-dashed border-oe-border-primary text-[11px] text-oe-foreground-tertiary"
+          >
+            미리보기
+          </span>
+        )}
+      </span>
+      <span className="flex min-h-7 items-center gap-2 pl-1">
+        <Radio value={value} aria-labelledby={labelId} className="focus-visible:ring-0 focus-visible:ring-offset-0" />
+        <span id={labelId} className="text-sm leading-5 font-medium whitespace-nowrap text-oe-foreground-primary">
+          {label}
+        </span>
+      </span>
+    </label>
+  );
+}
+
+/**
+ * 같은 예시의 밝은 모드 미리보기다. 좌측 띠와 본문, 그 안의 막대 셋으로 화면의 얼개만 그린다.
  */
 function LightStylePreview() {
   return (
