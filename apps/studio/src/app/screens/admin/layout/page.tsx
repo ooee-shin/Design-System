@@ -19,7 +19,7 @@ import {
   RiSideBarLine,
 } from "@remixicon/react"
 
-import { Button, ToggleButton } from "@ooee/ui"
+import { Badge, Button, ToggleButton } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -43,9 +43,9 @@ const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 149, height: 28 
 // 값인지 그대로 적는다. 관리자 로그인 화면과 같은 처리다.
 const SYSTEM_NAME = "{환경설정 시스템명}";
 
-// 로그인한 사람의 표시는 인증이 소유하는 값이다. 실제 값이 붙기 전까지 어디서 오는 값인지 그대로
-// 적는다.
-const SIGNED_IN_AS = "{로그인 사용자}";
+// 로그인한 사람의 표시는 인증이 소유하는 값이다. 이름과 권한은 화면을 보기 위해 사용자가 준
+// 예시 값이고, 아이디는 아직 값이 없어 어디서 오는 값인지 그대로 적는다.
+const SIGNED_IN = { name: "김블루", id: "{UserId}", role: "Admin" };
 
 // 헤더 오른쪽의 Utility 다. 화면과 상관없이 어디서나 같은 자리에 서는 전역 기능이며, 누르면
 // 무엇이 열리는지는 아직 정하지 않았다.
@@ -90,7 +90,14 @@ export default function Page() {
 
             <span className="mx-2 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
 
-            <span className="text-sm text-oe-foreground-secondary">{SIGNED_IN_AS}</span>
+            {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
+            <span className="flex items-center gap-2 text-sm">
+              <span className="text-oe-foreground-primary">{SIGNED_IN.name}</span>
+              <span className="text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
+              <Badge tone="neutral" variant="outlined">
+                {SIGNED_IN.role}
+              </Badge>
+            </span>
             <UtilityButton name="로그아웃" icon={RiLogoutBoxRLine} />
           </div>
         </header>
