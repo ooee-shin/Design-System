@@ -11,6 +11,7 @@
  * `pipeline.md` 가 정한 대로 지시를 받은 범위만 바꾸고 나머지는 그 자리에 둔다.
  */
 
+import * as React from "react"
 import { useState } from "react"
 
 import Image from "next/image"
@@ -61,6 +62,9 @@ const UTILITIES = [
 ] as const;
 
 export default function Page() {
+  const [styleName, setStyleName] = useState(SIDEBAR_STYLES[0].name);
+  const style = SIDEBAR_STYLES.find((item) => item.name === styleName) ?? SIDEBAR_STYLES[0];
+
   return (
     // 헤더가 위에서 전체 너비를 차지하고, 그 아래를 사이드 내비게이션과 본문이 나눈다. 원본은
     // 사이드가 화면 높이를 전부 쓰고 헤더가 그 오른쪽에만 서는 구조였다.
@@ -120,11 +124,20 @@ export default function Page() {
 
         {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 56px 아래에서
             시작해 창 바닥까지 선다. */}
-        <div className="flex w-full min-h-0 flex-1">
+        <div
+          className="flex w-full min-h-0 flex-1"
+          style={{
+            // 좌측 메뉴의 글자색은 사이드바의 가장 바깥 요소가 정하므로, 변수를 그보다 위에
+            // 얹어야 안쪽까지 따라온다. 고른 줄의 색도 스타일이 바꿀 수 있도록 변수로 둔다.
+            "--menu-active-bg": "var(--oe-brand-background-secondary)",
+            "--menu-active-fg": "var(--oe-brand-foreground-primary)",
+            ...style.vars,
+          } as React.CSSProperties}
+        >
           <AppSidebar className="top-14 bottom-0 h-auto" />
           <SidebarInset className="min-h-0">
             <div className="flex flex-1 flex-col gap-6 p-6">
-              <SidebarStyleSetting />
+              <SidebarStyleSetting value={styleName} onChange={setStyleName} />
             </div>
           </SidebarInset>
         </div>
@@ -148,13 +161,39 @@ export default function Page() {
  *
  * 세 선택지의 이름은 아직 정해지지 않았다. 무엇이 달라지는지 정해지면 그 이름으로 바꾼다.
  */
-// 라벨 A 는 지금 이 화면에 적용되어 있는 스타일이다. 그래서 처음 선택된 것도 A 이고, 미리보기도
-// 지금의 좌측 메뉴를 그린다. 나머지 둘은 무엇이 달라지는지 정해지면 채운다.
-const SIDEBAR_STYLES = ["라벨 A", "라벨 B", "라벨 C"];
+// 좌측 메뉴 스타일이다. 지금 갈리는 축은 바탕색과 고른 줄의 색 둘이며, 그 값을 CSS 변수로 얹어
+// 좌측 메뉴 전체가 한 번에 따라가게 한다.
+//
+// 라벨 A 는 지금 이 화면에 적용되어 있는 스타일이라 덮어쓰는 값이 없다. 라벨 C 는 무엇이
+// 달라지는지 아직 정해지지 않았다.
+//
+// **이 시스템은 다크 모드를 제공하지 않는다.** 그래서 짙은 바탕은 테마가 아니라 스타일의 선택이며,
+// 테마에 따라 뒤집히는 token 대신 고정된 중립 단계를 쓴다.
+type SidebarStyle = {
+  name: string
+  /** 좌측 메뉴에 얹을 CSS 변수. 비어 있으면 지금 값을 그대로 쓴다. */
+  vars: React.CSSProperties
+  /** 미리보기의 좌측 띠와 본문 색. */
+  preview?: { band: string; body: string }
+}
 
-function SidebarStyleSetting() {
-  const [style, setStyle] = useState(SIDEBAR_STYLES[0]);
+const SIDEBAR_STYLES: SidebarStyle[] = [
+  { name: "라벨 A", vars: {}, preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" } },
+  {
+    name: "라벨 B",
+    vars: {
+      "--sidebar": "var(--color-neutral-900)",
+      "--sidebar-foreground": "var(--color-neutral-50)",
+      "--sidebar-border": "var(--color-neutral-800)",
+      "--sidebar-accent": "var(--color-neutral-800)",
+      "--sidebar-accent-foreground": "var(--color-neutral-50)",
+    } as React.CSSProperties,
+    preview: { band: "bg-neutral-900", body: "bg-white text-neutral-900" },
+  },
+  { name: "라벨 C", vars: {} },
+]
 
+function SidebarStyleSetting({ value, onChange }: { value: string; onChange: (name: string) => void }) {
   return (
     <section className="flex w-fit flex-col gap-3">
       <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">좌측 메뉴 스타일</h2>
@@ -162,12 +201,12 @@ function SidebarStyleSetting() {
         // 원본은 폭이 정해진 상자 안에 있어서 칸을 균등 분할했다. 여기서는 그 상자가 없어 카드가
         // 글자 폭까지 눌리므로, 카드 폭을 직접 정한다.
         className="flex gap-3"
-        value={style}
-        onValueChange={(value) => setStyle(String(value))}
+        value={value}
+        onValueChange={(next) => onChange(String(next))}
         aria-label="좌측 메뉴 스타일"
       >
-        {SIDEBAR_STYLES.map((name) => (
-          <StyleOptionCard key={name} value={name} label={name} />
+        {SIDEBAR_STYLES.map((item) => (
+          <StyleOptionCard key={item.name} value={item.name} label={item.name} preview={item.preview} />
         ))}
       </RadioGroup>
     </section>
@@ -178,16 +217,24 @@ function SidebarStyleSetting() {
  * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 보여 주는 카드를 그대로 가져왔다. 고른 카드는
  * 미리보기 둘레에 브랜드 색 테두리가 생기고, 카드 자체의 바탕은 바뀌지 않는다.
  */
-function StyleOptionCard({ value, label }: { value: string; label: string }) {
+function StyleOptionCard({
+  value,
+  label,
+  preview,
+}: {
+  value: string
+  label: string
+  preview?: { band: string; body: string }
+}) {
   const labelId = `sidebar-style-${value}`;
 
   return (
     <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
       <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
-        {/* 라벨 A 는 지금 적용된 스타일이므로 그 모습을 그린다. 그림은 `radio.md` 의 「선택
-            가능한 콘텐츠와 결합하기」가 쓰는 밝은 모드 미리보기와 같다. */}
-        {value === SIDEBAR_STYLES[0] ? (
-          <LightStylePreview />
+        {/* 미리보기는 그 스타일의 좌측 메뉴 바탕을 그대로 보여 준다. 그림의 얼개는 `radio.md` 의
+            「선택 가능한 콘텐츠와 결합하기」가 쓰는 것과 같다. */}
+        {preview ? (
+          <StylePreview band={preview.band} body={preview.body} />
         ) : (
           <span
             aria-hidden="true"
@@ -208,17 +255,17 @@ function StyleOptionCard({ value, label }: { value: string; label: string }) {
 }
 
 /**
- * 지금 적용된 스타일의 미리보기다. 좌측 띠와 본문, 그 안의 막대 셋으로 화면의 얼개만 그리며,
- * 그림은 `radio.md` 의 밝은 모드 미리보기와 같다.
+ * 스타일의 미리보기다. 좌측 띠와 본문, 그 안의 막대 셋으로 화면의 얼개만 그리며, 그림은
+ * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 쓰는 것과 같다.
  */
-function LightStylePreview() {
+function StylePreview({ band, body }: { band: string; body: string }) {
   return (
     <span
       aria-hidden="true"
-      className="flex h-24 w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/16"
+      className="flex h-24 w-full overflow-hidden rounded-lg border border-black/10"
     >
-      <span className="w-1/4 shrink-0 bg-neutral-100" />
-      <span className="flex-1 bg-white p-3 text-neutral-900">
+      <span className={`w-1/4 shrink-0 ${band}`} />
+      <span className={`flex-1 p-3 ${body}`}>
         <span className="block h-1.5 w-1/3 rounded-full bg-current opacity-35" />
         <span className="mt-2 block h-1.5 w-1/2 rounded-full bg-current opacity-20" />
         <span className="mt-7 block h-6 w-full rounded-md bg-current opacity-10" />

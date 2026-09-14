@@ -173,7 +173,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     // 어긋나지 않게 하기 위해서다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="h-9 font-medium data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className="h-9 font-medium data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
@@ -185,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
-                                  className="h-8 data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary"
+                                  className="h-8 data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
                                   isActive={activeMenu === `${group.title}/${item.title}/${child.title}`}
                                   onClick={(event) => {
                                     event.preventDefault()
@@ -204,7 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   ) : (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        className="h-9 font-medium data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary"
+                        className="h-9 font-medium data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
                         isActive={activeMenu === `${group.title}/${item.title}`}
                         onClick={(event) => {
                           event.preventDefault()
