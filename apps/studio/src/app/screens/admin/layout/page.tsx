@@ -289,6 +289,8 @@ function StylePreview({ band, body }: { band: string; body: string }) {
 
 /**
  * Utility 의 아이콘 버튼이다. 글자가 없으므로 이름은 툴팁과 접근 가능한 이름이 함께 갖는다.
+ * 아이콘은 헤더 왼쪽의 메뉴 버튼과 같은 20px 이다. 버튼 상자가 같은데 그림만 작으면 크기 차이가
+ * 의도가 아니라 어긋난 것으로 읽힌다.
  * 누르면 무엇이 열리는지는 아직 정하지 않았다.
  *
  * 읽지 않은 개수를 받으면 버튼 안에서 아이콘 오른쪽에 나란히 선다. 아이콘 모서리에 얹지 않으므로
@@ -312,7 +314,7 @@ function UtilityButton({
             tone="neutral"
             controlSize="small"
             aria-label={unread === undefined ? name : `${name}, 읽지 않음 ${unread}개`}
-            leadingIcon={<Icon />}
+            leadingIcon={<Icon className="size-oe-icon-medium" />}
           >
             {unread === undefined ? undefined : <NotificationBadge count={unread} stroke={false} />}
           </Button>
