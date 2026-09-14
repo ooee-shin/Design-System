@@ -19,7 +19,7 @@ import {
   RiSideBarLine,
 } from "@remixicon/react"
 
-import { Badge, Button, ToggleButton } from "@ooee/ui"
+import { Badge, Button, NotificationBadge, ToggleButton } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -50,7 +50,9 @@ const SIGNED_IN = { name: "김블루", id: "UserId", role: "Admin" };
 // 헤더 오른쪽의 Utility 다. 화면과 상관없이 어디서나 같은 자리에 서는 전역 기능이며, 누르면
 // 무엇이 열리는지는 아직 정하지 않았다.
 const UTILITIES = [
-  { key: "notification", name: "알림", icon: RiNotification3Line },
+  // 읽지 않은 개수는 알림이 소유하는 값이다. 아직 그 데이터와 잇지 않았고, 세 자리로 넘어갈 때의
+  // 모습을 보기 위해 100 을 예시로 둔다. 배지가 99 를 넘으면 `99+` 로 줄여 그린다.
+  { key: "notification", name: "알림", icon: RiNotification3Line, unread: 100 },
   { key: "settings", name: "설정", icon: RiSettings3Line },
   { key: "organization", name: "조직도", icon: RiOrganizationChart },
 ] as const;
@@ -85,7 +87,12 @@ export default function Page() {
           {/* 여기부터 오른쪽이 Utility 다. 가운데를 비워 두어 왼쪽의 이동 장치와 갈라 놓는다. */}
           <div className="ml-auto flex items-center gap-1">
             {UTILITIES.map((utility) => (
-              <UtilityButton key={utility.key} name={utility.name} icon={utility.icon} />
+              <UtilityButton
+                key={utility.key}
+                name={utility.name}
+                icon={utility.icon}
+                unread={"unread" in utility ? utility.unread : undefined}
+              />
             ))}
 
             <span className="mx-2 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
@@ -136,8 +143,19 @@ export default function Page() {
 /**
  * Utility 의 아이콘 버튼이다. 글자가 없으므로 이름은 툴팁과 접근 가능한 이름이 함께 갖는다.
  * 누르면 무엇이 열리는지는 아직 정하지 않았다.
+ *
+ * 읽지 않은 개수를 받으면 버튼 안에서 아이콘 오른쪽에 나란히 선다. 아이콘 모서리에 얹지 않으므로
+ * 자리를 좌표로 잡을 일이 없고, 버튼이 갖고 있는 gap 이 둘 사이를 벌린다.
  */
-function UtilityButton({ name, icon: Icon }: { name: string; icon: typeof RiSideBarLine }) {
+function UtilityButton({
+  name,
+  icon: Icon,
+  unread,
+}: {
+  name: string;
+  icon: typeof RiSideBarLine;
+  unread?: number;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger
@@ -146,9 +164,11 @@ function UtilityButton({ name, icon: Icon }: { name: string; icon: typeof RiSide
             variant="ghost"
             tone="neutral"
             controlSize="small"
-            aria-label={name}
+            aria-label={unread === undefined ? name : `${name}, 읽지 않음 ${unread}개`}
             leadingIcon={<Icon />}
-          />
+          >
+            {unread === undefined ? undefined : <NotificationBadge count={unread} stroke={false} />}
+          </Button>
         }
       />
       <TooltipContent side="bottom" align="center">
