@@ -219,8 +219,10 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     vars: {
       "--sidebar": "var(--brand-800)",
       "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
-      "--sidebar-border": "rgb(255 255 255 / 0.12)",
-      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
+      "--sidebar-border": "rgb(0 0 0 / 0.16)",
+      // 검색창의 면도 흰색이 아니라 검정이다. 밝은 유채색 바탕에서는 흰색을 얹어도 거의 변하지
+      // 않으므로, 눌린 면으로 보이도록 검정을 옅게 얹는다.
+      "--sidebar-accent": "rgb(0 0 0 / 0.16)",
       "--sidebar-accent-foreground": "var(--color-white)",
       "--menu-active-bg": "var(--brand-950)",
       "--menu-active-fg": "var(--color-white)",
