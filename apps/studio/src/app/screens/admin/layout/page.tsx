@@ -205,11 +205,16 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     name: "라벨 B",
     vars: {
       "--sidebar": "var(--brand-950)",
-      "--sidebar-foreground": "var(--color-neutral-50)",
-      "--sidebar-border": "var(--color-neutral-800)",
-      "--sidebar-accent": "var(--color-neutral-800)",
+      // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
+      // 흰 글자가 그 사이에서 드러난다.
+      "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
+      "--sidebar-border": "rgb(255 255 255 / 0.12)",
+      // 검색창의 면과 줄 위에 마우스를 얹었을 때의 면이 같은 값이다. 짙은 레일 위에서는 고정된
+      // 색 한 단계보다 흰색을 옅게 얹는 편이, 레일 색이 바뀌어도 같은 정도로 밝아진다.
+      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
       "--sidebar-accent-foreground": "var(--color-neutral-50)",
       "--menu-active-bg": "var(--brand-600)",
+      "--menu-active-fg": "var(--color-white)",
     } as React.CSSProperties,
     preview: { band: "bg-neutral-900", body: "bg-white text-neutral-900" },
   },
