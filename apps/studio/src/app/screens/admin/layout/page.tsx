@@ -348,8 +348,8 @@ function SidebarToggle() {
             />
           }
         />
-        {/* 버튼이 아이콘보다 6px 넓으므로, 시작점을 그만큼 밀어 아이콘의 왼쪽과 맞춘다. */}
-        <TooltipContent side="bottom" align="start" alignOffset={6}>
+        {/* 버튼의 시작점에 맞춰 왼쪽으로 붙인다. */}
+        <TooltipContent side="bottom" align="start">
           {label}
         </TooltipContent>
       </Tooltip>

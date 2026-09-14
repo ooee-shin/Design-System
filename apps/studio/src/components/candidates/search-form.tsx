@@ -27,14 +27,15 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           <Input
             id="search"
             type="text"
-            // Fill 이다. 테두리로 경계를 만들지 않고 바탕 한 단계로만 선다. 편집하는 동안 바탕이
+            // Fill 이다. 테두리로 경계를 만들지 않고 바탕 한 단계로만 선다. 좌우 안쪽 여백은
+            // controlSize 가 주는 10px 에 6px 을 더해 16px 로 둔다. 편집하는 동안 바탕이
             // 밝아지는 것은 컴포넌트가 갖고 있는 동작이므로 덮어쓰지 않고, 그때 글자와 아이콘만
             // 밝은 바탕에 맞는 색으로 함께 바꾼다.
             //
             // 공용 `Input` 은 `oe` 토큰을 쓰므로 좌측 메뉴 바탕과 무관하게 흰 상자로 선다. 짙은
             // 바탕에서는 그것만 떠 보이므로 바탕과 글자를 좌측 메뉴의 값에 맞춘다.
             variant="filled"
-            containerClassName="bg-sidebar-accent text-sidebar-foreground has-[[data-slot=input]:focus]:text-oe-foreground-primary [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60 has-[[data-slot=input]:focus]:[&_[data-slot=input-leading]]:text-oe-foreground-tertiary has-[[data-slot=input]:focus]:[&_[data-slot=input-clear]]:text-oe-foreground-tertiary"
+            containerClassName="px-4 bg-sidebar-accent text-sidebar-foreground has-[[data-slot=input]:focus]:text-oe-foreground-primary [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60 has-[[data-slot=input]:focus]:[&_[data-slot=input-leading]]:text-oe-foreground-tertiary has-[[data-slot=input]:focus]:[&_[data-slot=input-clear]]:text-oe-foreground-tertiary"
             className="placeholder:text-sidebar-foreground/50"
             controlSize="small"
             placeholder="메뉴 검색"
