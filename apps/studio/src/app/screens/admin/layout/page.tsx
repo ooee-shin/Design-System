@@ -45,9 +45,8 @@ const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 149, height: 28 
 // 값인지 그대로 적는다.
 const SYSTEM_NAME = "환경설정 시스템명";
 
-// 로그인한 사람의 표시는 인증이 소유하는 값이다. 이름과 권한은 화면을 보기 위해 사용자가 준
-// 예시 값이고, 아이디는 아직 값이 없어 어디서 오는 값인지 그대로 적는다.
-const SIGNED_IN = { name: "김블루", id: "UserId", role: "Admin" };
+// 로그인한 사람의 표시는 인증이 소유하는 값이다. 셋 다 화면을 보기 위해 사용자가 준 예시 값이다.
+const SIGNED_IN = { name: "김블루", id: "KimblueId", role: "Admin" };
 
 // 헤더 오른쪽의 Utility 다. 화면과 상관없이 어디서나 같은 자리에 서는 전역 기능이며, 누르면
 // 무엇이 열리는지는 아직 정하지 않았다.
