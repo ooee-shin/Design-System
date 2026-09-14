@@ -27,10 +27,12 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           <Input
             id="search"
             type="text"
+            // Fill 이다. 테두리로 경계를 만들지 않고 바탕 한 단계로만 선다.
+            //
             // 공용 `Input` 은 `oe` 토큰을 쓰므로 좌측 메뉴 바탕과 무관하게 흰 상자로 선다. 짙은
-            // 바탕에서는 그것만 떠 보이므로 좌측 메뉴의 값에 맞춘다. 투명하게 두면 이번에는
-            // 테두리가 바탕에 묻혀 입력란인지 읽히지 않으므로, 바탕을 한 단계 밝혀 둔다.
-            containerClassName="border-sidebar-border bg-sidebar-accent text-sidebar-foreground [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60"
+            // 바탕에서는 그것만 떠 보이므로 바탕과 글자를 좌측 메뉴의 값에 맞춘다.
+            variant="filled"
+            containerClassName="bg-sidebar-accent text-sidebar-foreground has-[[data-slot=input]:focus]:bg-sidebar-accent [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60"
             className="placeholder:text-sidebar-foreground/50"
             controlSize="small"
             placeholder="메뉴 검색"
