@@ -54,8 +54,10 @@ pnpm check
 
 ```bash
 git push -u origin feature/작업이름
-gh pr create --base dev
+gh pr create
 ```
+
+저장소의 기본 branch가 `dev`이므로 `--base`를 적지 않아도 `dev`로 향한다. `main`으로 올리는 pull request만 `--base main`을 명시한다.
 
 push하기 전에 로컬에서 `pnpm check`를 통과시킨다. pull request에서 자동 검사 `Quality / Lint, test, and build`가 돌며, 성공한 뒤 합치고 branch를 지운다.
 
@@ -83,7 +85,7 @@ feat(badge)!: 색을 프리미티브 단계 규칙으로 정리하고 크기·�
 
 `Quality` workflow는 모든 pull request와 `main`·`dev` push에서 돈다. `feature/*`에 push만 하는 동안에는 돌지 않으므로, 올리기 전에 로컬에서 `pnpm check`를 통과시킨다.
 
-`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다.
+`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다. 기본 branch를 `dev`로 둔 것도 같은 이유다. 막을 수 없다면 실수하기 어려운 쪽을 기본값으로 만든다.
 
 ## 다른 기기로 이동할 때
 

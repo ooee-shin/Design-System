@@ -392,7 +392,7 @@ pnpm visual --path /components/badge \
 
 **통합 검증 항목 다섯 중 넷은 아직 대상이 없다.** Storybook, Figma MCP, Storybook MCP, Skill·Agent가 저장소에 없으므로 지금 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 유진식의 작업이 들어오는 순서대로 채운다.
 
-**`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 기본 branch는 `main`으로 두었다.
+**`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
