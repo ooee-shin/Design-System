@@ -21,8 +21,28 @@ test("Input shows the focus ring only for focus-visible", () => {
   const container = view.container.querySelector("[data-slot=input-container]")
 
   assert.ok(container)
-  assert.match(container.className, /has-\[:focus-visible\]:ring-oe-focus-ring/)
+  assert.match(container.className, /has-\[\[data-slot=input\]:focus-visible\]:ring-oe-focus-ring/)
   assert.doesNotMatch(container.className, /focus-within:ring/)
+})
+
+// 초점선은 입력란을 쓰고 있다는 표시다. `has-[:focus-visible]` 는 자손이면 무엇이든 걸리므로
+// Trailing element 의 버튼으로 키보드 초점이 넘어가는 것만으로 입력란 전체에 선이 켜지고,
+// 그 버튼이 갖고 있는 자신의 ring 과 겹쳐 두 겹이 된다.
+test("Input rings only for the text field, not for a trailing control", () => {
+  const view = render(
+    <Input
+      aria-label="비밀번호"
+      trailingElement={
+        <button type="button" aria-label="비밀번호 보기">
+          eye
+        </button>
+      }
+    />,
+  )
+  const container = view.container.querySelector("[data-slot=input-container]")
+
+  assert.ok(container)
+  assert.doesNotMatch(container.className, /has-\[:focus-visible\]/)
 })
 
 // filled 의 바닥이 밝아지는 것은 입력란을 편집하는 동안의 표시다. focus-within 은 컨테이너 안의

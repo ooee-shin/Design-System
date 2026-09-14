@@ -5,8 +5,14 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "./utils"
 
+// 초점선과 바닥 밝기는 「이 입력란을 쓰고 있다」는 표시다. `focus-within` 과 `has(:focus-visible)`
+// 는 컨테이너 안의 자손이면 무엇이든 걸리므로, Trailing element 의 버튼에 초점이 가는 것만으로
+// 입력란 전체가 같은 모습이 된다. 그래서 두 표시 모두 대상을 입력란 자신으로 좁혔다.
+//
+// `InputButton` 이 이 스타일을 함께 쓴다. 그쪽은 초점을 받는 요소가 자신이라 `:has()` 로는 걸리지
+// 않으므로, 바닥 밝기만 `focus` 로 따로 잡아 준다.
 const inputContainerVariants = cva(
-  "group/input flex w-full min-w-0 items-center rounded-oe-control border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] has-[:focus-visible]:border-oe-focus-ring has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
+  "group/input flex w-full min-w-0 items-center rounded-oe-control border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] has-[[data-slot=input]:focus-visible]:border-oe-focus-ring has-[[data-slot=input]:focus-visible]:ring-1 has-[[data-slot=input]:focus-visible]:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
   {
     variants: {
       variant: {
