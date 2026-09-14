@@ -40,12 +40,12 @@ import {
 const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 149, height: 28 };
 
 // 로고의 대체 텍스트는 환경설정이 소유하는 시스템명이다. 실제 값이 붙기 전까지 어디서 오는
-// 값인지 그대로 적는다. 관리자 로그인 화면과 같은 처리다.
-const SYSTEM_NAME = "{환경설정 시스템명}";
+// 값인지 그대로 적는다.
+const SYSTEM_NAME = "환경설정 시스템명";
 
 // 로그인한 사람의 표시는 인증이 소유하는 값이다. 이름과 권한은 화면을 보기 위해 사용자가 준
 // 예시 값이고, 아이디는 아직 값이 없어 어디서 오는 값인지 그대로 적는다.
-const SIGNED_IN = { name: "김블루", id: "{UserId}", role: "Admin" };
+const SIGNED_IN = { name: "김블루", id: "UserId", role: "Admin" };
 
 // 헤더 오른쪽의 Utility 다. 화면과 상관없이 어디서나 같은 자리에 서는 전역 기능이며, 누르면
 // 무엇이 열리는지는 아직 정하지 않았다.
@@ -94,7 +94,9 @@ export default function Page() {
             <span className="flex items-center gap-2 text-sm">
               <span className="text-oe-foreground-primary">{SIGNED_IN.name}</span>
               <span className="text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
-              <Badge tone="neutral" variant="outlined">
+              {/* 글자와 가운데를 맞추면 배지가 위로 올라 보인다. 2px 만큼 내려 앉힌다. 여백 대신
+                  옮기는 이유는, 가운데 정렬이 여백만큼 다시 끌어올려 절반만 내려가기 때문이다. */}
+              <Badge tone="neutral" variant="outlined" className="translate-y-0.5">
                 {SIGNED_IN.role}
               </Badge>
             </span>
