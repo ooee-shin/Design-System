@@ -179,8 +179,8 @@ function AdminHeader() {
 // 좌측 메뉴 스타일이다. 지금 갈리는 축은 바탕색과 고른 줄의 색 둘이며, 그 값을 CSS 변수로 얹어
 // 좌측 메뉴 전체가 한 번에 따라가게 한다.
 //
-// 라벨 A 는 지금 이 화면에 적용되어 있는 스타일이라 덮어쓰는 값이 없다. 라벨 C 는 무엇이
-// 달라지는지 아직 정해지지 않았다.
+// 지금 갈리는 것은 레일의 바탕이다. 라벨 A 가 회색, 라벨 B 가 짙은 색, 라벨 C 가 흰색이며 나머지
+// 값은 셋이 같다.
 //
 // **이 시스템은 다크 모드를 제공하지 않는다.** 그래서 짙은 바탕은 테마가 아니라 스타일의 선택이며,
 // 테마에 따라 뒤집히는 token 대신 고정된 중립 단계를 쓴다.
@@ -193,7 +193,14 @@ type SidebarStyle = {
 }
 
 const SIDEBAR_STYLES: SidebarStyle[] = [
-  { name: "라벨 A", vars: {}, preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" } },
+  {
+    name: "라벨 A",
+    vars: {
+      "--sidebar": "var(--color-neutral-100)",
+      "--sidebar-accent": "var(--color-neutral-200)",
+    } as React.CSSProperties,
+    preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
+  },
   {
     name: "라벨 B",
     vars: {
@@ -205,7 +212,14 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     } as React.CSSProperties,
     preview: { band: "bg-neutral-900", body: "bg-white text-neutral-900" },
   },
-  { name: "라벨 C", vars: {} },
+  {
+    name: "라벨 C",
+    vars: {
+      "--sidebar": "var(--color-white)",
+      "--sidebar-accent": "var(--color-neutral-100)",
+    } as React.CSSProperties,
+    preview: { band: "bg-white", body: "bg-white text-neutral-900" },
+  },
 ]
 
 function SidebarStyleSetting({ value, onChange }: { value: string; onChange: (name: string) => void }) {
@@ -279,7 +293,8 @@ function StylePreview({ band, body }: { band: string; body: string }) {
       aria-hidden="true"
       className="flex h-24 w-full overflow-hidden rounded-lg border border-black/10"
     >
-      <span className={`w-1/4 shrink-0 ${band}`} />
+      {/* 흰 바탕끼리는 경계가 없으므로 띠의 오른쪽에 선을 둔다. */}
+      <span className={`w-1/4 shrink-0 border-r border-black/10 ${band}`} />
       <span className={`flex-1 p-3 ${body}`}>
         <span className="block h-1.5 w-1/3 rounded-full bg-current opacity-35" />
         <span className="mt-2 block h-1.5 w-1/2 rounded-full bg-current opacity-20" />
