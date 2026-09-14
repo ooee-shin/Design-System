@@ -5,18 +5,52 @@ import { join } from "node:path";
 
 import { componentRegistry, getComponentRelations } from "./component-registry";
 
-test("component registry is the single complete catalog for detail pages", () => {
-  assert.equal(componentRegistry.length, 19);
+test("component registry is the single complete catalog", () => {
+  assert.equal(componentRegistry.length, 21);
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
-  assert.equal(new Set(componentRegistry.map((item) => item.href)).size, componentRegistry.length);
 });
 
-test("every registered page uses the common detail shell", () => {
+test("확정 owns a detail page and 초안 does not", () => {
+  const settled = componentRegistry.filter((item) => item.status === "확정");
+  const draft = componentRegistry.filter((item) => item.status === "초안");
+
+  assert.equal(settled.length, 19);
+  assert.equal(draft.length, 2);
+  assert.equal(settled.length + draft.length, componentRegistry.length);
+
+  const hrefs = settled.map((item) => item.href);
+  assert.equal(new Set(hrefs).size, settled.length);
+  draft.forEach((item) => assert.equal(item.href, undefined));
+});
+
+test("every 확정 page uses the common detail shell", () => {
   componentRegistry.forEach((item) => {
+    if (!item.href) return;
     const source = readFileSync(join(process.cwd(), "apps/studio/src/app", item.href, "page.tsx"), "utf8");
     assert.match(source, /ComponentDetailPage/);
     assert.match(source, new RegExp(`componentKey=["']${item.key}["']`));
   });
+});
+
+test("relations never point at a 초안 component, which has no page to open", () => {
+  const draft = new Set(componentRegistry.filter((item) => item.status === "초안").map((item) => item.key));
+  for (const item of componentRegistry) {
+    for (const relation of [...(item.similar ?? []), ...(item.worksWith ?? [])]) {
+      assert.equal(draft.has(relation), false, `${item.key} points at the draft ${relation}`);
+    }
+  }
+});
+
+test("the components index separates 확정 from 초안", () => {
+  const source = readFileSync(join(process.cwd(), "apps/studio/src/app/components/page.tsx"), "utf8");
+  assert.match(source, /확정/);
+  assert.match(source, /초안/);
+});
+
+test("a card without a link shows 준비 중 instead of the open action", () => {
+  const source = readFileSync(join(process.cwd(), "apps/studio/src/components/asset-group-page.tsx"), "utf8");
+  assert.match(source, /item\.href \?/);
+  assert.match(source, /준비 중/);
 });
 
 test("Field stays first in Works with and resolves from the registry itself", () => {

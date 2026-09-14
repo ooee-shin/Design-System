@@ -32,6 +32,7 @@
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다

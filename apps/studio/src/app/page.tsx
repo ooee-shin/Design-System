@@ -44,7 +44,7 @@ export default function Home() {
         {
           title: "Components",
           description: "독립적인 의미와 상태를 가진 재사용 가능한 UI 컴포넌트입니다.",
-          status: `${componentRegistry.length}개 컴포넌트`,
+          status: `${componentRegistry.filter((item) => item.status === "확정").length}개 컴포넌트`,
           href: "/components",
           icon: Layers3,
         },
