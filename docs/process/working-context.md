@@ -381,7 +381,7 @@ pnpm visual --path /components/badge \
 
 ### 2026-09-14 AI 개발 환경 트랙을 시작했다
 
-유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Storybook과 Figma 확인이다. Studio가 이미 문서와 Playground를 제공하므로 Storybook을 만들지 자체를 A/B 검증 뒤 함께 다시 정하며, 그때까지 `apps/storybook` 골격은 Skill v0 결과로 필요할 때만 유진식이 `9/17~18`에 만든다. 확정 컴포넌트마다 최소 `Default` Story 하나를 그 pull request에 한 번에 넣는 것은 신주희가 `9/16`까지 동의하면 유진식이 하는 제안이고, Story 파일 위치와 기본 브랜드 값의 자리(Storybook decorator 또는 `packages/tokens`)는 그 pull request 전에 함께 정한다. `@ooee/ui`를 반영한 Figma 라이브러리와 seat는 `9/16`까지 신주희에게 묻는다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
+유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Storybook과 Figma 확인이다. Studio가 이미 문서와 Playground를 제공하므로 Storybook을 만들지 자체를 A/B 검증 뒤 함께 다시 정하며, 그때까지 `apps/storybook` 골격은 Skill v0 결과로 필요할 때만 유진식이 `9/17~18`에 만든다. 확정 컴포넌트마다 최소 `Default` Story 하나를 그 pull request에 한 번에 넣는 것은 신주희가 `9/16`까지 동의하면 유진식이 하는 제안이고, Story 파일 위치와 기본 브랜드 값의 자리(Storybook decorator 또는 `packages/tokens`)는 그 pull request 전에 함께 정한다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

@@ -29,7 +29,7 @@
 | --- | --- | --- |
 | Storybook과 Story | 없음 | `.storybook/`, `*.stories.*`, storybook 의존성이 어느 package에도 없다. `.gitignore`의 `storybook-static/`과 문서의 언급만 있다 |
 | Storybook MCP | 없음 | 위와 같다 |
-| Figma MCP와 Figma 라이브러리 | 없음 | `.mcp.json`이 없다. Figma 팀과 결과물 폴더는 [figma-page-agent.md](figma-page-agent.md)에 있지만 `@ooee/ui`를 반영한 라이브러리는 지정된 적이 없고, Obra 자료는 참고용이다 |
+| Figma MCP와 Figma 라이브러리 | 없음 | `.mcp.json`이 없다. Figma 팀과 결과물 폴더는 [figma-page-agent.md](figma-page-agent.md)에 있지만 `@ooee/ui`를 반영한 라이브러리는 없다(스파이크 R1에서 확인). Obra 자료는 참고용이다 |
 | Agent Rules와 `AGENTS.md` | 운영 규칙만 있음 | MCP 사용, Story 작성, 명령어, 자동 pull request에 관한 규칙이 없다 |
 | Skill과 Plugin | 없음 | `.claude/settings.json`은 `{ "enabledPlugins": {} }` 하나다. [tooling.md](tooling.md)가 프로젝트 전용 Skill의 내용 목록을 적어 두었다 |
 | 배포와 CI | `Quality`만 있음 | `pnpm check`만 돌고 배포 job이 없다. GitHub Pages는 공식 문서 기준으로 비공개 저장소의 무료 플랜에서 쓸 수 없으므로 [working-context.md](working-context.md) 「일정과 분담」의 `~9/4` GitHub Pages 호스팅은 성립하지 않았고, 호스팅은 스파이크 R4가 정한다 |
@@ -40,7 +40,7 @@
 
 - **Storybook MCP는 Studio가 아니다.** Studio는 MCP를 제공하지 않는다. Storybook MCP는 `@storybook/addon-mcp`가 Storybook 개발 서버의 `http://localhost:6006/mcp`로 제공한다. `build-storybook`으로 만든 정적 결과물은 `/mcp`를 제공하지 않으므로, 여러 사람이 공유하는 endpoint는 Chromatic 같은 호스팅이나 정적 결과물 위에 별도로 띄우는 `@storybook/mcp`가 필요하다. Studio에 MCP가 없다는 것은 저장소에서 확인했고, 나머지는 Storybook 공식 문서 기준이며 스파이크 R2에서 이 저장소로 확인한다.
 - **`docs-list`·`docs-show`는 `@storybook/addon-mcp`의 `docs` toolset에 드는 MCP 도구 이름이다.** 이 toolset은 components manifest가 있어야 켜지고, manifest는 `.storybook/main.ts`의 `features.componentsManifest: true`가 만든다. 역시 공식 문서 기준이며 스파이크 R2에서 확인한다.
-- **Figma MCP의 읽기와 쓰기는 다른 도구다.** 공식 문서 기준으로 노드를 읽는 `get_metadata` 같은 도구는 desktop·remote 서버 모두에 있고, 화면을 만드는 `generate_figma_design`과 `use_figma`는 remote 서버 전용이며 beta다. 저장소에는 이를 확인할 근거가 없으므로, 이 문서가 쓰는 Figma 도구 이름과 서버·seat·플랜 조건은 ②가 성립하는지와 함께 스파이크 R1이 유진식 계정으로 확인한다. seat는 Figma 계정의 종류이며 어떤 종류가 있는지는 공식 문서 기준으로 스파이크 R1이 함께 적는다. Code Connect는 Figma 컴포넌트를 코드 구현과 잇는 Figma 기능이다.
+- **Figma MCP의 읽기와 쓰기는 다른 도구다.** 공식 문서 기준으로 노드를 읽는 `get_metadata` 같은 도구는 desktop·remote 서버 모두에 있고, 화면을 만드는 `generate_figma_design`과 `use_figma`는 remote 서버 전용이며 beta다. 도구 이름과 seat·플랜 조건은 스파이크 R1이 유진식 계정으로 확인했다(「스파이크 결과」). seat는 Figma 계정의 종류이고 `whoami`가 `Full`로 돌려준다. Code Connect는 Figma 컴포넌트를 코드 구현과 잇는 Figma 기능이며 bluekey의 Pro 플랜에서는 쓸 수 없다.
 - **패키지 이름은 `@ooee/ui`다.** 저장소 밖의 초기 계획 메모에 적힌 `@repo/ui`는 이 이름을 가리키며, 저장소 안의 문서와 코드는 `@ooee/ui`만 쓴다.
 - **「Sonnet 수준의 모델」은 Claude Code를 `claude --model sonnet`으로 띄운 세션이다.** [roadmap.md](roadmap.md)의 「목표 품질은 Sonnet 수준의 낮은 모델로도」를 실행 방법으로 옮긴 것이다. `sonnet`은 그 시점의 최신 Sonnet을 가리키므로 순서 2의 결과 절과 A/B 결과에는 실제로 돈 모델의 전체 이름을 적는다.
 - **로컬 Storybook은 Studio의 브랜드 변수 주입에 기대지 못한다.** Brand 값이 `packages/tokens`가 아니라 Studio의 `BrandThemeProvider`와 `globals.css`에 있다는 사실은 [working-context.md](working-context.md)의 「현재 구현」이 적는다. `packages/ui`에서 Button·Badge·ToggleButton은 `var(--brand-{단계})`를, Chip·SelectBox·Combobox는 `var(--brand-alpha-*)`를 직접 쓰고, Checkbox·Radio의 선택 색과 Chip의 Active 글자, Combobox·Select의 선택 Check 표시는 `oe-brand-*`, `focus-visible` 색은 전부 `oe-focus-ring`이다. 그래서 Storybook이 Studio 없이 `@ooee/tokens/styles.css`만 불러오면 Brand tone뿐 아니라 Checkbox·Radio·Chip·Combobox·Select의 선택 표현과 모든 Focus ring이 비어서 나온다. 순서 3은 Storybook decorator가 `DEFAULT_BRAND_SEED`에서 Studio와 같은 값을 넣는 방식으로 시작하며 `packages/tokens`와 `apps/studio/src/app/globals.css`는 건드리지 않는다. 기본 브랜드 값을 `packages/tokens`로 옮길지는 「아직 정하지 않은 것」에 있다.
@@ -72,7 +72,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 순서 | branch | 산출물 | 완료 기준 |
 | --- | --- | --- | --- |
 | 0 | `docs/ai-environment-plan` | 이 문서, [figma-page-agent.md](figma-page-agent.md), [README.md](README.md) 색인 두 행, [working-context.md](working-context.md) 「현재 구현」 `packages/tokens` 항목의 Brand 변수 위치 수정, 새 절 하나, 「일정과 분담」의 `~9/4`·`9/14~` 두 행 | pull request가 `dev`에 합쳐진다 |
-| 1 | `docs/figma-mcp-spike` | Figma 항목 답변과 스파이크 R1 결과를 담은 「스파이크 결과」 한 절 | 그 절이 적히고 「아직 정하지 않은 것」의 Figma 행이 지워진다 |
+| 1 | `docs/figma-spike-r1` | Figma 항목 답변과 스파이크 R1 결과를 담은 「스파이크 결과」 한 절 | 그 절이 적히고 「아직 정하지 않은 것」의 Figma 행이 답으로 바뀐다 |
 | 2 | `feature/skill-generate-code` | `.claude/skills/generate-code/SKILL.md`, `.claude/skills/review-design/SKILL.md`, `apps/sandbox`, v0가 틀린 사례를 적은 결과 절 | Sonnet 수준의 모델로 화면 둘을 만들어 `pnpm check`, `pnpm --filter @ooee/sandbox build`, `pnpm --filter @ooee/sandbox test` 통과, `/review-design` 위반 0건, 「pull request 준비 완료」까지 도달 |
 | 3 | `feature/storybook`, 그 뒤 `feature/storybook-mcp` | 순서 2의 결과 절에 `docs/system/`만으로 부족했던 것이 적힐 때만 진행한다. `feature/storybook`: `apps/storybook`, 확정 컴포넌트마다 `Default` Story 하나(「아직 정하지 않은 것」의 신주희 확인 뒤), 브랜드 변수 주입 decorator. `feature/storybook-mcp`: `.mcp.json`, `apps/storybook`에 `@storybook/addon-mcp`와 `features.componentsManifest` 추가 | `feature/storybook`: `pnpm build-storybook` 성공, Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 Studio 없이 보임. `feature/storybook-mcp`: `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있음(대조 방법은 「통합 검증 항목 채우기」) |
 | 4 | `feature/agent-rules` | `AGENTS.md` 한 절, `SKILL.md` 규칙, `.claude/settings.json` 공용 권한 | 순서 2의 결과 절에 적힌 틀린 사례가 규칙으로 막힌다 |
@@ -133,7 +133,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 | 항목 | 담당 | 기한 |
 | --- | --- | --- |
-| `@ooee/ui`를 반영한 Figma 라이브러리가 있는가, 담당자, seat 종류, Code Connect 가능 여부. 신주희에게 묻는다. `2026-09-14` 현재 아직 묻지 않았다 | 유진식 | `2026-09-16` |
+| `@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 레이어 이름 규칙과 매핑표로 대신한다 | 신주희·유진식 | `2026-09-23` |
 | Story 파일 위치(`packages/ui/src/<component>.stories.tsx` 병치 또는 `apps/storybook/stories/`)와 폴더 구조. [working-context.md](working-context.md) 「남은 작업」 10번의 카테고리화와 함께 정한다 | 신주희·유진식 | `2026-09-16` |
 | 확정 컴포넌트 19개의 최소 `Default` Story(필수 prop만)를 유진식이 순서 3의 pull request에 한 번에 넣어도 되는가. 순서 3의 완료 기준이 컴포넌트마다 Story 하나를 전제하고 신주희는 `9/14~` 화면 개선 중이라 제안한다. Property를 나열하는 Story는 제안 밖이며 [open-questions.md](open-questions.md)의 Style·Size 이름 통일 뒤에 신주희가 쓴다 | 신주희 | `2026-09-16` |
 | 기본 브랜드 값의 자리: Storybook decorator에 두는 채로 갈지, `packages/tokens/src/styles.css`가 `DEFAULT_BRAND_SEED`의 `--brand-*`·`--oe-brand-*` 값을 갖게 할지. 후자는 브랜드만 런타임 주입으로 남겨 둔 tokens 구조와 전달 패키지가 싣는 값을 바꾸며, [open-questions.md](open-questions.md)의 「기본 ooee brand seed」가 Provisional인 채로 값이 공용 package에 들어간다 | 신주희 | `2026-09-16` |
@@ -183,4 +183,16 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 ## 스파이크 결과
 
-아직 없다. R1부터 끝난 날짜 순으로 쌓는다.
+끝난 날짜 순으로 쌓는다.
+
+### 2026-09-14 스파이크 R1: Figma 쓰기
+
+- **연결.** Figma remote MCP(`https://mcp.figma.com/mcp`)를 `claude mcp add --scope user`로 등록하고 OAuth 로그인은 브라우저에서 한 번 했다. 저장소에는 아무것도 넣지 않았다. 세션을 시작한 뒤 등록한 서버는 그 세션에 실리지 않으므로, 이 스파이크는 `claude -p --allowedTools mcp__figma`로 띄운 별도 headless 세션에서 돌렸다.
+- **계정과 플랜.** `whoami`가 돌려준 유진식 계정의 팀은 둘이다. bluekey(`team::1395716714983274137`, tier `pro`, seat `Full`)와 개인 팀(tier `starter`, seat `Full`). [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더는 bluekey 팀이다.
+- **도구.** remote 서버 하나에 41개가 실린다. 읽기는 `get_metadata`·`get_design_context`·`get_screenshot`·`get_variable_defs`·`get_libraries`·`search_design_system`, 쓰기는 `create_new_file`·`use_figma`(plugin API 코드를 넘겨 실행)·`generate_figma_design`(`captureId`를 받는 브라우저 캡처 기반), 그 밖에 Code Connect 도구 일곱과 FigJam·shader·Weave 도구다. desktop 서버는 시험하지 않았다.
+- **라이브러리.** `@ooee/ui`를 반영한 Figma 라이브러리는 없다. `search_design_system("Button")`이 돌려준 것은 「🔵 BKDS 블루키 디자인 시스템」(button·iconButton·textButton·searchInput 등, `2026-09-09`까지 갱신)과 「[공차] 공차 ERP UI 디자인」뿐이다. 새 파일에는 Figma 기본 community 라이브러리(Material 3, Simple Design System, iOS 18)가 붙어 있다.
+- **Code Connect.** 쓸 수 없다. `list_file_components_for_code_connect`가 「You need a Dev or Full seat on an Organization or Enterprise plan」을 돌려준다. bluekey는 Pro다.
+- **쓰기.** `create_new_file`로 결과물 폴더(projectId `651781449`)에 `ooee · 관리자 로그인 · 2026-09-14`(file key `4fNHfA8YKtrhlIT7V76CAc`)를 만들고, `use_figma`에 plugin API 코드를 넘겨 1440×900 관리자 로그인 frame(node `1:2`)을 auto-layout으로 만들었다. 글꼴은 Figma에 있는 Inter를 썼고 Pretendard는 시험하지 않았다. Figma 변수가 없어서 색은 hex 근사값이고, 레이어 이름에 컴포넌트와 `oe` 토큰 이름을 적었다. 한 번 실패했다. auto-layout frame에 `resize`로 높이를 주면 크기가 고정돼 내용이 잘리며, `layoutSizingVertical = "HUG"`로 바꿔 해결했다.
+- **재조회.** `get_metadata`는 레이어 이름과 좌표 XML을, `get_screenshot`은 1440×900 PNG의 7일짜리 URL을, `get_design_context`는 React+Tailwind 코드를 돌려준다. 그 코드는 `bg-[#1d4ed8]`·`text-[#171717]`·`font-['Inter:Medium']`처럼 값이 그대로 박혀 있고, `@ooee/ui` 컴포넌트나 `oe` 토큰은 `data-name`에 남은 레이어 이름 말고는 없다. [roadmap.md](roadmap.md)가 적은 A안의 경험이 그대로 재현된다.
+- **결론.** ②(Figma 화면 생성)는 `use_figma`로 성립하고 ④(재조회)도 된다. 재조회 결과를 `@ooee/ui`로 되돌리려면 레이어 이름 규칙(`Button / 로그인 / layout=fill controlSize=xlarge / oe-brand-background-bold-primary`처럼 컴포넌트·Property·토큰을 이름에 적는다)과 Skill의 매핑표가 있어야 한다. Code Connect는 플랜상 쓸 수 없으므로 매핑표가 그 자리를 맡는다. A/B 검증의 A안은 「코드에서 만든 캔버스를 사람이 고친 뒤 재조회」로 돌린다.
+- **남은 것.** 파일이 폴더 `651781449`에 들어갔는지는 API로 확인하지 못했다. `generate_figma_design`은 `captureId`가 필요해 시험하지 않았다. Pretendard 글꼴과 rate limit(`rate-limits-access.md` 리소스)은 다음에 본다.
