@@ -49,7 +49,10 @@ export default function AdminLoginScreenPage() {
                 <PasswordInput />
 
                 <div className="flex items-center justify-between">
-                  <CheckboxField label="아이디 저장" />
+                  {/* CheckboxField 는 사방 8px 의 내부 조작 여백을 갖는다. 그대로 두면 체크박스가
+                    입력보다 8px 안쪽에서 시작하므로, `checkbox.md` 가 정한 대로 여백만큼 바깥으로
+                    보정해 실제 Indicator 의 왼쪽 시작점을 입력에 맞춘다. */}
+                <CheckboxField label="아이디 저장" className="-ml-2" />
                   <a
                     href="#"
                     className="rounded-sm text-sm font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
