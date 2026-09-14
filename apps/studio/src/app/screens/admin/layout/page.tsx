@@ -23,7 +23,7 @@ import {
   RiSideBarLine,
 } from "@remixicon/react"
 
-import { Badge, Button, NotificationBadge, RadioField, RadioGroup, ToggleButton } from "@ooee/ui"
+import { Badge, Button, NotificationBadge, Radio, RadioGroup, ToggleButton } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -125,16 +125,6 @@ export default function Page() {
           <SidebarInset className="min-h-0">
             <div className="flex flex-1 flex-col gap-6 p-6">
               <SidebarStyleSetting />
-
-              {/* 아직 채우지 않은 본문이다. */}
-              <div className="flex flex-col gap-4">
-                {Array.from({ length: 24 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="aspect-video h-12 w-full rounded-lg bg-muted/50"
-                  />
-                ))}
-              </div>
             </div>
           </SidebarInset>
         </div>
@@ -153,8 +143,8 @@ export default function Page() {
  * 낭독기로 듣는 사람이 서로 다른 말을 만난다.
  */
 /**
- * 사이드 내비게이션의 스타일을 고르는 자리다. 나중에는 환경설정 화면이 갖지만, 고른 것이 왼쪽에
- * 어떻게 반영되는지 먼저 보려고 본문에 둔다.
+ * 좌측 메뉴의 스타일을 고르는 자리다. 나중에는 환경설정 화면이 갖지만, 고른 것이 왼쪽에 어떻게
+ * 반영되는지 먼저 보려고 본문에 둔다.
  *
  * 세 선택지의 이름은 아직 정해지지 않았다. 무엇이 달라지는지 정해지면 그 이름으로 바꾼다.
  */
@@ -164,16 +154,30 @@ function SidebarStyleSetting() {
   const [style, setStyle] = useState(SIDEBAR_STYLES[0]);
 
   return (
-    <section className="flex w-fit flex-col gap-2 rounded-lg border border-oe-border-secondary p-4">
-      <h2 className="text-sm font-medium text-oe-foreground-primary">사이드 내비게이션 스타일</h2>
+    <section className="flex w-fit flex-col gap-3">
+      <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">좌측 메뉴 스타일</h2>
       <RadioGroup
-        className="flex flex-col gap-1"
+        className="flex gap-3"
         value={style}
         onValueChange={(value) => setStyle(String(value))}
-        aria-label="사이드 내비게이션 스타일"
+        aria-label="좌측 메뉴 스타일"
       >
         {SIDEBAR_STYLES.map((name) => (
-          <RadioField key={name} value={name} label={name} />
+          // 한 장이 통째로 고르는 자리다. 이름이 label 안에 있으므로 Radio 는 그 이름을 그대로
+          // 자기 이름으로 갖는다.
+          <label
+            key={name}
+            className="flex w-44 cursor-pointer flex-col gap-2 rounded-lg border border-oe-border-secondary p-2 transition-colors has-[[aria-checked=true]]:border-oe-brand-border-primary has-[[aria-checked=true]]:bg-oe-brand-background-secondary"
+          >
+            {/* 미리보기 이미지가 들어갈 자리다. 세 스타일이 무엇인지 정해지면 그 그림이 들어간다. */}
+            <span className="flex aspect-[4/3] items-center justify-center rounded border border-dashed border-oe-border-primary text-[11px] text-oe-foreground-tertiary">
+              미리보기
+            </span>
+            <span className="flex items-center gap-2 px-1">
+              <Radio value={name} />
+              <span className="text-sm text-oe-foreground-primary">{name}</span>
+            </span>
+          </label>
         ))}
       </RadioGroup>
     </section>
