@@ -357,9 +357,7 @@ function SidebarToggle() {
 
   return (
     // 펼쳐져 있으면 레일 위에, 접혀 있으면 헤더 위에 놓이므로 글자색이 그 바닥을 따라간다.
-    <span
-      className={`fixed top-0 left-0 z-30 flex h-14 items-center px-4 ${collapsed ? "text-oe-foreground-secondary" : "text-sidebar-foreground"}`}
-    >
+    <span className="fixed top-0 left-0 z-30 flex h-14 items-center px-4">
       <Tooltip>
         <TooltipTrigger
           render={
@@ -367,6 +365,14 @@ function SidebarToggle() {
               variant="ghost"
               tone="neutral"
               controlSize="small"
+              // 펼쳐져 있으면 레일 위에 놓인다. Button 은 자기 글자색을 직접 칠하므로 그대로 두면
+              // 짙은 레일에서 대비가 1.13:1 까지 떨어져 보이지 않는다. 그때는 레일의 글자색과
+              // 레일 위의 면을 쓴다.
+              className={
+                collapsed
+                  ? undefined
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              }
               leadingIcon={<RiMenuLine className="size-oe-icon-medium" aria-hidden="true" />}
               onClick={toggleSidebar}
               aria-label={label}
