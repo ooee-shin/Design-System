@@ -11,6 +11,8 @@
  * `pipeline.md` 가 정한 대로 지시를 받은 범위만 바꾸고 나머지는 그 자리에 둔다.
  */
 
+import { useState } from "react"
+
 import Image from "next/image"
 
 import {
@@ -21,7 +23,7 @@ import {
   RiSideBarLine,
 } from "@remixicon/react"
 
-import { Badge, Button, NotificationBadge, ToggleButton } from "@ooee/ui"
+import { Badge, Button, NotificationBadge, RadioField, RadioGroup, ToggleButton } from "@ooee/ui"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -121,13 +123,18 @@ export default function Page() {
         <div className="flex w-full min-h-0 flex-1">
           <AppSidebar className="top-14 bottom-0 h-auto" />
           <SidebarInset className="min-h-0">
-            <div className="flex flex-1 flex-col gap-4 p-4">
-              {Array.from({ length: 24 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="aspect-video h-12 w-full rounded-lg bg-muted/50"
-                />
-              ))}
+            <div className="flex flex-1 flex-col gap-6 p-6">
+              <SidebarStyleSetting />
+
+              {/* 아직 채우지 않은 본문이다. */}
+              <div className="flex flex-col gap-4">
+                {Array.from({ length: 24 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="aspect-video h-12 w-full rounded-lg bg-muted/50"
+                  />
+                ))}
+              </div>
             </div>
           </SidebarInset>
         </div>
@@ -145,6 +152,34 @@ export default function Page() {
  * 그 자리를 대신한다. 툴팁의 문구와 접근 가능한 이름은 같은 말을 쓴다. 다르게 두면 보는 사람과
  * 낭독기로 듣는 사람이 서로 다른 말을 만난다.
  */
+/**
+ * 사이드 내비게이션의 스타일을 고르는 자리다. 나중에는 환경설정 화면이 갖지만, 고른 것이 왼쪽에
+ * 어떻게 반영되는지 먼저 보려고 본문에 둔다.
+ *
+ * 세 선택지의 이름은 아직 정해지지 않았다. 무엇이 달라지는지 정해지면 그 이름으로 바꾼다.
+ */
+const SIDEBAR_STYLES = ["라벨 A", "라벨 B", "라벨 C"];
+
+function SidebarStyleSetting() {
+  const [style, setStyle] = useState(SIDEBAR_STYLES[0]);
+
+  return (
+    <section className="flex w-fit flex-col gap-2 rounded-lg border border-oe-border-secondary p-4">
+      <h2 className="text-sm font-medium text-oe-foreground-primary">사이드 내비게이션 스타일</h2>
+      <RadioGroup
+        className="flex flex-col gap-1"
+        value={style}
+        onValueChange={(value) => setStyle(String(value))}
+        aria-label="사이드 내비게이션 스타일"
+      >
+        {SIDEBAR_STYLES.map((name) => (
+          <RadioField key={name} value={name} label={name} />
+        ))}
+      </RadioGroup>
+    </section>
+  );
+}
+
 /**
  * Utility 의 아이콘 버튼이다. 글자가 없으므로 이름은 툴팁과 접근 가능한 이름이 함께 갖는다.
  * 누르면 무엇이 열리는지는 아직 정하지 않았다.
