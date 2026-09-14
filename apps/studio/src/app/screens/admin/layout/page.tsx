@@ -224,7 +224,9 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       // 않으므로, 눌린 면으로 보이도록 검정을 옅게 얹는다.
       "--sidebar-accent": "rgb(0 0 0 / 0.16)",
       "--sidebar-accent-foreground": "var(--color-white)",
-      "--menu-active-bg": "var(--brand-950)",
+      // 고른 줄을 짙은 색으로 채우면 표시가 아니라 구멍처럼 읽힌다. 레일을 밝히는 알파로 두고
+      // 글자를 온전한 흰색으로 올려 구분한다.
+      "--menu-active-bg": "rgb(255 255 255 / 0.16)",
       "--menu-active-fg": "var(--color-white)",
       // 밝은 유채색 바탕에서는 흰색을 얹어도 거의 변하지 않는다. 검정을 옅게 얹어 눌린 면으로
       // 보이게 한다.
@@ -233,7 +235,7 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
   },
   {
-    // 바탕은 회색조이고 고른 줄만 브랜드를 쓴다. 나머지 둘과 얼개는 같다.
+    // 브랜드를 쓰지 않는 회색조다. 나머지 둘과 얼개는 같고 색 계열만 중립이다.
     name: "라벨 C",
     vars: {
       "--sidebar": "var(--color-neutral-100)",
@@ -242,8 +244,10 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       "--sidebar-border": "rgb(0 0 0 / 0.12)",
       "--sidebar-accent": "rgb(0 0 0 / 0.06)",
       "--sidebar-accent-foreground": "rgb(0 0 0 / 0.8)",
-      "--menu-active-bg": "var(--brand-700)",
-      "--menu-active-fg": "var(--color-white)",
+      // 바탕이 회색조인 스타일이므로 고른 줄에도 브랜드를 쓰지 않는다. 같은 검정을 hover 보다
+      // 한 단계 더 얹고 글자를 온전한 검정으로 올린다.
+      "--menu-active-bg": "rgb(0 0 0 / 0.1)",
+      "--menu-active-fg": "rgb(0 0 0 / 0.95)",
     } as React.CSSProperties,
     preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
   },
