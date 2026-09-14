@@ -20,9 +20,15 @@ export function ScreenExitLink({ backTo, label, className }: { backTo: string; l
     <Link
       href={backTo}
       className={cn(
-        // 왼쪽 아래는 Next.js 개발 표시가 쓰는 자리라 겹친다.
-        "fixed right-3 bottom-3 z-[60] inline-flex items-center gap-1.5 rounded-full border border-oe-border-primary bg-oe-background-primary/90 px-3 py-1.5 text-[11px] font-medium text-oe-foreground-secondary backdrop-blur",
-        "hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+        // Next.js 개발 표시가 왼쪽 아래 20px 지점에 36px 정사각으로 서 있다. 왼쪽 여백을 그것과
+        // 같은 20px 로 맞추고, 그 표시의 윗변인 56px 위에서 시작하게 두어 겹치지 않게 한다.
+        "fixed bottom-16 left-5 z-[60] inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium backdrop-blur",
+        // 개발 표시와 같은 어두운 바닥이다. 배경 token 중 두 테마 모두에서 어두운 것은 없고
+        // `oe-background-bold-primary` 는 Dark 에서 밝은 쪽으로 뒤집히므로, 프리미티브 중립
+        // 단계를 직접 쓴다. 어두운 바닥 위에서는 Button 의 Dark 와 같이 누를수록 밝아진다.
+        "border border-white/15 bg-neutral-900/90 text-neutral-300",
+        "transition-colors hover:bg-neutral-800/90 hover:text-neutral-50 active:bg-neutral-700/90",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
         className,
       )}
     >

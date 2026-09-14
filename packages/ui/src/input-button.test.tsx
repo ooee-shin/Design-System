@@ -31,6 +31,15 @@ test("InputButton keeps focus and blocks opening while read only", async () => {
   assert.equal(globalThis.document.activeElement, trigger)
 })
 
+// InputButton 은 Input 과 같은 컨테이너 스타일을 쓰지만 초점을 받는 요소가 자신이다. Input 쪽에서
+// Trailing element 를 제외하려고 대상을 좁힐 때 이쪽이 함께 빠지면 안 된다.
+test("InputButton filled brightens while the trigger itself has focus", () => {
+  const view = render(<InputButton aria-label="날짜" value="2026-09-14" variant="filled" />)
+  const trigger = view.getByLabelText("날짜")
+
+  assert.match(trigger.className, /focus:bg-oe-background-primary/)
+})
+
 test("InputButton opens when it is not read only", async () => {
   const user = userEvent.setup({ document: globalThis.document })
   let opened = 0
