@@ -41,10 +41,10 @@ export default function AdminLoginScreenPage() {
                 <p className="mt-1 text-sm text-oe-foreground-secondary">관리자 로그인</p>
               </div>
 
-              <form className="flex flex-col gap-4">
+              <form className="flex flex-col gap-3">
                 {/* 보이는 Label 을 두지 않으므로 이름은 `aria-label` 이 갖는다. Placeholder 는 값이
                     들어오면 사라지므로 이름을 대신할 수 없다. */}
-                <Input type="text" autoComplete="username" placeholder="아이디 입력" aria-label="아이디" variant="filled" controlSize="large" />
+                <Input type="text" autoComplete="username" placeholder="아이디 입력" aria-label="아이디" variant="filled" controlSize="xlarge" />
 
                 <PasswordInput />
 
@@ -105,7 +105,7 @@ function PasswordInput() {
       placeholder="비밀번호 입력"
       aria-label="비밀번호"
       variant="filled"
-      controlSize="large"
+      controlSize="xlarge"
       trailingElement={
         <button
           type="button"
