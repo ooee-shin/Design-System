@@ -169,10 +169,15 @@ function SidebarStyleSetting() {
             key={name}
             className="flex w-44 cursor-pointer flex-col gap-2 rounded-lg border border-oe-border-secondary p-2 transition-colors has-[[aria-checked=true]]:border-oe-brand-border-primary has-[[aria-checked=true]]:bg-oe-brand-background-secondary"
           >
-            {/* 미리보기 이미지가 들어갈 자리다. 세 스타일이 무엇인지 정해지면 그 그림이 들어간다. */}
-            <span className="flex aspect-[4/3] items-center justify-center rounded border border-dashed border-oe-border-primary text-[11px] text-oe-foreground-tertiary">
-              미리보기
-            </span>
+            {/* 라벨 A 는 Radio 명세의 「콘텐츠 결합 예시」에 있는 밝은 모드 미리보기를 그대로
+                가져왔다. 나머지 둘은 무엇이 다른지 정해지면 그 그림이 들어간다. */}
+            {name === SIDEBAR_STYLES[0] ? (
+              <LightStylePreview />
+            ) : (
+              <span className="flex aspect-[4/3] items-center justify-center rounded border border-dashed border-oe-border-primary text-[11px] text-oe-foreground-tertiary">
+                미리보기
+              </span>
+            )}
             <span className="flex items-center gap-2 px-1">
               <Radio value={name} />
               <span className="text-sm text-oe-foreground-primary">{name}</span>
@@ -181,6 +186,26 @@ function SidebarStyleSetting() {
         ))}
       </RadioGroup>
     </section>
+  );
+}
+
+/**
+ * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 보여 주는 밝은 모드 미리보기다. 좌측 띠와
+ * 본문, 그 안의 막대 셋으로 화면의 얼개만 그린다.
+ */
+function LightStylePreview() {
+  return (
+    <span
+      aria-hidden="true"
+      className="flex h-24 w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/16"
+    >
+      <span className="w-1/4 shrink-0 bg-neutral-100" />
+      <span className="flex-1 bg-white p-3 text-neutral-900">
+        <span className="block h-1.5 w-1/3 rounded-full bg-current opacity-35" />
+        <span className="mt-2 block h-1.5 w-1/2 rounded-full bg-current opacity-20" />
+        <span className="mt-7 block h-6 w-full rounded-md bg-current opacity-10" />
+      </span>
+    </span>
   );
 }
 
