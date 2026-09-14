@@ -32,25 +32,33 @@ export function ScreenExitLink({ className }: { className?: string }) {
   );
 }
 
-// 375px 은 지금 국내에서 가장 좁은 축에 드는 실제 기기 폭이다. 여기서 들어가면 더 넓은
-// 기기에서도 들어간다. 높이를 함께 고정하는 것이 핵심이다. 앱 레이아웃은 위가 고정되고 아래가
-// 붙고 가운데만 스크롤되는 구조라, 잘린 높이 안에 두지 않으면 그 동작이 드러나지 않는다.
-const PHONE_WIDTH = 375;
-const PHONE_HEIGHT = 812;
+// 웹에서 앱에 접근하면 모바일 뷰가 화면 가운데에 선다. 기기 모형이 아니라 실제 페이지이므로
+// 둥근 모서리나 그림자로 상자를 만들지 않고, 높이도 고정하지 않고 창 높이를 그대로 쓴다.
+//
+// 좌우에 남는 자리는 지금 비워 둔다. 넓은 화면에서 그 자리를 무엇으로 채울지는 정하지 않았고,
+// 가능성만 열어 둔 상태에서 임의로 채우면 그것이 결정처럼 굳는다.
+const MOBILE_WIDTH = "max-w-[390px]";
 
 /**
- * 웹에서 앱 화면을 볼 때 쓰는 기기 상자다. STO 와 SV 가 함께 쓰며, 화면마다 폭을 따로 적으면
- * 한쪽만 고쳤을 때 두 화면의 기준이 갈린다.
+ * 웹에서 보는 앱 화면의 본체다. STO 와 SV 가 함께 쓰며, 화면마다 폭을 따로 적으면 한쪽만 고쳤을 때
+ * 두 화면의 기준이 갈린다.
+ *
+ * 세로 구조는 컴포넌트가 스스로 잡는다. `AppHeader` 는 `sticky top-0`, `BottomNavigation` 은
+ * `sticky bottom-0` 이므로, 본문을 `flex-1` 로 두면 내용이 짧을 때는 아래 줄이 창 바닥에 서고
+ * 길어지면 스크롤하는 동안 두 줄이 제자리에 머문다.
  */
-export function PhoneFrame({ children, label }: { children: ReactNode; label: string }) {
+export function MobileWebView({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-oe-background-canvas-secondary p-6">
+    <div className="min-h-dvh bg-oe-background-canvas-secondary">
       <div
         aria-label={label}
-        style={{ width: PHONE_WIDTH, height: PHONE_HEIGHT }}
-        // 실제 기기에는 세로 스크롤바가 화면에 남지 않는다. 보이면 그만큼 본문 폭이 줄어
-        // 글자가 잘리는 지점이 실제와 달라진다.
-        className="relative flex shrink-0 flex-col overflow-hidden rounded-[28px] border border-oe-border-primary bg-oe-background-primary shadow-xl [&_*]:[scrollbar-width:none] [&_*::-webkit-scrollbar]:hidden"
+        className={cn(
+          "mx-auto flex min-h-dvh w-full flex-col bg-oe-background-primary",
+          // 넓은 화면에서 좌우 바닥과 본문이 만나는 자리를 한 줄로만 구분한다. 테두리를 네 면에
+          // 두르면 페이지가 아니라 얹힌 상자로 읽힌다.
+          "border-oe-border-secondary sm:border-x",
+          MOBILE_WIDTH,
+        )}
       >
         {children}
       </div>
