@@ -161,7 +161,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              {/* 줄 사이를 띄우지 않는다. 높이가 36px 이라 줄끼리 붙어도 서로 눌리지 않는다. */}
+                <SidebarMenu className="gap-0">
                 {group.items.map((item) =>
                   item.items ? (
                     // 하위 목록을 가진 2depth 는 접고 펼 수 있고 처음에는 닫혀 있다. 화살표를
@@ -177,10 +178,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         {/* 3depth 는 2depth 와 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로
                             작아진 자리에서 3depth 까지 어중간하게 줄이면 단계가 읽히지 않는다. */}
                         <CollapsibleContent>
-                          <SidebarMenuSub>
+                          <SidebarMenuSub className="gap-0">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
-                                <SidebarMenuSubButton isActive={child.isActive} render={<a href="#" />}>
+                                <SidebarMenuSubButton className="h-8" isActive={child.isActive} render={<a href="#" />}>
                                   {child.title}
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
