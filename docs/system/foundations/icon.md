@@ -2,7 +2,7 @@
 
 상태: `공급원 규칙 확정 / 사용 세부는 Provisional`
 
-ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com/)이며 Secondary 공급원은 Google Material Symbols다. React 구현에서 Remix Icon은 repository에 버전이 고정된 `@remixicon/react`를 사용한다.
+ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com/)이며 Secondary 공급원은 Google Material Symbols다. React 구현에서 Remix Icon은 repository에 버전이 고정된 `@remixicon/react`를 사용한다. shadcn CLI로 컴포넌트를 받을 때도 같은 공급원이 딸려 오도록 `components.json`의 `iconLibrary`를 `remixicon`으로 둔다.
 
 ## 공급원 우선순위
 
