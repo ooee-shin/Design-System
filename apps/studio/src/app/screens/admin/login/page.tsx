@@ -1,8 +1,12 @@
-// `Field` 와 `Input` 은 `"use client"` 를 스스로 선언하지 않고 소비자 쪽을 전제한다. Studio 의
-// 다른 워크벤치와 같다.
+// `Input` 은 `"use client"` 를 스스로 선언하지 않고 소비자 쪽을 전제한다. Studio 의 다른
+// 워크벤치와 같다.
 "use client";
 
-import { Button, CheckboxField, Field, Input } from "@ooee/ui";
+import { useState } from "react";
+
+import { RiEyeLine, RiEyeOffLine } from "@remixicon/react";
+
+import { Button, CheckboxField, Input } from "@ooee/ui";
 
 import { ScreenExitLink } from "@/components/screens/screen-chrome";
 
@@ -31,15 +35,12 @@ export default function AdminLoginScreenPage() {
               <p className="mt-1 text-sm text-oe-foreground-secondary">관리자 로그인</p>
             </div>
 
-            {/* 한 줄 Control 은 Large 40px 을 쓴다. Field 와 묶이는 자리의 기준이다. */}
             <form className="flex flex-col gap-4">
-              <Field label="아이디">
-                <Input type="text" autoComplete="username" placeholder="아이디 입력" controlSize="large" />
-              </Field>
+              {/* 보이는 Label 을 두지 않으므로 이름은 `aria-label` 이 갖는다. Placeholder 는 값이
+                  들어오면 사라지므로 이름을 대신할 수 없다. */}
+              <Input type="text" autoComplete="username" placeholder="아이디 입력" aria-label="아이디" variant="filled" controlSize="large" />
 
-              <Field label="비밀번호">
-                <Input type="password" autoComplete="current-password" placeholder="비밀번호 입력" controlSize="large" />
-              </Field>
+              <PasswordInput />
 
               <div className="flex items-center justify-between">
                 <CheckboxField label="아이디 저장" />
@@ -51,7 +52,7 @@ export default function AdminLoginScreenPage() {
                 </a>
               </div>
 
-              <Button type="submit" layout="fill" controlSize="large" className="mt-2">
+              <Button type="submit" layout="fill" controlSize="xlarge" className="mt-2">
                 로그인
               </Button>
             </form>
@@ -64,5 +65,35 @@ export default function AdminLoginScreenPage() {
 
       <ScreenExitLink backTo="/screens/admin" label="관리자" />
     </>
+  );
+}
+
+/**
+ * `input.md` 가 정한 비밀번호 입력이다. 입력하는 동안에도 마스킹하고, 자기 입력을 확인해야 하는
+ * 자리이므로 Trailing element 로 보기 전환을 둔다. 실제 `type` 을 `password` 와 `text` 로 바꾸며
+ * 비밀번호용 Leading icon 은 쓰지 않는다.
+ */
+function PasswordInput() {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <Input
+      type={visible ? "text" : "password"}
+      autoComplete="current-password"
+      placeholder="비밀번호 입력"
+      aria-label="비밀번호"
+      variant="filled"
+      controlSize="large"
+      trailingElement={
+        <button
+          type="button"
+          aria-label={visible ? "비밀번호 숨기기" : "비밀번호 보기"}
+          onClick={() => setVisible((current) => !current)}
+          className="grid size-6 place-items-center rounded-md text-oe-foreground-tertiary transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:outline-none"
+        >
+          {visible ? <RiEyeOffLine className="size-oe-icon-small" aria-hidden="true" /> : <RiEyeLine className="size-oe-icon-small" aria-hidden="true" />}
+        </button>
+      }
+    />
   );
 }
