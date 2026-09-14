@@ -177,17 +177,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenu>
                     {group.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton className="pl-7" isActive={item.isActive} render={<a href="#" />}>
+                        <SidebarMenuButton className="pl-7 font-medium" isActive={item.isActive} render={<a href="#" />}>
                           {item.title}
                         </SidebarMenuButton>
 
-                        {/* 세 번째 단계를 가진 항목이 있다. 블록이 갖고 있는 하위 메뉴로 그린다. */}
+                        {/* 세 번째 단계를 가진 항목이 있다. 블록이 갖고 있는 하위 메뉴로 그린다.
+                            2depth 와는 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로 작아진
+                            자리에서 3depth 까지 어중간하게 줄이면 단계의 순서가 읽히지 않는다. */}
                         {item.items ? (
                           <SidebarMenuSub>
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
-                                  className="pl-6 data-[size=md]:text-[13px] text-sidebar-foreground/70"
+                                  className="pl-6"
                                   isActive={child.isActive}
                                   render={<a href="#" />}
                                 >
