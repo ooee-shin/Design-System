@@ -328,7 +328,7 @@ function UtilityButton({
 function SidebarToggle() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
-  const label = collapsed ? "좌측 메뉴 열기" : "좌측 메뉴 닫기";
+  const label = collapsed ? "메뉴 열기" : "메뉴 닫기";
 
   return (
     // 펼쳐져 있으면 레일 위에, 접혀 있으면 헤더 위에 놓이므로 글자색이 그 바닥을 따라간다.
