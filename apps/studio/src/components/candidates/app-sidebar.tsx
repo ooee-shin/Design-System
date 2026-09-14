@@ -145,6 +145,9 @@ const data: { navMain: NavGroup[] } = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // 지금 보고 있는 메뉴가 어느 것인지 화면이 말해야 한다. 실제 경로가 아직 없으므로 누른 것을
   // 기억해 두고, 경로가 붙으면 주소에서 읽는 값으로 바꾼다.
+  //
+  // 고른 줄은 브랜드 색을 두른다. 받은 코드의 회색 바탕은 hover 와 같은 색이라, 가리키고 있는
+  // 줄과 고른 줄이 구분되지 않았다.
   const [activeMenu, setActiveMenu] = React.useState<string | null>(null)
 
   return (
@@ -170,7 +173,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     // 어긋나지 않게 하기 위해서다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="h-9 font-medium" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className="h-9 font-medium data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary" isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
@@ -182,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
-                                  className="h-8"
+                                  className="h-8 data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary"
                                   isActive={activeMenu === `${group.title}/${item.title}/${child.title}`}
                                   onClick={(event) => {
                                     event.preventDefault()
@@ -201,7 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   ) : (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        className="h-9 font-medium"
+                        className="h-9 font-medium data-active:bg-oe-brand-background-secondary data-active:text-oe-brand-foreground-primary hover:data-active:bg-oe-brand-background-secondary hover:data-active:text-oe-brand-foreground-primary"
                         isActive={activeMenu === `${group.title}/${item.title}`}
                         onClick={(event) => {
                           event.preventDefault()
