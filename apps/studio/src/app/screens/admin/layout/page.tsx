@@ -6,6 +6,8 @@
  * 지시가 있기 전까지 `oe` token 으로 바꾸지 않는다. 출처는 `sources.md` 가 갖는다.
  */
 
+import Image from "next/image"
+
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
   Breadcrumb,
@@ -22,6 +24,10 @@ import {
   SidebarTrigger,
 } from "@/components/candidates/sidebar"
 
+// 메인 로고는 사용자가 테마 설정에서 등록하는 값이다. 아직 그 설정과 잇지 않았으므로 기본값을
+// 둔다. 원본은 2120×399 이며 헤더 안에서 높이 24px 로 서고 폭은 비율대로 128px 이 된다.
+const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 128, height: 24 };
+
 export default function Page() {
   return (
     // 헤더가 위에서 전체 너비를 차지하고, 그 아래를 사이드 내비게이션과 본문이 나눈다. 원본은
@@ -30,7 +36,16 @@ export default function Page() {
     // 헤더의 여닫기 버튼이 사이드 내비게이션의 상태를 읽으므로 provider 가 헤더까지 감싼다.
     <SidebarProvider className="flex-col">
       <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-        <SidebarTrigger className="-ml-1" />
+        {/* 헤더의 가장 왼쪽은 로고 자리다. */}
+        <Image
+          src={MAIN_LOGO.src}
+          width={MAIN_LOGO.width}
+          height={MAIN_LOGO.height}
+          alt=""
+          priority
+          className="mr-2 h-6 w-auto shrink-0"
+        />
+        <SidebarTrigger />
         <Separator
           orientation="vertical"
           className="mr-2 data-vertical:h-4 data-vertical:self-auto"
