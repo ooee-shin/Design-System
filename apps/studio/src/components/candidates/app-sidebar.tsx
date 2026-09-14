@@ -44,16 +44,12 @@ type NavGroup = { title: string; items: NavItem[] }
 const data: { navMain: NavGroup[] } = {
   navMain: [
     {
-      title: "신규가맹문의",
+      title: "가맹영업",
       items: [
-        {
-          title: "신규가맹문의",
-          items: [
-            { title: "신규DB관리" },
-            { title: "분배DB관리" },
-            { title: "휴지통" },
-          ],
-        },
+        { title: "신규가맹문의" },
+        { title: "가맹상담관리" },
+        { title: "제외문의" },
+        { title: "상권탐색" },
       ],
     },
     {
@@ -147,6 +143,10 @@ const data: { navMain: NavGroup[] } = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  // 지금 보고 있는 메뉴가 어느 것인지 화면이 말해야 한다. 실제 경로가 아직 없으므로 누른 것을
+  // 기억해 두고, 경로가 붙으면 주소에서 읽는 값으로 바꾼다.
+  const [activeMenu, setActiveMenu] = React.useState<string | null>(null)
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -157,7 +157,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title} className="pt-3 pb-0.5">
-            <SidebarGroupLabel className="text-xs font-medium text-sidebar-foreground/50">
+            <SidebarGroupLabel className="text-[length:var(--text-oe-label)] font-medium text-sidebar-foreground/50">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -181,7 +181,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <SidebarMenuSub className="gap-0">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
-                                <SidebarMenuSubButton className="h-8" isActive={child.isActive} render={<a href="#" />}>
+                                <SidebarMenuSubButton
+                                  className="h-8"
+                                  isActive={activeMenu === `${group.title}/${item.title}/${child.title}`}
+                                  onClick={(event) => {
+                                    event.preventDefault()
+                                    setActiveMenu(`${group.title}/${item.title}/${child.title}`)
+                                  }}
+                                  render={<a href="#" />}
+                                >
                                   {child.title}
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
@@ -192,7 +200,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton className="h-9 font-medium" isActive={item.isActive} render={<a href="#" />}>
+                      <SidebarMenuButton
+                        className="h-9 font-medium"
+                        isActive={activeMenu === `${group.title}/${item.title}`}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          setActiveMenu(`${group.title}/${item.title}`)
+                        }}
+                        render={<a href="#" />}
+                      >
                         {item.title}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
