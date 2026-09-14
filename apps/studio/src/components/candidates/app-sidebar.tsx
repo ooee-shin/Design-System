@@ -2,14 +2,7 @@
 
 import * as React from "react"
 
-import { RiArrowRightSLine } from "@remixicon/react"
-
 import { SearchForm } from "@/components/candidates/search-form"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/candidates/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -153,59 +146,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SearchForm />
       </SidebarHeader>
       <SidebarContent className="gap-0">
-        {/* 묶음마다 접을 수 있는 SidebarGroup 을 하나씩 만든다. */}
+        {/* 1depth 는 접지 않는다. 페이지가 아니라 묶음이라는 것은 작고 옅은 글자가 말하고,
+            그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
-          <Collapsible
-            key={group.title}
-            title={group.title}
-            defaultOpen
-            className="group/collapsible"
-          >
-            {/* 묶음이 여덟이라 위아래 여백이 쌓이면 한 화면에 들어오지 않는다. 세로 여백만 줄인다. */}
-            <SidebarGroup className="py-0.5">
-              {/* 1depth 는 페이지가 아니라 묶음이다. 글자를 한 단계 줄이고 색을 옅게 두어 아래
-                  단계와 성격이 다르다는 것을 말하고, 접고 펴는 화살표를 글자 앞에 둔다. */}
-              <SidebarGroupLabel
-                className="group/label gap-1 text-xs font-semibold text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                render={<CollapsibleTrigger />}
-              >
-                <RiArrowRightSLine className="shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
-                {group.title}
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {group.items.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton className="pl-7 font-medium" isActive={item.isActive} render={<a href="#" />}>
-                          {item.title}
-                        </SidebarMenuButton>
+          <SidebarGroup key={group.title} className="py-0.5">
+            <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/50">
+              {group.title}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<a href="#" />}>
+                      {item.title}
+                    </SidebarMenuButton>
 
-                        {/* 세 번째 단계를 가진 항목이 있다. 블록이 갖고 있는 하위 메뉴로 그린다.
-                            2depth 와는 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로 작아진
-                            자리에서 3depth 까지 어중간하게 줄이면 단계의 순서가 읽히지 않는다. */}
-                        {item.items ? (
-                          <SidebarMenuSub>
-                            {item.items.map((child) => (
-                              <SidebarMenuSubItem key={child.title}>
-                                <SidebarMenuSubButton
-                                  className="pl-6"
-                                  isActive={child.isActive}
-                                  render={<a href="#" />}
-                                >
-                                  {child.title}
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                          </SidebarMenuSub>
-                        ) : null}
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
+                    {/* 세 번째 단계를 가진 항목이 있다. 블록이 갖고 있는 하위 메뉴로 그린다.
+                        2depth 와는 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로 작아진
+                        자리에서 3depth 까지 어중간하게 줄이면 단계의 순서가 읽히지 않는다. */}
+                    {item.items ? (
+                      <SidebarMenuSub>
+                        {item.items.map((child) => (
+                          <SidebarMenuSubItem key={child.title}>
+                            <SidebarMenuSubButton isActive={child.isActive} render={<a href="#" />}>
+                              {child.title}
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    ) : null}
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         ))}
       </SidebarContent>
       <SidebarRail />
