@@ -1,17 +1,18 @@
+// `Field` 와 `Input` 은 `"use client"` 를 스스로 선언하지 않고 소비자 쪽을 전제한다. Studio 의
+// 다른 워크벤치와 같다.
+"use client";
+
+import { Button, CheckboxField, Field, Input } from "@ooee/ui";
+
 import { ScreenExitLink } from "@/components/screens/screen-chrome";
 
 /**
- * 관리자 로그인 — 화면 실험.
+ * 관리자 로그인.
  *
- * VibePrompt 의 Auth split screen 구조를 가져와 관리자 로그인의 문구와 구성으로 바꿨다.
- * `pipeline.md` 의 2단계이므로 raw Tailwind 색과 직접 만든 입력을 **일부러** 그대로 둔다.
- * 이 단계의 목적은 정규화가 아니라 전체 구조와 반응형 동작, 유지할 부분과 바꿀 부분을 가려내는
- * 것이다. 출처는 `sources.md` 가 갖는다.
+ * VibePrompt 의 Auth split screen 에서 구조를 가져왔고, `pipeline.md` 의 6단계에 따라 직접 만든
+ * 입력과 raw Tailwind 색을 공용 컴포넌트와 `oe` 토큰으로 바꿨다. 출처는 `sources.md` 가 갖는다.
  *
- * 다음 단계에서 바꿀 것이 이미 보인다. 입력 둘은 공용 `Input` 과 `Field`, 체크박스는 공용
- * `Checkbox`, 버튼은 공용 `Button` 의 `fill` 이 맡을 자리이고, `neutral-900` 은
- * `oe-foreground-primary` 와 `oe-background-bold-primary` 로 갈린다. 다만 그 판단은 화면에서
- * 비율과 밀도를 먼저 보고 하는 것이므로 여기서 앞당기지 않는다.
+ * 남은 자리는 셋이다. 로고, 오른쪽 패널의 내용, 그리고 로그인을 눌렀을 때의 동작이다.
  */
 
 // 제목은 환경설정이 소유하는 시스템명이다. 실제 값이 붙기 전까지 어디서 오는 값인지 그대로 적는다.
@@ -20,65 +21,45 @@ const SYSTEM_NAME = "{환경설정 시스템명}";
 export default function AdminLoginScreenPage() {
   return (
     <>
-      <div className="flex min-h-screen">
-        {/* Form */}
+      <div className="flex min-h-dvh">
         <div className="flex w-full items-center justify-center px-6 lg:w-1/2">
           <div className="w-full max-w-sm">
             <div className="mb-8">
-              <div className="mb-6 h-9 w-9 rounded-lg bg-neutral-900" />
-              <h1 className="text-2xl font-semibold text-neutral-900">{SYSTEM_NAME}</h1>
-              <p className="mt-1 text-sm text-neutral-500">관리자 로그인</p>
+              {/* 로고 자리. 무엇이 들어갈지 정하지 않았다. */}
+              <div className="mb-6 size-9 rounded-lg bg-oe-background-bold-primary" />
+              <h1 className="text-2xl font-semibold text-oe-foreground-primary">{SYSTEM_NAME}</h1>
+              <p className="mt-1 text-sm text-oe-foreground-secondary">관리자 로그인</p>
             </div>
 
-            <form className="space-y-4">
-              <div>
-                <label htmlFor="admin-login-id" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  아이디
-                </label>
-                <input
-                  id="admin-login-id"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="아이디 입력"
-                  className="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-sm outline-none ring-neutral-900/10 focus:border-neutral-900 focus:ring-4"
-                />
-              </div>
+            {/* 한 줄 Control 은 Large 40px 을 쓴다. Field 와 묶이는 자리의 기준이다. */}
+            <form className="flex flex-col gap-4">
+              <Field label="아이디">
+                <Input type="text" autoComplete="username" placeholder="아이디 입력" controlSize="large" />
+              </Field>
 
-              <div>
-                <label htmlFor="admin-login-password" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  비밀번호
-                </label>
-                <input
-                  id="admin-login-password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="비밀번호 입력"
-                  className="w-full rounded-xl border border-neutral-200 px-3.5 py-2.5 text-sm outline-none ring-neutral-900/10 focus:border-neutral-900 focus:ring-4"
-                />
-              </div>
+              <Field label="비밀번호">
+                <Input type="password" autoComplete="current-password" placeholder="비밀번호 입력" controlSize="large" />
+              </Field>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-neutral-600">
-                  <input type="checkbox" className="rounded border-neutral-300" /> 아이디 저장
-                </label>
-                <a href="#" className="font-medium text-neutral-900 hover:underline">
+              <div className="flex items-center justify-between">
+                <CheckboxField label="아이디 저장" />
+                <a
+                  href="#"
+                  className="rounded-sm text-sm font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+                >
                   비밀번호 찾기
                 </a>
               </div>
 
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-neutral-900 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
-              >
+              <Button type="submit" layout="fill" controlSize="large" className="mt-2">
                 로그인
-              </button>
+              </Button>
             </form>
           </div>
         </div>
 
-        {/* Visual */}
         {/* 오른쪽에 무엇을 둘지는 정하지 않았다. 자리만 남기고 비워 둔다. */}
-        <div className="hidden bg-neutral-900 lg:block lg:w-1/2" />
+        <div className="hidden bg-oe-background-bold-primary lg:block lg:w-1/2" />
       </div>
 
       <ScreenExitLink backTo="/screens/admin" label="관리자" />
