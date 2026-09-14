@@ -219,18 +219,16 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     vars: {
       "--sidebar": "var(--brand-800)",
       "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
-      "--sidebar-border": "rgb(0 0 0 / 0.16)",
-      // 검색창의 면도 흰색이 아니라 검정이다. 밝은 유채색 바탕에서는 흰색을 얹어도 거의 변하지
-      // 않으므로, 눌린 면으로 보이도록 검정을 옅게 얹는다.
-      "--sidebar-accent": "rgb(0 0 0 / 0.16)",
+      "--sidebar-border": "rgb(255 255 255 / 0.16)",
+      // 검색창의 면과 hover, 고른 줄이 모두 레일을 밝히는 방향으로 간다. 하나만 어두워지면 한
+      // 레일 안에서 방향이 둘로 갈린다. 옅은 것부터 진한 것까지 8·12·16% 의 사다리다.
+      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
       "--sidebar-accent-foreground": "var(--color-white)",
       // 고른 줄을 짙은 색으로 채우면 표시가 아니라 구멍처럼 읽힌다. 레일을 밝히는 알파로 두고
       // 글자를 온전한 흰색으로 올려 구분한다.
       "--menu-active-bg": "rgb(255 255 255 / 0.16)",
       "--menu-active-fg": "var(--color-white)",
-      // 밝은 유채색 바탕에서는 흰색을 얹어도 거의 변하지 않는다. 검정을 옅게 얹어 눌린 면으로
-      // 보이게 한다.
-      "--menu-hover-bg": "rgb(0 0 0 / 0.16)",
+      "--menu-hover-bg": "rgb(255 255 255 / 0.12)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
   },
