@@ -2,7 +2,6 @@
 @import "tailwindcss";
 @import "@ooee/tokens/styles.css";
 @import "@ooee/ui/styles.css";
-@import "@ooee/patterns/styles.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 

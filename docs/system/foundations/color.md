@@ -194,9 +194,9 @@ token candidate에는 최소한 다음을 기록한다.
 
 같은 의미로 세 번 반복되거나 두 개 이상의 독립 컴포넌트에서 필요하면 공용 semantic token 승격을 검토한다. 접근성, theme, 시스템 경계에 필수적인 값은 첫 용례에서도 등록할 수 있다. 특정 컴포넌트에만 의미가 있다면 공용 token을 늘리지 않고 component token 또는 recipe로 유지한다.
 
-## 첫 적용: Inbox split view
+## 첫 적용
 
-`/examples/inbox-split-view`는 Color v0의 첫 실제 검증 화면이다. 다음 역할을 Provisional로 연결한다.
+Color v0의 역할 매핑은 목록과 상세를 좌우로 나눈 Inbox 화면에서 처음 검증했다. 그 화면은 `2026-09-14`에 저장소에서 걷어냈으며 아래 연결은 Provisional로 남는다.
 
 - Preview 바탕: `oe-background-canvas-secondary`
 - Inbox와 reading pane surface: `oe-background-primary`

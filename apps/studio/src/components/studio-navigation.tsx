@@ -12,7 +12,6 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
   { href: "/foundations", label: "Foundations" },
   { href: "/components", label: "Components" },
   { href: "/docs", label: "Docs" },
-  { href: "/examples", label: "Examples" },
   { href: "/presentation", label: "Presentation" },
 ];
 

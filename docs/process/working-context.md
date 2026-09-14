@@ -33,7 +33,6 @@
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
-  - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
   - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
@@ -41,14 +40,14 @@
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - 메뉴 순서는 `Home → Foundations → Components → Docs → Examples → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 참고 사례를 본다. 앞으로 추가할 `Patterns`는 Components와 Docs 사이에 들어간다
-  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Examples·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
+  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장인 `/screens`는 메뉴에 올리지 않고 주소로 연다
+  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
   - 모든 화면이 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다. 밀도가 페이지 틀을 건드리면 화면을 옮길 때 본문이 위아래로 밀린다
   - 우측 `On this page` 목차는 공용 `OnThisPage` 하나를 컴포넌트 상세와 Presentation이 함께 사용한다. 최대 높이를 뷰포트 안으로 제한하고 넘치면 목차 안에서 스크롤한다
   - Foundations Color 화면의 탭은 주소 해시와 연결된다. `#primitive`·`#semantic`·`#brand`로 특정 탭을 바로 가리킬 수 있고 탭을 누르면 주소도 따라 바뀐다
   - 12px 글자 옆의 인라인 아이콘은 `oe-icon-xsmall`을 사용한다. `size-3.5`는 아이콘 Foundation의 크기 체계에 없는 값이라 쓰지 않는다. 내비게이션의 라이트·다크 토글만 예외로 남아 있다
   - 각 그룹 index에서 현재 접근 가능한 모든 자산을 확인하고 상세 화면으로 이동
-  - Components index와 Docs 목록은 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations·Examples index는 기본 밀도를 유지
+  - Components index와 Docs 목록은 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations index는 기본 밀도를 유지
   - 컴포넌트에는 등급 badge를 달지 않는다. 아직 확정되지 않은 Foundation 결정만 `Provisional` 표시를 단다
   - 공통 검수 설정인 `PC/TB/MB`, `라이트/다크`, `KO/EN`을 sticky Studio header에서 변경하며 route 이동과 새로고침 후에도 유지
   - viewport 설정은 Studio chrome이 아니라 상세 화면의 검수 콘텐츠만 fluid desktop, 768px tablet, 390px mobile 너비로 변경
@@ -64,12 +63,6 @@
   - Studio의 Violet 측정 Annotation은 width·height·min/max·Target area, padding·gap·inset, radius와 font-size·line-height·letter-spacing 등 수치 치수에 공통 사용. 숫자 Pill은 border 없이 Violet tonal 배경과 글자로 표시하며 semantic color·state·Anatomy·Swap에는 사용하지 않음
   - 상세 페이지의 연관 컴포넌트 영역은 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않음. Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 표시하고, 전체 Form 목록이 아니라 코드와 사용 사례로 확인된 관계만 연결
 
-- `/examples/inbox-split-view`
-  - VibePrompt의 Inbox split view를 React로 변환한 첫 화면 실험
-  - 대화 검색, 읽지 않은 메시지 count, 답장, 모바일 전환
-  - Light/Dark 및 국문/영문/일어 콘텐츠 검수
-  - Neutral OE semantic mapping을 첫 실제 검증 대상으로 Provisional 적용
-  - canvas, surface, foreground 위계, border 위계, bold fill, inverse, focus ring을 사용
 - `/foundations/color`
   - Tailwind CSS v4의 white/black과 22개 기본 primitive palette 전체 표시
   - 실제 oe Neutral·Brand·Accent·Status semantic token의 Light/Dark mapping 표시
@@ -248,17 +241,6 @@
   - 배타적 선택의 잘못된 예시는 `사용할 알림 기능` 아래 동시에 켤 수 있는 로그인·결제 알림을 Radio로 제한한 형태로 표시해 질문과 오류 이유를 함께 드러냄
   - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
   - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class와 Flipped 배치를 보호함
-- `/examples/breadcrumb-page-header`
-  - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation 화면 실험
-  - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수
-  - 구현 원본은 `@ooee/patterns`가 소유하고 Studio는 locale과 검수 context만 전달
-  - 일반 surface는 oe Neutral semantic token을 사용하고 Draft는 공용 Badge의 warning tonal 조합을 사용
-- `/examples/collapsible-sidebar-nav`
-  - VibePrompt의 collapsible sidebar navigation을 기반으로 한 Navigation 화면 실험
-  - 260px/72px rail, group disclosure, active row, count badge, search와 user chip 검수
-  - navigation 패턴을 먼저 축적한 뒤 active state, row, badge와 trigger의 반복 규칙을 비교해 공용 자산을 추출
-  - 구현 원본은 `@ooee/patterns`가 소유하며 내부 navigation row는 비교 사례가 더 쌓일 때까지 예시 내부에 유지
-
 ## 확정된 결정
 
 - 모양의 공통 어휘는 `Square`, `Rounded`, `Circle(Pill)`이며 각 컴포넌트가 `shape` Property로 소유한다. 선택 단위는 시스템 전체가 아니라 서비스와 컴포넌트의 조합이고, 같은 컴포넌트를 한 서비스 안에서 섞어 쓰지 않기를 권장하는 수준이다. 강제 규칙이 아니다.
