@@ -37,7 +37,11 @@ import {
  * 적혀 있어 뺐고, 앱관리의 「점주 앱에 뿌리는 콘텐츠 6종」과 커뮤니티의 「사내 게시판 3종」은 메뉴
  * 이름이 아니라 그 묶음을 설명하는 문장이라 그 아래 항목만 남겼다.
  */
-const data = {
+type NavLeaf = { title: string; isActive?: boolean }
+type NavItem = NavLeaf & { items?: NavLeaf[] }
+type NavGroup = { title: string; items: NavItem[] }
+
+const data: { navMain: NavGroup[] } = {
   navMain: [
     {
       title: "신규가맹문의",
@@ -140,11 +144,6 @@ const data = {
       items: [{ title: "업무관리" }, { title: "업무관리 사용자별" }],
     },
   ],
-} satisfies {
-  navMain: {
-    title: string
-    items: { title: string; isActive?: boolean; items?: { title: string; isActive?: boolean }[] }[]
-  }[]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
