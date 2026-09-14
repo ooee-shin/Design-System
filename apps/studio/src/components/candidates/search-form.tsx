@@ -21,8 +21,8 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
             id="search"
             type="search"
             controlSize="small"
-            placeholder="Search the docs..."
-            aria-label="Search"
+            placeholder="메뉴 검색"
+            aria-label="메뉴 검색"
             leadingElement={<RiSearchLine />}
           />
         </SidebarGroupContent>
