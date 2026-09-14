@@ -15,10 +15,10 @@ import { cn } from "@/lib/utils";
  * Studio 내비게이션은 이 아래에서 그려지지 않는다. 상단에 바가 얹히면 관리자 화면이 실제로
  * 차지하는 높이를 볼 수 없기 때문이다. 대신 돌아가는 길을 화면이 스스로 갖는다.
  */
-export function ScreenExitLink({ className }: { className?: string }) {
+export function ScreenExitLink({ backTo, label, className }: { backTo: string; label: string; className?: string }) {
   return (
     <Link
-      href="/screens"
+      href={backTo}
       className={cn(
         // 왼쪽 아래는 Next.js 개발 표시가 쓰는 자리라 겹친다.
         "fixed right-3 bottom-3 z-[60] inline-flex items-center gap-1.5 rounded-full border border-oe-border-primary bg-oe-background-primary/90 px-3 py-1.5 text-[11px] font-medium text-oe-foreground-secondary backdrop-blur",
@@ -27,7 +27,7 @@ export function ScreenExitLink({ className }: { className?: string }) {
       )}
     >
       <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
-      Studio
+      {label}
     </Link>
   );
 }
@@ -49,7 +49,7 @@ const MOBILE_WIDTH = "max-w-[390px]";
  */
 export function MobileWebView({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <div className="min-h-dvh bg-oe-background-canvas-secondary">
+    <div className="min-h-dvh bg-oe-background-secondary">
       <div
         aria-label={label}
         className={cn(

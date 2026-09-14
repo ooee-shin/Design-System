@@ -6,7 +6,7 @@ import { ScreenExitLink, ScreenPlaceholder } from "@/components/screens/screen-c
  */
 export default function AdminScreenPage() {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-oe-background-canvas-primary">
+    <div className="flex h-screen w-full overflow-hidden bg-oe-background-secondary">
       <aside className="flex w-60 shrink-0 flex-col gap-3 border-r border-oe-border-secondary bg-oe-background-primary p-3">
         <ScreenPlaceholder name="Sidebar" className="h-14" />
         <ScreenPlaceholder name="Navigation" className="flex-1" />
@@ -22,7 +22,7 @@ export default function AdminScreenPage() {
         </main>
       </div>
 
-      <ScreenExitLink />
+      <ScreenExitLink backTo="/screens/admin" label="관리자" />
     </div>
   );
 }

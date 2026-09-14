@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RiArrowLeftLine, RiArrowRightLine } from "@remixicon/react";
 
 import { getScreenRoot, type ScreenRoot } from "@/components/screens/screen-registry";
+import { ScreenRootTabs } from "@/components/screens/screen-root-tabs";
 
 /**
  * 한 루트에서 만들 화면의 목록이다. 루트로 들어오면 가장 먼저 이 화면을 만난다.
@@ -15,26 +16,33 @@ export function ScreenWorkList({ root: key }: { root: ScreenRoot["key"] }) {
   const done = root.items.filter((item) => item.href).length;
 
   return (
-    <main className="min-h-dvh bg-oe-background-canvas-secondary px-6 py-10">
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
+    <main className="min-h-dvh bg-oe-background-secondary px-6 py-10">
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-5">
         <header className="flex flex-col gap-2">
-          <Link href="/screens" className="inline-flex w-fit items-center gap-1.5 text-xs text-oe-foreground-tertiary hover:text-oe-foreground-primary">
+          {/* 세 목록 사이 이동은 아래 탭이 맡으므로, 여기서는 Studio 로 나가는 길만 둔다. */}
+          <Link href="/" className="inline-flex w-fit items-center gap-1.5 text-xs text-oe-foreground-tertiary hover:text-oe-foreground-primary">
             <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
-            Screens
+            Studio
           </Link>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">{root.name}</h1>
-            <p className="mt-1 text-sm leading-6 text-oe-foreground-secondary">{root.note}</p>
-            <p className="mt-2 text-xs leading-5 text-oe-foreground-tertiary">
-              기능 화면을 한 건씩 만듭니다. 화면끼리 이어지는 데모가 아니므로 각 항목은 적어 둔 범위까지만 동작합니다.
-              {" "}
-              <span className="tabular-nums">
-                {done}/{root.items.length}
-              </span>
-              {" "}만들었습니다.
+            <h1 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">Screens</h1>
+            <p className="mt-1 text-sm leading-6 text-oe-foreground-secondary">
+              제품 화면을 구현하는 작업장입니다. 기능 화면을 한 건씩 만들며, 화면끼리 이어지는 데모가 아니므로 각 항목은 적어 둔 범위까지만 동작합니다.
             </p>
           </div>
         </header>
+
+        {/* 어느 목록을 볼지는 탭이 고른다. 제목에 루트 이름을 또 적으면 같은 것이 두 번 서고,
+            탭이 현재 위치를 이미 말하고 있으므로 아래에는 그 루트의 설명만 둔다. */}
+        <ScreenRootTabs current={root.key} />
+
+        <p className="-mt-2 text-xs leading-5 text-oe-foreground-tertiary">
+          {root.note}{" "}
+          <span className="tabular-nums">
+            {done}/{root.items.length}
+          </span>{" "}
+          만들었습니다.
+        </p>
 
         <ol className="flex flex-col gap-2">
           {root.items.map((item) => {
@@ -71,6 +79,7 @@ export function ScreenWorkList({ root: key }: { root: ScreenRoot["key"] }) {
           })}
         </ol>
       </div>
+
     </main>
   );
 }

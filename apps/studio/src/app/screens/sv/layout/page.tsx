@@ -14,7 +14,7 @@ export default function SvScreenPage() {
         <ScreenPlaceholder name="Content" className="m-4 flex-1" />
       </MobileWebView>
 
-      <ScreenExitLink />
+      <ScreenExitLink backTo="/screens/sv" label="SV" />
     </>
   );
 }

@@ -20,6 +20,21 @@ test("세 테스트 경로가 모두 있다", () => {
   }
 });
 
+// 세 목록은 화면 아래 탭으로 이어져 있다. 목록을 고르는 화면을 한 겹 더 두면 같은 선택을 두 번
+// 하게 되므로 `/screens` 는 첫 목록으로 보낸다.
+test("세 목록은 탭으로 이어지고 /screens 는 첫 목록으로 보낸다", () => {
+  const index = read("apps/studio/src/app/screens/page.tsx");
+  assert.match(index, /redirect/);
+
+  const list = read("apps/studio/src/components/screens/screen-work-list.tsx");
+  assert.match(list, /ScreenRootTabs/, "작업 목록이 전환 탭을 그리지 않는다");
+
+  // 공용 BottomNavigation 은 모바일 제품 화면의 최상위 이동만 맡기로 정해져 있다. Studio 쪽
+  // 작업장의 전환 장치로 쓰면 그 규칙을 어긴다.
+  const tabs = read("apps/studio/src/components/screens/screen-root-tabs.tsx");
+  assert.doesNotMatch(tabs, /from "@ooee\/ui"/, "Studio 전환 탭이 제품 컴포넌트를 끌어다 쓰고 있다");
+});
+
 // 루트로 들어오면 완성된 앱이 아니라 작업 목록을 만난다. 화면끼리 이어지는 데모가 아니므로,
 // 무엇을 만들 예정이고 어디까지 왔는지를 먼저 보여 주지 않으면 덜 만들어진 화면이 고장난 것으로
 // 읽힌다.

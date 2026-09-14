@@ -14,7 +14,7 @@ export default function StoScreenPage() {
         <ScreenPlaceholder name="Content" className="m-4 flex-1" />
       </MobileWebView>
 
-      <ScreenExitLink />
+      <ScreenExitLink backTo="/screens/sto" label="STO" />
     </>
   );
 }
