@@ -157,7 +157,9 @@ function SidebarStyleSetting() {
     <section className="flex w-fit flex-col gap-3">
       <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">좌측 메뉴 스타일</h2>
       <RadioGroup
-        className="grid w-max min-w-full grid-flow-col auto-cols-fr gap-3"
+        // 원본은 폭이 정해진 상자 안에 있어서 칸을 균등 분할했다. 여기서는 그 상자가 없어 카드가
+        // 글자 폭까지 눌리므로, 카드 폭을 직접 정한다.
+        className="flex gap-3"
         value={style}
         onValueChange={(value) => setStyle(String(value))}
         aria-label="좌측 메뉴 스타일"
@@ -178,7 +180,7 @@ function StyleOptionCard({ value, label }: { value: string; label: string }) {
   const labelId = `sidebar-style-${value}`;
 
   return (
-    <label className="relative grid cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
+    <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
       <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
         {/* 라벨 A 는 그 예시의 두 번째 카드인 밝은 모드 미리보기를 쓴다. 나머지 둘은 무엇이
             다른지 정해지면 그 그림이 들어간다. */}
