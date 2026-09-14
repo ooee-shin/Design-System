@@ -153,13 +153,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="p-0">
+      <SidebarHeader className="gap-0 p-0">
         {/* 맨 위 띠는 헤더와 같은 56px 이다. 여닫기 버튼은 화면에 하나만 두고 그 자리에 고정해
-            두므로, 여기서는 그만큼을 비워 둔다. */}
+            두므로, 여기서는 그만큼을 비워 둔다. 버튼과 검색, 검색과 메뉴 사이는 서로 붙여 둔다. */}
         <div className="h-14 shrink-0" />
-        <div className="pb-2">
-          <SearchForm />
-        </div>
+        <SearchForm />
       </SidebarHeader>
       <SidebarContent className="gap-0">
         {/* 1depth 는 접지 않는다. 페이지가 아니라 묶음이라는 것은 작고 옅은 글자가 말하고,

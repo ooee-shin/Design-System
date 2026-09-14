@@ -341,8 +341,8 @@ function SidebarToggle() {
             <Button
               variant="ghost"
               tone="neutral"
-              controlSize="xsmall"
-              leadingIcon={<RiMenuLine className="size-oe-icon-small" aria-hidden="true" />}
+              controlSize="small"
+              leadingIcon={<RiMenuLine className="size-oe-icon-medium" aria-hidden="true" />}
               onClick={toggleSidebar}
               aria-label={label}
             />
