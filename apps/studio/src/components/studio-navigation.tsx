@@ -21,6 +21,11 @@ export function StudioNavigation() {
   const { theme, locale, viewport, setTheme, setLocale, setViewport } = useStudioPreferences();
   const isComponentDetail = /^\/components\/[^/]+$/.test(pathname);
 
+  // `/screens/*` 는 제품 화면 자체를 구현하는 자리다. 상단에 바가 얹히면 관리자 화면이 실제로
+  // 차지하는 높이를 볼 수 없고 앱 화면은 기기 상자 밖에 다른 것이 서게 된다. 돌아가는 길은 각
+  // 화면이 `ScreenExitLink` 로 스스로 갖는다. 범위는 `docs/system/studio.md` 가 소유한다.
+  if (pathname.startsWith("/screens")) return null;
+
   return (
     <>
       {isComponentDetail ? (

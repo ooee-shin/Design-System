@@ -50,6 +50,8 @@ Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구�
 
 화면과 제품 패턴을 발견하는 입력이다. 정보 구조, 레이아웃과 반응형 동작, 콘텐츠 조합, 제품 시나리오와 시각적 아이디어를 본다.
 
+- Auth split screen은 관리자 로그인 화면의 출발점으로 들여왔다. 확인일은 `2026-09-14`이며 `/screens/admin/login`에 원본 구조 그대로 두었다. 왼쪽 로그인 카드와 오른쪽 브랜드 패널이 `lg`에서 갈리는 구성, 카드 폭 상한, 구분선과 소셜 로그인 버튼의 자리를 본다. 아직 `oe` 토큰으로 바꾸지 않은 2단계 상태다.
+
 외부 프롬프트 자체를 축적하는 것이 핵심은 아니다. 화면을 구현하고 수정한 뒤 그 안에서 재사용 가능한 컴포넌트, 패턴과 템플릿을 추출하는 것이 핵심이다.
 
 외부 자료는 출처, 확인일과 사용 목적을 기록한다. 라이선스가 불명확한 자료는 복제·재배포 대상이 아니라 참고자료로 취급하고, 최종 구현은 ooee의 구조와 규칙으로 작성한다.
@@ -58,6 +60,7 @@ Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구�
 
 - [pxd: shadcn과 함께 UI 컴포넌트를 AI 에이전트와 더 잘 쓰는 방법](https://tech.pxd.co.kr/post/shadcn%EA%B3%BC-%ED%95%A8%EA%BB%98-UI-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%EB%A5%BC-AI-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%99%80-%EB%8D%94-%EC%9E%98%EC%93%B0%EB%8A%94-%EB%B0%A9%EB%B2%95-340)
 - [VibePrompt](https://vibeprompts.dev/)
+- [VibePrompt Auth split screen with visual](https://vibeprompts.dev/auth/auth-split-screen-with-visual/)
 - [Obra shadcn/ui Pro](https://shadcn.obra.studio/products/obra-shadcn-ui-pro)
 - [Obra license](https://shadcn.obra.studio/license)
 - [Seed Design Field](https://seed-design.io/components/field)
