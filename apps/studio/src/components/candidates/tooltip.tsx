@@ -3,8 +3,10 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 import { cn } from "@/lib/utils"
 
+// 받은 코드는 지연 없이 곧바로 띄운다. 마우스가 지나가기만 해도 뜨므로 500ms 를 기다린 뒤에
+// 보여 준다. 자리를 옮겨 다니는 동안에는 뜨지 않고, 머무를 때만 뜬다.
 function TooltipProvider({
-  delay = 0,
+  delay = 500,
   ...props
 }: TooltipPrimitive.Provider.Props) {
   return (
