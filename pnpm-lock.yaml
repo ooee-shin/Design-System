@@ -20,9 +20,6 @@ importers:
       '@ooee/fonts':
         specifier: workspace:*
         version: link:../../packages/fonts
-      '@ooee/patterns':
-        specifier: workspace:*
-        version: link:../../packages/patterns
       '@ooee/tokens':
         specifier: workspace:*
         version: link:../../packages/tokens
@@ -96,31 +93,6 @@ importers:
       pretendard:
         specifier: ^1.3.9
         version: 1.3.9
-
-  packages/patterns:
-    dependencies:
-      '@base-ui/react':
-        specifier: ^1.7.0
-        version: 1.7.0(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@ooee/ui':
-        specifier: workspace:*
-        version: link:../ui
-      '@remixicon/react':
-        specifier: ^4.9.0
-        version: 4.9.0(react@19.2.8)
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      tailwind-merge:
-        specifier: ^3.6.0
-        version: 3.6.0
-    devDependencies:
-      '@types/react':
-        specifier: ^19
-        version: 19.2.18
-      react:
-        specifier: 19.2.8
-        version: 19.2.8
 
   packages/tokens:
     dependencies:

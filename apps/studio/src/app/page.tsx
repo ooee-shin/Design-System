@@ -4,7 +4,6 @@ import {
   RiArrowRightLine as ArrowRight,
   RiBookOpenLine as BookOpen,
   RiBox3Line as Boxes,
-  RiLayoutLine as Layout,
   RiShapesLine as Shapes,
   RiSlideshowLine as Slideshow,
   RiStackLine as Layers3,
@@ -66,13 +65,6 @@ export default function Home() {
           status: `${docCount}개 문서`,
           href: "/docs",
           icon: BookOpen,
-        },
-        {
-          title: "Examples",
-          description: "외부 화면을 공용 컴포넌트로 다시 만든 사례입니다. 확정된 Pattern은 아닙니다.",
-          status: "Inbox · Page Header · Sidebar",
-          href: "/examples",
-          icon: Layout,
         },
         {
           title: "Presentation",

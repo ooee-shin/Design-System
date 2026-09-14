@@ -14,7 +14,7 @@ test("every system document is listed and reachable as a route", () => {
   listed.forEach((doc) => {
     assert.ok(hasDoc(doc.slug), `${doc.slug} 문서를 route에서 읽지 못한다`);
     assert.ok(doc.title.trim().length > 0, `${doc.slug} 문서에 제목이 없다`);
-    assert.ok(["시작", "Foundations", "Components", "Examples"].includes(doc.group));
+    assert.ok(["시작", "Foundations", "Components"].includes(doc.group));
   });
 });
 
