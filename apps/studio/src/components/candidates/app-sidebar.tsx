@@ -161,20 +161,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             defaultOpen
             className="group/collapsible"
           >
-            <SidebarGroup>
+            {/* 묶음이 여덟이라 위아래 여백이 쌓이면 한 화면에 들어오지 않는다. 세로 여백만 줄인다. */}
+            <SidebarGroup className="py-0.5">
+              {/* 1depth 는 페이지가 아니라 묶음이다. 글자를 한 단계 줄이고 색을 옅게 두어 아래
+                  단계와 성격이 다르다는 것을 말하고, 접고 펴는 화살표를 글자 앞에 둔다. */}
               <SidebarGroupLabel
-                className="group/label text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                className="group/label gap-1 text-xs font-semibold text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 render={<CollapsibleTrigger />}
               >
-                {group.title}{" "}
-                <RiArrowRightSLine className="ml-auto transition-transform group-data-open/collapsible:rotate-90" />
+                <RiArrowRightSLine className="shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
+                {group.title}
               </SidebarGroupLabel>
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {group.items.map((item) => (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton isActive={item.isActive} render={<a href="#" />}>
+                        <SidebarMenuButton className="pl-7" isActive={item.isActive} render={<a href="#" />}>
                           {item.title}
                         </SidebarMenuButton>
 
@@ -183,7 +186,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <SidebarMenuSub>
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
-                                <SidebarMenuSubButton isActive={child.isActive} render={<a href="#" />}>
+                                <SidebarMenuSubButton
+                                  className="pl-6 data-[size=md]:text-[13px] text-sidebar-foreground/70"
+                                  isActive={child.isActive}
+                                  render={<a href="#" />}
+                                >
                                   {child.title}
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
