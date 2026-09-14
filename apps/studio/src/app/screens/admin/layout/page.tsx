@@ -81,6 +81,8 @@ export default function Page() {
         style={{
           "--menu-active-bg": "var(--oe-brand-background-secondary)",
           "--menu-active-fg": "var(--oe-brand-foreground-primary)",
+          // 줄 위에 마우스를 얹었을 때의 면이다. 따로 정하지 않으면 검색창과 같은 값을 쓴다.
+          "--menu-hover-bg": "var(--sidebar-accent)",
           ...style.vars,
         } as React.CSSProperties}
       >
@@ -222,6 +224,9 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       "--sidebar-accent-foreground": "var(--color-white)",
       "--menu-active-bg": "var(--brand-950)",
       "--menu-active-fg": "var(--color-white)",
+      // 밝은 유채색 바탕에서는 흰색을 얹어도 거의 변하지 않는다. 검정을 옅게 얹어 눌린 면으로
+      // 보이게 한다.
+      "--menu-hover-bg": "rgb(0 0 0 / 0.16)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
   },
