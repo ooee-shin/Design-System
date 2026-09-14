@@ -163,7 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 1depth 는 접지 않는다. 페이지가 아니라 묶음이라는 것은 작고 옅은 글자가 말하고,
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
-          <SidebarGroup key={group.title} className="pt-3 pb-0.5">
+          <SidebarGroup key={group.title} className="pt-5 pb-0.5">
             <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-medium text-sidebar-foreground/70">
               {group.title}
             </SidebarGroupLabel>
