@@ -103,11 +103,12 @@ export default function Page() {
 
             {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
             <span className="flex items-center gap-2 text-sm">
-              <span className="text-oe-foreground-primary">{SIGNED_IN.name}</span>
-              <span className="text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
-              {/* 글자와 가운데를 맞추면 배지가 위로 올라 보인다. 2px 만큼 내려 앉힌다. 여백 대신
-                  옮기는 이유는, 가운데 정렬이 여백만큼 다시 끌어올려 절반만 내려가기 때문이다. */}
-              <Badge tone="neutral" variant="outlined" className="translate-y-0.5">
+              <span className="font-medium text-oe-foreground-primary">{SIGNED_IN.name}</span>
+              <span className="text-xs text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
+              {/* 글자와 가운데를 맞추면 배지가 위로 올라 보이고, 2px 을 내리면 이번에는 내려가
+                  보인다. 그 사이인 1px 로 둔다. 여백 대신 옮기는 이유는, 가운데 정렬이 여백만큼
+                  다시 끌어올려 절반만 내려가기 때문이다. */}
+              <Badge tone="neutral" variant="outlined" className="translate-y-px">
                 {SIGNED_IN.role}
               </Badge>
             </span>
