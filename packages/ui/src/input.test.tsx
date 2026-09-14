@@ -25,6 +25,28 @@ test("Input shows the focus ring only for focus-visible", () => {
   assert.doesNotMatch(container.className, /focus-within:ring/)
 })
 
+// filled 의 바닥이 밝아지는 것은 입력란을 편집하는 동안의 표시다. focus-within 은 컨테이너 안의
+// 어떤 요소든 초점을 받으면 걸리므로, Trailing element 의 버튼을 누르는 것만으로 입력란 전체가
+// 편집 중인 모습이 된다.
+test("Input filled brightens only while the text field itself has focus", () => {
+  const view = render(
+    <Input
+      aria-label="비밀번호"
+      variant="filled"
+      trailingElement={
+        <button type="button" aria-label="비밀번호 보기">
+          eye
+        </button>
+      }
+    />,
+  )
+  const container = view.container.querySelector("[data-slot=input-container]")
+
+  assert.ok(container)
+  assert.doesNotMatch(container.className, /focus-within:bg/)
+  assert.match(container.className, /has-\[\[data-slot=input\]:focus\]:bg-oe-background-primary/)
+})
+
 test("Textarea shows the focus ring only for focus-visible", () => {
   const view = render(<Textarea aria-label="설명" />)
   const container = view.container.querySelector("[data-slot=textarea-container]")
