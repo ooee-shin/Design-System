@@ -57,13 +57,14 @@ test("목록의 href 는 실제로 있는 화면만 가리킨다", () => {
   }
 });
 
-// 각 항목은 어디까지 만드는 화면인지를 스스로 밝힌다. 「홈(헤더와 메뉴까지만)」처럼 범위가 없으면
-// 열어 본 사람이 나머지를 미완성으로 읽는다.
-test("목록의 모든 항목이 범위를 밝힌다", () => {
+// 범위는 사용자가 준 문구만 적는다. 빈 문자열은 「범위가 없다」와 「아직 정하지 않았다」를 구분하지
+// 못하므로 아예 두지 않는다.
+test("목록의 범위 문구는 비어 있지 않거나 아예 없다", () => {
   for (const root of screenRoots) {
     assert.ok(root.items.length > 0, `${root.key} 에 작업 항목이 없다`);
     for (const item of root.items) {
-      assert.ok(item.scope.length > 0, `${root.key}/${item.key} 에 범위가 없다`);
+      if (item.scope === undefined) continue;
+      assert.ok(item.scope.length > 0, `${root.key}/${item.key} 의 범위가 빈 문자열이다`);
     }
   }
 });

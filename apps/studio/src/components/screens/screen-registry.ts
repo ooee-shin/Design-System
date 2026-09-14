@@ -17,8 +17,11 @@ export type ScreenRoot = {
 export type ScreenWorkItem = {
   key: string;
   name: string;
-  /** 이 화면에서 **어디까지** 만드는지. 「헤더와 메뉴까지만」처럼 범위를 좁혀 적는다. */
-  scope: string;
+  /**
+   * 이 화면에서 **어디까지** 만드는지. 「헤더와 메뉴까지만」처럼 범위를 좁혀 적는다.
+   * 사용자가 준 문구만 적는다. 비어 있으면 아직 정하지 않은 것이므로 임의로 채우지 않는다.
+   */
+  scope?: string;
   /** 아직 만들지 않은 화면은 갖지 않는다. 없으면 링크가 아니라 `예정`으로 표시한다. */
   href?: string;
 };
@@ -29,8 +32,8 @@ export const screenRoots: ScreenRoot[] = [
     name: "관리자",
     note: "뷰포트를 전부 씁니다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤됩니다.",
     items: [
-      { key: "layout", name: "레이아웃", scope: "사이드바·상단 바·본문의 골격만", href: "/screens/admin/layout" },
-      { key: "login", name: "로그인", scope: "VibePrompt 원본 구조 그대로 — 화면 실험", href: "/screens/admin/login" },
+      { key: "layout", name: "레이아웃", href: "/screens/admin/layout" },
+      { key: "login", name: "로그인", href: "/screens/admin/login" },
     ],
   },
   {
@@ -38,10 +41,10 @@ export const screenRoots: ScreenRoot[] = [
     name: "STO",
     note: "사장님용 앱입니다. 웹에서 접근하면 모바일 뷰가 화면 가운데에 섭니다.",
     items: [
-      { key: "layout", name: "레이아웃", scope: "가운데 모바일 뷰의 골격만", href: "/screens/sto/layout" },
-      { key: "login", name: "로그인", scope: "아직 정하지 않음" },
+      { key: "layout", name: "레이아웃", href: "/screens/sto/layout" },
+      { key: "login", name: "로그인" },
       { key: "home", name: "홈", scope: "헤더와 메뉴까지만" },
-      { key: "support", name: "지원요청", scope: "아직 정하지 않음" },
+      { key: "support", name: "지원요청" },
     ],
   },
   {
@@ -49,7 +52,7 @@ export const screenRoots: ScreenRoot[] = [
     name: "SV",
     note: "슈퍼바이저와 직원용 앱입니다. STO 와 같은 모바일 뷰를 씁니다.",
     items: [
-      { key: "layout", name: "레이아웃", scope: "가운데 모바일 뷰의 골격만", href: "/screens/sv/layout" },
+      { key: "layout", name: "레이아웃", href: "/screens/sv/layout" },
     ],
   },
 ];

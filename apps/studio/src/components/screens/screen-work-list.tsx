@@ -50,7 +50,7 @@ export function ScreenWorkList({ root: key }: { root: ScreenRoot["key"] }) {
               <>
                 <div className="min-w-0 flex-1">
                   <h2 className="font-semibold tracking-tight text-inherit">{item.name}</h2>
-                  <p className="mt-0.5 text-xs leading-5 text-oe-foreground-tertiary">{item.scope}</p>
+                  {item.scope ? <p className="mt-0.5 text-xs leading-5 text-oe-foreground-tertiary">{item.scope}</p> : null}
                 </div>
                 {item.href ? (
                   <RiArrowRightLine className="size-oe-icon-small shrink-0 text-oe-foreground-tertiary transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
