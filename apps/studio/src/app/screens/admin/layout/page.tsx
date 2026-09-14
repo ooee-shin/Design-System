@@ -1,3 +1,6 @@
+// 접힘 상태를 읽어 표시에 반영하므로 이 화면은 클라이언트에서 그린다.
+"use client";
+
 /**
  * 관리자 레이아웃.
  *
@@ -8,11 +11,15 @@
 
 import Image from "next/image"
 
+import { RiSideBarLine } from "@remixicon/react"
+
+import { ToggleButton } from "@ooee/ui"
+
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
+  useSidebar,
 } from "@/components/candidates/sidebar"
 
 // 메인 로고는 사용자가 테마 설정에서 등록하는 값이다. 아직 그 설정과 잇지 않았으므로 기본값을
@@ -44,7 +51,7 @@ export default function Page() {
             className="h-6 w-auto"
           />
         </a>
-        <SidebarTrigger />
+        <SidebarToggle />
       </header>
 
       {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 56px 아래에서
@@ -64,4 +71,25 @@ export default function Page() {
       </div>
     </SidebarProvider>
   )
+}
+
+/**
+ * 사이드 내비게이션을 접고 펴는 버튼이다. 접힌 동안에는 켜진 모습으로 서서, 지금 내비게이션이
+ * 숨어 있다는 것을 버튼 자신이 말한다. 블록이 준 `SidebarTrigger` 는 누르는 동작만 갖고 상태를
+ * 드러내지 않으므로 공용 `ToggleButton` 으로 바꿨다.
+ */
+function SidebarToggle() {
+  const { state, toggleSidebar } = useSidebar();
+  const collapsed = state === "collapsed";
+
+  return (
+    <ToggleButton
+      variant="tonal"
+      controlSize="xsmall"
+      icon={<RiSideBarLine className="size-oe-icon-small" aria-hidden="true" />}
+      pressed={collapsed}
+      onPressedChange={toggleSidebar}
+      aria-label={collapsed ? "사이드 내비게이션 펼치기" : "사이드 내비게이션 접기"}
+    />
+  );
 }
