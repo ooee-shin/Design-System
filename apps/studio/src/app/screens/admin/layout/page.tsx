@@ -212,12 +212,18 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     preview: { band: "bg-[var(--brand-950)]", body: "bg-white text-neutral-900" },
   },
   {
+    // 「다크」와 두 값이 뒤집힌 스타일이다. 바탕이 밝은 브랜드 단계이고 고른 줄이 짙다.
     name: "라벨 A",
     vars: {
-      "--sidebar": "var(--color-neutral-100)",
-      "--sidebar-accent": "var(--color-neutral-200)",
+      "--sidebar": "var(--brand-700)",
+      "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
+      "--sidebar-border": "rgb(255 255 255 / 0.12)",
+      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
+      "--sidebar-accent-foreground": "var(--color-white)",
+      "--menu-active-bg": "var(--brand-950)",
+      "--menu-active-fg": "var(--color-white)",
     } as React.CSSProperties,
-    preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
+    preview: { band: "bg-[var(--brand-700)]", body: "bg-white text-neutral-900" },
   },
   {
     name: "라벨 C",
