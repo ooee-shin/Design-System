@@ -13,8 +13,8 @@
 - 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
 - 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
 - 현재 repository에는 필수 환경변수가 없다.
-- `main`을 항상 정상 작동하는 공식 원본으로 사용한다. 커밋하는 사람이 한 명이므로 작업은 `main`에서 바로 진행하고, 공개된 이름이나 동작을 바꾸는 변경만 작업 branch와 pull request를 사용한다.
-- `main` push에서도 GitHub `Quality` 자동 검사가 돈다. 실패하면 즉시 되돌린다.
+- branch는 `main` · `dev` · `feature/*` 세 층이며 `2026-09-14`에 개발자와 정했다. 작업은 `dev`에서 뻗은 자기 `feature/*`에서 하고 pull request로 `dev`에 올린다. 절차는 [git-workflow.md](git-workflow.md)가 소유한다.
+- `Quality` 자동 검사는 모든 pull request와 `main`·`dev` push에서 돈다. 실패하면 즉시 되돌린다.
 
 ## 현재 기술 환경
 
@@ -385,15 +385,15 @@ pnpm visual --path /components/badge \
   --measure "[data-slot=badge]"
 ```
 
-### 2026-09-14 오전에 branch 방식을 논의한다
+### 2026-09-14 branch 방식을 정했다
 
-개발자가 합류하면서 branch를 어떻게 나눌지 `2026-09-14` 월요일 오전에 논의한다. **그때까지는 지금 방식을 그대로 유지한다.** 규칙을 미리 고치면 논의 뒤에 다시 고치게 되고 그 사이에 문서와 실제가 또 어긋난다.
+개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-개발자 제안은 `main` 기준으로 `dev_1`·`dev_2`를 만들어 사람마다 하나씩 쓰는 방식이다. 확인해 보니 지금까지 열린 pull request 13개가 전부 작업 단위 branch에서 왔으므로, 실제 관행은 이미 작업 단위이고 [git-workflow.md](git-workflow.md)의 「작업 branch를 따로 만들지 않는다」만 한 명 기준에 머물러 있다. 정할 항목과 현재 상태를 정리한 논의 자료는 <https://claude.ai/code/artifact/6a30a671-efdd-4a10-9a92-5ba00d0eaf54>에 있다.
+담당은 신주희가 Component·Variant, Token·UI 개선과 Story 작성이고, 유진식이 Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill·Plugin이다.
 
-**논의에서 확인할 제약 둘.** `main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다(API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다). 그리고 `Quality` workflow가 `pull_request`와 `main` push에서만 돌므로 branch에 push만 하는 동안에는 검사가 돌지 않는다.
+**통합 검증 항목 다섯 중 넷은 아직 대상이 없다.** Storybook, Figma MCP, Storybook MCP, Skill·Agent가 저장소에 없으므로 지금 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 유진식의 작업이 들어오는 순서대로 채운다.
 
-정해지면 git-workflow.md의 「작업을 시작할 때」·「branch와 pull request를 사용하는 경우」와 AGENTS.md의 「여러 환경에서 이어서 작업할 때」를 한 번에 고친다.
+**`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
