@@ -179,8 +179,8 @@ function AdminHeader() {
 // 좌측 메뉴 스타일이다. 지금 갈리는 축은 바탕색과 고른 줄의 색 둘이며, 그 값을 CSS 변수로 얹어
 // 좌측 메뉴 전체가 한 번에 따라가게 한다.
 //
-// 지금 갈리는 것은 레일의 바탕이다. 라벨 A 가 회색, 라벨 B 가 짙은 색, 라벨 C 가 흰색이며 나머지
-// 값은 셋이 같다.
+// 지금 갈리는 것은 레일의 바탕이다. 「다크」가 짙은 브랜드 색, 라벨 A 가 회색, 라벨 C 가 흰색이다.
+// 「다크」는 아직 이름이 정해지지 않은 가제다.
 //
 // **이 시스템은 다크 모드를 제공하지 않는다.** 그래서 짙은 바탕은 테마가 아니라 스타일의 선택이며,
 // 테마에 따라 뒤집히는 token 대신 고정된 중립 단계를 쓴다.
@@ -194,15 +194,8 @@ type SidebarStyle = {
 
 const SIDEBAR_STYLES: SidebarStyle[] = [
   {
-    name: "라벨 A",
-    vars: {
-      "--sidebar": "var(--color-neutral-100)",
-      "--sidebar-accent": "var(--color-neutral-200)",
-    } as React.CSSProperties,
-    preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
-  },
-  {
-    name: "라벨 B",
+    // 이름이 아직 정해지지 않은 가제다.
+    name: "다크",
     vars: {
       "--sidebar": "var(--brand-950)",
       // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
@@ -216,7 +209,15 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       "--menu-active-bg": "var(--brand-600)",
       "--menu-active-fg": "var(--color-white)",
     } as React.CSSProperties,
-    preview: { band: "bg-neutral-900", body: "bg-white text-neutral-900" },
+    preview: { band: "bg-[var(--brand-950)]", body: "bg-white text-neutral-900" },
+  },
+  {
+    name: "라벨 A",
+    vars: {
+      "--sidebar": "var(--color-neutral-100)",
+      "--sidebar-accent": "var(--color-neutral-200)",
+    } as React.CSSProperties,
+    preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
   },
   {
     name: "라벨 C",
