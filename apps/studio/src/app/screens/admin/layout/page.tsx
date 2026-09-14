@@ -140,7 +140,9 @@ function AdminHeader() {
           ))}
         </div>
 
-        <span className="mx-2 h-4 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
+        {/* 헤더 높이 56px 를 통째로 가른다. 감싼 묶음은 32px 이라 그것에 맞추면 짧아지므로
+            높이를 직접 적는다. 오른쪽 여백은 로그아웃과 헤더 끝 사이와 같은 16px 로 둔다. */}
+        <span className="ml-2 mr-3 h-14 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
 
         {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
         <span className="flex items-center gap-2 text-sm">
