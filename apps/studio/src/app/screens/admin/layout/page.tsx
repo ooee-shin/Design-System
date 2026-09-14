@@ -29,9 +29,9 @@ import {
 } from "@/components/candidates/tooltip"
 
 // 메인 로고는 사용자가 테마 설정에서 등록하는 값이다. 아직 그 설정과 잇지 않았으므로 기본값을
-// 둔다. 원본은 2120×399 이며 헤더 안에서 높이 32px 로 서고 폭은 비율대로 170px 이 된다. 헤더가
-// 56px 이므로 위아래로 12px 씩 남는다.
-const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 170, height: 32 };
+// 둔다. 원본은 2120×399 이며 헤더 안에서 높이 28px 로 서고 폭은 비율대로 149px 이 된다. 헤더가
+// 56px 이므로 위아래로 14px 씩 남는다.
+const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 149, height: 28 };
 
 // 로고의 대체 텍스트는 환경설정이 소유하는 시스템명이다. 실제 값이 붙기 전까지 어디서 오는
 // 값인지 그대로 적는다. 관리자 로그인 화면과 같은 처리다.
@@ -57,7 +57,7 @@ export default function Page() {
               height={MAIN_LOGO.height}
               alt={SYSTEM_NAME}
               priority
-              className="h-8 w-auto"
+              className="h-7 w-auto"
             />
           </a>
           <SidebarToggle />
