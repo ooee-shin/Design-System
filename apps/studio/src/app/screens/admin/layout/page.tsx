@@ -204,11 +204,12 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   {
     name: "라벨 B",
     vars: {
-      "--sidebar": "var(--color-neutral-900)",
+      "--sidebar": "var(--brand-900)",
       "--sidebar-foreground": "var(--color-neutral-50)",
       "--sidebar-border": "var(--color-neutral-800)",
       "--sidebar-accent": "var(--color-neutral-800)",
       "--sidebar-accent-foreground": "var(--color-neutral-50)",
+      "--menu-active-bg": "var(--brand-600)",
     } as React.CSSProperties,
     preview: { band: "bg-neutral-900", body: "bg-white text-neutral-900" },
   },
