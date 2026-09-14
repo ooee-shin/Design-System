@@ -72,6 +72,7 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 | --- | --- | --- |
 | App Header | [app-header.md](components/app-header.md) | 모바일 화면 최상단의 한 줄. 제목과 좌우 아이콘 자리를 소유 |
 | Badge | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
+| Bottom Navigation | [bottom-navigation.md](components/bottom-navigation.md) | 모바일 화면 맨 아래에서 최상위 화면을 오가는 한 줄 |
 | Button | [button.md](components/button.md) | 누르면 실행되는 액션 |
 | Checkbox | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
 | Chip | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |

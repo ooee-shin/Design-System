@@ -64,5 +64,6 @@
 - **Combobox 단일 선택 행 배경** — Brand alpha primitive `brand-alpha-08`
 - **Select Box 선택 표현** — Brand alpha 조합
 - **엑셀 액션 버튼의 색** — Button의 `custom` tone이 쓰는 Microsoft Excel 브랜드 그린이다. 팔레트 단계 규칙에 들어오지 않고 Light와 Dark에서 값을 뒤집지 않으므로 `button.tsx`가 로컬 값으로 갖는다. 외부 서비스를 가리키는 색이 두 번째로 필요해질 때 그 색들을 함께 다루는 방식을 정한다.
+- **`oe-foreground-tertiary`보다 옅은 중립 foreground** — BottomNavigation이 선택되지 않은 항목의 아이콘에 쓰는 값이다. Label을 `tertiary`로 두고 Icon을 그보다 한 단계 낮춰야 선택되지 않은 항목 다섯이 나란히 섰을 때 화면 아래쪽이 무거워지지 않는다. 중립 foreground에는 `tertiary` 아래 단계가 없고, `placeholder`는 Dark에서 `tertiary`와 값이 같아 옅어지지 않으며 `disabled`는 꺼진 요소를 뜻한다. `bottom-navigation.tsx`가 Light `neutral-400`, Dark `neutral-600`을 로컬 값으로 갖는다. 같은 자리가 두 번째로 필요해지면 semantic token으로 올릴지 판단한다.
 - **즐겨찾기와 찜의 색** — ToggleButton의 `custom` tone이 쓰는 별의 노랑과 하트의 빨강이다. 팔레트 단계 규칙에 들어오지 않고 브랜드 seed를 바꿔도 함께 움직이면 안 되는 고정 색이므로 `toggle-button.tsx`가 로컬 값으로 갖는다. 엑셀 색과 성격이 같으며, 밖에서 굳어진 색이 세 번째로 필요해질 때 그 색들을 함께 다루는 방식을 정한다.
 - **Color swatch 경계** — 안쪽에 합성한 Black alpha 10%의 1px inset. Input Button의 선택 전용 Color picker와 Input의 Color input이 함께 쓴다

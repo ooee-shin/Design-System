@@ -8,6 +8,7 @@
     "./styles.css": "./src/styles.css",
     "./app-header": "./src/app-header.tsx",
     "./badge": "./src/badge.tsx",
+    "./bottom-navigation": "./src/bottom-navigation.tsx",
     "./button": "./src/button.tsx",
     "./combobox": "./src/combobox.tsx",
     "./chip": "./src/chip.tsx",

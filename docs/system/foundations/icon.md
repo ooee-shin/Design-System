@@ -17,6 +17,7 @@ ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com
 
 - 기본 UI action과 metadata에는 `Line` variant를 우선한다.
 - `Fill` variant는 선택, 활성, 성공처럼 채움 자체가 상태를 전달할 때만 사용한다.
+- Navigation 요소의 아이콘은 선택 여부와 무관하게 `Fill`을 유지한다. 항목이 나란히 서는 자리에서 시각적 위계를 잡기 위해서다.
 - 아이콘은 장식이 아니라 action의 의미를 보조한다. 아이콘만 있는 버튼에는 접근 가능한 label을 제공한다.
 - 크기와 색상은 컴포넌트의 oe semantic token을 따른다. 아이콘 내부에서 raw color를 지정하지 않는다.
 - 클릭 가능한 아이콘은 공통 hover state layer와 `oe-focus-ring`을 사용한다.

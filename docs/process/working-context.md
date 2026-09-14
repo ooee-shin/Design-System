@@ -2,7 +2,7 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 시스템 정의는 `docs/system/`, 제작 절차와 근거는 `docs/process/`, 작업 운영 규칙은 루트 `AGENTS.md`를 확인한다.
 
-마지막 내용 점검: `2026-09-11`
+마지막 내용 점검: `2026-09-14`
 
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
@@ -31,7 +31,7 @@
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: AppHeader, Badge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
+  - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -342,7 +342,7 @@
 
 **이 절은 각 문서가 소유한 결정을 다시 적지 않는다.** 컴포넌트의 공개 API와 시각·접근성 결정은 `docs/system/components/*.md`가, 토큰과 공통 규칙은 `docs/system/`의 해당 문서가, 아직 정하지 못한 것은 [open-questions.md](open-questions.md)가, 검토 항목의 세부는 [component-audit.md](component-audit.md)가 갖는다. 여기에는 지금 어디까지 왔고 다음에 무엇을 하는지만 남긴다.
 
-**새로 만든 컴포넌트 다섯.** Chip(`2026-09-08`), Badge(`2026-09-08`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`)다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `main`에서 뻗은 `feature/app-header` branch에 있으며 아직 `main`에 합치지 않았다.
+**새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 pull request #22로 `main`에 합쳤다. BottomNavigation은 `main`에서 뻗은 `feature/bottom-navigation` branch에 있다.
 
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
