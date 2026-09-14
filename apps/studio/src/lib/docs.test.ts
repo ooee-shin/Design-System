@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import test from "node:test";
 
+import { componentRegistry } from "../components/component-registry";
 import { docSlugs, hasDoc, listDocs, renderDoc } from "./docs";
 
 test("every system document is listed and reachable as a route", () => {
@@ -37,13 +36,8 @@ test("every internal document link points at a document that exists", () => {
 });
 
 test("component detail pages can attach the matching specification", () => {
-  const registryPath = join(process.cwd(), "apps/studio/src/components/component-registry.ts");
-  const keys = [...readSource(registryPath).matchAll(/\{ key: "([a-z-]+)"/g)].map((match) => match[1]);
-  assert.ok(keys.length > 0);
-  keys.forEach((key) => assert.ok(hasDoc(`components/${key}`), `components/${key}.md 명세 문서가 없다`));
+  // 상세 화면을 가진 컴포넌트만 명세를 요구한다. `초안`은 명세와 상세 화면을 아직 갖지 않은 단계를 뜻한다.
+  const settled = componentRegistry.filter((item) => item.status === "확정");
+  assert.ok(settled.length > 0);
+  settled.forEach((item) => assert.ok(hasDoc(`components/${item.key}`), `components/${item.key}.md 명세 문서가 없다`));
 });
-
-function readSource(path: string) {
-  assert.ok(existsSync(path), `${path} 를 찾지 못했다`);
-  return readFileSync(path, "utf8");
-}
