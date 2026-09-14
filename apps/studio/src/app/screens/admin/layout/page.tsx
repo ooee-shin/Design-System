@@ -220,7 +220,7 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       "--sidebar-border": "rgb(255 255 255 / 0.12)",
       "--sidebar-accent": "rgb(255 255 255 / 0.08)",
       "--sidebar-accent-foreground": "var(--color-white)",
-      "--menu-active-bg": "var(--brand-900)",
+      "--menu-active-bg": "var(--brand-950)",
       "--menu-active-fg": "var(--color-white)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
