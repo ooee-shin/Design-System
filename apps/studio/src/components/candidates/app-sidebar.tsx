@@ -156,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 1depth 는 접지 않는다. 페이지가 아니라 묶음이라는 것은 작고 옅은 글자가 말하고,
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
-          <SidebarGroup key={group.title} className="py-0.5">
+          <SidebarGroup key={group.title} className="pt-3 pb-0.5">
             <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/50">
               {group.title}
             </SidebarGroupLabel>
@@ -169,7 +169,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     // 어긋나지 않게 하기 위해서다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className="h-9 font-medium" isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
@@ -191,7 +191,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Collapsible>
                   ) : (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<a href="#" />}>
+                      <SidebarMenuButton className="h-9 font-medium" isActive={item.isActive} render={<a href="#" />}>
                         {item.title}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
