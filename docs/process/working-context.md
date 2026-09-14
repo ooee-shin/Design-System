@@ -33,8 +33,10 @@
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
+  - `apps/studio`의 `/screens`: 제품 화면을 구현하는 작업장. 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. Studio 의 문서형 레이아웃을 따르지 않는 유일한 자리이며 규칙은 `docs/system/studio.md`의 「화면 프레임과 그 예외」가 소유한다. Studio 메뉴에 올리지 않고 주소로 연다
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
+  - 외부 자료를 받아 두고 작업하다가 컴포넌트나 패턴으로 올려보내는 자리는 `2026-09-14`에 Examples 에서 `/screens` 로 옮겼다. Examples 와 `packages/patterns` 는 함께 걷어냈고, 그 안에 확정된 Pattern 은 하나도 없었다. 화면 작업에서 패턴이 나오면 그때 패키지를 다시 만든다
   - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
   - Combobox Anatomy의 범위 표시선 3개만 예외로 로컬에 남아 있다. 그중 하나가 Popup 콘텐츠 높이에 맞춰 늘어나야 해서 마커 기준 고정 길이만 표현하는 `AnatomyBoundaryMarker`로 옮길 수 없다
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
@@ -325,7 +327,7 @@
 
 **이 절은 각 문서가 소유한 결정을 다시 적지 않는다.** 컴포넌트의 공개 API와 시각·접근성 결정은 `docs/system/components/*.md`가, 토큰과 공통 규칙은 `docs/system/`의 해당 문서가, 아직 정하지 못한 것은 [open-questions.md](open-questions.md)가, 검토 항목의 세부는 [component-audit.md](component-audit.md)가 갖는다. 여기에는 지금 어디까지 왔고 다음에 무엇을 하는지만 남긴다.
 
-**새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 pull request #22로 `main`에 합쳤다. BottomNavigation은 `main`에서 뻗은 `feature/bottom-navigation` branch에 있다.
+**새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 `main`에 합쳤고 BottomNavigation은 `2026-09-14`에 `dev`에 합쳤다.
 
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
@@ -339,7 +341,7 @@
 2. **Anatomy 안 흰색 내부 Container 5곳.** `studio.md`가 정한 규칙과 어느 다섯 곳이 다른지 화면에서 확인한다.
 3. **Structure map이 없는 화면 여섯.** Anatomy가 있는 열한 화면 중 여섯 곳에 없다. 한번에 몰아서 할 작업으로 [component-audit.md](component-audit.md)에 있다.
 4. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio 화면과 명세를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
-5. **옛 Badge를 쓰던 일곱 자리.** `packages/patterns` 세 파일과 Studio workbench 세 파일에 하드코딩해 두었고, 새 Badge의 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. 어느 자리를 새 Badge로 되돌릴지는 사용자가 화면에서 직접 확인한다.
+5. **옛 Badge를 쓰던 자리.** Studio workbench 세 파일에 하드코딩해 두었고, 새 Badge의 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. `packages/patterns`에 있던 세 자리는 `2026-09-14`에 그 패키지를 걷어내며 함께 사라졌다. 어느 자리를 새 Badge로 되돌릴지는 사용자가 화면에서 직접 확인한다.
 6. **Chip의 Filter 쓰임.** 다섯 가지가 남아 있으며 [component-audit.md](component-audit.md)의 「Chip 진행 상황」에 있다. 그중 셋은 Filter Bar를 별도 컴포넌트로 분리할 때 함께 다루는 편이 낫고, 미정 셋은 [open-questions.md](open-questions.md)에 있다. Chip의 정보 표시 쓰임을 Badge로 대체할 수 있으면 Chip에서 걷어낼지도 함께 판단한다.
 7. **Chip 확정 후 Combobox 잔여 작업.** Combobox의 선택값 Container가 Chip을 렌더링하므로 Chip 디자인이 바뀌면 Container를 두 번 만들게 된다. Chip을 먼저 처리한다. 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
 8. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
