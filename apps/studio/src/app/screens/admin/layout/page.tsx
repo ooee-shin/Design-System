@@ -226,12 +226,19 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
   },
   {
+    // 브랜드를 쓰지 않는 회색조다. 나머지 둘과 얼개는 같고 색 계열만 중립이다.
     name: "라벨 C",
     vars: {
-      "--sidebar": "var(--color-white)",
-      "--sidebar-accent": "var(--color-neutral-100)",
+      "--sidebar": "var(--color-neutral-100)",
+      // 바탕이 밝으므로 얹는 알파도 검정이다. 나머지 둘과 얼개는 같고 방향만 뒤집힌다.
+      "--sidebar-foreground": "rgb(0 0 0 / 0.8)",
+      "--sidebar-border": "rgb(0 0 0 / 0.12)",
+      "--sidebar-accent": "rgb(0 0 0 / 0.06)",
+      "--sidebar-accent-foreground": "rgb(0 0 0 / 0.8)",
+      "--menu-active-bg": "var(--color-neutral-900)",
+      "--menu-active-fg": "var(--color-white)",
     } as React.CSSProperties,
-    preview: { band: "bg-white", body: "bg-white text-neutral-900" },
+    preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
   },
 ]
 
