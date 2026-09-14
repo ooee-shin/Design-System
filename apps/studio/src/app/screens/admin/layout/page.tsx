@@ -86,14 +86,17 @@ export default function Page() {
 
           {/* 여기부터 오른쪽이 Utility 다. 가운데를 비워 두어 왼쪽의 이동 장치와 갈라 놓는다. */}
           <div className="ml-auto flex items-center gap-1">
-            {UTILITIES.map((utility) => (
-              <UtilityButton
-                key={utility.key}
-                name={utility.name}
-                icon={utility.icon}
-                unread={"unread" in utility ? utility.unread : undefined}
-              />
-            ))}
+            {/* 세 버튼은 같은 성격이라 서로 붙여 하나의 덩이로 읽히게 한다. */}
+            <div className="flex items-center">
+              {UTILITIES.map((utility) => (
+                <UtilityButton
+                  key={utility.key}
+                  name={utility.name}
+                  icon={utility.icon}
+                  unread={"unread" in utility ? utility.unread : undefined}
+                />
+              ))}
+            </div>
 
             <span className="mx-2 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
 
