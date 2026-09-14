@@ -17,9 +17,12 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     <form {...props}>
       <SidebarGroup className="py-0">
         <SidebarGroupContent>
+          {/* `type="search"` 로 두면 브라우저가 자기 지우기 버튼을 붙인다. 공용 `Input` 은 지우기를
+              `clearable` 로 스스로 그리므로, 브라우저 것이 함께 서면 같은 일을 하는 버튼이 둘이
+              된다. 지우기 동작을 아직 붙이지 않았으므로 `text` 로 두어 하나도 그리지 않는다. */}
           <Input
             id="search"
-            type="search"
+            type="text"
             controlSize="small"
             placeholder="메뉴 검색"
             aria-label="메뉴 검색"
