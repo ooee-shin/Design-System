@@ -10,15 +10,6 @@ import Image from "next/image"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/candidates/breadcrumb"
-import { Separator } from "@/components/candidates/separator"
-import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -28,6 +19,10 @@ import {
 // 둔다. 원본은 2120×399 이며 헤더 안에서 높이 24px 로 서고 폭은 비율대로 128px 이 된다.
 const MAIN_LOGO = { src: "/images/main-logo-sample.png", width: 128, height: 24 };
 
+// 로고의 대체 텍스트는 환경설정이 소유하는 시스템명이다. 실제 값이 붙기 전까지 어디서 오는
+// 값인지 그대로 적는다. 관리자 로그인 화면과 같은 처리다.
+const SYSTEM_NAME = "{환경설정 시스템명}";
+
 export default function Page() {
   return (
     // 헤더가 위에서 전체 너비를 차지하고, 그 아래를 사이드 내비게이션과 본문이 나눈다. 원본은
@@ -35,38 +30,27 @@ export default function Page() {
     //
     // 헤더의 여닫기 버튼이 사이드 내비게이션의 상태를 읽으므로 provider 가 헤더까지 감싼다.
     <SidebarProvider className="flex-col">
-      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-        {/* 헤더의 가장 왼쪽은 로고 자리다. */}
-        <Image
-          src={MAIN_LOGO.src}
-          width={MAIN_LOGO.width}
-          height={MAIN_LOGO.height}
-          alt=""
-          priority
-          className="mr-2 h-6 w-auto shrink-0"
-        />
+      <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
+        {/* 헤더의 가장 왼쪽은 로고 자리이고, 누르면 첫 화면으로 돌아간다. 그 화면은 아직 만들지
+            않았으므로 블록이 쓰는 것과 같은 자리 표시 링크를 둔다. 링크의 이름은 이미지의 대체
+            텍스트가 갖는다. */}
+        <a href="#" className="mr-2 shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Image
+            src={MAIN_LOGO.src}
+            width={MAIN_LOGO.width}
+            height={MAIN_LOGO.height}
+            alt={SYSTEM_NAME}
+            priority
+            className="h-6 w-auto"
+          />
+        </a>
         <SidebarTrigger />
-        <Separator
-          orientation="vertical"
-          className="mr-2 data-vertical:h-4 data-vertical:self-auto"
-        />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">Build Your Application</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
       </header>
 
-      {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 64px 아래에서
+      {/* 사이드 내비게이션은 고정 배치라 자기 자리를 직접 적어야 한다. 헤더 높이 56px 아래에서
           시작해 창 바닥까지 선다. */}
       <div className="flex w-full min-h-0 flex-1">
-        <AppSidebar className="top-16 bottom-0 h-auto" />
+        <AppSidebar className="top-14 bottom-0 h-auto" />
         <SidebarInset className="min-h-0">
           <div className="flex flex-1 flex-col gap-4 p-4">
             {Array.from({ length: 24 }).map((_, index) => (
