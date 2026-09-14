@@ -29,7 +29,7 @@
 ## 현재 구현
 
 - 공용 자산 소유 구조
-  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
+  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Brand만 예외다. `--brand-*`·`--brand-alpha-*`와 mode별 `--oe-brand-light-*`·`--oe-brand-dark-*`는 Studio의 `BrandThemeProvider`가 mount마다 `packages/tokens`의 생성 함수로 seed에서 만들어 런타임으로 주입하고, `--oe-brand-*`와 `--oe-focus-ring`은 `apps/studio/src/app/globals.css`가 그 mode별 주입값에 `--color-blue-*` 기본값을 붙여 정의한다. `packages/tokens`는 `DEFAULT_BRAND_SEED`와 생성 함수, `styles.css`의 `@theme inline`이 `--oe-brand-*`·`--oe-focus-ring`을 Tailwind 색으로 잇는 별칭만 갖고 `:root`·`.dark`의 실제 값은 갖지 않는다
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
@@ -324,11 +324,11 @@
 | 날짜 (2026) | 내용 | 담당 |
 | --- | --- | --- |
 | 9/3 | 기존 환경 공유 | 신주희 |
-| ~9/4 | 기존 리뷰, 배포 환경 세팅과 GitHub Pages 호스팅 | 유진식 |
+| ~9/4 | 기존 리뷰, 배포 환경 세팅. GitHub Pages 호스팅은 성립하지 않았고 호스팅은 [ai-environment.md](ai-environment.md)의 스파이크 R4가 정한다 | 유진식 |
 | ~9/11 | shadcn + Panda CSS 동시 사용 시 번들 용량 확인 | 유진식 |
 | ~9/14 | 1차 컴포넌트 마무리 및 공유 | 신주희 |
 | ~9/14 | 블루키 이관 테스트 | 공통 |
-| 9/14~ | Figma MCP·스토리북 MCP 연동 | 유진식 |
+| 9/14~ | AI 개발 환경 트랙. 순서와 일정은 [ai-environment.md](ai-environment.md)가 소유한다 | 유진식 |
 | 9/14~ | 화면 개선 작업 (약 1주) | 신주희 |
 | 9/20~23 | 4·5단계 에이전트 룰 테스트와 A/B 비교 검증 | 공통 |
 | 9/28~30 | 작업 마무리 | 공통 |
@@ -394,6 +394,10 @@ pnpm visual --path /components/badge \
 **통합 검증 항목 다섯 중 넷은 아직 대상이 없다.** Storybook, Figma MCP, Storybook MCP, Skill·Agent가 저장소에 없으므로 지금 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 유진식의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
+
+### 2026-09-14 AI 개발 환경 트랙을 시작했다
+
+유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Storybook과 Figma 확인이다. Studio가 이미 문서와 Playground를 제공하므로 Storybook을 만들지 자체를 A/B 검증 뒤 함께 다시 정하며, 그때까지 `apps/storybook` 골격은 Skill v0 결과로 필요할 때만 유진식이 `9/17~18`에 만든다. 확정 컴포넌트마다 최소 `Default` Story 하나를 그 pull request에 한 번에 넣는 것은 신주희가 `9/16`까지 동의하면 유진식이 하는 제안이고, Story 파일 위치와 기본 브랜드 값의 자리(Storybook decorator 또는 `packages/tokens`)는 그 pull request 전에 함께 정한다. `@ooee/ui`를 반영한 Figma 라이브러리와 seat는 `9/16`까지 신주희에게 묻는다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
