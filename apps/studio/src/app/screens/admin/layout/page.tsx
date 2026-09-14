@@ -148,6 +148,8 @@ export default function Page() {
  *
  * 세 선택지의 이름은 아직 정해지지 않았다. 무엇이 달라지는지 정해지면 그 이름으로 바꾼다.
  */
+// 라벨 A 는 지금 이 화면에 적용되어 있는 스타일이다. 그래서 처음 선택된 것도 A 이고, 미리보기도
+// 지금의 좌측 메뉴를 그린다. 나머지 둘은 무엇이 달라지는지 정해지면 채운다.
 const SIDEBAR_STYLES = ["라벨 A", "라벨 B", "라벨 C"];
 
 function SidebarStyleSetting() {
@@ -182,8 +184,8 @@ function StyleOptionCard({ value, label }: { value: string; label: string }) {
   return (
     <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
       <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
-        {/* 라벨 A 는 그 예시의 두 번째 카드인 밝은 모드 미리보기를 쓴다. 나머지 둘은 무엇이
-            다른지 정해지면 그 그림이 들어간다. */}
+        {/* 라벨 A 는 지금 적용된 스타일이므로 그 모습을 그린다. 그림은 `radio.md` 의 「선택
+            가능한 콘텐츠와 결합하기」가 쓰는 밝은 모드 미리보기와 같다. */}
         {value === SIDEBAR_STYLES[0] ? (
           <LightStylePreview />
         ) : (
@@ -206,7 +208,8 @@ function StyleOptionCard({ value, label }: { value: string; label: string }) {
 }
 
 /**
- * 같은 예시의 밝은 모드 미리보기다. 좌측 띠와 본문, 그 안의 막대 셋으로 화면의 얼개만 그린다.
+ * 지금 적용된 스타일의 미리보기다. 좌측 띠와 본문, 그 안의 막대 셋으로 화면의 얼개만 그리며,
+ * 그림은 `radio.md` 의 밝은 모드 미리보기와 같다.
  */
 function LightStylePreview() {
   return (
