@@ -4,9 +4,11 @@
 /**
  * 관리자 레이아웃.
  *
- * shadcn 의 sidebar-02 블록을 그대로 들여온 것이며 `pipeline.md` 의 2단계에 멈춰 있다. 색은 아직
- * shadcn token 이고 메뉴 내용도 원본의 영문 그대로다. 구조와 동작을 먼저 보기 위한 상태이므로,
- * 지시가 있기 전까지 `oe` token 으로 바꾸지 않는다. 출처는 `sources.md` 가 갖는다.
+ * shadcn 의 sidebar-02 블록에서 들여왔다. 출처는 `sources.md` 가 갖는다.
+ *
+ * **헤더까지는 `oe` token 으로 바꿨고 그 아래는 아직 shadcn token 이다.** 사이드 내비게이션과
+ * 본문, 그리고 그것들이 쓰는 `candidates` 의 부품이 남아 있다. 메뉴 내용도 원본의 영문 그대로다.
+ * `pipeline.md` 가 정한 대로 지시를 받은 범위만 바꾸고 나머지는 그 자리에 둔다.
  */
 
 import Image from "next/image"
@@ -68,11 +70,11 @@ export default function Page() {
       {/* 관리자는 `lg`(1024px)까지만 대응한다. 그보다 좁아지면 화면을 다시 짜지 않고 가로로
           스크롤한다. 규칙은 `quality.md` 가 갖는다. */}
       <SidebarProvider className="min-w-[1024px] flex-col">
-        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-oe-border-secondary bg-oe-background-primary px-4">
           {/* 헤더의 가장 왼쪽은 로고 자리이고, 누르면 첫 화면으로 돌아간다. 그 화면은 아직 만들지
               않았으므로 블록이 쓰는 것과 같은 자리 표시 링크를 둔다. 링크의 이름은 이미지의 대체
               텍스트가 갖는다. */}
-          <a href="#" className="mr-2 shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <a href="#" className="mr-2 shrink-0 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
             <Image
               src={MAIN_LOGO.src}
               width={MAIN_LOGO.width}
@@ -98,7 +100,7 @@ export default function Page() {
               ))}
             </div>
 
-            <span className="mx-2 h-4 w-px shrink-0 bg-border" aria-hidden="true" />
+            <span className="mx-2 h-4 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
 
             {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
             <span className="flex items-center gap-2 text-sm">
