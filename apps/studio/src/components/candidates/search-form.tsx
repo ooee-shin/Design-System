@@ -37,7 +37,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
             variant="filled"
             containerClassName="px-4 bg-sidebar-accent text-sidebar-foreground has-[[data-slot=input]:focus]:bg-sidebar-accent [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60"
             className="placeholder:text-sidebar-foreground/50"
-            controlSize="small"
+            controlSize="regular"
             placeholder="메뉴 검색"
             aria-label="메뉴 검색"
             leadingElement={<RiSearchLine />}
