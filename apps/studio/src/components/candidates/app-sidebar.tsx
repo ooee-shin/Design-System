@@ -2,7 +2,14 @@
 
 import * as React from "react"
 
+import { RiArrowRightSLine } from "@remixicon/react"
+
 import { SearchForm } from "@/components/candidates/search-form"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/candidates/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -155,28 +162,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<a href="#" />}>
-                      {item.title}
-                    </SidebarMenuButton>
+                {group.items.map((item) =>
+                  item.items ? (
+                    // 하위 목록을 가진 2depth 는 접고 펼 수 있고 처음에는 닫혀 있다. 화살표를
+                    // 글자 앞이 아니라 줄 끝에 두는 이유는, 하위가 없는 형제와 글자 시작점이
+                    // 어긋나지 않게 하기 위해서다.
+                    <Collapsible key={item.title} className="group/collapsible">
+                      <SidebarMenuItem>
+                        <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                          {item.title}
+                          <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
+                        </SidebarMenuButton>
 
-                    {/* 세 번째 단계를 가진 항목이 있다. 블록이 갖고 있는 하위 메뉴로 그린다.
-                        2depth 와는 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로 작아진
-                        자리에서 3depth 까지 어중간하게 줄이면 단계의 순서가 읽히지 않는다. */}
-                    {item.items ? (
-                      <SidebarMenuSub>
-                        {item.items.map((child) => (
-                          <SidebarMenuSubItem key={child.title}>
-                            <SidebarMenuSubButton isActive={child.isActive} render={<a href="#" />}>
-                              {child.title}
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    ) : null}
-                  </SidebarMenuItem>
-                ))}
+                        {/* 3depth 는 2depth 와 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로
+                            작아진 자리에서 3depth 까지 어중간하게 줄이면 단계가 읽히지 않는다. */}
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items.map((child) => (
+                              <SidebarMenuSubItem key={child.title}>
+                                <SidebarMenuSubButton isActive={child.isActive} render={<a href="#" />}>
+                                  {child.title}
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton className="font-medium" isActive={item.isActive} render={<a href="#" />}>
+                        {item.title}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ),
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
