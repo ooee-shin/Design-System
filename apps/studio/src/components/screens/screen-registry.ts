@@ -30,6 +30,7 @@ export const screenRoots: ScreenRoot[] = [
     note: "뷰포트를 전부 씁니다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤됩니다.",
     items: [
       { key: "layout", name: "레이아웃", scope: "사이드바·상단 바·본문의 골격만", href: "/screens/admin/layout" },
+      { key: "login", name: "로그인", scope: "VibePrompt 원본 구조 그대로 — 화면 실험", href: "/screens/admin/login" },
     ],
   },
   {
