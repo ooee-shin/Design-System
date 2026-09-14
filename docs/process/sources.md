@@ -56,6 +56,10 @@ Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구�
 
 외부 자료는 출처, 확인일과 사용 목적을 기록한다. 라이선스가 불명확한 자료는 복제·재배포 대상이 아니라 참고자료로 취급하고, 최종 구현은 ooee의 구조와 규칙으로 작성한다.
 
+## 전달 자료
+
+- [ooee 제작 파이프라인](https://claude.ai/code/artifact/a1cb7fcb-d88e-4cfa-8d81-c7144bbdc6a1) — `2026-09-14`. shadcn 에서 `oe` 자산이 되기까지의 여덟 단계와 단계별 코드 규칙을 한 화면으로 정리한 것이다. 읽는 사람은 이관을 맡을 개발자이며, 에이전트가 읽는 자리는 `docs/system/` 이므로 이 자료는 사람용이다. 내용의 원본은 이 디렉터리와 `docs/system/` 의 문서들이고 규칙이 갈리면 저장소 문서가 원본이다.
+
 ## 참고 링크
 
 - [pxd: shadcn과 함께 UI 컴포넌트를 AI 에이전트와 더 잘 쓰는 방법](https://tech.pxd.co.kr/post/shadcn%EA%B3%BC-%ED%95%A8%EA%BB%98-UI-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%EB%A5%BC-AI-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%99%80-%EB%8D%94-%EC%9E%98%EC%93%B0%EB%8A%94-%EB%B0%A9%EB%B2%95-340)
