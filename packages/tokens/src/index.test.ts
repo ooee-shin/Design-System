@@ -141,3 +141,25 @@ test("styles.css ships the same token values the source of truth declares", () =
     assert.deepEqual(actual, expected, `styles.css ${mode} block drifted from CORE_SEMANTIC_TOKENS`);
   }
 });
+
+test("the neutral foreground ladder has a named step below tertiary", () => {
+  const find = (name: string) => CORE_SEMANTIC_TOKENS.find((token) => token.name === name);
+
+  const tertiary = find("oe-foreground-tertiary");
+  const subtle = find("oe-foreground-subtle");
+  assert.ok(tertiary, "oe-foreground-tertiary 가 없다");
+  assert.ok(subtle, "oe-foreground-subtle 가 없다");
+
+  // tertiary 아래 한 단계다. Light 는 옅어지고 Dark 는 어두워진다.
+  assert.equal(tertiary.light, "neutral-500");
+  assert.equal(subtle.light, "neutral-400");
+  assert.equal(tertiary.dark, "neutral-500");
+  assert.equal(subtle.dark, "neutral-600");
+
+  // `disabled` 와 값은 같지만 역할이 다르므로 별도 이름을 갖는다.
+  const disabled = find("oe-foreground-disabled");
+  assert.ok(disabled);
+  assert.equal(disabled.light, subtle.light);
+  assert.equal(disabled.dark, subtle.dark);
+});
+

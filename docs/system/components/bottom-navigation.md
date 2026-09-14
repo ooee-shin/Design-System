@@ -63,7 +63,7 @@
 **아이콘은 선택 여부와 무관하게 같은 `Fill` 하나를 그리고 색만 바뀐다.**
 
 - 선택된 항목: Icon과 Label이 함께 `oe-foreground-primary`다. **Brand를 쓰지 않는다.** 하단 내비게이션이 알리는 것은 브랜드가 아니라 지금 어느 화면에 있는지이며, 그 자리에 유채색을 두면 다섯 항목 중 하나만 색을 갖는 강조로 읽힌다. 이 token은 Light에서 neutral-950, Dark에서 neutral-50이라 두 테마 모두 나머지 항목과 가장 멀다.
-- 선택되지 않은 항목: Label은 `oe-foreground-tertiary`이고 **Icon은 그보다 한 단계 더 옅다.** 아이콘이 라벨과 같은 무게로 서면 선택되지 않은 항목이 다섯 개 나란히 있을 때 화면 아래쪽이 무거워진다. 중립 foreground에 `tertiary` 아래 단계가 없어 Light `neutral-400`, Dark `neutral-600`을 로컬 값으로 쓴다.
+- 선택되지 않은 항목: Label은 `oe-foreground-tertiary`이고 **Icon은 `oe-foreground-subtle`이다.** 아이콘이 라벨과 같은 무게로 서면 선택되지 않은 항목이 다섯 개 나란히 있을 때 화면 아래쪽이 무거워진다. `subtle`은 위계 줄의 네 번째 칸이 아니라 그보다 약한 단계가 국소적으로 필요한 자리의 이름이며 정의는 [tokens.md](../tokens.md)가 소유한다.
 
 항목이 나란히 서는 자리에서 시각적 위계를 잡기 위해서다. `Line`과 섞으면 선택되지 않은 항목끼리도 시각 무게가 달라 보인다. 근거는 [icon.md](../foundations/icon.md)가 소유한다.
 

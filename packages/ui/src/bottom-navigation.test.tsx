@@ -1,6 +1,7 @@
 import "./test-setup"
 
 import assert from "node:assert/strict"
+import { readFileSync } from "node:fs"
 import test, { afterEach } from "node:test"
 
 import React from "react"
@@ -108,7 +109,7 @@ test("선택되지 않은 항목은 아이콘을 라벨보다 옅게 둔다", ()
   const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
   const unselectedIcon = items(nav)[1].querySelector("[data-slot=bottom-navigation-icon]") as HTMLElement
 
-  assertHas(unselectedIcon.className, ["text-neutral-400", "dark:text-neutral-600"], "선택되지 않은 항목의 아이콘")
+  assertHas(unselectedIcon.className, ["text-oe-foreground-subtle"], "선택되지 않은 항목의 아이콘")
 })
 
 // 선택된 항목에서는 아이콘과 라벨이 같은 Brand 색이다. 아이콘만 옅게 두면 무엇이 선택되었는지가
@@ -117,7 +118,7 @@ test("선택된 항목은 아이콘과 라벨이 같은 색이다", () => {
   const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
   const selectedIcon = items(nav)[0].querySelector("[data-slot=bottom-navigation-icon]") as HTMLElement
 
-  assertLacks(selectedIcon.className, ["text-neutral-400"], "선택된 항목의 아이콘")
+  assertLacks(selectedIcon.className, ["text-oe-foreground-subtle"], "선택된 항목의 아이콘")
 })
 
 test("아이콘은 선택 여부와 관계없이 같은 것을 그린다", () => {
@@ -187,3 +188,14 @@ test("항목이 다섯을 넘으면 오류를 낸다", () => {
 
   assert.throws(() => render(<BottomNavigation value="item-0" items={tooMany} />), /5/)
 })
+
+// 같은 값이 `oe-foreground-disabled` 에도 있지만 그쪽은 꺼진 요소를 뜻한다. 로컬 값으로 되돌아가면
+// 두 테마 쌍을 컴포넌트가 다시 들고 있게 되므로 회귀를 막는다.
+test("선택되지 않은 아이콘은 로컬 값이 아니라 semantic token 을 쓴다", () => {
+  const source = readFileSync(new URL("./bottom-navigation.tsx", import.meta.url), "utf8")
+
+  assert.match(source, /text-oe-foreground-subtle/)
+  assert.doesNotMatch(source, /text-neutral-400/)
+  assert.doesNotMatch(source, /dark:text-neutral-600/)
+})
+
