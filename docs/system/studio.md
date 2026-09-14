@@ -27,6 +27,19 @@ Target area를 설명할 때는 실제 컴포넌트를 바꾸지 않고 공용 `
 Studio의 수치 측정 Annotation은 Violet 계열을 공통으로 사용한다. 대상은 width·height·min/max·Target area 같은 크기, padding·gap·inset 같은 내부/외부 간격, radius, font-size·line-height·letter-spacing처럼 수치로 측정하는 Typography 스펙이다. 숫자가 token으로 표현되어도 역할이 치수이면 같은 Violet 표시를 사용한다. Font family·weight 명칭, semantic color 값, 상태, Anatomy 번호와 Swap 영역은 치수 Annotation이 아니므로 Violet 규칙을 적용하지 않는다. 치수 숫자 Pill은 border 없이 옅은 Violet 배경과 진한 Violet 글자만 사용한다.
 
 
+## 화면 프레임과 그 예외
+
+Studio의 화면은 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 화면을 옮길 때 본문이 위아래나 좌우로 밀리지 않게 하기 위해서다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다.
+
+**`/screens/*`는 예외다.** 그 아래 경로는 자산을 검수하는 화면이 아니라 제품 화면 자체를 구현하는 자리이므로, 문서형 레이아웃을 따르지 않고 각자의 레이아웃 규칙을 갖는다. 관리자는 뷰포트를 전부 쓰고, 앱 화면은 웹에서 볼 때 기기 폭과 높이만큼의 상자 안에 선다.
+
+- 두 앱 화면은 공용 `PhoneFrame`을 함께 쓴다. 화면마다 기기 폭을 직접 적으면 한쪽만 고쳤을 때 두 화면의 기준이 갈린다.
+- Studio 내비게이션은 `/screens/*`에서 그려지지 않는다. 상단에 바가 얹히면 관리자 화면이 실제로 차지하는 높이를 볼 수 없고 앱 화면은 기기 상자 밖에 다른 것이 서게 된다. 돌아가는 길은 각 화면이 공용 `ScreenExitLink`로 스스로 갖는다.
+- `/screens/*`는 Studio 메뉴에 올리지 않는다. 확정된 자산의 카탈로그와 섞이면 무엇이 검수를 마친 것인지 흐려진다.
+
+예외의 경계는 경로로 긋는다. 「카탈로그 화면」처럼 성격으로 나누면 새 화면이 생길 때마다 어느 쪽인지 다시 판단하게 된다.
+
+
 ## 문서 화면
 
 Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 있게 표시한다. 저장소가 문서 원본을 소유하고 Studio는 표시만 하며, 별도 사본을 만들지 않는다.
