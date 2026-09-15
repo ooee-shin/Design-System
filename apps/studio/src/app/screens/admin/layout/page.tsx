@@ -339,7 +339,9 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
         aria-label="메인 컬러"
         aria-haspopup="dialog"
         onClick={() => picker.current?.click()}
-        className="font-mono tabular-nums uppercase"
+        // 한 단계 옅은 선을 이 자리에서만 시험한다. 공용 `Input` 의 값을 바꾸면 저장소의 모든
+        // 폼 요소가 함께 따라오므로, 괜찮다고 판단된 뒤에 그쪽을 옮긴다.
+        className="border-oe-border-secondary font-mono tabular-nums uppercase"
       />
       <input
         ref={picker}
