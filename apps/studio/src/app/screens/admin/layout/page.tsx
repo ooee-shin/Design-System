@@ -292,25 +292,34 @@ function MenuStyleSetting({
   return (
     // 카드 셋과 사이 간격을 더한 폭이다. 176 × 3 + 12 × 2 = 552 이다.
     <section className="flex w-[552px] flex-col gap-6">
-      <span className="flex items-baseline justify-between gap-4">
-        <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
-        {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. 기본값과
-            같은 상태에서도 끄지 않는다. 눌러도 달라지지 않을 뿐이고, 꺼져 있으면 왜 못 누르는지
-            설명할 자리가 필요해진다. */}
-        <Button
-          variant="ghost"
-          tone="neutral"
-          controlSize="small"
-          // 버튼의 오른쪽 여백 12px 만큼 바깥으로 빼서 글자가 영역의 오른쪽 끝에 선다. 상자를
-          // 기준으로 맞추면 글자만 안쪽으로 들어가 보인다.
-          className="-mr-3"
-          onClick={() => {
-            applySeed(DEFAULT_BRAND_SEED);
-            onStyleChange(SIDEBAR_STYLES[0].name);
-            onRowIconsChange(true);
-          }}
-        >
-          기본값 초기화
+      <span className="flex items-start justify-between gap-4">
+        <span className="flex flex-col items-start gap-1">
+          <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+
+          {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. 기본값과
+              같은 상태에서도 끄지 않는다. 눌러도 달라지지 않을 뿐이고, 꺼져 있으면 왜 못 누르는지
+              설명할 자리가 필요해진다.
+
+              공용 `Button` 에는 배경 없이 글자만 있는 변형이 없고, `button.md` 가 그것을 아직
+              정의하지 않은 항목으로 적어 두고 있다. 그래서 관리자 로그인의 「비밀번호 찾기」와 같은
+              표기로 이 자리에서 세운다. */}
+          <button
+            type="button"
+            onClick={() => {
+              applySeed(DEFAULT_BRAND_SEED);
+              onStyleChange(SIDEBAR_STYLES[0].name);
+              onRowIconsChange(true);
+            }}
+            className="rounded-sm text-[length:var(--text-oe-label)] text-oe-foreground-tertiary underline underline-offset-4 outline-none hover:text-oe-foreground-secondary focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+          >
+            기본값 초기화
+            </button>
+        </span>
+
+        {/* 누르면 무엇이 일어나는지는 아직 정해지지 않았다. 지금은 고른 즉시 반영되므로 이 버튼에
+            동작을 붙이지 않았다. */}
+        <Button variant="fill" controlSize="small">
+          저장
         </Button>
       </span>
 
@@ -412,7 +421,7 @@ function SettingRow({
   return (
     <div className={inline ? "flex items-center justify-between gap-6" : "flex flex-col gap-4"}>
       <span className="flex flex-col gap-0.5">
-        <span className="text-sm font-medium text-oe-foreground-primary">{label}</span>
+        <span className="text-[15px] font-medium text-oe-foreground-primary">{label}</span>
         {description ? <span className="text-xs text-oe-foreground-tertiary">{description}</span> : null}
       </span>
       {children}
