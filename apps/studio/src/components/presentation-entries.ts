@@ -22,8 +22,13 @@ export type PresentationSection = {
   body: string;
 };
 
+/** 꼭지가 무엇을 다루는지. Presentation 화면의 두 탭이 이 값으로 갈린다. */
+export type PresentationKind = "component" | "screen";
+
 export type PresentationEntry = {
   id: string;
+  /** 컴포넌트 하나를 다루면 `component`, 화면이나 레이아웃을 다루면 `screen`이다. */
+  kind: PresentationKind;
   title: string;
   /** 최소 두 개. 효과가 따로 설 만하면 세 번째를 둔다. */
   sections: PresentationSection[];
@@ -33,7 +38,54 @@ export type PresentationEntry = {
 
 export const presentationEntries: PresentationEntry[] = [
   {
+    id: "expanded-menu-list",
+    kind: "screen",
+    title: "메뉴는 눌러서 찾지 않고 펼쳐 놓고 찾아요",
+    sections: [
+      {
+        heading: "대분류를 거쳐야 하위가 보이던 GNB",
+        body: "예전에는 왼쪽 레일에서 대분류를 고르고, 그때 열리는 패널에서 다시 메뉴를 골랐어요. 어떤 메뉴가 어디에 들어 있는지는 눌러보기 전에는 알 수 없어서, 위치를 외우고 있는 사람과 아닌 사람의 이동 비용이 크게 달랐어요. 레일과 패널이 늘 두 컬럼을 차지하고 있어서 본문에 쓸 가로 폭도 그만큼 줄었어요.",
+      },
+      {
+        heading: "전체를 펼쳐 두고 그룹은 이름으로 묶기",
+        body: "Side Navigation은 메뉴를 한 컬럼에 쌓고, 대분류는 열고 닫는 단계가 아니라 목록 위에 붙는 이름으로 남겨요. 대분류 아래는 늘 펼쳐져 있어서, 화면을 훑는 것만으로 이 시스템이 무엇을 다루는지 알 수 있어요. 목록에 바로 서는 메뉴에는 아이콘을 둘 수 있어 글자를 읽지 않고도 자리를 기억하고, 하위 목록을 가진 메뉴만 접었다 펴요. 컬럼이 하나로 줄면서 표가 많은 화면에 가로 폭을 돌려줬어요.",
+      },
+    ],
+  },
+  {
+    id: "favorites-in-the-menu",
+    kind: "screen",
+    title: "즐겨찾기도 메뉴니까 메뉴가 있는 곳에 둬요",
+    sections: [
+      {
+        heading: "헤더에 따로 놓여 있던 즐겨찾기",
+        body: "즐겨찾기는 상단 헤더에 가로로 나열돼 있었어요. 하는 일은 메뉴로 이동하는 것과 같은데 있는 곳이 달라서, 어디로 가느냐에 따라 위를 볼지 왼쪽을 볼지가 갈렸어요. 가로로 늘어놓는 방식이라 담을 수 있는 개수도 폭에 묶였어요.",
+      },
+      {
+        heading: "내가 고른 목록을 전체 목록 위에 두기",
+        body: "즐겨찾기를 Side Navigation 안으로 들여와 전체 목록 바로 위에 두어서, 메뉴를 찾는 일이 한 곳에서 끝나요. 전체 목록과 같은 방식으로 세로로 쌓이기 때문에 개수가 폭에 묶이지 않고, 헤더는 한 줄을 돌려받아요.",
+      },
+    ],
+  },
+  {
+    id: "menu-search",
+    kind: "screen",
+    title: "길어진 목록을 메뉴 검색이 받도록, 목록 맨 위에 자리를 냈어요",
+    sections: [
+      {
+        heading: "펼쳐 두면서 길어진 목록",
+        body: "대분류를 모두 펼치자 목록이 화면보다 길어졌어요. 자주 가는 메뉴는 즐겨찾기가 위로 끌어올리지만, 가끔 한 번 가는 메뉴는 이름을 알고 있어도 스크롤해서 찾아야 해요.",
+      },
+      {
+        heading: "이름을 아는 사람을 위한 길을 따로 두기",
+        body: "목록 맨 위에 메뉴 검색을 두어, 이름을 아는 사람이 목록을 훑지 않고 이름으로 찾아가는 길을 마련했어요. 훑어서 찾기, 즐겨찾기로 가기, 이름으로 찾기가 각각 다른 상황을 맡기 때문에 메뉴가 늘어나도 구조를 다시 접을 필요가 없어요.",
+      },
+    ],
+    caption: "메뉴 검색은 지금 입력창까지 서 있고, 입력한 이름으로 목록을 거르는 동작은 아직 붙이지 않았어요.",
+  },
+  {
     id: "button-tones",
+    kind: "component",
     title: "삭제처럼 되돌릴 수 없는 액션은 Button 색으로 구분해요",
     sections: [
       {
@@ -48,6 +100,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "badge-tones",
+    kind: "component",
     title: "색이 아니라 뜻으로 Badge를 골라요",
     sections: [
       {
@@ -62,6 +115,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "notification-badge",
+    kind: "component",
     title: "붙어서 알리는 표시는 Notification Badge가 담당해요",
     sections: [
       {
@@ -76,6 +130,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "toggle-button",
+    kind: "component",
     title: "Button은 Action에만 쓰도록, 상태를 나타내는 버튼은 ToggleButton으로 나눴어요",
     sections: [
       {
@@ -90,6 +145,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "chip",
+    kind: "component",
     title: "따로 만들던 표시를 Chip으로 정의하고 다섯 역할로 나눴어요",
     sections: [
       {
@@ -104,6 +160,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "field",
+    kind: "component",
     title: "라벨과 안내 문구를 Field가 맡아, 폼 한 칸을 한 곳에서 다뤄요",
     sections: [
       {
@@ -123,6 +180,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "select-box",
+    kind: "component",
     title: "별도 액션 없이 비교할 수 있는 Select Box를 추가했어요",
     sections: [
       {
@@ -142,6 +200,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "select-custom-list",
+    kind: "component",
     title: "브라우저가 그리던 Select 목록을 우리가 직접 그려요",
     sections: [
       {
@@ -156,6 +215,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "radio-shape",
+    kind: "component",
     title: "모양만으로 선택 방식이 읽히도록, Radio를 원형으로 되돌렸어요",
     sections: [
       {
@@ -170,6 +230,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "brand-palette-and-semantic-tokens",
+    kind: "component",
     title: "명도를 단계로 나눠 브랜드 색이 바뀌어도 대비를 지켜요",
     sections: [
       {
@@ -188,6 +249,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "input-and-input-button",
+    kind: "component",
     title: "하는 일이 다른 Input과 Input Button을 나눴어요",
     sections: [
       {

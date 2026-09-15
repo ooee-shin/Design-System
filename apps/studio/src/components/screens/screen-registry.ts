@@ -32,7 +32,8 @@ export const screenRoots: ScreenRoot[] = [
     name: "관리자",
     note: "뷰포트를 전부 씁니다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤됩니다.",
     items: [
-      { key: "layout", name: "레이아웃", href: "/screens/admin/layout" },
+      { key: "layout", name: "레이아웃·테마설정", scope: "Admin Layout(Header, Side Navigation, Page Header)", href: "/screens/admin/layout" },
+      { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
     ],
   },
@@ -41,7 +42,11 @@ export const screenRoots: ScreenRoot[] = [
     name: "STO",
     note: "사장님용 앱입니다. 웹에서 접근하면 모바일 뷰가 화면 가운데에 섭니다.",
     items: [
-      { key: "layout", name: "레이아웃", href: "/screens/sto/layout" },
+      { key: "layout", name: "App Layout V1", scope: "기존 앱 헤더입니다. Bottom Navigation을 제공하지 않습니다.", href: "/screens/sto/layout" },
+      { key: "layout-v2", name: "App Layout V2·Bar", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v2" },
+      { key: "layout-v3", name: "App Layout V3·Floating", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v3" },
+      { key: "test", name: "테스트", href: "/screens/sto/test" },
+      { key: "login", name: "로그인", href: "/screens/sto/login" },
     ],
   },
   {
@@ -49,7 +54,7 @@ export const screenRoots: ScreenRoot[] = [
     name: "SV",
     note: "슈퍼바이저와 직원용 앱입니다. STO 와 같은 모바일 뷰를 씁니다.",
     items: [
-      { key: "layout", name: "레이아웃", href: "/screens/sv/layout" },
+      { key: "test", name: "테스트", href: "/screens/sv/test" },
     ],
   },
 ];

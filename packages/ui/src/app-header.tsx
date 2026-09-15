@@ -12,7 +12,7 @@ export type AppHeaderTitleAlign = "center" | "start"
 // 설명 줄이 있는 화면과 없는 화면을 오갈 때 헤더가 늘었다 줄었다 하면 그 아래 본문이 위아래로
 // 밀리므로 높이를 내용에 맡기지 않는다.
 const BASE_CLASS =
-  "z-10 flex h-14 w-full items-center border-b bg-oe-background-primary px-2 transition-colors"
+  "z-10 flex h-14 w-full items-center border-b bg-oe-background-primary px-oe-padding-default transition-colors"
 
 // 좌우는 성격이 같은 아이콘 자리다. 어느 쪽에 무엇이 서는지를 여기서 정하지 않는다.
 // `leading` 을 뒤로가기로, `trailing` 을 동작으로 못박으면 화면 유형이 늘어날 때마다 타입을
@@ -32,7 +32,24 @@ const SIDE_CLASS: Record<AppHeaderTitleAlign, string> = {
 // 재는 일이 생기지 않는다. `shrink-0` 으로 자연 폭을 지켜 재는 값이 흔들리지 않게 한다.
 // 아이콘 사이에 간격을 두지 않는다. 아이콘 버튼은 아이콘보다 큰 정사각형이라 버튼 자체의 여백이
 // 이미 둘을 갈라 놓으며, 여기에 간격을 더하면 두 개짜리 자리만 제목을 그만큼 더 밀어낸다.
-const SIDE_CONTENT_CLASS = "flex shrink-0 items-center"
+// 좌우 자리에 놓인 아이콘의 크기는 헤더가 정한다. 그 자리에 서는 Button 은 자기 크기 단계에
+// 맞는 아이콘 크기를 갖고 오는데, 헤더에서는 그 값이 작게 읽힌다. 화면마다 크기를 적게 두면
+// 헤더마다 값이 갈리므로 여기서 한 번 덮어쓴다. Button 이 자기 규칙으로 정한 값을 이기려면
+// 우선순위를 밝혀야 한다. 로고처럼 그림이 서는 자리는 svg 가 아니므로 걸리지 않는다.
+// 값과 이유는 app-header.md 의 「아이콘 크기는 헤더가 정한다」가 소유한다.
+// 아이콘의 크기와 누를 때의 움직임을 헤더가 자기 자리 안에서 정한다. 공용 Button 은 누를 때
+// 움직이지 않기로 정해져 있으므로(`button.md`) 그쪽을 고치지 않고 여기서만 건다. 누르는 동안
+// 아이콘이 90% 로 줄었다가 손을 떼면 돌아온다. 로고처럼 그림이 서는 자리는 svg 가 아니므로
+// 걸리지 않는다.
+const SIDE_CONTENT_CLASS =
+  "flex shrink-0 items-center [&_svg]:size-oe-icon-large! [&_svg]:transition-transform [&_svg]:duration-200 [&_svg]:ease-out [&_[data-slot=button]:active_svg]:scale-90"
+
+// 아이콘 버튼은 자기 안쪽에 여백을 갖는다. 그대로 두면 아이콘 그림이 헤더의 여백선보다 한 단계 더
+// 안쪽에 서므로, 버튼이 든 자리만 그만큼 바깥으로 당겨 그림을 선에 맞춘다. 헤더의 아이콘 버튼은
+// Large 40px 안에 24px 아이콘이 가운데 서므로 한쪽이 8px 이다. 로고처럼 버튼이 아닌 것이 서는
+// 자리는 당기지 않는다. 그 자리는 여백선에 그대로 맞아야 한다.
+const LEADING_CONTENT_CLASS = cn(SIDE_CONTENT_CLASS, "has-[[data-slot=button]]:-ml-2")
+const TRAILING_CONTENT_CLASS = cn(SIDE_CONTENT_CLASS, "has-[[data-slot=button]]:-mr-2")
 
 // 왼쪽 정렬에서는 예약하지 않는다. 예약하면 제목이 오른쪽 아이콘 개수만큼 좁아지는데, 이 정렬을
 // 고르는 이유가 긴 이름을 넓게 쓰기 위해서이기 때문이다.
@@ -112,7 +129,10 @@ function AppHeader({
   // 줄어드는 것이 자리가 아니라 제목이 되므로, 제목이 잘리는 상황에서도 중심이 움직이지 않는다.
   // 왼쪽 정렬에서는 걸지 않는다. 그 정렬을 고르는 이유가 제목을 넓게 쓰기 위해서다.
   useMeasureEffect(() => {
-    if (titleAlign !== "center") {
+    // 제목을 감추면 가운데 맞출 대상이 없다. 그런데도 폭을 예약하면 로고처럼 넓은 것이 한쪽에 설
+    // 때 그 폭이 두 배로 잡혀 좁은 화면에서 헤더가 넘친다. 감춘 제목은 흐름에서 빠지므로 좌우
+    // 자리가 남은 공간을 반씩 나눠 갖고 아이콘이 양 끝에 붙는다.
+    if (titleAlign !== "center" || titleHidden) {
       setSideWidth(undefined)
       return
     }
@@ -127,7 +147,7 @@ function AppHeader({
     const observer = new ResizeObserver(measure)
     for (const side of sides) observer.observe(side!)
     return () => observer.disconnect()
-  }, [titleAlign])
+  }, [titleAlign, titleHidden])
 
   // 헤더를 감싸고 실제로 스크롤되는 영역을 찾아 그 위치를 읽는다. 화면 전체가 스크롤되는 배치도
   // 안쪽 영역이 스크롤되는 배치도 같게 동작해야 하므로, 화면을 기준으로 재지 않는다. 화면 기준은
@@ -170,7 +190,7 @@ function AppHeader({
         className={cn(SIDE_CLASS[titleAlign], "justify-start")}
         style={sideWidth === undefined ? undefined : { minWidth: sideWidth }}
       >
-        <span ref={leadingRef} data-slot="app-header-leading-content" className={SIDE_CONTENT_CLASS}>
+        <span ref={leadingRef} data-slot="app-header-leading-content" className={LEADING_CONTENT_CLASS}>
           {leadingElement}
         </span>
       </div>
@@ -192,7 +212,7 @@ function AppHeader({
         className={cn(SIDE_CLASS[titleAlign], "justify-end")}
         style={sideWidth === undefined ? undefined : { minWidth: sideWidth }}
       >
-        <span ref={trailingRef} data-slot="app-header-trailing-content" className={SIDE_CONTENT_CLASS}>
+        <span ref={trailingRef} data-slot="app-header-trailing-content" className={TRAILING_CONTENT_CLASS}>
           {trailingElement}
         </span>
       </div>

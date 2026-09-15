@@ -32,6 +32,19 @@ export const ICON_SIZES = {
 export type IconSize = keyof typeof ICON_SIZES;
 
 /**
+ * 화면 안쪽의 좌우 여백 scale이다. 앱 화면은 폭이 좁아 본문이 테두리에 붙기 쉬우므로, 화면마다
+ * 값을 따로 적지 않고 이 두 단계 중 하나를 고른다. `default`는 목록과 폼이 이어져 세로로 길게
+ * 흐르는 보통 화면이 쓰고, `wide`는 로그인처럼 한 덩이만 놓여서 좌우 여백이 그 덩이를 강조하는
+ * 화면이 쓴다. 단위는 px이고 CSS에는 rem으로 노출한다.
+ */
+export const PADDINGS = {
+  default: 16,
+  wide: 40,
+} as const;
+
+export type PaddingName = keyof typeof PADDINGS;
+
+/**
  * 모서리 반지름 scale이다. `control`은 값을 입력받거나 고르는 컨트롤이 공유하는 값이며,
  * 나머지 단계와 값이 같아도 이름을 따로 두어 컨트롤만 조정할 수 있게 한다.
  * 단위는 px이고 CSS에는 rem으로 노출한다.

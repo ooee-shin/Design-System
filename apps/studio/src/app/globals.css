@@ -14,14 +14,17 @@
   --font-sans: var(--oe-font-family-ko);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
+  /* 좌측 내비게이션이 자기 안에서만 쓰는 색이다. 값은 `:root` 가 갖고, 스타일을 고르면
+     `AdminLayout` 이 그 위에 덮어쓴다. */
+  --color-nav-background: var(--nav-background);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-border: var(--nav-border);
+  --color-nav-hover-background: var(--nav-hover-background);
+  --color-nav-hover-foreground: var(--nav-hover-foreground);
+  --color-nav-active-background: var(--nav-active-background);
+  --color-nav-active-foreground: var(--nav-active-foreground);
+  --color-nav-search-background: var(--nav-search-background);
+  --color-nav-group-foreground: var(--nav-group-foreground);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
@@ -69,14 +72,18 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* 좌측 내비게이션의 기본값이다. 관리자 화면은 `AdminLayout` 이 고른 스타일로 이 값을 덮어
+     쓰므로, 여기 남는 것은 스타일을 고르지 않았을 때의 모습이다. */
+  --nav-background: var(--oe-background-primary);
+  --nav-foreground: var(--oe-foreground-primary);
+  --nav-border: var(--oe-border-secondary);
+  --nav-hover-background: var(--oe-background-secondary);
+  --nav-hover-foreground: var(--oe-foreground-primary);
+  --nav-active-background: var(--oe-brand-background-secondary);
+  --nav-active-foreground: var(--oe-brand-foreground-primary);
+  --nav-search-background: var(--oe-background-secondary);
+  --nav-group-foreground: var(--oe-foreground-tertiary);
+
   --oe-brand-foreground-primary: var(--oe-brand-light-foreground-primary, var(--color-blue-800));
   --oe-brand-foreground-secondary: var(--oe-brand-light-foreground-secondary, var(--color-blue-600));
   --oe-brand-background-primary: var(--oe-brand-light-background-primary, var(--color-blue-50));
@@ -111,14 +118,6 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
   --oe-brand-foreground-primary: var(--oe-brand-dark-foreground-primary, var(--color-blue-200));
   --oe-brand-foreground-secondary: var(--oe-brand-dark-foreground-secondary, var(--color-blue-400));
   --oe-brand-background-primary: var(--oe-brand-dark-background-primary, var(--color-blue-950));
@@ -145,6 +144,10 @@
   }
   html {
     @apply font-sans;
+    /* 국문은 단어 중간에서 줄이 바뀌면 읽는 사람이 앞 조각을 다시 붙여 읽어야 한다. 어절
+       단위로만 넘긴다. 규칙은 docs/system/quality.md 의 「반응형과 테마」가 소유한다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 }
 

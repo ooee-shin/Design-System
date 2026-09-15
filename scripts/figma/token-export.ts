@@ -1,8 +1,8 @@
-// packages/tokens 의 oe 토큰(Light·Dark)과 브랜드 단계를 Figma 변수에 넣을 RGBA JSON 으로 뽑는다.
-// 사용: node --import tsx scripts/figma/token-export.ts .figma-work/oe-tokens.json (저장소 루트에서)
+// packages/tokens 의 oe 토큰(Light·Dark), 브랜드 단계, 크기 값을 Figma 변수에 넣을 JSON 으로 뽑는다. 색은 RGBA, 크기는 px 숫자다.
+// prepare.mjs 가 부르고 결과를 .figma-work/<key>/oe-tokens.json 에 둔다. 값만 볼 때: node --import tsx scripts/figma/token-export.ts <출력 JSON 경로> (저장소 루트에서)
 import { readFileSync, writeFileSync } from "node:fs";
-import { CORE_SEMANTIC_TOKENS, DEFAULT_BRAND_SEED, createBrandPalette, createBrandSemanticMapping, BRAND_STEPS } from "../../packages/tokens/src/index.ts";
 import { globSync } from "node:fs";
+import { BRAND_STEPS, CONTROL_HEIGHTS, CORE_SEMANTIC_TOKENS, DEFAULT_BRAND_SEED, ICON_SIZES, RADII, createBrandPalette, createBrandSemanticMapping } from "../../packages/tokens/src/index.ts";
 
 const theme = readFileSync(globSync("node_modules/.pnpm/tailwindcss@4*/node_modules/tailwindcss/theme.css").sort().at(-1)!, "utf8");
 const colors: Record<string, string> = {};
@@ -41,5 +41,10 @@ for (const [k, name] of Object.entries(brandNames)) {
   out[name] = { light: { r: lr, g: lg, b: lb, a: 1, source: l.primitive }, dark: { r: dr, g: dg, b: db, a: 1, source: d.primitive } };
 }
 const brandSolid = Object.fromEntries(BRAND_STEPS.map((s) => [`brand-${s}`, palette.solid[s]]));
-writeFileSync(process.argv[2], JSON.stringify({ seed: DEFAULT_BRAND_SEED, tokens: out, brandSolid }, null, 1));
+const sizes = {
+  ...Object.fromEntries(Object.entries(CONTROL_HEIGHTS).map(([k, v]) => [`oe-control-${k}`, v])),
+  ...Object.fromEntries(Object.entries(ICON_SIZES).map(([k, v]) => [`oe-icon-${k}`, v])),
+  ...Object.fromEntries(Object.entries(RADII).map(([k, v]) => [k === "control" ? "radius-oe-control" : `radius-${k}`, v])),
+};
+writeFileSync(process.argv[2], JSON.stringify({ seed: DEFAULT_BRAND_SEED, tokens: out, brandSolid, sizes }, null, 1));
 console.log(Object.keys(out).length, "tokens");

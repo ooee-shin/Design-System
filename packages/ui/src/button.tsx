@@ -125,7 +125,7 @@ const DETACHED_FOCUS = "focus-visible:ring-2 focus-visible:ring-oe-focus-ring fo
 const DISABLED_SURFACE =
   "disabled:bg-oe-background-disabled disabled:text-oe-foreground-disabled disabled:hover:bg-oe-background-disabled disabled:active:bg-oe-background-disabled dark:disabled:bg-oe-background-disabled dark:disabled:text-oe-foreground-disabled dark:disabled:hover:bg-oe-background-disabled dark:disabled:active:bg-oe-background-disabled"
 
-const DISABLED_OUTLINE = "disabled:border-oe-border-primary dark:disabled:border-oe-border-primary"
+const DISABLED_OUTLINE = "disabled:border-oe-border-secondary dark:disabled:border-oe-border-secondary"
 
 function variantClass(variant: ButtonVariant, tone: ButtonTone, color?: ButtonColor) {
   const palette = tone === "custom" ? null : TONE_PALETTE[tone]

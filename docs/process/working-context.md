@@ -329,6 +329,8 @@
 
 **새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 `main`에 합쳤고 BottomNavigation은 `2026-09-14`에 `dev`에 합쳤다.
 
+**관리자 웹 화면 하나와 초안 컴포넌트 넷.** `2026-09-15`에 `/screens/admin/layout`에 환경설정의 테마설정 화면을 세웠다. 좌측 메뉴의 스타일 셋(다크·브랜드·라이트)과 메인 컬러, 메뉴 아이콘을 고르고 저장하면 함께 반영된다. 그 과정에서 Admin Header·Side Navigation·Page Header·Tabs를 뽑아 `candidates/`에 두고 Studio의 「초안」에 올렸으며, 넷을 감싸는 `AdminLayout`도 함께 두어 다음 관리자 화면이 본문만 쓰면 되게 했다. 좌측 내비게이션이 쓰던 shadcn의 `--sidebar-*`는 `--nav-*`로 옮겼다. 넷 다 명세와 상세 화면이 없으며 남은 것은 [open-questions.md](open-questions.md)에 있다.
+
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
 `2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 폼 요소 10개의 84건을 처리했다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건 중 앞의 둘은 새로 만들면서 함께 해소했다.
@@ -348,7 +350,7 @@
 9. **Button의 Ghost.** 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다. 그 밖의 미정 항목은 [button.md](../system/components/button.md)의 「현재 정의하지 않은 항목」이 갖는다.
 10. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
 
-`Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열한 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
+`Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열네 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
 **꼭지로 세우지 않기로 한 작업이 셋 있다.** AppHeader는 전할 만한 것이 시각 세부에 그쳐 판단으로 남길 내용이 아니다. Textarea와 Number Input은 작업의 대부분이 규격이거나 이미 있는 판단을 한 번 더 적용한 것이다. 세 건 모두 사용자가 확인한 결정이므로 다시 판단하지 않는다.
 
@@ -375,7 +377,7 @@ pnpm visual --path /components/badge \
 
 담당은 신주희가 Component·Variant, Token·UI 개선과 Story 작성이고, 유진식이 Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill·Plugin이다.
 
-**통합 검증 항목 다섯 중 넷은 아직 대상이 없다.** Storybook, Figma MCP, Storybook MCP, Skill·Agent가 저장소에 없으므로 지금 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 유진식의 작업이 들어오는 순서대로 채운다.
+**통합 검증 항목 다섯 중 셋은 아직 대상이 없다.** Storybook, Storybook MCP와 `.mcp.json`의 Figma MCP 설정이 없다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 유진식의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 

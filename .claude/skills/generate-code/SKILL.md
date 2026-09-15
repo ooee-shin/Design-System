@@ -17,13 +17,23 @@ description: 기획자의 화면 요청을 docs/system/과 @ooee/ui만으로 app
 ## 하지 않는 것
 
 - commit, push, pull request 생성. 마지막 단계에서 멈추고 사용자가 요청할 때만 한다.
-- 세 파일 밖의 수정. 고치는 파일은 `apps/sandbox/src/app/<key>/page.tsx`, 같은 디렉터리의 `page.test.tsx`, `apps/sandbox/src/screens.ts` 셋뿐이다. `apps/sandbox`의 공용 파일(`test-setup.ts`, `package.json`, `src/app/layout.tsx`, `src/app/page.tsx`, `globals.css`), `apps/studio`, `packages/*`, `docs/system/`은 고치지 않는다. 그쪽을 고쳐야만 검사가 통과하면 5단계의 「검사가 실패하면」을 따른다.
-- 빌드 캐시 삭제(`rm -rf .next` 등)와 working tree를 되돌리는 명령(`git stash`, `git checkout`, `git reset`).
+- 세 파일 밖의 수정. 고치는 파일은 `apps/sandbox/src/app/<key>/page.tsx`, 같은 디렉터리의 `page.test.tsx`, `apps/sandbox/src/screens.ts` 셋뿐이다. `apps/sandbox`의 공용 파일(`test-setup.ts`, `screen-rules.ts`, `screen-rules.test.tsx`, `package.json`, `src/app/layout.tsx`, `src/app/page.tsx`, `globals.css`), 다른 화면의 디렉터리, `apps/studio`, `packages/*`, `docs/system/`은 고치지 않는다. 그쪽을 고쳐야만 검사가 통과하면 5단계의 「검사가 실패하면」을 따른다.
+- 빌드 캐시 삭제(`rm -rf .next` 등)와 working tree를 되돌리는 명령(`git stash`, `git checkout`, `git reset`, `git clean`). `docs/process/tooling.md`가 적은 `apps/studio/.next` 삭제는 사람이 확인하고 하는 절차이며 이 명령은 하지 않는다.
+- 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꾸거나(`./` 경로, `rm -fr`, `node -e`, `dangerouslyDisableSandbox`) 같은 일을 하는 다른 명령으로 되풀이하지 않는다. 막힌 명령과 거부 메시지를 7단계 보고의 「막힌 명령」에 그대로 적는다.
 - 원본 파일 읽기. `원본:` 경로는 3단계에서 `screens.ts`의 `source`에 적기만 하고 열지 않는다. `apps/studio/src/app/screens/` 아래는 언제나 읽지 않는다. 원본과의 대조는 사람이 한다.
+- 다른 화면의 코드 읽기. `apps/sandbox/src/app/<다른 key>/` 아래 파일은 열지 않는다. `admin-login`·`sto-support-request`는 Skill v0의 틀린 사례를 고치지 않고 둔 기록이라, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `docs/system/`과 `packages/ui/src/`에서만 찾는다.
 - Tailwind primitive 색(`bg-blue-700`, `text-neutral-500`, `text-white`, `bg-black`), hex 값, shadcn 토큰(`bg-background`, `text-muted-foreground`, `bg-primary`). 색은 `oe-*` semantic token 클래스만 쓴다.
 - 서버 호출, 실제 제출 동작, 라우팅 로직. 제출은 `<form onSubmit={(event) => event.preventDefault()}>`까지, 목적지가 정해지지 않은 링크는 `<a href="#">`까지만 둔다. 목적지 없는 `<a href="#">`는 라우팅 로직이 아니다.
 
 ## 순서
+
+### 0. 시작 전에 확인한다
+
+```bash
+git status --porcelain --untracked-files=all apps/sandbox
+```
+
+출력이 한 줄이라도 있으면 파일을 만들지 않고 멈춘다. 다른 세션이나 사람이 같은 working tree에서 `apps/sandbox`를 고치는 중이거나, 앞선 화면이 아직 commit되지 않은 상태다. 이 상태에서 시작하면 5단계 검사가 남의 변경으로 실패하고 7단계의 「세 파일」 확인이 성립하지 않는다. 보고 첫 제목을 「## 시작하지 않음」으로 하고 출력 전문을 붙인다.
 
 ### 1. 읽는다 — ① 디자인 시스템 검색
 
@@ -42,10 +52,13 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 
 코드를 쓰기 전에 대화에 표를 먼저 낸다.
 
-| 화면 요소 | 요구사항의 낱말 | 컴포넌트와 Property | 근거 |
-| --- | --- | --- | --- |
-| 아이디 입력 | 아이디 입력 | `Input` `variant="filled"` `controlSize="xlarge"` `aria-label="아이디"` | input.md 「Properties」 |
-| 비밀번호 찾기 | 텍스트 링크 | `<a href="#">` + `oe-*` 클래스 | 목적지 미정 |
+| 화면 요소 | 요구사항의 낱말 | 컴포넌트와 Property | 요구사항이 정한 값 | 근거 |
+| --- | --- | --- | --- | --- |
+| 아이디 입력 | 아이디 입력 | `Input` `variant="filled"` `controlSize="xlarge"` `aria-label="아이디"` | placeholder 「아이디 입력」 | input.md 「Properties」 |
+| 비밀번호 입력 | 마스킹, 눈 아이콘으로 보기·숨기기 | `Input` `type="password"` + `trailingElement` 버튼 | 처음 가림, 누르면 보임 | input.md 「민감한 정보는 마스킹하기」 |
+| 비밀번호 찾기 | 텍스트 링크 | `<a href="#">` + `oe-*` 클래스 | 링크 | 목적지 미정 |
+
+「요구사항이 정한 값」에는 요구사항이 그 요소에 정한 문구·기본값·선택지·최대 글자 수·필수 여부·동작·요소 종류(링크·버튼)를 빠짐없이 적고, 없으면 `-`로 둔다. 4단계 테스트가 이 칸을 그대로 옮긴다.
 
 - 컴포넌트가 있는 요소는 반드시 그 컴포넌트를 쓴다. 같은 역할을 native 요소와 클래스로 다시 만들지 않는다.
 - 컴포넌트가 없는 요소(제목, 문단, 레이아웃 상자, 링크, 로고 자리)는 native 요소에 `oe-*` 토큰 클래스를 쓴다.
@@ -59,6 +72,7 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 **파일과 등록**
 
 - 위치는 `apps/sandbox/src/app/<key>/page.tsx`. `<key>`는 소문자 kebab-case 영문이다. 예: `admin-login`, `sto-support-request`.
+- 고른 key가 `screens.ts`에 이미 있거나 `apps/sandbox/src/app/<key>/`가 이미 있으면 그 화면을 덮어쓰지 않고 `admin-login-2`처럼 끝에 번호를 붙인 새 key를 쓴다. `name`은 요청의 화면 이름 그대로 두고, 「판단이 필요한 것」에 「key `admin-login`이 이미 있어 `admin-login-2`로 만듦」을 적는다.
 - 상태(`useState`)를 쓰면 첫 줄에 `"use client"`를 둔다. `@ooee/ui`의 Control은 소비자 쪽 `"use client"`를 전제한다.
 - import는 `react`(hook), `@ooee/ui`(컴포넌트), `@remixicon/react`(아이콘, Line variant 우선), `@/lib/utils`(`cn`)만 쓴다. `next/link`·`next/navigation`은 쓰지 않는다.
 - 파일 머리말 주석에 「입력」의 요구사항 문단을 **그대로** 붙여 넣는다. 줄이거나 고쳐 쓰지 않으며 선택지 목록·placeholder·기본값·Label 문구를 하나도 빠뜨리지 않는다. 그 아래에 정하지 않아 비워 둔 자리를 적는다. 단독 `/review-design`은 요청을 받지 않으므로 이 주석이 근거다.
@@ -97,17 +111,17 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 
 - 데스크톱 화면은 뷰포트를 그대로 쓴다. `min-h-dvh`는 최상위 레이아웃 상자 한 곳에만 둔다.
 - 모바일 앱 화면은 Studio의 `MobileWebView`와 같은 모양으로 세운다. 바깥 상자 `min-h-dvh bg-oe-background-secondary` 안에 `mx-auto flex min-h-dvh w-full max-w-[390px] flex-col bg-oe-background-primary border-oe-border-secondary sm:border-x`를 둔다. 기기 모형이 아니므로 둥근 모서리와 그림자를 두르지 않고 높이를 고정하지 않는다.
-- 가운데 정렬(`items-center`, `text-center`, `justify-center`)은 요청이 가운데라고 말한 요소에만 쓴다. 요청이 한 요소에만 준 정렬(예: 「Footer는 가운데 정렬」)을 다른 요소로 옮기지 않는다. 정렬을 말하지 않은 제목·문단·폼 요소·링크는 왼쪽 정렬로 둔다. 「폼을 남은 높이의 가운데에 세운다」는 상자의 위치이지 상자 안 글자의 정렬이 아니다.
+- 글자와 덩이의 가로 가운데 정렬(`text-center`, 세로 방향 flex의 `items-center`, 가로 방향 flex의 `justify-center`)은 요청이 가운데라고 말한 요소에만 쓴다. 요청이 한 요소에만 준 정렬(예: 「Footer는 가운데 정렬」)을 다른 요소로 옮기지 않는다. 정렬을 말하지 않은 제목·문단·폼 요소·링크는 왼쪽 정렬로 둔다. 「폼을 남은 높이의 가운데에 세운다」는 상자의 위치이지 상자 안 글자의 정렬이 아니다. 한 줄에 놓인 요소끼리 세로 가운데를 맞추는 가로 방향 flex의 `items-center`는 이 규칙의 대상이 아니다.
 - `docs/system/`이 크기를 정한 자리(App Header의 Title 등)는 그 문서를 따른다. 그 밖에 요청이 말하지 않아 스스로 정한 값(화면 제목의 `text-*`·`font-*`, 폼 요소 사이 `gap-*`, 덩이 사이 `mt-*`)은 코드에 쓰되 「판단이 필요한 것」에 「제목 `text-2xl font-semibold`, 폼 `gap-3` — 요청에 없어 정함」처럼 한 줄로 적는다.
 
 ### 4. 테스트를 쓴다 — ⑦
 
-`apps/sandbox/src/app/<key>/page.test.tsx`. 첫 줄은 `import "@/test-setup"`, 실행기는 `node:test`, 렌더는 `@testing-library/react`, JSX를 쓰므로 `import React from "react"`를 둔다. 테스트 이름과 `assert` 실패 메시지는 한국어로 쓴다. 검사할 것은 넷이다.
+`apps/sandbox/src/app/<key>/page.test.tsx`. 첫 줄은 `import "@/test-setup"`, 실행기는 `node:test`, 렌더는 `@testing-library/react`, JSX를 쓰므로 `import React from "react"`를 둔다. 테스트 이름과 `assert` 실패 메시지는 한국어로 쓴다. 이름에 한글이 없으면 `screen-rules` 테스트가 실패한다. 검사할 것은 넷이다.
 
 1. 화면 제목이 `heading`으로 잡힌다.
 2. 매핑표의 상호작용 요소마다 접근 가능한 이름으로 찾아진다. Control만이 아니라 native `<button>`·`<a>`로 만든 요소도 모두 포함한다. role은 요구사항의 낱말에서 정한다. 입력은 `getByLabelText(이름)`, 「버튼」은 `getByRole("button", { name })`, 「링크」는 `getByRole("link", { name })`이다.
 3. 제출 버튼이 있고 이름이 요구사항의 문구와 같다.
-4. 요구사항이 값이나 동작을 정한 자리는 그대로 렌더된다. 마스킹 입력은 처음 `type="password"`, 보기 전환은 `fireEvent.click` 뒤 `type="text"`와 바뀐 `aria-label`, 스위치·체크박스의 기본 상태는 `aria-checked`, 선택의 기본값은 Trigger에 보이는 문구, 글자 수 표시는 `getByText("0/최대")`, 필수 항목은 `Input`·`Textarea`의 `required` 또는 `Select`의 `aria-required="true"`다. 요구사항에 없는 값은 검사하지 않는다.
+4. 매핑표 「요구사항이 정한 값」 칸에서 렌더 결과로 확인할 수 있는 값(문구, 선택지, 기본값, 필수 여부, 입력 종류, 요소 종류, 최대 글자 수, 동작 뒤 바뀌는 상태)마다 assert 하나로 그대로 렌더되는지 본다. 크기·폭·배치·색처럼 JSDOM이 계산하지 않는 시각 값은 테스트하지 않으며, 칸에서 그 값 뒤에 `(시각)`을 붙여 테스트하지 않은 값임을 드러낸다. 칸이 `-`인 요소만 건너뛴다. 마스킹 입력은 처음 `type="password"`, 보기 전환은 `fireEvent.click` 뒤 `type="text"`와 바뀐 `aria-label`, 스위치·체크박스의 기본 상태는 `aria-checked`, 선택의 기본값은 Trigger에 보이는 문구, 글자 수 표시는 `getByText("0/최대")`, 필수 항목은 `Input`·`Textarea`의 `required` 또는 `Select`의 `aria-required="true"`, placeholder는 `getByPlaceholderText`, 링크는 `getByRole("link", { name })`다. 요구사항에 없는 값은 검사하지 않는다.
 
 ### 5. 검사한다
 
@@ -119,7 +133,9 @@ pnpm check
 
 셋 다 통과할 때까지 「하지 않는 것」의 세 파일을 고친다. `pnpm check`는 `apps/sandbox`를 잡지 않지만 저장소 전체가 깨지지 않았는지 확인하는 자리다.
 
-**검사가 실패하면.** 세 파일을 고쳐도 통과하지 않거나 오류의 파일 경로가 세 파일 밖이면(예: `apps/studio/.next/dev/types/validator.ts`, 다른 화면의 `page.test.tsx`), 원인이 자기 변경과 무관해 보여도 그 파일을 고치지 않고 캐시도 지우지 않는다. 6단계는 그대로 하고, 7단계의 보고 첫 제목을 「## 검사 실패」로 바꿔 낸다. 「확인 사항」에서 실패한 명령은 `[ ]`로 두고 옆에 명령과 오류 메시지 첫 줄을 적으며, 원인은 추정이라고 밝힌다.
+`pnpm --filter @ooee/sandbox test`에는 `src/screen-rules.test.tsx`가 들어 있다. 이 테스트가 모든 화면의 `page.tsx`를 `/review-design` 검사 항목 가운데 기계로 가를 수 있는 것(1·2·3의 버튼·5·12·13·14와 머리말)으로 읽어, 새 화면에 위반이 있으면 `L<행> [<항목>] <내용>`으로 실패한다. 그 줄이 가리키는 자리를 `page.tsx`에서 고친다. 이 테스트가 통과해도 6단계 검수는 그대로 한다.
+
+**검사가 실패하면.** 세 파일을 고쳐도 통과하지 않거나 오류의 파일 경로가 세 파일 밖이면(예: `apps/studio/.next/dev/types/validator.ts`, 다른 화면의 `page.test.tsx`), 원인이 자기 변경과 무관해 보여도 그 파일을 고치지 않고 캐시도 지우지 않는다. 6단계는 그대로 하고, 7단계의 보고 첫 제목을 「## 검사 실패」로 바꿔 낸다. 원인은 추정이라고 밝힌다.
 
 ### 6. 검수한다 — ③
 
@@ -129,7 +145,13 @@ pnpm check
 
 ### 7. 보고한다 — ⑧ pull request 준비 완료
 
-commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5단계의 셋이 모두 통과했을 때만 첫 제목이 「## pull request 준비 완료」이며, 하나라도 실패했으면 「## 검사 실패」다. 확인 사항은 실제로 확인한 것만 `[x]`로 채운다.
+commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5단계의 셋이 모두 통과했을 때만 첫 제목이 「## pull request 준비 완료」이며, 하나라도 실패했으면 「## 검사 실패」다.
+
+보고 직전에 5단계의 세 명령을 **마지막으로 한 번 더** 돌리고 `git status --porcelain --untracked-files=all`을 돌린다. 확인 사항은 그 결과로만 채운다.
+
+- 명령 줄은 그 실행의 종료 코드가 0일 때만 `[x]`다. 테스트가 1건이라도 `not ok`이거나 「내 변경과 무관」해 보여도 `[ ]`이며, 괄호 단서를 붙여 `[x]`로 두지 않는다. `[ ]` 줄 옆에는 오류 메시지 첫 줄을 그대로 적는다.
+- 「세 파일 밖을 고치지 않았다」는 `git status` 출력의 경로가 세 파일(새 디렉터리 안의 두 파일과 `screens.ts`)뿐일 때만 `[x]`다. 출력은 「변경 파일」에 원문 그대로 붙인다.
+- 보고 본문이 「아래 절」을 가리키면 그 절이 실제로 있어야 한다.
 
 ```text
 ## pull request 준비 완료
@@ -152,6 +174,12 @@ commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5�
 
 ## 미확정 자산 후보
 - <이름> — <쓰임> — <왜 못 만드는지>
+
+## 막힌 명령
+- <명령> — <거부 메시지 첫 줄> (없으면 「없음」)
+
+## 변경 파일
+<git status --porcelain --untracked-files=all 출력 원문>
 
 ## 확인 사항
 - [ ] pnpm --filter @ooee/sandbox build
