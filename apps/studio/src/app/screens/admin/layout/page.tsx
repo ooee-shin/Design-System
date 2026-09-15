@@ -24,7 +24,10 @@ import {
   RiSettings3Line,
 } from "@remixicon/react"
 
-import { Badge, Button, NotificationBadge, Radio, RadioGroup } from "@ooee/ui"
+import { Badge, Button, Input, NotificationBadge, Radio, RadioGroup, SwitchField } from "@ooee/ui"
+
+import { useBrandTheme } from "@/components/brand-theme-provider"
+import { ColorSwatch } from "@/components/color-swatch"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import {
@@ -63,6 +66,7 @@ const UTILITIES = [
 
 export default function Page() {
   const [styleName, setStyleName] = useState(SIDEBAR_STYLES[0].name);
+  const [showRowIcons, setShowRowIcons] = useState(true);
   const style = SIDEBAR_STYLES.find((item) => item.name === styleName) ?? SIDEBAR_STYLES[0];
 
   return (
@@ -92,11 +96,16 @@ export default function Page() {
             따로 두면 접을 때 하나가 사라지고 다른 하나가 생겨서, 유지되는 것이 아니라 새로
             만들어지는 것처럼 보인다. */}
         <SidebarToggle />
-        <AppSidebar showRowIcons={style.rowIcons} />
+        <AppSidebar showRowIcons={showRowIcons} />
         <SidebarInset className="min-h-0">
           <AdminHeader />
           <div className="flex flex-1 flex-col gap-6 p-6">
-            <SidebarStyleSetting value={styleName} onChange={setStyleName} />
+            <MenuStyleSetting
+              styleName={styleName}
+              onStyleChange={setStyleName}
+              showRowIcons={showRowIcons}
+              onRowIconsChange={setShowRowIcons}
+            />
           </div>
         </SidebarInset>
       </SidebarProvider>
@@ -194,15 +203,12 @@ type SidebarStyle = {
   vars: React.CSSProperties
   /** 미리보기의 좌측 띠와 본문 색. */
   preview?: { band: string; body: string }
-  /** 메뉴 줄 앞에 아이콘을 그릴지. */
-  rowIcons?: boolean
 }
 
 const SIDEBAR_STYLES: SidebarStyle[] = [
   {
     // 이름이 아직 정해지지 않은 가제다.
     name: "다크",
-    rowIcons: true,
     vars: {
       "--sidebar": "var(--brand-950)",
       // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
@@ -259,23 +265,112 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   },
 ]
 
-function SidebarStyleSetting({ value, onChange }: { value: string; onChange: (name: string) => void }) {
+function MenuStyleSetting({
+  styleName,
+  onStyleChange,
+  showRowIcons,
+  onRowIconsChange,
+}: {
+  styleName: string
+  onStyleChange: (name: string) => void
+  showRowIcons: boolean
+  onRowIconsChange: (next: boolean) => void
+}) {
+  const { seed, applySeed } = useBrandTheme();
+
   return (
-    <section className="flex w-fit flex-col gap-3">
-      <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">좌측 메뉴 스타일</h2>
-      <RadioGroup
-        // 원본은 폭이 정해진 상자 안에 있어서 칸을 균등 분할했다. 여기서는 그 상자가 없어 카드가
-        // 글자 폭까지 눌리므로, 카드 폭을 직접 정한다.
-        className="flex gap-3"
-        value={value}
-        onValueChange={(next) => onChange(String(next))}
-        aria-label="좌측 메뉴 스타일"
-      >
-        {SIDEBAR_STYLES.map((item) => (
-          <StyleOptionCard key={item.name} value={item.name} label={item.name} preview={item.preview} />
-        ))}
-      </RadioGroup>
+    <section className="flex w-fit flex-col gap-6">
+      <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+
+      {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
+          레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
+      <SettingRow label="메인 컬러" description="이 색에서 만들어진 팔레트를 메뉴 스타일이 가져다 씁니다.">
+        <MainColorInput value={seed} onChange={applySeed} />
+      </SettingRow>
+
+      <SettingRow label="메뉴 스타일" description="레일의 바탕과 글자, 고른 줄의 표시가 함께 바뀝니다.">
+        <RadioGroup
+          className="flex gap-3"
+          value={styleName}
+          onValueChange={(next) => onStyleChange(String(next))}
+          aria-label="메뉴 스타일"
+        >
+          {SIDEBAR_STYLES.map((item) => (
+            <StyleOptionCard key={item.name} value={item.name} label={item.name} preview={item.preview} />
+          ))}
+        </RadioGroup>
+      </SettingRow>
+
+      {/* 아이콘은 색과 상관없이 어느 스타일에서나 같게 동작하므로 자기 축을 갖는다. */}
+      <SettingRow label="메뉴 아이콘">
+        <SwitchField
+          label={showRowIcons ? "보임" : "숨김"}
+          checked={showRowIcons}
+          onCheckedChange={(next) => onRowIconsChange(Boolean(next))}
+        />
+      </SettingRow>
     </section>
+  );
+}
+
+/**
+ * `input.md` 의 「Color input」이 보여 주는 조합을 그대로 가져왔다. HEX 를 직접 적고 Leading
+ * element 의 색 조각이 지금 색을 보여 준다. 여섯 자리가 다 찼을 때만 실제 색으로 반영한다.
+ */
+function MainColorInput({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+  const [text, setText] = useState(value.toUpperCase());
+  const complete = isCompleteHexColor(text);
+
+  return (
+    <Input
+      type="text"
+      inputMode="text"
+      autoComplete="off"
+      aria-label="메인 컬러"
+      layout="fixed"
+      fixedWidth={176}
+      value={text}
+      onChange={(event) => {
+        const next = formatHexColor(event.target.value);
+        setText(next);
+        if (isCompleteHexColor(next)) onChange(next);
+      }}
+      placeholder="#000000"
+      leadingElement={<ColorSwatch color={complete ? text : value} />}
+      className="font-mono tabular-nums uppercase"
+    />
+  );
+}
+
+function formatHexColor(value: string) {
+  const hex = value.replace(/[^0-9a-f]/gi, "").slice(0, 6).toUpperCase();
+  return hex.length > 0 ? `#${hex}` : "";
+}
+
+function isCompleteHexColor(value: string) {
+  return /^#[0-9A-F]{6}$/i.test(value);
+}
+
+/**
+ * 설정 하나를 이름과 설명, 조작 장치로 묶는다. 설명은 그 설정이 무엇을 바꾸는지만 적는다.
+ */
+function SettingRow({
+  label,
+  description,
+  children,
+}: {
+  label: string
+  description?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium text-oe-foreground-primary">{label}</span>
+        {description ? <span className="text-xs text-oe-foreground-tertiary">{description}</span> : null}
+      </span>
+      {children}
+    </div>
   );
 }
 
