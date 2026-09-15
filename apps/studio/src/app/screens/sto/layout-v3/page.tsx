@@ -24,10 +24,10 @@ import { AppHeader, BottomNavigation, Button, type BottomNavigationItem } from "
 import { MobileWebView, ScreenSkeleton } from "@/components/screens/screen-chrome";
 
 /**
- * STO 레이아웃 V3. 담는 것은 V2 와 같고 하단 내비게이션의 형태만 다르다. 바닥에 붙는 줄 대신
+ * STO 레이아웃 V3. 담는 것은 V2 와 같고 Bottom Navigation의 형태만 다르다. 바닥에 붙는 줄 대신
  * 좌우에 여백을 두고 떠 있는 알약으로 서며, 선택된 항목이 자기 배경을 갖는다.
  *
- * 배경은 중립이다. 하단 내비게이션이 알리는 것은 브랜드가 아니라 지금 어느 화면에 있는지이므로,
+ * 배경은 중립이다. Bottom Navigation이 알리는 것은 브랜드가 아니라 지금 어느 화면에 있는지이므로,
  * 형태가 바뀌어도 그 규칙은 그대로 둔다.
  *
  * 본문 맨 위에는 지금 고른 메뉴의 이름이 크게 선다. 하단의 선택 표시만으로는 어느 것이 켜져

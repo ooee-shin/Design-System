@@ -221,7 +221,7 @@ export function BottomNavigationWorkbench() {
         </Section>
 
         <Section id="state" title="Properties · State" description="항목이 갖는 상태는 선택 여부 하나입니다. 선택되지 않은 항목은 Line, 선택된 항목은 Fill을 씁니다. 색만으로 가르면 다섯이 나란히 선 자리에서 어느 것이 켜져 있는지 한눈에 들어오지 않습니다.">
-          <Example label="Selected" description="아이콘이 Fill로 바뀌고 가장 진한 중립이 되며 배경 표시를 갖습니다. Brand를 쓰지 않는 이유는 하단 내비가 알리는 것이 브랜드가 아니라 지금 어느 화면에 있는지이기 때문입니다.">
+          <Example label="Selected" description="아이콘이 Fill로 바뀌고 가장 진한 중립이 되며 배경 표시를 갖습니다. Brand를 쓰지 않는 이유는 Bottom Navigation 이 알리는 것이 브랜드가 아니라 지금 어느 화면에 있는지이기 때문입니다.">
             <PhoneStrip>
               <BottomNavigation value="0" items={itemsOf(4, c)} showLabels />
             </PhoneStrip>
@@ -325,7 +325,7 @@ export function BottomNavigationWorkbench() {
               doText="최상위 화면을 오갑니다."
               dontText="한 화면 안의 영역을 나누지 않습니다."
               description={[
-                "하단 내비게이션은 지금 어느 화면에 있는지를 알리는 자리입니다. 한 화면 안에서 목록을 거르거나 구간을 나누는 데 쓰면 위치 표시가 아니라 조작 도구로 읽힙니다.",
+                "Bottom Navigation은 지금 어느 화면에 있는지를 알리는 자리입니다. 한 화면 안에서 목록을 거르거나 구간을 나누는 데 쓰면 위치 표시가 아니라 조작 도구로 읽힙니다.",
                 "한 화면 안을 나누는 것은 Tab이 맡습니다. 아직 시스템에 없으므로 필요해지면 그때 만듭니다.",
               ]}
               doVisual={<GuideExample className="items-end"><GuideNav c={c} picks={[0, 1, 4]} /></GuideExample>}

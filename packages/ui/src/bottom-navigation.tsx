@@ -137,7 +137,7 @@ const FLOATING_FOCUS_CLASS =
 // 자리에서 시각적 위계를 잡기 위해서이며 근거는 `icon.md` 가 소유한다. 그래서 이 컴포넌트는
 // ToggleButton 과 달리 아이콘을 하나만 받는다.
 //
-// 선택은 Brand 가 아니라 가장 진한 중립이다. 하단 내비가 알리는 것은 브랜드가 아니라 지금 어느
+// 선택은 Brand 가 아니라 가장 진한 중립이다. Bottom Navigation 이 알리는 것은 브랜드가 아니라 지금 어느
 // 화면에 있는지이며, 그 자리에 유채색을 두면 다섯 항목 중 하나만 색을 갖는 강조로 읽힌다.
 // `oe-foreground-primary` 는 Light 에서 neutral-950, Dark 에서 neutral-50 이라 두 테마 모두
 // 나머지 항목과 가장 멀다.

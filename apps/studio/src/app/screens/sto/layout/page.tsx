@@ -18,7 +18,7 @@ import { MobileWebView, ScreenSkeleton } from "@/components/screens/screen-chrom
  * 글자를 화면에 두지 않고 `titleHidden` 으로 감춰 이름만 남긴다. 왼쪽에는 나가는 길인 로고가,
  * 오른쪽에는 그 화면에서 하는 일인 알림과 전체메뉴가 선다.
  *
- * 비워 둔 자리: 본문, 하단 내비게이션을 쓰는지 여부, 알림·전체메뉴를 눌렀을 때 열리는 것,
+ * 비워 둔 자리: 본문, Bottom Navigation을 쓰는지 여부, 알림·전체메뉴를 눌렀을 때 열리는 것,
  * 그리고 읽지 않은 알림 개수 표시다.
  */
 

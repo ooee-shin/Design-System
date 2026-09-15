@@ -24,9 +24,9 @@ import { AppHeader, BottomNavigation, Button, type BottomNavigationItem } from "
 import { MobileWebView, ScreenSkeleton } from "@/components/screens/screen-chrome";
 
 /**
- * STO 레이아웃 V2. V1 의 헤더 아래에 하단 내비게이션을 더한 구성이다.
+ * STO 레이아웃 V2. V1 의 헤더 아래에 Bottom Navigation을 더한 구성이다.
  *
- * 헤더는 V1 과 같은 Main 유형이되 오른쪽에 알림만 선다. 전체메뉴가 하단 내비게이션의 다섯 번째
+ * 헤더는 V1 과 같은 Main 유형이되 오른쪽에 알림만 선다. 전체메뉴가 Bottom Navigation의 다섯 번째
  * 항목으로 내려갔으므로 헤더에 같은 입구를 두 번 두지 않는다.
  *
  * 비워 둔 자리: 본문, 각 항목이 가는 화면, 알림을 눌렀을 때 열리는 것, 그리고 읽지 않은 알림
