@@ -1,7 +1,4 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
-
-import { RiArrowLeftLine } from "@remixicon/react";
 
 import { cn } from "@/lib/utils";
 
@@ -11,39 +8,15 @@ import { cn } from "@/lib/utils";
  * `docs/system/studio.md` 가 소유한다.
  */
 
-/**
- * Studio 내비게이션은 이 아래에서 그려지지 않는다. 상단에 바가 얹히면 관리자 화면이 실제로
- * 차지하는 높이를 볼 수 없기 때문이다. 대신 돌아가는 길을 화면이 스스로 갖는다.
- */
-export function ScreenExitLink({ backTo, label, className }: { backTo: string; label: string; className?: string }) {
-  return (
-    <Link
-      href={backTo}
-      className={cn(
-        // Next.js 개발 표시가 왼쪽 아래 20px 지점에 36px 정사각으로 서 있다. 왼쪽 여백을 그것과
-        // 같은 20px 로 맞추고, 그 표시의 윗변인 56px 위에서 시작하게 두어 겹치지 않게 한다.
-        "fixed bottom-16 left-5 z-[60] inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium backdrop-blur",
-        // 개발 표시와 같은 어두운 바닥이다. 배경 token 중 두 테마 모두에서 어두운 것은 없고
-        // `oe-background-bold-primary` 는 Dark 에서 밝은 쪽으로 뒤집히므로, 프리미티브 중립
-        // 단계를 직접 쓴다. 어두운 바닥 위에서는 Button 의 Dark 와 같이 누를수록 밝아진다.
-        "border border-white/15 bg-neutral-900/90 text-neutral-300",
-        "transition-colors hover:bg-neutral-800/90 hover:text-neutral-50 active:bg-neutral-700/90",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
-        className,
-      )}
-    >
-      <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
-      {label}
-    </Link>
-  );
-}
-
 // 웹에서 앱에 접근하면 모바일 뷰가 화면 가운데에 선다. 기기 모형이 아니라 실제 페이지이므로
 // 둥근 모서리나 그림자로 상자를 만들지 않고, 높이도 고정하지 않고 창 높이를 그대로 쓴다.
 //
 // 좌우에 남는 자리는 지금 비워 둔다. 넓은 화면에서 그 자리를 무엇으로 채울지는 정하지 않았고,
 // 가능성만 열어 둔 상태에서 임의로 채우면 그것이 결정처럼 굳는다.
-const MOBILE_WIDTH = "max-w-[390px]";
+//
+// 아래로는 280px 에서 멈춘다. 그보다 좁아지면 화면을 다시 짜지 않고 가로로 스크롤한다. 앱이
+// 대응하는 가장 좁은 폭이며 `quality.md` 의 「반응형과 테마」가 소유한다.
+const MOBILE_WIDTH = "min-w-[280px] max-w-[570px]";
 
 /**
  * 웹에서 보는 앱 화면의 본체다. STO 와 SV 가 함께 쓰며, 화면마다 폭을 따로 적으면 한쪽만 고쳤을 때
@@ -55,7 +28,10 @@ const MOBILE_WIDTH = "max-w-[390px]";
  */
 export function MobileWebView({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <div className="min-h-dvh bg-oe-background-secondary">
+    // 모바일 뷰 바깥의 바닥이다. `oe-background-secondary`(neutral-100)보다 한 단계 연한 회색을
+    // 쓰기로 했는데 그 자리에 놓인 배경 token 이 없다. Light 는 흰 본문과 겨우 갈리는 neutral-50,
+    // Dark 는 본문인 neutral-900 보다 한 단계 어두운 neutral-950 으로 프리미티브를 직접 쓴다.
+    <div className="min-h-dvh bg-neutral-50 dark:bg-neutral-950">
       <div
         aria-label={label}
         className={cn(

@@ -1,4 +1,4 @@
-import { MobileWebView, ScreenExitLink, ScreenPlaceholder } from "@/components/screens/screen-chrome";
+import { MobileWebView, ScreenPlaceholder } from "@/components/screens/screen-chrome";
 
 /**
  * STO 는 사장님용 앱이다. 웹에서 접근하면 모바일 뷰가 화면 가운데에 선다.
@@ -13,8 +13,6 @@ export default function StoScreenPage() {
       <MobileWebView label="STO 사장님용 앱 화면">
         <ScreenPlaceholder name="Content" className="m-4 flex-1" />
       </MobileWebView>
-
-      <ScreenExitLink backTo="/screens/sto" label="STO" />
     </>
   );
 }
