@@ -48,8 +48,10 @@ const GUIDE_BOX = "flex min-h-28 w-full";
 // 좌우 자리는 구현과 달리 내용 폭만 차지하게 둔다. 구현처럼 남은 공간을 반씩 나눠 가지면 자리가
 // 아이콘보다 훨씬 넓어져 번호선이 빈 여백을 가리키고, 가운데에 남는 폭이 좁아져 명칭까지
 // 잘린다. 자리의 폭을 견주는 것은 Balance 절이 맡고 여기서는 명칭만 알린다.
-const HEADER_DIAGRAM = "flex h-14 w-full items-center px-2";
-const SIDE_DIAGRAM = "flex shrink-0 items-center text-oe-foreground-secondary [&_svg]:size-5";
+// 도식은 실제 컴포넌트와 같은 값을 쓴다. 좌우 여백과 아이콘 크기가 어긋나면 Anatomy 가 지금
+// 화면과 다른 것을 설명하게 된다.
+const HEADER_DIAGRAM = "flex h-14 w-full items-center px-oe-padding-default";
+const SIDE_DIAGRAM = "flex shrink-0 items-center text-oe-foreground-secondary [&_svg]:size-oe-icon-large";
 
 const sections = [
   { id: "playground", label: "Playground" },
@@ -406,6 +408,8 @@ export function AppHeaderWorkbench() {
               <GuidelineList items={[
                 "한쪽에 아이콘을 셋 이상 두지 않습니다. 세 개부터는 제목이 들어갈 폭이 남지 않습니다.",
                 "아이콘은 공용 Button의 Ghost를 tone=\"neutral\"로 씁니다. 헤더가 자기 버튼을 따로 만들지 않습니다.",
+                "아이콘 크기는 헤더가 정합니다. Button의 크기 단계가 갖고 오는 값을 쓰지 않고 24px로 덮어쓰므로 화면이 크기를 직접 적지 않습니다. 버튼은 Large를 쓰며, 아이콘 그림이 Container의 여백선에 맞도록 헤더가 버튼이 든 자리를 그 안쪽 여백만큼 바깥으로 당깁니다.",
+                "누르는 동안 아이콘이 90%로 작아졌다가 손을 떼면 돌아옵니다. 공용 Button은 누를 때 움직이지 않기로 정해져 있으므로 헤더가 자기 자리 안에서만 겁니다.",
                 "아이콘에는 aria-label로 이름을 줍니다. 모양만으로는 무엇을 하는 버튼인지 전달되지 않습니다.",
                 "화면에서 가장 중요한 동작이 아니면 헤더에 올리지 않고 본문에 둡니다.",
               ]} />
