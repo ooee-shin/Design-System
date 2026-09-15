@@ -78,6 +78,10 @@ const PAGE_PATH = ["환경설정", "테마설정"];
 // 이므로 이름은 경로의 마지막 항목을 쓴다.
 const PAGE_FAVORITE = { title: PAGE_PATH[PAGE_PATH.length - 1], icon: RiPaletteLine };
 
+// 제목 옆 설명 아이콘을 세우는 값이다. 펼쳐지는 자리는 아직 붙이지 않았고 실제 문구도 받지
+// 않아, 지금은 아이콘이 서는지만 정한다.
+const PAGE_DESCRIPTION = "이 화면이 무엇을 하는 자리인지 적습니다.";
+
 // 테마는 관리자 웹과 두 앱이 따로 갖는다. 지금 만든 것은 관리자 웹 하나이며, 나머지 둘은 탭만
 // 서 있고 내용은 아직 없다.
 const THEME_TABS: PageHeaderTab[] = [
@@ -138,6 +142,7 @@ export default function Page() {
               tabs={THEME_TABS}
               favorite={favorite}
               onFavoriteChange={setFavorite}
+              description={PAGE_DESCRIPTION}
             />
             <Tabs.Panel value={THEME_TABS[0].value} className="flex flex-1 flex-col gap-6 p-6">
               <MenuStyleSetting
@@ -200,12 +205,10 @@ function AdminHeader() {
           ))}
         </div>
 
-        {/* 헤더 높이 56px 를 통째로 가른다. 감싼 묶음은 32px 이라 그것에 맞추면 짧아지므로
-            높이를 직접 적는다. 오른쪽 여백은 로그아웃과 헤더 끝 사이와 같은 16px 로 둔다. */}
-        <span className="ml-2 mr-3 h-14 w-px shrink-0 bg-oe-border-secondary" aria-hidden="true" />
-
-        {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. */}
-        <span className="flex items-center gap-2 text-sm">
+        {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. 세 Utility 와는 선으로 가르지
+            않고 여백만으로 갈라 둔다. 헤더 전체를 세로로 자르는 선은 나누는 힘이 너무 세서,
+            성격이 다를 뿐 같은 오른쪽 묶음인 둘을 서로 다른 영역처럼 보이게 했다. */}
+        <span className="ml-3 flex items-center gap-2 text-sm">
           <span className="font-medium text-oe-foreground-primary">{SIGNED_IN.name}</span>
           <span className="text-xs text-oe-foreground-tertiary">{SIGNED_IN.id}</span>
           {/* 글자와 가운데를 맞추면 배지가 위로 올라 보이고, 2px 을 내리면 이번에는 내려가
