@@ -188,9 +188,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         {/* 3depth 는 2depth 와 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로
                             작아진 자리에서 3depth 까지 어중간하게 줄이면 단계가 읽히지 않는다. */}
                         <CollapsibleContent>
-                          {/* 오른쪽은 2depth 줄과 같은 선에서 끝나게 둔다. 받은 값은 좌우가 같은 여백이라 하위
-                              목록만 혼자 좁아 보였다. */}
-                          <SidebarMenuSub className="mr-0 gap-0 pr-0">
+                          {/* 오른쪽은 2depth 줄과 같은 선에서 끝나게 둔다. 받은 값은 좌우가 같은
+                              여백이라 하위 목록만 혼자 좁아 보였다. 왼쪽 선은 2px 이다. 1px 은
+                              옅은 색과 만나면 포함 관계를 말하기에 약하다. */}
+                          <SidebarMenuSub className="mr-0 gap-0 border-l-2 pr-0">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
