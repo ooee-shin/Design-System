@@ -127,12 +127,12 @@ test("모바일 뷰는 기기 상자로 그리지 않는다", () => {
   assert.match(view, /min-h-dvh/, "모바일 뷰가 창 높이를 쓰지 않는다");
 });
 
-// 위아래에 무엇이 서는지, 하단 내비게이션을 쓰는지가 아직 정해지지 않았다. 자리를 미리 채우면
+// 위아래에 무엇이 서는지, Bottom Navigation을 쓰는지가 아직 정해지지 않았다. 자리를 미리 채우면
 // 그것이 결정처럼 굳는다.
 test("앱 화면은 아직 정하지 않은 구성을 미리 채우지 않는다", () => {
   for (const screen of APPS) {
     const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
-    assert.doesNotMatch(source, /BottomNavigation/, `${screen} 이 정해지지 않은 하단 내비게이션을 두고 있다`);
+    assert.doesNotMatch(source, /BottomNavigation/, `${screen} 이 정해지지 않은 Bottom Navigation을 두고 있다`);
     assert.doesNotMatch(source, /AppHeader/, `${screen} 이 정해지지 않은 상단 줄을 두고 있다`);
   }
 });

@@ -49,6 +49,15 @@ export function MobileWebView({ children, label }: { children: ReactNode; label:
 }
 
 /**
+ * 아직 무엇을 놓을지 정하지 않은 본문을 덩이로만 보여 준다. 헤더나 하단 줄처럼 확정된 부분을
+ * 검수할 때, 점선과 글자가 함께 서면 시선이 그쪽으로 끌려 정작 볼 것을 보지 못한다. 자리를
+ * 차지하되 읽을 것이 없는 옅은 면으로 둔다.
+ */
+export function ScreenSkeleton({ className }: { className?: string }) {
+  return <div aria-hidden="true" className={cn("rounded-lg bg-oe-background-secondary", className)} />;
+}
+
+/**
  * 아직 화면을 채우지 않은 자리를 드러낸다. 빈 채로 두면 레이아웃이 무너진 것인지 아직 만들지
  * 않은 것인지 구분되지 않는다.
  */

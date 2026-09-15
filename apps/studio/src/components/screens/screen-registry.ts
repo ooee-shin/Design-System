@@ -42,6 +42,9 @@ export const screenRoots: ScreenRoot[] = [
     name: "STO",
     note: "사장님용 앱입니다. 웹에서 접근하면 모바일 뷰가 화면 가운데에 섭니다.",
     items: [
+      { key: "layout", name: "App Layout V1", scope: "기존 앱 헤더입니다. Bottom Navigation을 제공하지 않습니다.", href: "/screens/sto/layout" },
+      { key: "layout-v2", name: "App Layout V2·Bar", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v2" },
+      { key: "layout-v3", name: "App Layout V3·Floating", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v3" },
       { key: "test", name: "테스트", href: "/screens/sto/test" },
       { key: "login", name: "로그인", href: "/screens/sto/login" },
     ],
