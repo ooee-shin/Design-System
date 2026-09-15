@@ -233,6 +233,7 @@ export function AppSidebar({
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
                         <SidebarMenuButton className="h-9 gap-2 pr-3 pl-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                          {showRowIcons ? <item.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
