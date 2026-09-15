@@ -1,0 +1,41 @@
+@import "@ooee/fonts/styles.css";
+@import "tailwindcss";
+@import "@ooee/tokens/styles.css";
+@import "@ooee/ui/styles.css";
+
+@theme inline {
+  --font-sans: var(--oe-font-family-ko);
+}
+
+/* Brand 값의 기본값. Studio의 globals.css와 같은 복제이며, 값의 자리를 packages/tokens로 옮길지 정해지면
+   걷어낸다(docs/process/ai-environment.md 「아직 정하지 않은 것」). 실제 값은 brand-variables.tsx가 넣는다. */
+:root {
+  --oe-brand-foreground-primary: var(--oe-brand-light-foreground-primary, var(--color-blue-800));
+  --oe-brand-foreground-secondary: var(--oe-brand-light-foreground-secondary, var(--color-blue-600));
+  --oe-brand-background-primary: var(--oe-brand-light-background-primary, var(--color-blue-50));
+  --oe-brand-background-secondary: var(--oe-brand-light-background-secondary, var(--color-blue-100));
+  --oe-brand-background-bold-primary: var(--oe-brand-light-background-bold-primary, var(--color-blue-700));
+  --oe-brand-border-primary: var(--oe-brand-light-border-primary, var(--color-blue-500));
+  --oe-brand-border-secondary: var(--oe-brand-light-border-secondary, var(--color-blue-200));
+  --oe-focus-ring: var(--oe-brand-light-focus-ring, var(--color-blue-600));
+}
+
+.dark {
+  --oe-brand-foreground-primary: var(--oe-brand-dark-foreground-primary, var(--color-blue-200));
+  --oe-brand-foreground-secondary: var(--oe-brand-dark-foreground-secondary, var(--color-blue-400));
+  --oe-brand-background-primary: var(--oe-brand-dark-background-primary, var(--color-blue-950));
+  --oe-brand-background-secondary: var(--oe-brand-dark-background-secondary, var(--color-blue-900));
+  --oe-brand-background-bold-primary: var(--oe-brand-dark-background-bold-primary, var(--color-blue-400));
+  --oe-brand-border-primary: var(--oe-brand-dark-border-primary, var(--color-blue-500));
+  --oe-brand-border-secondary: var(--oe-brand-dark-border-secondary, var(--color-blue-800));
+  --oe-focus-ring: var(--oe-brand-dark-focus-ring, var(--color-blue-400));
+}
+
+@layer base {
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-oe-background-primary text-oe-foreground-primary;
+  }
+}
