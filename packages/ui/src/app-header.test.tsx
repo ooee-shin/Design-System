@@ -10,6 +10,61 @@ import { AppHeader } from "./app-header"
 
 afterEach(() => cleanup())
 
+// 제목을 감추면 가운데 맞출 대상이 없다. 그런데도 좌우 자리의 폭을 넓은 쪽에 맞춰 예약하면,
+// 로고처럼 넓은 것이 한쪽에 설 때 그 폭이 두 배로 잡혀 좁은 화면에서 헤더가 넘친다.
+test("AppHeader reserves no side width while the title is hidden", () => {
+  const view = render(
+    <AppHeader title="메인" titleHidden leadingElement={LEADING_ONE} trailingElement={TRAILING_ONE} />,
+  )
+
+  for (const slot of ["leading", "trailing"]) {
+    const side = view.container.querySelector(`[data-slot=app-header-${slot}]`) as HTMLElement
+    assert.ok(side)
+    assert.equal(side.style.minWidth, "", `${slot} 자리가 제목이 없는데도 폭을 예약한다`)
+  }
+})
+
+// 누르는 동안 아이콘이 작아졌다가 손을 떼면 돌아온다. 눌린 것이 손에서 떨어지기 전에 화면에서
+// 먼저 읽힌다. 공용 Button 은 누를 때 움직이지 않기로 정해져 있으므로 헤더가 자기 자리 안에서만
+// 건다. 규칙은 docs/system/components/app-header.md 의 「아이콘 크기는 헤더가 정한다」가 소유한다.
+test("AppHeader shrinks a side icon while its button is pressed", () => {
+  const view = render(<AppHeader title="메인" leadingElement={LEADING_ONE} trailingElement={TRAILING_ONE} />)
+
+  for (const slot of ["leading", "trailing"]) {
+    const content = view.container.querySelector(`[data-slot=app-header-${slot}-content]`)
+    assert.ok(content)
+    assert.match(content.className, /\[&_\[data-slot=button\]:active_svg\]:scale-90/, `${slot} 자리가 눌림을 드러내지 않는다`)
+    assert.match(content.className, /\[&_svg\]:transition-transform/, `${slot} 자리가 전환을 걸지 않는다`)
+  }
+})
+
+// 헤더의 아이콘은 그 자리에 선 Button 의 크기 단계를 따르지 않는다. 화면마다 크기를 적게 두면
+// 헤더마다 값이 갈리므로 헤더가 자기 자리 안에서 한 번 정한다.
+// 규칙은 docs/system/components/app-header.md 의 「아이콘 크기는 헤더가 정한다」가 소유한다.
+test("AppHeader sets the icon size for whatever stands in its side slots", () => {
+  const view = render(<AppHeader title="메인" leadingElement={LEADING_ONE} trailingElement={TRAILING_ONE} />)
+
+  for (const slot of ["leading", "trailing"]) {
+    const content = view.container.querySelector(`[data-slot=app-header-${slot}-content]`)
+    assert.ok(content)
+    assert.match(content.className, /\[&_svg\]:size-oe-icon-large!/, `${slot} 자리가 아이콘 크기를 정하지 않는다`)
+  }
+})
+
+// 아이콘 버튼은 자기 안쪽 여백만큼 아이콘을 안으로 들여놓는다. 그대로 두면 로고가 선 왼쪽과
+// 아이콘이 선 오른쪽의 여백이 달라 보인다. 버튼이 든 자리만 당기고 로고가 선 자리는 그대로 둔다.
+test("AppHeader pulls a slot out only when it holds a button", () => {
+  const view = render(<AppHeader title="메인" leadingElement={LEADING_ONE} trailingElement={TRAILING_ONE} />)
+
+  const leading = view.container.querySelector("[data-slot=app-header-leading-content]")
+  const trailing = view.container.querySelector("[data-slot=app-header-trailing-content]")
+
+  assert.ok(leading)
+  assert.ok(trailing)
+  assert.match(leading.className, /has-\[\[data-slot=button\]\]:-ml-2/)
+  assert.match(trailing.className, /has-\[\[data-slot=button\]\]:-mr-2/)
+})
+
 const LEADING_ONE = <button data-testid="back">뒤로</button>
 const TRAILING_ONE = <button data-testid="search">검색</button>
 const LEADING_TWO = (

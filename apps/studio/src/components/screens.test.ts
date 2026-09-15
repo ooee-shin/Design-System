@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { join } from "node:path";
 
@@ -12,6 +12,16 @@ const SCREENS = ["admin", "sto", "sv"] as const;
 const APPS = ["sto", "sv"] as const;
 
 const read = (path: string) => readFileSync(join(process.cwd(), path), "utf8");
+
+/** 루트의 목록 화면을 뺀, 개별 제품 화면의 `page.tsx` 경로다. 화면이 늘어도 규칙이 따라붙는다. */
+const screenPagePaths = () => {
+  const base = "apps/studio/src/app/screens";
+  return SCREENS.flatMap((screen) =>
+    readdirSync(join(process.cwd(), base, screen), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => `${base}/${screen}/${entry.name}/page.tsx`),
+  );
+};
 
 test("세 테스트 경로가 모두 있다", () => {
   for (const screen of SCREENS) {
@@ -78,25 +88,21 @@ test("제품 화면은 카탈로그의 프레임을 쓰지 않는다", () => {
   }
 });
 
-// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 대신 앱 화면이 돌아가는 링크를
-// 스스로 갖는다.
-//
-// 관리자는 예외다. 뷰포트를 전부 쓰는 화면이라 바닥에 고정된 링크가 실제 화면 요소를 가려서,
-// 무엇을 보고 있는지 확인하는 일을 방해한다. 앱 화면은 모바일 뷰가 가운데에 서고 좌우가 비므로
-// 링크가 그 빈 자리에 놓인다.
-test("Studio 내비게이션은 제품 화면에서 물러난다", () => {
+// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 그렇다고 돌아가는 링크를 화면
+// 위에 고정해 두지도 않는다. 링크가 실제 화면 요소를 가려서 무엇을 보고 있는지 확인하는 일을
+// 방해하기 때문이며, 이는 뷰포트를 다 쓰는 관리자 화면과 모바일 뷰가 가운데 서는 앱 화면이
+// 다르지 않다. 돌아가는 길은 브라우저 뒤로 가기가 갖는다.
+test("Studio 내비게이션은 제품 화면에서 물러나고 그 자리를 대신 채우지 않는다", () => {
   const navigation = read("apps/studio/src/components/studio-navigation.tsx");
   assert.match(navigation, /\/screens/);
 
-  for (const screen of APPS) {
-    const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
-    assert.match(source, /ScreenExitLink/, `${screen} 에 Studio 로 돌아가는 링크가 없다`);
-  }
-
-  for (const path of ["admin/layout", "admin/test", "admin/login"]) {
-    const source = read(`apps/studio/src/app/screens/${path}/page.tsx`);
+  for (const path of screenPagePaths()) {
+    const source = read(path);
     assert.doesNotMatch(source, /ScreenExitLink/, `${path} 이 화면을 가리는 고정 링크를 두고 있다`);
   }
+
+  const chrome = read("apps/studio/src/components/screens/screen-chrome.tsx");
+  assert.doesNotMatch(chrome, /ScreenExitLink/, "쓰지 않는 ScreenExitLink 가 공용 부품에 남아 있다");
 });
 
 // 두 앱 화면이 같은 모바일 뷰를 쓴다. 화면마다 폭을 따로 적으면 한쪽만 고쳤을 때 두 화면의
@@ -121,12 +127,12 @@ test("모바일 뷰는 기기 상자로 그리지 않는다", () => {
   assert.match(view, /min-h-dvh/, "모바일 뷰가 창 높이를 쓰지 않는다");
 });
 
-// 위아래에 무엇이 서는지, 하단 내비게이션을 쓰는지가 아직 정해지지 않았다. 자리를 미리 채우면
+// 위아래에 무엇이 서는지, Bottom Navigation을 쓰는지가 아직 정해지지 않았다. 자리를 미리 채우면
 // 그것이 결정처럼 굳는다.
 test("앱 화면은 아직 정하지 않은 구성을 미리 채우지 않는다", () => {
   for (const screen of APPS) {
     const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
-    assert.doesNotMatch(source, /BottomNavigation/, `${screen} 이 정해지지 않은 하단 내비게이션을 두고 있다`);
+    assert.doesNotMatch(source, /BottomNavigation/, `${screen} 이 정해지지 않은 Bottom Navigation을 두고 있다`);
     assert.doesNotMatch(source, /AppHeader/, `${screen} 이 정해지지 않은 상단 줄을 두고 있다`);
   }
 });

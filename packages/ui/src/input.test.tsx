@@ -25,6 +25,39 @@ test("Input shows the focus ring only for focus-visible", () => {
   assert.doesNotMatch(container.className, /focus-within:ring/)
 })
 
+// 오류가 있는 칸에 커서를 두면 오류 색이 유지되어야 한다. Focus 색으로 덮이면 커서를 올려 둔
+// 동안에는 그 칸이 틀렸다는 표시가 사라지고, 고치려고 들어간 순간에 무엇이 틀렸는지를 잃는다.
+// 규칙은 docs/system/interaction.md 의 「오류와 Focus 가 겹칠 때」가 소유한다.
+test("Input keeps the error colour while the invalid field has focus", () => {
+  const view = render(<Input aria-label="아이디" aria-invalid />)
+  const container = view.container.querySelector("[data-slot=input-container]")
+
+  assert.ok(container)
+  assert.match(
+    container.className,
+    /has-\[\[aria-invalid=true\]\]:has-\[\[data-slot=input\]:focus-visible\]:border-oe-danger-border-primary/,
+  )
+  assert.match(
+    container.className,
+    /has-\[\[aria-invalid=true\]\]:has-\[\[data-slot=input\]:focus-visible\]:ring-oe-danger-border-primary/,
+  )
+})
+
+test("Textarea keeps the error colour while the invalid field has focus", () => {
+  const view = render(<Textarea aria-label="내용" aria-invalid />)
+  const container = view.container.querySelector("[data-slot=textarea-container]")
+
+  assert.ok(container)
+  assert.match(
+    container.className,
+    /has-\[\[aria-invalid=true\]\]:has-\[:focus-visible\]:border-oe-danger-border-primary/,
+  )
+  assert.match(
+    container.className,
+    /has-\[\[aria-invalid=true\]\]:has-\[:focus-visible\]:ring-oe-danger-border-primary/,
+  )
+})
+
 // 초점선은 입력란을 쓰고 있다는 표시다. `has-[:focus-visible]` 는 자손이면 무엇이든 걸리므로
 // Trailing element 의 버튼으로 키보드 초점이 넘어가는 것만으로 입력란 전체에 선이 켜지고,
 // 그 버튼이 갖고 있는 자신의 ring 과 겹쳐 두 겹이 된다.
