@@ -175,9 +175,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     // 하위 목록을 가진 2depth 는 접고 펼 수 있고 처음에는 닫혀 있다. 화살표를
                     // 글자 앞이 아니라 줄 끝에 두는 이유는, 하위가 없는 형제와 글자 시작점이
                     // 어긋나지 않게 하기 위해서다.
+                    //
+                    // 오른쪽 여백은 글자가 쓰는 16px 보다 좁은 12px 이다. 아이콘은 그림 안쪽에
+                    // 자기 여백을 품고 있어서 같은 값을 주면 더 들어와 보인다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="h-9 px-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className="h-9 pr-3 pl-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
@@ -185,7 +188,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         {/* 3depth 는 2depth 와 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로
                             작아진 자리에서 3depth 까지 어중간하게 줄이면 단계가 읽히지 않는다. */}
                         <CollapsibleContent>
-                          <SidebarMenuSub className="gap-0">
+                          {/* 오른쪽은 2depth 줄과 같은 선에서 끝나게 둔다. 받은 값은 좌우가 같은 여백이라 하위
+                              목록만 혼자 좁아 보였다. */}
+                          <SidebarMenuSub className="mr-0 gap-0 pr-0">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
