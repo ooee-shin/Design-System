@@ -185,7 +185,7 @@ export function SidebarToggle() {
               className={
                 collapsed
                   ? undefined
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  : "text-nav-foreground hover:bg-nav-hover-background hover:text-nav-foreground"
               }
               leadingIcon={<RiMenuLine className="size-oe-icon-medium" aria-hidden="true" />}
               onClick={toggleSidebar}

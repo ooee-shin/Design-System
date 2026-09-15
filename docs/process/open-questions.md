@@ -47,7 +47,6 @@
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
 - **관리자 레이아웃에서 뽑은 네 초안** — `/screens/admin/layout`에서 Admin Header, Side Navigation, Page Header와 Tabs 넷을 뽑아 `candidates/`에 두고 Studio에 초안으로 올렸다. 명세와 상세 화면이 없고, 넷 다 아직 `oe` 토큰으로 정규화하지 않았다. 남은 것은 다음과 같다.
-  - **Side Navigation이 shadcn 토큰 위에 서 있다.** 받은 `sidebar.tsx`의 컴포넌트 24개가 `--sidebar-*` 계열을 쓰고, 그 위에 화면이 `--menu-*` 변수를 얹어 스타일 셋을 만든다. 정규화할 때 이 두 층을 어떻게 합칠지 정한다.
   - **Page Header의 설명이 아직 그려지지 않는다.** 제목 옆 아이콘만 세워 두었고 누르면 펼쳐지는 자리를 붙이지 않았다. 팝오버를 받아 두었다가 지웠으므로 붙일 때 다시 받는다.
   - **Tabs는 `underline` 한 모양뿐이다.** 아래 「Tab 컴포넌트」가 적어 둔 `filled`는 만들지 않았다.
   - **Admin Header의 Utility 넷이 컴포넌트 안에 박혀 있다.** 알림·설정·조직도·로그아웃이 어느 화면에서나 같아서 그렇게 두었는데, 시스템마다 달라지면 밖에서 받아야 한다.

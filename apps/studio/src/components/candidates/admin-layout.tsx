@@ -59,21 +59,21 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
     name: "다크",
     hint: "브랜드의 가장 짙은 색을 씁니다.",
     vars: {
-      "--sidebar": "var(--brand-950)",
+      "--nav-background": "var(--brand-950)",
       // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
       // 흰 글자가 그 사이에서 드러난다.
-      "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
-      "--sidebar-border": "rgb(255 255 255 / 0.12)",
+      "--nav-foreground": "rgb(255 255 255 / 0.8)",
+      "--nav-border": "rgb(255 255 255 / 0.12)",
       // 검색창의 면과 줄 위에 마우스를 얹었을 때의 면이 같은 값이다. 짙은 레일 위에서는 고정된
       // 색 한 단계보다 흰색을 옅게 얹는 편이, 레일 색이 바뀌어도 같은 정도로 밝아진다.
-      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
-      "--sidebar-accent-foreground": "var(--color-neutral-50)",
+      "--nav-hover-background": "rgb(255 255 255 / 0.08)",
+      "--nav-hover-foreground": "var(--color-neutral-50)",
       // 검색창은 줄 위의 면보다 한 단계 더 밝다. 늘 떠 있는 면이라 같은 값으로는 레일에 묻힌다.
-      "--menu-search-bg": "rgb(255 255 255 / 0.12)",
-      "--menu-active-bg": "var(--brand-700)",
-      "--menu-active-fg": "var(--color-white)",
+      "--nav-search-background": "rgb(255 255 255 / 0.12)",
+      "--nav-active-background": "var(--brand-700)",
+      "--nav-active-foreground": "var(--color-white)",
       // 짙은 바탕에서는 흰 글자가 더 또렷하게 보이므로, 묶음 이름을 한 단계 더 옅게 둔다.
-      "--menu-group-fg": "rgb(255 255 255 / 0.5)",
+      "--nav-group-foreground": "rgb(255 255 255 / 0.5)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-950)]", body: "bg-white text-neutral-900" },
   },
@@ -82,20 +82,19 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
     name: "브랜드",
     hint: "브랜드 색이 그대로 드러납니다.",
     vars: {
-      "--sidebar": "var(--brand-800)",
-      "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
-      "--sidebar-border": "rgb(255 255 255 / 0.16)",
+      "--nav-background": "var(--brand-800)",
+      "--nav-foreground": "rgb(255 255 255 / 0.8)",
+      "--nav-border": "rgb(255 255 255 / 0.16)",
       // 검색창의 면과 hover, 고른 줄이 모두 레일을 밝히는 방향으로 간다. 하나만 어두워지면 한
-      // 레일 안에서 방향이 둘로 갈린다. 옅은 것부터 진한 것까지 8·12·16% 의 사다리다.
-      "--sidebar-accent": "rgb(255 255 255 / 0.08)",
-      "--sidebar-accent-foreground": "var(--color-white)",
+      // 레일 안에서 방향이 둘로 갈린다. 옅은 것부터 진한 것까지 12·14·16% 의 사다리다.
+      "--nav-hover-background": "rgb(255 255 255 / 0.12)",
+      "--nav-hover-foreground": "var(--color-white)",
+      "--nav-search-background": "rgb(255 255 255 / 0.14)",
       // 고른 줄을 짙은 색으로 채우면 표시가 아니라 구멍처럼 읽힌다. 레일을 밝히는 알파로 두고
       // 글자를 온전한 흰색으로 올려 구분한다.
-      "--menu-active-bg": "rgb(255 255 255 / 0.16)",
-      "--menu-active-fg": "var(--color-white)",
-      "--menu-group-fg": "rgb(255 255 255 / 0.5)",
-      "--menu-hover-bg": "rgb(255 255 255 / 0.12)",
-      "--menu-search-bg": "rgb(255 255 255 / 0.14)",
+      "--nav-active-background": "rgb(255 255 255 / 0.16)",
+      "--nav-active-foreground": "var(--color-white)",
+      "--nav-group-foreground": "rgb(255 255 255 / 0.5)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
   },
@@ -104,16 +103,16 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
     name: "라이트",
     hint: "브랜드 색을 쓰지 않는 밝은 회색입니다. 메인 컬러를 바꿔도 이 스타일은 달라지지 않습니다.",
     vars: {
-      "--sidebar": "var(--color-neutral-100)",
+      "--nav-background": "var(--color-neutral-100)",
       // 바탕이 밝으므로 얹는 알파도 검정이다. 나머지 둘과 얼개는 같고 방향만 뒤집힌다.
-      "--sidebar-foreground": "rgb(0 0 0 / 0.8)",
-      "--sidebar-border": "rgb(0 0 0 / 0.12)",
-      "--sidebar-accent": "rgb(0 0 0 / 0.06)",
-      "--sidebar-accent-foreground": "rgb(0 0 0 / 0.8)",
+      "--nav-foreground": "rgb(0 0 0 / 0.8)",
+      "--nav-border": "rgb(0 0 0 / 0.12)",
+      "--nav-hover-background": "rgb(0 0 0 / 0.06)",
+      "--nav-hover-foreground": "rgb(0 0 0 / 0.8)",
       // 바탕이 회색조인 스타일이므로 고른 줄에도 브랜드를 쓰지 않는다. 같은 검정을 hover 보다
       // 한 단계 더 얹고 글자를 온전한 검정으로 올린다.
-      "--menu-active-bg": "rgb(0 0 0 / 0.1)",
-      "--menu-active-fg": "rgb(0 0 0 / 0.95)",
+      "--nav-active-background": "rgb(0 0 0 / 0.1)",
+      "--nav-active-foreground": "rgb(0 0 0 / 0.95)",
     } as React.CSSProperties,
     preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
   },
@@ -147,14 +146,14 @@ export function AdminLayout({
         className="min-w-[1024px]"
         style={
           {
-            "--menu-active-bg": "var(--oe-brand-background-secondary)",
-            "--menu-active-fg": "var(--oe-brand-foreground-primary)",
+            "--nav-active-background": "var(--oe-brand-background-secondary)",
+            "--nav-active-foreground": "var(--oe-brand-foreground-primary)",
             // 줄 위에 마우스를 얹었을 때의 면이다. 따로 정하지 않으면 검색창과 같은 값을 쓴다.
-            "--menu-hover-bg": "var(--sidebar-accent)",
+            "--nav-hover-background": "var(--nav-hover-background)",
             // 검색창의 면이다. 따로 정하지 않으면 줄 위의 면과 같은 값을 쓴다.
-            "--menu-search-bg": "var(--sidebar-accent)",
+            "--nav-search-background": "var(--nav-hover-background)",
             // 묶음 이름의 색이다. 따로 정하지 않으면 줄 글자의 70% 로 둔다.
-            "--menu-group-fg": "color-mix(in srgb, var(--sidebar-foreground) 70%, transparent)",
+            "--nav-group-foreground": "color-mix(in srgb, var(--nav-foreground) 70%, transparent)",
             ...style.vars,
           } as React.CSSProperties
         }

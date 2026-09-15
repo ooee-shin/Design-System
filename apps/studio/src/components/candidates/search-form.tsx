@@ -35,8 +35,8 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
             // 공용 `Input` 은 `oe` 토큰을 쓰므로 좌측 메뉴 바탕과 무관하게 흰 상자로 선다. 짙은
             // 바탕에서는 그것만 떠 보이므로 바탕과 글자를 좌측 메뉴의 값에 맞춘다.
             variant="filled"
-            containerClassName="px-4 bg-[var(--menu-search-bg)] text-sidebar-foreground has-[[data-slot=input]:focus]:bg-[var(--menu-search-bg)] [&_[data-slot=input-leading]]:text-sidebar-foreground/60 [&_[data-slot=input-clear]]:text-sidebar-foreground/60"
-            className="placeholder:text-sidebar-foreground/50"
+            containerClassName="px-4 bg-[var(--nav-search-background)] text-nav-foreground has-[[data-slot=input]:focus]:bg-[var(--nav-search-background)] [&_[data-slot=input-leading]]:text-nav-foreground/60 [&_[data-slot=input-clear]]:text-nav-foreground/60"
+            className="placeholder:text-nav-foreground/50"
             controlSize="regular"
             placeholder="메뉴 검색"
             aria-label="메뉴 검색"

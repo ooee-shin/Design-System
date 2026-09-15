@@ -29,7 +29,7 @@ import {
 // 줄 위에 마우스를 얹었을 때와 그 줄을 고른 상태다. 1·2·3depth 가 높이와 여백만 다르고 색이
 // 바뀌는 방식은 같으므로 한 곳에 둔다.
 const MENU_ROW_CLASS =
-  "transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
+  "transition-colors duration-150 hover:bg-[var(--nav-hover-background)] hover:text-[var(--nav-hover-foreground,inherit)] data-active:bg-[var(--nav-active-background)] data-active:text-[var(--nav-active-foreground)] hover:data-active:bg-[var(--nav-active-background)] hover:data-active:text-[var(--nav-active-foreground)]"
 
 /**
  * 메뉴 한 줄이다. 3depth 는 아이콘을 갖지 않으므로 이름만 있는 `NavLeaf` 이고, 2depth 는 아이콘을
@@ -92,7 +92,7 @@ export function AppSidebar({
             줄이며, 담긴 것이 어느 묶음에서 왔든 여기서는 한 층으로 나란히 선다. */}
         {favorites.length > 0 ? (
           <SidebarGroup className="pt-5 pb-0.5">
-            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
+            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--nav-group-foreground)]">
               즐겨찾기
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -122,7 +122,7 @@ export function AppSidebar({
             그 아래는 늘 펼쳐져 있다. */}
         {groups.map((group) => (
           <SidebarGroup key={group.title} className="pt-5 pb-0.5">
-            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
+            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--nav-group-foreground)]">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -152,7 +152,7 @@ export function AppSidebar({
                               둥글다. border 는 끝을 둥글게 만들 수 없어서 선을 따로 그린다.
                               위아래를 6px 씩 들여 목록보다 짧게 두고, 안쪽 여백을 10px 로 두어
                               고른 줄의 바탕이 선에 닿지 않게 한다. */}
-                          <SidebarMenuSub className="relative mr-0 gap-0 border-l-0 pr-0 pl-2.5 before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-sidebar-border">
+                          <SidebarMenuSub className="relative mr-0 gap-0 border-l-0 pr-0 pl-2.5 before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-nav-border">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton

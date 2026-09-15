@@ -6,9 +6,6 @@
  *
  * 화면을 감싸는 레이아웃은 `AdminLayout` 이 갖는다. 헤더와 좌측 메뉴, 그 둘을 세우는 CSS 변수가
  * 거기 있고, 이 파일에는 본문만 남는다.
- *
- * **아직 `oe` token 으로 정규화하지 않았다.** 좌측 메뉴와 그것이 쓰는 `candidates` 의 컴포넌트에
- * shadcn token 이 남아 있다. `pipeline.md` 가 정한 대로 지시를 받은 범위만 바꾼다.
  */
 
 import * as React from "react"
