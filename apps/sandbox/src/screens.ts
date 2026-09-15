@@ -33,4 +33,11 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "STO 사장님 앱의 지원요청 폼 한 장. 요청 유형·매장·제목·내용·사진 첨부·연락 가능 시간·긴급 요청 여부.",
     createdAt: "2026-09-14",
   },
+  {
+    key: "voc",
+    name: "고객의 소리",
+    href: "/voc",
+    prompt: "블루키 관리자 웹의 고객의 소리 화면. 필터·상태 칩·표·상세 답변 패널·페이지 이동.",
+    createdAt: "2026-09-15",
+  },
 ];
