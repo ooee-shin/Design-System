@@ -237,17 +237,21 @@ function SidebarTrigger({
   )
 }
 
+// 레일의 오른쪽 모서리에 있는 선이다. 가리키면 드러나고 누르면 여닫는다. 같은 일을 하는 버튼이
+// 헤더 왼쪽에 있으므로, 문구도 그 버튼과 같은 말을 쓴다. 하나는 「메뉴 열기」라 하고 다른 하나는
+// 다른 말을 쓰면 낭독기로 듣는 사람에게 서로 다른 기능으로 들린다.
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
-  const { toggleSidebar } = useSidebar()
+  const { state, toggleSidebar } = useSidebar()
+  const label = state === "collapsed" ? "메뉴 열기" : "메뉴 닫기"
 
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
+      aria-label={label}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title={label}
       className={cn(
         "absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
