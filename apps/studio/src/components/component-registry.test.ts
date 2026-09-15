@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { componentRegistry, getComponentRelations } from "./component-registry";
 
 test("component registry is the single complete catalog", () => {
-  assert.equal(componentRegistry.length, 21);
+  assert.equal(componentRegistry.length, 25);
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
 });
 
@@ -15,7 +15,7 @@ test("확정 owns a detail page and 초안 does not", () => {
   const draft = componentRegistry.filter((item) => item.status === "초안");
 
   assert.equal(settled.length, 19);
-  assert.equal(draft.length, 2);
+  assert.equal(draft.length, 6);
   assert.equal(settled.length + draft.length, componentRegistry.length);
 
   const hrefs = settled.map((item) => item.href);
