@@ -12,7 +12,7 @@
  */
 
 import * as React from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 import Image from "next/image"
 
@@ -24,7 +24,7 @@ import {
   RiSettings3Line,
 } from "@remixicon/react"
 
-import { Badge, Button, Input, NotificationBadge, Radio, RadioGroup, SwitchField } from "@ooee/ui"
+import { Badge, Button, InputButton, NotificationBadge, Radio, RadioGroup, SwitchField } from "@ooee/ui"
 
 import { useBrandTheme } from "@/components/brand-theme-provider"
 import { ColorSwatch } from "@/components/color-swatch"
@@ -219,7 +219,7 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       // 색 한 단계보다 흰색을 옅게 얹는 편이, 레일 색이 바뀌어도 같은 정도로 밝아진다.
       "--sidebar-accent": "rgb(255 255 255 / 0.08)",
       "--sidebar-accent-foreground": "var(--color-neutral-50)",
-      "--menu-active-bg": "var(--brand-600)",
+      "--menu-active-bg": "var(--brand-700)",
       "--menu-active-fg": "var(--color-white)",
       // 짙은 바탕에서는 흰 글자가 더 또렷하게 보이므로, 묶음 이름을 한 단계 더 옅게 둔다.
       "--menu-group-fg": "rgb(255 255 255 / 0.5)",
@@ -314,41 +314,38 @@ function MenuStyleSetting({
 }
 
 /**
- * `input.md` 의 「Color input」이 보여 주는 조합을 그대로 가져왔다. HEX 를 직접 적고 Leading
- * element 의 색 조각이 지금 색을 보여 준다. 여섯 자리가 다 찼을 때만 실제 색으로 반영한다.
+ * `input.md` 의 「Color input」이 보여 주는 둘째 조합이다. 입력란 모양의 버튼이 색 조각과 HEX 를
+ * 함께 보여 주고, 줄 전체가 색 선택기를 여는 자리다.
+ *
+ * 공용 Color Picker 는 아직 없다. `input.md` 도 그것이 완성되기 전까지 팝업을 잇지 않는다고
+ * 적고 있으므로, 그때까지 브라우저 선택기를 감춰 두고 버튼이 그것을 대신 연다.
  */
 function MainColorInput({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
-  const [text, setText] = useState(value.toUpperCase());
-  const complete = isCompleteHexColor(text);
+  const picker = useRef<HTMLInputElement>(null);
 
   return (
-    <Input
-      type="text"
-      inputMode="text"
-      autoComplete="off"
-      aria-label="메인 컬러"
-      layout="fixed"
-      fixedWidth={176}
-      value={text}
-      onChange={(event) => {
-        const next = formatHexColor(event.target.value);
-        setText(next);
-        if (isCompleteHexColor(next)) onChange(next);
-      }}
-      placeholder="#000000"
-      leadingElement={<ColorSwatch color={complete ? text : value} />}
-      className="font-mono tabular-nums uppercase"
-    />
+    <span className="relative inline-flex">
+      <InputButton
+        layout="fixed"
+        fixedWidth={176}
+        value={value.toUpperCase()}
+        leadingElement={<ColorSwatch color={value} />}
+        aria-label="메인 컬러"
+        aria-haspopup="dialog"
+        onClick={() => picker.current?.click()}
+        className="font-mono tabular-nums uppercase"
+      />
+      <input
+        ref={picker}
+        type="color"
+        value={value}
+        onChange={(event) => onChange(event.target.value.toUpperCase())}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-4 size-0 opacity-0"
+      />
+    </span>
   );
-}
-
-function formatHexColor(value: string) {
-  const hex = value.replace(/[^0-9a-f]/gi, "").slice(0, 6).toUpperCase();
-  return hex.length > 0 ? `#${hex}` : "";
-}
-
-function isCompleteHexColor(value: string) {
-  return /^#[0-9A-F]{6}$/i.test(value);
 }
 
 /**
@@ -377,6 +374,9 @@ function SettingRow({
 /**
  * `radio.md` 의 「선택 가능한 콘텐츠와 결합하기」가 보여 주는 카드를 그대로 가져왔다. 고른 카드는
  * 미리보기 둘레에 브랜드 색 테두리가 생기고, 카드 자체의 바탕은 바뀌지 않는다.
+ *
+ * 그 테두리는 `--brand-alpha-40` 대신 600 단계에 투명도를 입혀 쓴다. `--brand-alpha-*` 는 팔레트
+ * 단계가 아니라 사용자가 넣은 seed 자체라, seed 가 아주 밝거나 어두우면 테두리도 함께 흔들린다.
  */
 function StyleOptionCard({
   value,
@@ -390,7 +390,7 @@ function StyleOptionCard({
   const labelId = `sidebar-style-${value}`;
 
   return (
-    <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
+    <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[color-mix(in_srgb,var(--brand-600)_40%,transparent)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
       <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
         {/* 미리보기는 그 스타일의 좌측 메뉴 바탕을 그대로 보여 준다. 그림의 얼개는 `radio.md` 의
             「선택 가능한 콘텐츠와 결합하기」가 쓰는 것과 같다. */}
