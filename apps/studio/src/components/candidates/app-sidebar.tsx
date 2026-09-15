@@ -189,9 +189,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             작아진 자리에서 3depth 까지 어중간하게 줄이면 단계가 읽히지 않는다. */}
                         <CollapsibleContent>
                           {/* 오른쪽은 2depth 줄과 같은 선에서 끝나게 둔다. 받은 값은 좌우가 같은
-                              여백이라 하위 목록만 혼자 좁아 보였다. 왼쪽 선은 2px 이다. 1px 은
-                              옅은 색과 만나면 포함 관계를 말하기에 약하다. */}
-                          <SidebarMenuSub className="mr-0 gap-0 border-l-2 pr-0">
+                              여백이라 하위 목록만 혼자 좁아 보였다. 왼쪽 선은 2px 이고 양 끝이
+                              둥글다. border 는 끝을 둥글게 만들 수 없어서 선을 따로 그린다.
+                              위아래를 6px 씩 들여 목록보다 짧게 두고, 안쪽 여백을 10px 로 두어
+                              고른 줄의 바탕이 선에 닿지 않게 한다. */}
+                          <SidebarMenuSub className="relative mr-0 gap-0 border-l-0 pr-0 pl-2.5 before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-sidebar-border">
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
