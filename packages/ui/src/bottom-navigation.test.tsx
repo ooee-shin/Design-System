@@ -99,13 +99,13 @@ test("선택된 항목만 가장 진한 중립이 되고 나머지는 낮은 위
   const [selected, unselected] = items(nav)
 
   assertHas(selected.className, ["text-oe-foreground-primary"], "선택된 항목")
-  assertHas(unselected.className, ["text-oe-foreground-tertiary"], "선택되지 않은 항목")
+  assertHas(unselected.className, ["text-oe-foreground-subtle"], "선택되지 않은 항목")
   assertLacks(unselected.className, ["text-oe-foreground-primary"], "선택되지 않은 항목")
 })
 
-// 선택되지 않은 항목에서 아이콘은 라벨보다 한 단계 더 옅다. 아이콘이 라벨과 같은 무게로 서면
-// 선택되지 않은 항목이 다섯 개 나란히 있을 때 화면 아래쪽이 무거워진다.
-test("선택되지 않은 항목은 아이콘을 라벨보다 옅게 둔다", () => {
+// 선택되지 않은 항목은 아이콘과 라벨이 같은 색이다. 둘을 갈라 놓으면 아이콘이 먼저 사라지면서
+// 항목이 무엇인지 알아보기 어려워진다.
+test("선택되지 않은 항목은 아이콘과 라벨이 같은 색이다", () => {
   const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
   const unselectedIcon = items(nav)[1].querySelector("[data-slot=bottom-navigation-icon]") as HTMLElement
 
@@ -146,13 +146,141 @@ test("안전 영역이 없는 기기에서도 하단에 최소 여백을 둔다"
   assertHas(nav.className, ["pb-[max(env(safe-area-inset-bottom),1rem)]"], "Container")
 })
 
-// 태블릿처럼 넓은 폭에서 항목이 지나치게 벌어지지 않도록 안쪽 목록의 폭을 제한한다.
-test("항목 목록의 폭에 상한을 둔다", () => {
+// 목록은 주어진 폭을 그대로 쓴다. 컴포넌트가 자기 상한을 들고 있으면 뷰포트를 넓혔을 때 바탕만
+// 넓어지고 항목은 가운데 모여 서서, 폭을 정한 쪽의 결정이 화면에 반영되지 않는다. 지나치게
+// 벌어지는 것은 뷰포트나 그 페이지가 다룬다.
+// 바닥에 붙는 줄에서도 초점선이 항목의 네모 전체를 두르지 않는다. 선택 표시와 같은 자리에 같은
+// 모양으로 그려서 무엇이 켜질 자리인지 그대로 읽히게 한다.
+test("bar 의 초점선은 선택 표시와 같은 모양으로 선다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
+  const icon = nav.querySelector("[data-slot=bottom-navigation-icon]") as HTMLElement
+
+  assertHas(
+    icon.className,
+    ["before:h-9", "before:w-10", "before:rounded-xl", "group-focus-visible/item:before:ring-2"],
+    "아이콘 자리",
+  )
+
+  const [item] = items(nav)
+  assertLacks(item.className, ["focus-visible:ring-inset"], "항목")
+})
+
+// 네모난 초점선이 둥근 알약 안에 서면 모양이 어긋난다. 떠 있는 형태에서는 선택 표시와 같은 자리에
+// 같은 모양으로 그린다.
+test("floating 의 초점선은 선택 표시와 같은 모양으로 선다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" />)
+  const [item] = items(nav)
+
+  assertHas(
+    item.className,
+    ["after:inset-y-2", "after:rounded-full", "focus-visible:after:ring-2", "focus-visible:after:ring-oe-focus-ring"],
+    "항목",
+  )
+  assertLacks(item.className, ["focus-visible:ring-inset"], "항목")
+})
+
+// 떠 있는 형태는 화면 바닥에 붙지 않고 좌우에 여백을 두고 선다. 경계선 없이 그림자만으로 본문과
+// 갈린다. 선을 두르면 바닥에 붙은 줄과 같은 모양이 되어 떠 있는 것으로 읽히지 않는다.
+test("floating 은 선 없이 떠 있는 알약으로 선다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" />)
+
+  assertHas(nav.className, ["mx-3", "rounded-full", "shadow-sm"], "내비게이션")
+  assertLacks(nav.className, ["border-t", "border-oe-border-secondary"], "내비게이션")
+})
+
+// 라벨을 감추면 줄 자체가 낮아진다. 글자가 빠진 만큼 높이가 남으면 아이콘만 있는 알약이 속 빈
+// 상자로 보인다. 높이가 끊기지 않고 바뀌도록 전환을 함께 건다.
+test("floating 의 높이는 라벨 유무를 따라간다", () => {
+  const shown = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" showLabels />)
+  const shownList = shown.nav.querySelector("[data-slot=bottom-navigation-list]") as HTMLElement
+  assertHas(shownList.className, ["h-18", "transition-[height]"], "라벨이 보이는 목록")
+
+  cleanup()
+
+  const hidden = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" />)
+  const hiddenList = hidden.nav.querySelector("[data-slot=bottom-navigation-list]") as HTMLElement
+  assertHas(hiddenList.className, ["h-16"], "라벨을 감춘 목록")
+})
+
+// 선택 표시가 항목마다 켜졌다 꺼지면 어디에서 어디로 옮겨 갔는지 읽히지 않는다. 하나가 자리를
+// 옮기게 해서 이동 자체를 보여 준다.
+test("floating 의 선택 표시는 하나가 자리를 옮긴다", () => {
+  const { nav } = renderNav(<BottomNavigation value={ITEMS[1].value} items={ITEMS} variant="floating" />)
+
+  const indicator = nav.querySelector("[data-slot=bottom-navigation-indicator]") as HTMLElement | null
+  assert.ok(indicator, "선택 표시가 없다")
+  assertHas(indicator.className, ["absolute", "rounded-full", "transition-transform", "motion-reduce:transition-none"], "선택 표시")
+  assert.equal(indicator.style.transform, "translateX(100%)")
+
+  // 표시가 하나뿐이므로 항목은 자기 배경을 갖지 않는다.
+  for (const item of items(nav)) {
+    assertLacks(item.className, ["bg-oe-background-secondary"], "항목")
+  }
+})
+
+// 누르는 동안 아이콘이 작아졌다가 선택되면 조금 커진다. 눌린 것이 손에서 떨어지기 전에 화면에서
+// 먼저 읽힌다.
+test("floating 의 아이콘은 누르면 작아지고 선택되면 커진다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" />)
+  const [selected, unselected] = items(nav)
+
+  const icon = (item: HTMLElement) => item.querySelector("[data-slot=bottom-navigation-icon]") as HTMLElement
+  assertHas(icon(selected).className, ["scale-105", "transition-transform"], "선택된 항목의 아이콘")
+  assertHas(icon(unselected).className, ["group-active/item:scale-90"], "선택되지 않은 항목의 아이콘")
+})
+
+// 기본은 지금까지의 꽉 찬 줄이다. 형태를 고르지 않은 화면이 조용히 바뀌면 안 된다.
+test("형태의 기본값은 화면 바닥에 붙는 줄이다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
+
+  assertHas(nav.className, ["border-t", "w-full"], "내비게이션")
+  assertLacks(nav.className, ["rounded-full"], "내비게이션")
+})
+
+// 글자를 화면에서 지워도 항목의 이름은 남아야 한다. 이름이 사라지면 화면 낭독기를 쓰는 사람에게
+// 다섯 항목이 모두 「버튼」으로만 읽힌다.
+test("showLabels 를 끄면 글자만 감추고 이름은 남는다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
+
+  const label = nav.querySelector("[data-slot=bottom-navigation-label]") as HTMLElement | null
+  assert.ok(label, "Label 자리가 없다")
+  assertHas(label.className, ["sr-only"], "Label")
+  assert.equal(label.textContent, ITEMS[0].label)
+})
+
+// 아이콘과 Label 사이는 형태가 정한다. 바닥에 붙는 줄에서는 선택 표시가 아이콘보다 8px 아래까지
+// 내려오므로 그보다 넓어야 표시가 라벨에 닿지 않는다.
+test("아이콘과 Label 사이는 형태가 정한다", () => {
+  const bar = renderNav(<BottomNavigation value="home" items={ITEMS} />)
+  assertHas((bar.nav.querySelector("[data-slot=bottom-navigation-item]") as HTMLElement).className, ["gap-2"], "bar 항목")
+
+  cleanup()
+
+  const floating = renderNav(<BottomNavigation value="home" items={ITEMS} variant="floating" />)
+  assertHas(
+    (floating.nav.querySelector("[data-slot=bottom-navigation-item]") as HTMLElement).className,
+    ["gap-1"],
+    "floating 항목",
+  )
+})
+
+// Label 크기는 bottom-navigation.md 의 「크기」가 소유한다. 13px 은 `text-oe-label` token 이
+// 소유하는 값이고 행간 16px 이 함께 온다. 아이콘 24px 과 합쳐도 56px 안에 든다.
+test("Label 은 13px label token 으로 선다", () => {
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} showLabels />)
+
+  const label = nav.querySelector("[data-slot=bottom-navigation-label]") as HTMLElement | null
+  assert.ok(label, "Label 자리가 없다")
+  assertHas(label.className, ["text-oe-label"], "Label")
+})
+
+test("항목 목록은 주어진 폭을 그대로 쓴다", () => {
   const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
 
   const list = nav.querySelector("[data-slot=bottom-navigation-list]") as HTMLElement | null
   assert.ok(list, "항목 목록 자리가 없다")
-  assertHas(list.className, ["max-w-[480px]", "mx-auto"], "항목 목록")
+  assertHas(list.className, ["w-full"], "항목 목록")
+  assert.doesNotMatch(list.className, /max-w-/, "항목 목록이 자기 폭 상한을 들고 있다")
 })
 
 test("badge 를 넘긴 항목에만 알림 표시를 붙인다", () => {
@@ -171,7 +299,7 @@ test("badge 를 넘긴 항목에만 알림 표시를 붙인다", () => {
 
 // 라벨은 한 줄에서 끝난다. 두 줄로 넘어가면 그 항목만 높아져 목록의 기준선이 어긋난다.
 test("라벨은 줄바꿈하지 않는다", () => {
-  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} />)
+  const { nav } = renderNav(<BottomNavigation value="home" items={ITEMS} showLabels />)
 
   const label = items(nav)[0].querySelector("[data-slot=bottom-navigation-label]") as HTMLElement
   assertHas(label.className, ["truncate"], "라벨")

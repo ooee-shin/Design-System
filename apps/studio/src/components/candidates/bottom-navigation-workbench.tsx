@@ -1,8 +1,25 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { RiBarChartBoxFill, RiCalendar2Fill, RiHome5Fill, RiMenuFill, RiStore2Fill } from "@remixicon/react";
-import { AppHeader, BottomNavigation, NotificationBadge, type BottomNavigationItem } from "@ooee/ui";
+import {
+  RiBarChartBoxFill,
+  RiBarChartBoxLine,
+  RiCalendar2Fill,
+  RiCalendar2Line,
+  RiHome5Fill,
+  RiHome5Line,
+  RiMenuFill,
+  RiMenuLine,
+  RiStore2Fill,
+  RiStore2Line,
+} from "@remixicon/react";
+import {
+  AppHeader,
+  BottomNavigation,
+  NotificationBadge,
+  type BottomNavigationItem,
+  type BottomNavigationVariant,
+} from "@ooee/ui";
 
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface } from "@/components/component-anatomy";
 import { GuidelineList, UsageComparison } from "@/components/component-guidelines";
@@ -35,11 +52,19 @@ const DIAGRAM_ICON = "relative flex shrink-0 items-center text-neutral-400 dark:
 
 const itemCounts = [3, 4, 5] as const;
 
+const variants = ["bar", "floating"] as const satisfies readonly BottomNavigationVariant[];
+
+const variantLabel: Record<BottomNavigationVariant, string> = {
+  bar: "Bar",
+  floating: "Floating",
+};
+
 type ItemCount = (typeof itemCounts)[number];
 
 const sections = [
   { id: "playground", label: "Playground" },
   { id: "anatomy", label: "Anatomy" },
+  { id: "variant", label: "Style" },
   { id: "state", label: "State" },
   { id: "count", label: "Item count" },
   { id: "badge", label: "Badge" },
@@ -71,11 +96,22 @@ const copy = {
 type Copy = (typeof copy)[keyof typeof copy];
 
 // 아이콘과 라벨은 이 컴포넌트가 정하는 것이 아니라 자리를 보여 주는 예시다. 무엇이 들어갈지는
-// 제품이 정한다.
-const ICONS = [<RiHome5Fill key="1" />, <RiCalendar2Fill key="2" />, <RiStore2Fill key="3" />, <RiBarChartBoxFill key="4" />, <RiMenuFill key="5" />];
+// 제품이 정한다. 선택되지 않은 항목은 Line, 선택된 항목은 Fill 이므로 짝으로 둔다.
+const ICONS = [
+  { line: <RiHome5Line key="1" />, fill: <RiHome5Fill key="1f" /> },
+  { line: <RiCalendar2Line key="2" />, fill: <RiCalendar2Fill key="2f" /> },
+  { line: <RiStore2Line key="3" />, fill: <RiStore2Fill key="3f" /> },
+  { line: <RiBarChartBoxLine key="4" />, fill: <RiBarChartBoxFill key="4f" /> },
+  { line: <RiMenuLine key="5" />, fill: <RiMenuFill key="5f" /> },
+];
 
 function allItems(c: Copy): BottomNavigationItem[] {
-  return ICONS.map((icon, index) => ({ value: String(index), label: c.labels[index], icon }));
+  return ICONS.map((icon, index) => ({
+    value: String(index),
+    label: c.labels[index],
+    icon: icon.line,
+    selectedIcon: icon.fill,
+  }));
 }
 
 function itemsOf(count: ItemCount, c: Copy) {
@@ -88,6 +124,8 @@ export function BottomNavigationWorkbench() {
   const [count, setCount] = useState<ItemCount>(5);
   const [value, setValue] = useState("0");
   const [showBadge, setShowBadge] = useState(false);
+  const [variant, setVariant] = useState<BottomNavigationVariant>("bar");
+  const [showLabels, setShowLabels] = useState(false);
 
   const playgroundItems = itemsOf(count, c).map((item, index) =>
     showBadge && index === 1 ? { ...item, badge: { count: 3 } } : item,
@@ -96,19 +134,29 @@ export function BottomNavigationWorkbench() {
   return (
     <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
       <div className="min-w-0 space-y-5">
-        <Section id="playground" title="🚩 Playground" description="항목 개수와 알림 표시를 조합해 확인합니다. 선택은 Control로 고르지 않고 미리보기의 항목을 직접 눌러 옮깁니다. 항목의 아이콘과 라벨은 자리를 보여 주는 예시이며 무엇이 들어갈지는 제품이 정합니다. 항목은 개수와 무관하게 같은 폭을 나눠 가지며 항목 영역의 높이는 언제나 56px입니다.">
+        <Section id="playground" title="🚩 Playground" description="항목 개수와 알림 표시를 조합해 확인합니다. 선택은 Control로 고르지 않고 미리보기의 항목을 직접 눌러 옮깁니다. 항목의 아이콘과 라벨은 자리를 보여 주는 예시이며 무엇이 들어갈지는 제품이 정합니다. 항목은 개수와 무관하게 같은 폭을 나눠 가집니다. 줄 높이는 형태와 라벨 유무가 정합니다.">
           <div className="col-span-full grid gap-5 rounded-xl border-2 border-oe-border-bold-primary bg-oe-background-secondary p-4 @min-[760px]:grid-cols-[minmax(20rem,1fr)_16rem]">
             <div className="flex items-start justify-center">
               <PhoneFrame>
                 <div className={cn("flex-1", PHONE_SCROLL)}>
                   <PhoneBody />
                 </div>
-                <BottomNavigation value={value} onValueChange={setValue} items={playgroundItems} />
+                <BottomNavigation
+                  value={value}
+                  onValueChange={setValue}
+                  items={playgroundItems}
+                  variant={variant}
+                  showLabels={showLabels}
+                />
               </PhoneFrame>
             </div>
             <div className="space-y-5 rounded-xl bg-oe-background-primary p-4">
+              <ControlSection title="Style">
+                <ControlGroup label="Variant">{variants.map((item) => <Choice key={item} active={variant === item} onClick={() => setVariant(item)}>{variantLabel[item]}</Choice>)}</ControlGroup>
+              </ControlSection>
               <ControlSection title="Elements">
                 <ControlGroup label="Items">{itemCounts.map((item) => <Choice key={item} active={count === item} onClick={() => { setCount(item); if (Number(value) >= item) setValue("0"); }}>{`${item}개`}</Choice>)}</ControlGroup>
+                <Toggle label="Label" value={showLabels} onChange={setShowLabels} />
                 <Toggle label="Badge" value={showBadge} onChange={setShowBadge} />
               </ControlSection>
             </div>
@@ -159,15 +207,33 @@ export function BottomNavigationWorkbench() {
           </div>
         </Section>
 
-        <Section id="state" title="Properties · State" description="항목이 갖는 상태는 선택 여부 하나입니다. 아이콘은 선택 여부와 무관하게 같은 Fill 하나를 그리고 색만 바뀝니다. 항목이 나란히 서는 자리에서 시각적 위계를 잡기 위해서이며 근거는 icon.md가 소유합니다.">
-          <Example label="Selected" description="아이콘과 라벨이 함께 가장 진한 중립이 됩니다. Brand를 쓰지 않는 이유는 하단 내비가 알리는 것이 브랜드가 아니라 지금 어느 화면에 있는지이기 때문입니다.">
+        <Section id="variant" title="Properties · Style" description="형태는 둘이며 기본값은 Bar입니다. 담는 것은 같고 줄이 서는 방식과 선택 표시의 모양이 다릅니다. 한 제품 안에서는 하나를 골라 모든 화면이 같은 것을 씁니다.">
+          <Example label="Bar" description="화면 바닥에 붙어 폭을 다 쓰고 위쪽에 선을 둡니다. 선택 표시가 아이콘만 감싸므로 라벨이 그 밖에 남습니다.">
             <PhoneStrip>
-              <BottomNavigation value="0" items={itemsOf(4, c)} />
+              <BottomNavigation value="0" items={itemsOf(5, c)} showLabels />
             </PhoneStrip>
           </Example>
-          <Example label="Unselected" description="라벨은 한 단계, 아이콘은 두 단계 낮춥니다. 모양은 선택된 항목과 같고 색만 다릅니다.">
+          <Example label="Floating" description="좌우에 여백을 두고 떠서 알약으로 섭니다. 선이 아니라 그림자로 본문과 갈리고, 선택 표시가 항목 전체를 감쌉니다.">
             <PhoneStrip>
-              <BottomNavigation value="none" items={itemsOf(4, c)} />
+              <BottomNavigation value="0" items={itemsOf(5, c)} variant="floating" />
+            </PhoneStrip>
+          </Example>
+        </Section>
+
+        <Section id="state" title="Properties · State" description="항목이 갖는 상태는 선택 여부 하나입니다. 선택되지 않은 항목은 Line, 선택된 항목은 Fill을 씁니다. 색만으로 가르면 다섯이 나란히 선 자리에서 어느 것이 켜져 있는지 한눈에 들어오지 않습니다.">
+          <Example label="Selected" description="아이콘이 Fill로 바뀌고 가장 진한 중립이 되며 배경 표시를 갖습니다. Brand를 쓰지 않는 이유는 하단 내비가 알리는 것이 브랜드가 아니라 지금 어느 화면에 있는지이기 때문입니다.">
+            <PhoneStrip>
+              <BottomNavigation value="0" items={itemsOf(4, c)} showLabels />
+            </PhoneStrip>
+          </Example>
+          <Example label="Unselected" description="아이콘과 라벨이 함께 oe-foreground-subtle입니다. 둘을 갈라 놓으면 아이콘이 먼저 사라지면서 항목이 무엇인지 알아보기 어려워집니다.">
+            <PhoneStrip>
+              <BottomNavigation value="none" items={itemsOf(4, c)} showLabels />
+            </PhoneStrip>
+          </Example>
+          <Example label="선택 표시는 자리를 옮긴다" description="항목마다 배경을 켜고 끄지 않고 표시 하나가 다음 자리로 미끄러집니다. 어디에서 어디로 갔는지가 움직임 자체로 읽힙니다. 누르는 동안에는 아이콘이 작아졌다가 손을 떼면 돌아옵니다. 움직임을 줄이도록 설정한 기기에서는 전환 없이 곧바로 자리를 잡습니다.">
+            <PhoneStrip>
+              <MovingIndicatorDemo items={itemsOf(5, c)} />
             </PhoneStrip>
           </Example>
         </Section>
@@ -176,7 +242,7 @@ export function BottomNavigationWorkbench() {
           {itemCounts.map((item) => (
             <Example key={item} label={`${item}개`} description={item === 5 ? "가장 좁은 조합입니다. 라벨이 들어가는지 이 칸에서 확인합니다." : undefined}>
               <PhoneStrip>
-                <BottomNavigation value="0" items={itemsOf(item, c)} />
+                <BottomNavigation value="0" items={itemsOf(item, c)} showLabels />
               </PhoneStrip>
             </Example>
           ))}
@@ -200,10 +266,10 @@ export function BottomNavigationWorkbench() {
           </Example>
         </Section>
 
-        <Section id="safe-area" title="하단 여백" description="항목 영역 56px 바깥에 하단 여백을 더합니다. 값은 기기의 안전 영역과 최소 16px 중 큰 쪽입니다. 높이 안에 넣지 않는 이유는 인디케이터가 있는 기기에서 항목이 그만큼 눌리기 때문입니다.">
+        <Section id="safe-area" title="하단 여백" description="줄 바깥에 하단 여백을 더합니다. 값은 기기의 안전 영역과 최소 16px 중 큰 쪽입니다. 높이 안에 넣지 않는 이유는 인디케이터가 있는 기기에서 항목이 그만큼 눌리기 때문입니다. Floating은 같은 여백을 알약 바깥의 여백으로 내보냅니다. 안쪽에 두면 알약이 그만큼 높아져 라벨을 감춰도 흰 면이 줄어들지 않습니다.">
           <Example label="홈 인디케이터가 없는 기기" description="안전 영역이 0이라 최소 16px을 씁니다. 이 값이 없으면 항목이 화면 맨 아래에 붙어 손가락이 닿기 어렵고 안드로이드의 제스처 핸들과 겹칩니다.">
             <PhoneBottomEdge>
-              <BottomNavigation value="0" items={itemsOf(4, c)} />
+              <BottomNavigation value="0" items={itemsOf(4, c)} showLabels />
             </PhoneBottomEdge>
           </Example>
           <Example label="홈 인디케이터가 있는 기기" description="안전 영역이 34px이라 그쪽이 커서 그 값을 씁니다. 검수 화면의 브라우저에는 안전 영역이 없으므로 이 칸만 같은 값을 직접 넣어 흉내 냈습니다.">
@@ -213,14 +279,14 @@ export function BottomNavigationWorkbench() {
           </Example>
         </Section>
 
-        <Section id="with-app-header" title="AppHeader와 함께" description="두 컴포넌트가 화면의 위아래를 잡습니다. 본문만 스크롤되고 두 줄은 제자리에 머뭅니다. 아래쪽이 더 두꺼운 것은 항목 영역 56px 바깥에 하단 여백이 붙기 때문입니다.">
+        <Section id="with-app-header" title="AppHeader와 함께" description="두 컴포넌트가 화면의 위아래를 잡습니다. 본문만 스크롤되고 두 줄은 제자리에 머뭅니다. 아래쪽이 더 두꺼운 것은 줄 바깥에 하단 여백이 붙기 때문입니다.">
           <div className="col-span-full flex justify-center">
             <PhoneFrame>
               <AppHeader title={c.screen} />
               <div className={cn("flex-1", PHONE_SCROLL)}>
                 <PhoneBody />
               </div>
-              <BottomNavigation value="2" items={allItems(c)} />
+              <BottomNavigation value="2" items={allItems(c)} showLabels />
             </PhoneFrame>
           </div>
         </Section>
@@ -290,8 +356,11 @@ export function BottomNavigationWorkbench() {
                 <MapRow property="onValueChange" values="(value: string) => void" defaultValue="undefined" />
                 <MapRow property="items[].value" values="string" defaultValue="필수" />
                 <MapRow property="items[].label" values="ReactNode" defaultValue="필수" />
-                <MapRow property="items[].icon" values="ReactNode (Fill)" defaultValue="필수" />
+                <MapRow property="items[].icon" values="ReactNode (Line)" defaultValue="필수" />
+                <MapRow property="items[].selectedIcon" values="ReactNode (Fill)" defaultValue="undefined" />
                 <MapRow property="items[].badge" values="NotificationBadge의 Props (className 제외)" defaultValue="undefined" />
+                <MapRow property="variant" values="bar | floating" defaultValue="bar" />
+                <MapRow property="showLabels" values="false | true" defaultValue="false" />
                 <MapRow property="className" values="string" defaultValue="undefined" />
               </tbody>
             </table>
@@ -362,7 +431,8 @@ function GuideNav({ c, picks, labels }: { c: Copy; picks: number[]; labels?: str
       items={picks.map((pick, index) => ({
         value: String(index),
         label: labels?.[index] ?? c.labels[pick],
-        icon: ICONS[pick],
+        icon: ICONS[pick].line,
+        selectedIcon: ICONS[pick].fill,
       }))}
     />
   );
@@ -370,6 +440,12 @@ function GuideNav({ c, picks, labels }: { c: Copy; picks: number[]; labels?: str
 
 function Section({ id, title, description, children }: { id: string; title: string; description: string; children: ReactNode }) { return <section id={id} className="scroll-mt-20 rounded-2xl border border-oe-border-secondary bg-oe-background-primary p-5"><h3 className="text-xl font-semibold text-oe-foreground-primary">{title}</h3><p className="mt-1 text-xs leading-5 text-oe-foreground-tertiary">{description}</p><div className="mt-5 grid gap-3 @min-[720px]:grid-cols-2">{children}</div></section>; }
 function ControlSection({ title, children }: { title: string; children: ReactNode }) { return <section><h4 className="mb-3 text-sm font-semibold text-oe-foreground-primary">{title}</h4><div className="space-y-3">{children}</div></section>; }
+/** 선택이 옮겨 가는 것은 정지한 그림으로 보이지 않으므로 이 칸만 눌러 볼 수 있게 둔다. */
+function MovingIndicatorDemo({ items }: { items: BottomNavigationItem[] }) {
+  const [value, setValue] = useState(items[0].value);
+  return <BottomNavigation value={value} onValueChange={setValue} items={items} showLabels />;
+}
+
 function ControlGroup({ label, children }: { label: string; children: ReactNode }) { return <fieldset><legend className={`mb-2 ${SMALL_LABEL}`}>{label}</legend><div className="flex flex-wrap gap-1.5">{children}</div></fieldset>; }
 function Toggle({ label, value, onChange }: { label: string; value: boolean; onChange: (value: boolean) => void }) { return <div className="flex items-center justify-between gap-3"><span className={SMALL_LABEL}>{label}</span><button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-5 w-9 shrink-0 rounded-full ${value ? "bg-oe-background-bold-primary" : "bg-oe-background-secondary ring-1 ring-inset ring-oe-border-primary"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-oe-background-primary shadow-sm transition-[left] ${value ? "left-[18px]" : "left-0.5"}`} /></button></div>; }
 
