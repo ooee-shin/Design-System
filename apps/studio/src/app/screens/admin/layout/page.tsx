@@ -67,9 +67,11 @@ const UTILITIES = [
 ] as const;
 
 export default function Page() {
-  const [styleName, setStyleName] = useState(SIDEBAR_STYLES[0].name);
-  const [showRowIcons, setShowRowIcons] = useState(true);
-  const style = SIDEBAR_STYLES.find((item) => item.name === styleName) ?? SIDEBAR_STYLES[0];
+  // 화면에 실제로 반영되어 있는 값이다. 설정 패널은 자기 안에서 고르고, 저장을 눌렀을 때만 이
+  // 값을 바꾼다.
+  const { seed, applySeed } = useBrandTheme();
+  const [applied, setApplied] = useState({ styleName: SIDEBAR_STYLES[0].name, showRowIcons: true });
+  const style = SIDEBAR_STYLES.find((item) => item.name === applied.styleName) ?? SIDEBAR_STYLES[0];
 
   return (
     // 좌측 메뉴가 화면 높이를 전부 쓰고, 그 오른쪽에서 헤더와 본문이 위아래로 나뉜다. 헤더를 가로
@@ -100,15 +102,16 @@ export default function Page() {
             따로 두면 접을 때 하나가 사라지고 다른 하나가 생겨서, 유지되는 것이 아니라 새로
             만들어지는 것처럼 보인다. */}
         <SidebarToggle />
-        <AppSidebar showRowIcons={showRowIcons} />
+        <AppSidebar showRowIcons={applied.showRowIcons} />
         <SidebarInset className="min-h-0">
           <AdminHeader />
           <div className="flex flex-1 flex-col gap-6 p-6">
             <MenuStyleSetting
-              styleName={styleName}
-              onStyleChange={setStyleName}
-              showRowIcons={showRowIcons}
-              onRowIconsChange={setShowRowIcons}
+              applied={{ seed, ...applied }}
+              onSave={(next) => {
+                applySeed(next.seed);
+                setApplied({ styleName: next.styleName, showRowIcons: next.showRowIcons });
+              }}
             />
           </div>
         </SidebarInset>
@@ -276,64 +279,51 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   },
 ]
 
+/**
+ * 세 설정은 고르는 동안에는 이 자리에만 남고, 저장을 눌러야 화면에 반영된다. 고르는 즉시 바뀌면
+ * 저장 버튼이 할 일이 없어지고, 한 패널 안에서 즉시 적용과 저장이 섞여 읽힌다.
+ */
 function MenuStyleSetting({
-  styleName,
-  onStyleChange,
-  showRowIcons,
-  onRowIconsChange,
+  applied,
+  onSave,
 }: {
-  styleName: string
-  onStyleChange: (name: string) => void
-  showRowIcons: boolean
-  onRowIconsChange: (next: boolean) => void
+  applied: { seed: string; styleName: string; showRowIcons: boolean }
+  onSave: (next: { seed: string; styleName: string; showRowIcons: boolean }) => void
 }) {
-  const { seed, applySeed } = useBrandTheme();
+  const [draft, setDraft] = useState(applied);
 
   return (
     // 카드 셋과 사이 간격을 더한 폭이다. 176 × 3 + 12 × 2 = 552 이다.
     <section className="flex w-[552px] flex-col gap-6">
       <span className="flex items-start justify-between gap-4">
-        <span className="flex flex-col items-start gap-1">
-          <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
 
-          {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. 기본값과
-              같은 상태에서도 끄지 않는다. 눌러도 달라지지 않을 뿐이고, 꺼져 있으면 왜 못 누르는지
-              설명할 자리가 필요해진다.
-
-              공용 `Button` 에는 배경 없이 글자만 있는 변형이 없고, `button.md` 가 그것을 아직
-              정의하지 않은 항목으로 적어 두고 있다. 그래서 관리자 로그인의 「비밀번호 찾기」와 같은
-              표기로 이 자리에서 세운다. */}
-          <button
-            type="button"
-            onClick={() => {
-              applySeed(DEFAULT_BRAND_SEED);
-              onStyleChange(SIDEBAR_STYLES[0].name);
-              onRowIconsChange(true);
-            }}
-            className="rounded-sm text-[length:var(--text-oe-label)] text-oe-foreground-tertiary underline underline-offset-4 outline-none hover:text-oe-foreground-secondary focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+        <span className="flex items-center gap-2">
+          {/* 잘못 골랐을 때 돌아올 자리다. 고른 값을 기본값으로 되돌릴 뿐이고, 화면에 반영하려면
+              저장을 눌러야 한다. */}
+          <Button
+            variant="outline"
+            tone="neutral"
+            controlSize="small"
+            onClick={() => setDraft({ seed: DEFAULT_BRAND_SEED, styleName: SIDEBAR_STYLES[0].name, showRowIcons: true })}
           >
             기본값 초기화
-            </button>
+          </Button>
+          <Button variant="fill" controlSize="small" onClick={() => onSave(draft)}>
+            저장
+          </Button>
         </span>
-
-        {/* 누르면 무엇이 일어나는지는 아직 정해지지 않았다. 지금은 고른 즉시 반영되므로 이 버튼에
-            동작을 붙이지 않았다. */}
-        <Button variant="fill" controlSize="small">
-          저장
-        </Button>
       </span>
 
-      {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
-          레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
       <SettingRow inline label="메인 컬러" description="버튼과 선택 표시 등 화면 곳곳의 기본 색으로 쓰입니다.">
-        <MainColorInput value={seed} onChange={applySeed} />
+        <MainColorInput value={draft.seed} onChange={(hex) => setDraft((prev) => ({ ...prev, seed: hex }))} />
       </SettingRow>
 
       <SettingRow label="메뉴 스타일" description="왼쪽 메뉴의 배경색과 글자색, 선택한 메뉴의 표시가 함께 바뀝니다.">
         <RadioGroup
           className="flex gap-3"
-          value={styleName}
-          onValueChange={(next) => onStyleChange(String(next))}
+          value={draft.styleName}
+          onValueChange={(next) => setDraft((prev) => ({ ...prev, styleName: String(next) }))}
           aria-label="메뉴 스타일"
         >
           {SIDEBAR_STYLES.map((item) => (
@@ -355,8 +345,8 @@ function MenuStyleSetting({
             환경설정으로 옮겨 가므로, 저장 여부가 정해져도 바뀌지 않는 Radio 로 둔다. */}
         <RadioGroup
           className="flex items-center gap-2"
-          value={showRowIcons ? "사용" : "미사용"}
-          onValueChange={(next) => onRowIconsChange(next === "사용")}
+          value={draft.showRowIcons ? "사용" : "미사용"}
+          onValueChange={(next) => setDraft((prev) => ({ ...prev, showRowIcons: next === "사용" }))}
           aria-label="메뉴 아이콘"
         >
           <RadioField value="사용" label="사용" />
