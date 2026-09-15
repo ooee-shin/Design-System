@@ -16,6 +16,8 @@ import { useRef, useState } from "react"
 
 import Image from "next/image"
 
+import { Tabs } from "@base-ui/react/tabs"
+
 import {
   RiLogoutBoxRLine,
   RiMenuLine,
@@ -32,6 +34,7 @@ import { useBrandTheme } from "@/components/brand-theme-provider"
 import { ColorSwatch } from "@/components/color-swatch"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
+import { PageHeader, type PageHeaderTab } from "@/components/candidates/page-header"
 import {
   SidebarInset,
   SidebarProvider,
@@ -65,6 +68,18 @@ const UTILITIES = [
   { key: "settings", name: "설정", icon: RiSettings3Line },
   { key: "organization", name: "조직도", icon: RiOrganizationChart },
 ] as const;
+
+// 지금 화면은 환경설정의 테마설정이다. 좌측 메뉴가 아니라 헤더의 설정에서 들어오는 자리이므로
+// 경로도 좌측 메뉴와 맞물리지 않는다.
+const PAGE_PATH = ["환경설정", "테마설정"];
+
+// 테마는 관리자 웹과 두 앱이 따로 갖는다. 지금 만든 것은 관리자 웹 하나이며, 나머지 둘은 탭만
+// 서 있고 내용은 아직 없다.
+const THEME_TABS: PageHeaderTab[] = [
+  { value: "admin", label: "관리자 웹" },
+  { value: "sv", label: "SV앱" },
+  { value: "sto", label: "STO앱" },
+];
 
 export default function Page() {
   // 화면에 실제로 반영되어 있는 값이다. 설정 패널은 자기 안에서 고르고, 저장을 눌렀을 때만 이
@@ -105,15 +120,25 @@ export default function Page() {
         <AppSidebar showRowIcons={applied.showRowIcons} />
         <SidebarInset className="min-h-0">
           <AdminHeader />
-          <div className="flex flex-1 flex-col gap-6 p-6">
-            <MenuStyleSetting
-              applied={{ seed, ...applied }}
-              onSave={(next) => {
-                applySeed(next.seed);
-                setApplied({ styleName: next.styleName, showRowIcons: next.showRowIcons });
-              }}
-            />
-          </div>
+          {/* 탭 줄은 머리에 서고 그 탭이 여는 내용은 그 아래 본문이다. 둘이 서로를 가리켜야 하므로
+              `Tabs.Root` 가 머리와 본문을 함께 감싼다. */}
+          <Tabs.Root defaultValue={THEME_TABS[0].value} className="flex min-h-0 flex-1 flex-col">
+            <PageHeader path={PAGE_PATH} title="테마설정" tabs={THEME_TABS} />
+            <Tabs.Panel value={THEME_TABS[0].value} className="flex flex-1 flex-col gap-6 p-6">
+              <MenuStyleSetting
+                applied={{ seed, ...applied }}
+                onSave={(next) => {
+                  applySeed(next.seed);
+                  setApplied({ styleName: next.styleName, showRowIcons: next.showRowIcons });
+                }}
+              />
+            </Tabs.Panel>
+            {THEME_TABS.slice(1).map((tab) => (
+              <Tabs.Panel key={tab.value} value={tab.value} className="p-6 text-sm text-oe-foreground-tertiary">
+                아직 만들지 않았습니다.
+              </Tabs.Panel>
+            ))}
+          </Tabs.Root>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
