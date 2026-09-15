@@ -32,7 +32,7 @@ export const screenRoots: ScreenRoot[] = [
     name: "관리자",
     note: "뷰포트를 전부 씁니다. 좌측 내비게이션이 화면 높이를 채우고 본문만 스크롤됩니다.",
     items: [
-      { key: "layout", name: "테마설정", scope: "관리자 레이아웃을 여기서 함께 세웠습니다. 헤더와 좌측 메뉴, 본문 머리가 여기서 나왔습니다.", href: "/screens/admin/layout" },
+      { key: "layout", name: "레이아웃·테마설정", scope: "Admin Layout(Header, Side Navigation, Page Header)", href: "/screens/admin/layout" },
       { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
     ],
