@@ -192,12 +192,26 @@ const data: { navMain: NavGroup[] } = {
   ],
 }
 
+// 줄 위에 마우스를 얹었을 때와 그 줄을 고른 상태다. 1·2·3depth 가 높이와 여백만 다르고 색이
+// 바뀌는 방식은 같으므로 한 곳에 둔다.
+const MENU_ROW_CLASS =
+  "transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
+
+/** 즐겨찾기에 담긴 화면 하나. 이름과 줄 앞의 아이콘을 갖는다. */
+export type FavoriteItem = {
+  title: string
+  icon: typeof RiUserAddLine
+}
+
 export function AppSidebar({
   showRowIcons = false,
+  favorites = [],
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   /** 메뉴 줄 앞의 아이콘을 그릴지. 좌측 메뉴 스타일이 정한다. */
   showRowIcons?: boolean
+  /** 즐겨찾기에 담은 화면들. 비어 있으면 그 묶음이 서지 않는다. */
+  favorites?: FavoriteItem[]
 }) {
   // 지금 보고 있는 메뉴가 어느 것인지 화면이 말해야 한다. 실제 경로가 아직 없으므로 누른 것을
   // 기억해 두고, 경로가 붙으면 주소에서 읽는 값으로 바꾼다.
@@ -216,6 +230,37 @@ export function AppSidebar({
         <SearchForm />
       </SidebarHeader>
       <SidebarContent className="gap-0">
+        {/* 즐겨찾기는 사용자가 직접 담은 화면들이라 정해진 묶음보다 위에 선다. 하나도 담지 않은
+            동안에는 이름만 남은 빈 묶음이 되므로 통째로 그리지 않는다. 안쪽은 2depth 와 같은
+            줄이며, 담긴 것이 어느 묶음에서 왔든 여기서는 한 층으로 나란히 선다. */}
+        {favorites.length > 0 ? (
+          <SidebarGroup className="pt-5 pb-0.5">
+            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
+              즐겨찾기
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-0">
+                {favorites.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      className={`h-9 gap-2 px-4 font-medium ${MENU_ROW_CLASS}`}
+                      isActive={activeMenu === `즐겨찾기/${item.title}`}
+                      onClick={(event) => {
+                        event.preventDefault()
+                        setActiveMenu(`즐겨찾기/${item.title}`)
+                      }}
+                      render={<a href="#" />}
+                    >
+                      {showRowIcons ? <item.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
+                      {item.title}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
+
         {/* 1depth 는 접지 않는다. 페이지가 아니라 묶음이라는 것은 작고 옅은 글자가 말하고,
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
@@ -236,7 +281,7 @@ export function AppSidebar({
                     // 자기 여백을 품고 있어서 같은 값을 주면 더 들어와 보인다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="h-9 gap-2 pr-3 pl-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className={`h-9 gap-2 pr-3 pl-4 font-medium ${MENU_ROW_CLASS}`} isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {showRowIcons ? <item.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
@@ -254,7 +299,7 @@ export function AppSidebar({
                             {item.items.map((child) => (
                               <SidebarMenuSubItem key={child.title}>
                                 <SidebarMenuSubButton
-                                  className="h-8 px-4 transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
+                                  className={`h-8 px-4 ${MENU_ROW_CLASS}`}
                                   isActive={activeMenu === `${group.title}/${item.title}/${child.title}`}
                                   onClick={(event) => {
                                     event.preventDefault()
@@ -273,7 +318,7 @@ export function AppSidebar({
                   ) : (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        className="h-9 gap-2 px-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
+                        className={`h-9 gap-2 px-4 font-medium ${MENU_ROW_CLASS}`}
                         isActive={activeMenu === `${group.title}/${item.title}`}
                         onClick={(event) => {
                           event.preventDefault()

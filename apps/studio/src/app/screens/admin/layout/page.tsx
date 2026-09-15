@@ -23,6 +23,7 @@ import {
   RiMenuLine,
   RiNotification3Line,
   RiOrganizationChart,
+  RiPaletteLine,
   RiSettings3Line,
 } from "@remixicon/react"
 
@@ -73,6 +74,10 @@ const UTILITIES = [
 // 경로도 좌측 메뉴와 맞물리지 않는다.
 const PAGE_PATH = ["환경설정", "테마설정"];
 
+// 즐겨찾기에 담기면 좌측 메뉴의 맨 위 묶음에 이 줄로 선다. 담는 것은 경로가 아니라 화면 하나
+// 이므로 이름은 경로의 마지막 항목을 쓴다.
+const PAGE_FAVORITE = { title: PAGE_PATH[PAGE_PATH.length - 1], icon: RiPaletteLine };
+
 // 테마는 관리자 웹과 두 앱이 따로 갖는다. 지금 만든 것은 관리자 웹 하나이며, 나머지 둘은 탭만
 // 서 있고 내용은 아직 없다.
 const THEME_TABS: PageHeaderTab[] = [
@@ -86,6 +91,10 @@ export default function Page() {
   // 값을 바꾼다.
   const { seed, applySeed } = useBrandTheme();
   const [applied, setApplied] = useState({ styleName: SIDEBAR_STYLES[0].name, showRowIcons: true });
+
+  // 즐겨찾기는 누른 즉시 좌측 메뉴에 반영된다. 저장을 거치는 세 설정과 달리 이 화면 자체를
+  // 담아 두는 표시이므로 저장 버튼이 관여하지 않는다.
+  const [favorite, setFavorite] = useState(false);
   const style = SIDEBAR_STYLES.find((item) => item.name === applied.styleName) ?? SIDEBAR_STYLES[0];
 
   return (
@@ -117,13 +126,19 @@ export default function Page() {
             따로 두면 접을 때 하나가 사라지고 다른 하나가 생겨서, 유지되는 것이 아니라 새로
             만들어지는 것처럼 보인다. */}
         <SidebarToggle />
-        <AppSidebar showRowIcons={applied.showRowIcons} />
+        <AppSidebar showRowIcons={applied.showRowIcons} favorites={favorite ? [PAGE_FAVORITE] : []} />
         <SidebarInset className="min-h-0">
           <AdminHeader />
           {/* 탭 줄은 머리에 서고 그 탭이 여는 내용은 그 아래 본문이다. 둘이 서로를 가리켜야 하므로
               `Tabs.Root` 가 머리와 본문을 함께 감싼다. */}
           <Tabs.Root defaultValue={THEME_TABS[0].value} className="flex min-h-0 flex-1 flex-col">
-            <PageHeader path={PAGE_PATH} title="테마설정" tabs={THEME_TABS} />
+            <PageHeader
+              path={PAGE_PATH}
+              title="테마설정"
+              tabs={THEME_TABS}
+              favorite={favorite}
+              onFavoriteChange={setFavorite}
+            />
             <Tabs.Panel value={THEME_TABS[0].value} className="flex flex-1 flex-col gap-6 p-6">
               <MenuStyleSetting
                 applied={{ seed, ...applied }}

@@ -3,7 +3,9 @@
 import * as React from "react"
 
 import { Tabs } from "@base-ui/react/tabs"
-import { RiArrowRightSLine } from "@remixicon/react"
+import { RiArrowRightSLine, RiStarFill, RiStarLine } from "@remixicon/react"
+
+import { ToggleButton } from "@ooee/ui"
 
 import { cn } from "@/lib/utils"
 
@@ -33,6 +35,8 @@ export function PageHeader({
   title,
   tabs,
   actions,
+  favorite,
+  onFavoriteChange,
   className,
   ...props
 }: React.ComponentProps<"div"> & {
@@ -43,6 +47,9 @@ export function PageHeader({
   tabs?: PageHeaderTab[]
   /** 제목 오른쪽에 서는 동작 버튼. 없으면 제목이 그 자리까지 쓴다. */
   actions?: React.ReactNode
+  /** 이 화면이 즐겨찾기에 담겨 있는지. 넘기지 않으면 별이 서지 않는다. */
+  favorite?: boolean
+  onFavoriteChange?: (next: boolean) => void
 }) {
   const current = path.length - 1
 
@@ -82,9 +89,29 @@ export function PageHeader({
 
       {/* 제목과 동작 버튼은 한 줄에서 좌우로 갈린다. 버튼이 여럿이면 제목 쪽이 먼저 줄어든다. */}
       <div className="mt-1.5 flex items-start justify-between gap-4">
-        <h1 className="text-2xl leading-8 font-semibold tracking-tight text-oe-foreground-primary">
-          {title}
-        </h1>
+        {/* 별은 오른쪽 묶음이 아니라 제목에 붙는다. 저장이나 발행처럼 이 화면이 다루는 대상을
+            바꾸는 동작이 아니라, 이 화면 자체를 내 목록에 담아 두는 표시이기 때문이다. 오른쪽
+            끝에 두면 화면마다 동작 버튼 수가 달라 별의 자리가 옮겨 다니기도 한다. */}
+        <div className="flex min-w-0 items-center gap-0.5">
+          <h1 className="text-2xl leading-8 font-semibold tracking-tight text-oe-foreground-primary">
+            {title}
+          </h1>
+          {favorite === undefined ? null : (
+            // 이름은 켜짐과 꺼짐에서 같은 것을 쓴다. 지금 담겨 있는지는 `aria-pressed` 가
+            // 이미 말하므로, 이름까지 바꾸면 상태와 누르면 일어날 일이 뒤섞인다.
+            <ToggleButton
+              variant="ghost"
+              tone="custom"
+              color="favorite"
+              controlSize="small"
+              icon={<RiStarLine />}
+              activeIcon={<RiStarFill />}
+              pressed={favorite}
+              onPressedChange={onFavoriteChange}
+              aria-label="즐겨찾기"
+            />
+          )}
+        </div>
         {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
       </div>
 
