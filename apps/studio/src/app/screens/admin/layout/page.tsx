@@ -426,7 +426,9 @@ function StyleOptionCard({
           </span>
         )}
       </span>
-      <span className="flex min-h-7 items-center gap-2 pl-1">
+      {/* 라디오가 미리보기의 왼쪽 끝과 같은 자리에서 시작한다. 링을 바깥으로 빼면서 이미지가
+          카드 끝까지 왔으므로, 예전에 이미지의 안쪽 여백을 맞추려고 두었던 4px 은 걷어낸다. */}
+      <span className="flex min-h-7 items-center gap-2">
         <Radio value={value} aria-labelledby={labelId} className="focus-visible:ring-0 focus-visible:ring-offset-0" />
         <span id={labelId} className="text-sm leading-5 font-medium whitespace-nowrap text-oe-foreground-primary">
           {label}
