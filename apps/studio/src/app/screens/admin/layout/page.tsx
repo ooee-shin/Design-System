@@ -284,16 +284,17 @@ function MenuStyleSetting({
   const { seed, applySeed } = useBrandTheme();
 
   return (
+    // 카드 셋과 사이 간격을 더한 폭이다. 176 × 3 + 12 × 2 = 552 이다.
     <section className="flex w-[552px] flex-col gap-6">
-      <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+      <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
 
       {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
           레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
-      <SettingRow inline label="메인 컬러" description="이 색에서 만들어진 팔레트를 메뉴 스타일이 가져다 씁니다.">
+      <SettingRow inline label="메인 컬러" description="버튼과 선택 표시 등 화면 곳곳의 기본 색으로 쓰입니다.">
         <MainColorInput value={seed} onChange={applySeed} />
       </SettingRow>
 
-      <SettingRow label="메뉴 스타일" description="레일의 바탕과 글자, 고른 줄의 표시가 함께 바뀝니다.">
+      <SettingRow label="메뉴 스타일" description="왼쪽 메뉴의 배경색과 글자색, 선택한 메뉴의 표시가 함께 바뀝니다.">
         <RadioGroup
           className="flex gap-3"
           value={styleName}
@@ -307,7 +308,7 @@ function MenuStyleSetting({
       </SettingRow>
 
       {/* 아이콘은 색과 상관없이 어느 스타일에서나 같게 동작하므로 자기 축을 갖는다. */}
-      <SettingRow inline label="메뉴 아이콘">
+      <SettingRow inline label="메뉴 아이콘" description="메뉴 이름 앞에 아이콘을 함께 보여 줍니다.">
         <SwitchField
           label={showRowIcons ? "보임" : "숨김"}
           labelPosition="left"
@@ -339,10 +340,9 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
         aria-label="메인 컬러"
         aria-haspopup="dialog"
         onClick={() => picker.current?.click()}
-        // 200 과 300 의 가운데를 이 자리에서만 시험한다. `neutral` 에 250 단계가 없어서 두 값을
-        // 섞어 만든다. 공용 `Input` 의 값을 바꾸면 저장소의 모든 폼 요소가 함께 따라오므로,
-        // 괜찮다고 판단된 뒤에 그쪽을 옮긴다.
-        className="border-[color-mix(in_oklab,var(--color-neutral-200),var(--color-neutral-300))] font-mono tabular-nums uppercase"
+        // shadcn 의 `--input` 이 이미 200 이라 폼 요소의 경계로는 그 값이 기준이다. 공용 `Input`
+        // 의 값을 바꾸면 저장소의 모든 폼 요소가 함께 따라오므로, 여기서 먼저 200 으로 두고 본다.
+        className="border-oe-border-secondary font-mono tabular-nums uppercase"
       />
       <input
         ref={picker}
@@ -402,8 +402,11 @@ function StyleOptionCard({
   const labelId = `sidebar-style-${value}`;
 
   return (
-    <label className="relative grid w-44 cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:border-[color-mix(in_srgb,var(--brand-600)_40%,transparent)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!border-oe-focus-ring">
-      <span className="style-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
+    // 링을 바깥으로 빼면서 미리보기 아래 3px 이 없어졌다. 카드 안쪽 간격으로 되돌린다.
+    <label className="relative grid w-44 cursor-pointer gap-2 [&:has([data-slot=radio][data-checked])_.style-preview-frame]:outline-[color-mix(in_srgb,var(--brand-600)_40%,transparent)] [&:has([data-slot=radio]:focus-visible)_.style-preview-frame]:!outline-oe-focus-ring">
+      {/* 고른 표시는 바깥에 그린다. 테두리로 두르면 그만큼 안쪽이 줄어서 미리보기가 카드 폭을
+          다 쓰지 못하고 여백만 넓어진다. */}
+      <span className="style-preview-frame block rounded-lg outline-2 outline-offset-2 outline-transparent transition-[outline-color] duration-150">
         {/* 미리보기는 그 스타일의 좌측 메뉴 바탕을 그대로 보여 준다. 그림의 얼개는 `radio.md` 의
             「선택 가능한 콘텐츠와 결합하기」가 쓰는 것과 같다. */}
         {preview ? (
@@ -435,10 +438,10 @@ function StylePreview({ band, body }: { band: string; body: string }) {
   return (
     <span
       aria-hidden="true"
-      className="flex h-24 w-full overflow-hidden rounded-lg border border-black/10"
+      className="flex h-24 w-full overflow-hidden rounded-lg border border-oe-border-visual"
     >
       {/* 흰 바탕끼리는 경계가 없으므로 띠의 오른쪽에 선을 둔다. */}
-      <span className={`w-1/4 shrink-0 border-r border-black/10 ${band}`} />
+      <span className={`w-1/4 shrink-0 border-r border-oe-border-visual ${band}`} />
       <span className={`flex-1 p-3 ${body}`}>
         <span className="block h-1.5 w-1/3 rounded-full bg-current opacity-35" />
         <span className="mt-2 block h-1.5 w-1/2 rounded-full bg-current opacity-20" />
