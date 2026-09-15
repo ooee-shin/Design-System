@@ -168,9 +168,9 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 문서 | 고칠 곳 | 순서 |
 | --- | --- | --- |
 | [roadmap.md](roadmap.md) | 「A/B 비교 검증」에 결과. 4·5단계의 「1차 범위: 제외」를 고칠지는 「아직 정하지 않은 것」에 있다 | A/B 뒤 |
-| [tooling.md](tooling.md) | 「테스트 배치 규칙」에 Story 위치, 검증 명령에 `pnpm storybook`·`build-storybook`과 `apps/sandbox` 검사 | 2, 3 |
+| [tooling.md](tooling.md) | 「테스트 배치 규칙」에 Story 위치, 검증 명령에 `pnpm storybook`·`build-storybook`. `apps/sandbox` 검사는 순서 2에서 넣었다 | 3 |
 | [git-workflow.md](git-workflow.md) | 「dev에서 main으로 올릴 때」 항목마다 명령과 컴포넌트·Story만 바뀐 pull request의 예외 | 각 순서 |
-| `AGENTS.md` | 「문서 구조」에 `apps/sandbox` 행과 `.claude/` 제거 규칙, MCP 사용과 명령 규칙 한 절 | 2, 4 |
+| `AGENTS.md` | 「문서 구조」의 `.claude/` 제거 규칙, MCP 사용과 명령 규칙 한 절. `apps/sandbox` 행은 순서 2에서 넣었다 | 4 |
 | 루트 `README.md` | 첫 환경변수가 생길 때 `.env.example`. 1차 범위 문구는 roadmap.md와 같은 결정을 따른다 | 6, A/B 뒤 |
 | [working-context.md](working-context.md) | 「일정과 분담」의 `~9/4` 행에 R4에서 정한 호스팅 이름 | 5 |
 | `.github/pull_request_template.md` | Storybook·MCP를 건드린 pull request의 확인 항목 | 3 |
@@ -196,3 +196,20 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **재조회.** `get_metadata`는 레이어 이름과 좌표 XML을, `get_screenshot`은 1440×900 PNG의 7일짜리 URL을, `get_design_context`는 React+Tailwind 코드를 돌려준다. 그 코드는 `bg-[#1d4ed8]`·`text-[#171717]`·`font-['Inter:Medium']`처럼 값이 그대로 박혀 있고, `@ooee/ui` 컴포넌트나 `oe` 토큰은 `data-name`에 남은 레이어 이름 말고는 없다. [roadmap.md](roadmap.md)가 적은 A안의 경험이 그대로 재현된다.
 - **결론.** ②(Figma 화면 생성)는 `use_figma`로 성립하고 ④(재조회)도 된다. 재조회 결과를 `@ooee/ui`로 되돌리려면 레이어 이름 규칙(`Button / 로그인 / layout=fill controlSize=xlarge / oe-brand-background-bold-primary`처럼 컴포넌트·Property·토큰을 이름에 적는다)과 Skill의 매핑표가 있어야 한다. Code Connect는 플랜상 쓸 수 없으므로 매핑표가 그 자리를 맡는다. A/B 검증의 A안은 「코드에서 만든 캔버스를 사람이 고친 뒤 재조회」로 돌린다.
 - **남은 것.** 파일이 폴더 `651781449`에 들어갔는지는 API로 확인하지 못했다. `generate_figma_design`은 `captureId`가 필요해 시험하지 않았다. Pretendard 글꼴과 rate limit(`rate-limits-access.md` 리소스)은 다음에 본다.
+
+### 2026-09-15 Skill v0: docs/system/만으로 화면 둘
+
+- **만든 것.** `.claude/skills/generate-code/SKILL.md`, `.claude/skills/review-design/SKILL.md`, `apps/sandbox`(3001 포트의 Next.js 앱, `typecheck` script 없음, 자체 `test` script와 JSDOM 설정, Studio와 같은 브랜드 변수 주입). `claude -p "/review-design <파일>" --model sonnet`처럼 print mode에서도 프로젝트 Skill이 돈다. `--allowedTools`는 뒤따르는 인수를 모두 먹으므로 프롬프트를 그 앞에 둔다.
+- **실행.** `claude --model sonnet`의 headless 세션 둘이 요청 문단 하나씩만 받아 관리자 로그인(`apps/sandbox/src/app/admin-login`)과 STO 지원요청(`apps/sandbox/src/app/sto-support-request`)을 만들었다. 사람이 코드를 고치지 않았다. 두 화면은 v0의 기록으로 그대로 두고, 아래 틀린 사례는 코드가 아니라 Skill 문구를 고쳐 막았다.
+- **결과.** `pnpm --filter @ooee/sandbox build`·`test`(7건)와 `pnpm check`가 통과한다. 두 세션 모두 `/review-design` 위반 0건과 「pull request 준비 완료」를 냈다. `@ooee/ui` 재사용은 컴포넌트가 있는 요소 기준으로 STO 9/9, 관리자 로그인 4/4다. Property 이름과 값은 두 화면 모두 문서와 코드에 있는 것만 썼고 primitive 색과 shadcn 토큰은 0개다. 코드 절반은 Sonnet 수준으로 충분했고, 절차 절반(링크·Focus·아이콘·검사 실패 처리)은 Skill 문구가 부족했다.
+- **v0가 틀린 사례.** 순서 4의 입력이다.
+  - 관리자 로그인의 링크 셋(비밀번호 찾기·이용약관·개인정보처리방침)을 목적지가 없다는 이유로 `<button type="button">`으로 만들었다. 「라우팅 로직을 만들지 않는다」를 「`<a>`도 만들지 않는다」로 읽었다.
+  - native 버튼의 Focus에 `ring-offset-2`가 없어 `interaction.md` 유형 3의 2px 간격이 빠졌다. Skill이 준 클래스 문자열 자체가 틀렸다.
+  - 눈 아이콘을 `size-4`로 주고 hover 층과 `aria-hidden`을 두지 않았다. Skill 읽기 목록에 `foundations/icon.md`가 없었다.
+  - 요청은 Footer만 가운데 정렬인데 제목 덩이까지 가운데로 세웠고 보고에 적지 않았다.
+  - STO의 「긴급 요청」은 「요청 보내기」를 눌러야 반영되는데 요청의 낱말대로 `SwitchField`를 썼다. switch.md 「역할과 경계」는 Checkbox를 가리킨다. `/review-design`이 컴포넌트 문서의 「Properties」만 읽어 잡지 못했다.
+  - 두 세션 모두 `pnpm check`가 `apps/studio/.next`의 옛 타입 파일로 실패했는데 「무관」으로 두고 「pull request 준비 완료」를 냈다. 한 세션은 공용 `test-setup.ts`에 `self`를 더하고 이유를 적지 않았다.
+  - 머리말 주석이 요청을 요약해 선택지·placeholder 문구가 저장소에 남지 않았고, Select placeholder가 Field label을 반복했다. 테스트는 존재 여부만 보고 요청이 정한 기본값·마스킹·링크 role을 보지 않았다.
+- **Skill에서 고친 것.** 링크는 목적지가 없어도 `<a href="#">`, 유형 3 Focus 문자열에 offset, `icon.md` 읽기와 `size-oe-icon-*`, 요청이 말하지 않은 정렬은 왼쪽, 요청과 문서가 어긋나면 문서를 따르고 보고, 세 파일 밖 수정과 캐시 삭제 금지, 검사가 실패하면 「검사 실패」로 보고, 요청 문단을 머리말에 그대로, `원본:` 경로를 `screens.ts`의 `source`에, 테스트 넷째 항목(요청이 정한 값과 동작). `/review-design`은 컴포넌트 문서 전체와 `icon.md`를 읽고 아이콘·초안 컴포넌트 항목과 「역할과 경계」 판단을 더했다.
+- **docs/system/만으로 부족했던 것.** 둘이다. 폼 안의 짧은 단일 선택에서 `Select`와 `RadioField`를 가르는 문장이 select.md·radio.md에 없고 select-box.md에만 있다. checkbox.md 「Properties」에 필수 Property `label`이 없다. 둘 다 Storybook이 아니라 문서 한 줄로 채울 공백이며, 순서 3(Storybook)을 열 근거는 되지 않는다.
+- **실행 방법.** 두 세션을 같은 working tree에서 동시에 돌려 서로의 쓰는 중인 테스트를 돌렸고 `screens.ts`를 함께 고쳤다. 다음부터 v0 세션은 하나가 「pull request 준비 완료」에 닿은 뒤 다음을 돌린다.
