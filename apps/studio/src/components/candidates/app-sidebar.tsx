@@ -164,7 +164,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title} className="pt-5 pb-0.5">
-            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-sidebar-foreground/70">
+            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>

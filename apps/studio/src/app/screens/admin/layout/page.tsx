@@ -83,6 +83,8 @@ export default function Page() {
           "--menu-active-fg": "var(--oe-brand-foreground-primary)",
           // 줄 위에 마우스를 얹었을 때의 면이다. 따로 정하지 않으면 검색창과 같은 값을 쓴다.
           "--menu-hover-bg": "var(--sidebar-accent)",
+          // 묶음 이름의 색이다. 따로 정하지 않으면 줄 글자의 70% 로 둔다.
+          "--menu-group-fg": "color-mix(in srgb, var(--sidebar-foreground) 70%, transparent)",
           ...style.vars,
         } as React.CSSProperties}
       >
@@ -210,6 +212,8 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       "--sidebar-accent-foreground": "var(--color-neutral-50)",
       "--menu-active-bg": "var(--brand-600)",
       "--menu-active-fg": "var(--color-white)",
+      // 짙은 바탕에서는 흰 글자가 더 또렷하게 보이므로, 묶음 이름을 한 단계 더 옅게 둔다.
+      "--menu-group-fg": "rgb(255 255 255 / 0.5)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-950)]", body: "bg-white text-neutral-900" },
   },
@@ -228,6 +232,7 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
       // 글자를 온전한 흰색으로 올려 구분한다.
       "--menu-active-bg": "rgb(255 255 255 / 0.16)",
       "--menu-active-fg": "var(--color-white)",
+      "--menu-group-fg": "rgb(255 255 255 / 0.5)",
       "--menu-hover-bg": "rgb(255 255 255 / 0.12)",
     } as React.CSSProperties,
     preview: { band: "bg-[var(--brand-800)]", body: "bg-white text-neutral-900" },
