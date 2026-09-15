@@ -21,9 +21,9 @@ shadcn Skill은 shadcn 사용법을 제공하지만 ooee의 취향과 품질 기
 pnpm check
 ```
 
-`apps/sandbox`는 `pnpm check` 밖이다. `/generate-code`가 만든 화면은 `pnpm --filter @ooee/sandbox build`와 `pnpm --filter @ooee/sandbox test`로 따로 검사한다. 무엇을 `apps/sandbox`에 두는지는 [ai-environment.md](ai-environment.md)가 정한다.
+`apps/sandbox`는 `pnpm check` 밖이다. `/generate-code`가 만든 화면은 `pnpm --filter @ooee/sandbox build`와 `pnpm --filter @ooee/sandbox test`로 따로 검사한다. test에는 모든 화면의 `page.tsx`를 `/review-design` 검사 항목 가운데 기계로 가를 수 있는 것으로 읽는 `src/screen-rules.test.tsx`가 들어 있다. 무엇을 `apps/sandbox`에 두는지는 [ai-environment.md](ai-environment.md)가 정한다.
 
-Studio의 라우트를 지운 뒤 `pnpm check`의 build가 없는 경로를 가리키며 실패하면 `apps/studio/.next`를 지우고 다시 돌린다. 앞서 `pnpm dev`가 남긴 `.next/dev/types`를 `next build`가 지우지 않고 `tsconfig.json`이 그 파일을 포함하기 때문이다.
+Studio의 라우트를 지운 뒤 `pnpm check`의 build가 없는 경로를 가리키며 실패하면 `apps/studio/.next`를 지우고 다시 돌린다. 앞서 `pnpm dev`가 남긴 `.next/dev/types`를 `next build`가 지우지 않고 `tsconfig.json`이 그 파일을 포함하기 때문이다. 이 삭제는 사람이 원인을 확인하고 하는 절차다. `/generate-code` 같은 Skill 명령은 지우지 않고 「검사 실패」로 보고하며, `rm -r`는 공용 권한에서 늘 확인을 묻는다(`AGENTS.md` 「Claude Code 명령과 권한」).
 
 인터랙션이나 반응형을 변경했다면 Studio의 실제 화면에서도 해당 동작을 검수한다. 승인된 화면과 주요 상태의 스크린샷을 기준으로 유지하고 시각 회귀를 확인한다. 개별 색상만 보지 않고 foreground/background/border 조합을 검증한다.
 

@@ -11,7 +11,7 @@
 | `docs/system/` | 시스템에 무엇이 있고 어떤 정의이며 어떻게 쓰는가. 블루키에 전달할 영구 자산 |
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
-| `.claude/` | Claude Code 도구 설정과 `/generate-code`·`/review-design`·`/design-page` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거 |
+| `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/generate-code`·`/review-design`·`/design-page` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거하며, Plugin으로 분리할지는 `docs/process/ai-environment.md`의 스파이크 R3가 정한다 |
 | `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 신주희가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
 | `scripts/figma/` | `/design-page`가 `apps/sandbox` 화면을 Figma 프레임으로 옮기는 도구. 중간 산출물은 `.figma-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/figma/README.md` |
 
@@ -66,7 +66,7 @@
 - 컴포넌트를 반복 조정하는 동안에는 개별 시각 수정마다 `docs/system/components/{component}.md`를 갱신하지 않는다. 사용자가 “확정할게”, “완료” 또는 같은 의미로 말하면 실제 공용 컴포넌트와 Studio 화면을 대조한 뒤 해당 Component MD의 Anatomy, Properties, State, Layout, Guidelines, Specification과 미정 사항을 한 번에 정리한다.
 - 여러 컴포넌트에 즉시 적용되는 Studio 공통 규칙, Foundation 결정 또는 다음 작업자가 중간에 반드시 알아야 하는 충돌은 Component 확정 시점까지 미루지 않고 `docs/system/*`, `docs/process/*` 또는 `docs/process/working-context.md`에 바로 기록한다.
 - 확인된 구현·문서 불일치는 수정할 수 있지만, 누락된 Property 카드의 필요성이나 새로운 사용 정책처럼 판단이 필요한 내용은 모아서 사용자에게 질문한다.
-- 화면 확정만으로 열린 결정을 확정하거나 commit·push하지 않는다. 각각 사용자의 명시적 요청이 필요하다.
+- 화면 확정만으로 열린 결정을 확정하거나 commit·push·pull request 생성을 하지 않는다. 각각 사용자의 명시적 요청이 필요하다.
 
 - 화면을 눈으로 판단하기 전에 `scripts/visual/inspect.mjs`로 실제 값을 잰다. 측정할 때마다 새 스크립트를 쓰지 않는다. 개발 서버가 떠 있어야 하고 결과 이미지는 `.visual/`에 쌓이며 저장소에 포함하지 않는다.
 
@@ -83,6 +83,16 @@
 
 코드 변경 후 `pnpm check`를 실행한다. 세부 규칙과 테스트 배치 기준은 `docs/process/tooling.md`를 따른다.
 
+## Claude Code 명령과 권한
+
+- **Claude Code는 저장소 루트에서 시작한다.** 공용 권한 `.claude/settings.json`은 세션을 시작한 폴더에서만 읽힌다. 하위 폴더나 홈에서 시작한 세션은 Skill은 보이지만 아래 권한이 걸리지 않는다.
+- **공용 권한이 막는 것.** `deny`는 `main`으로 직접 push하는 명령이다. `ask`는 작업을 되돌리거나 지우는 명령(`git stash`, `git reset --hard`, `git clean`, `git checkout -- …`, `rm -r`), force push, `apps/sandbox`의 공용 파일(`package.json`, `test-setup.ts`, `screen-rules.*`, 첫 화면) 수정이다. `ask`와 `deny`는 개인 설정·`--allowedTools`·권한 모드로 풀리지 않고, 확인을 물을 수 없는 headless 세션에서는 거부된다. 규칙은 명령 문자열을 대조할 뿐이라 `git -C . push`처럼 형태를 바꾸면 걸리지 않으며 GitHub의 branch 보호가 아니다. 규칙을 바꾸는 pull request는 상대에게 먼저 알린다.
+- **막힌 명령은 형태를 바꿔 다시 시도하지 않는다.** 권한 규칙이나 확인 요청에 막히면 경로·옵션·도구를 바꿔 같은 일을 되풀이하지 않고, 막힌 명령과 거부 메시지를 사용자에게 알린다.
+- **명령 셋의 쓰임과 멈추는 자리.** `/generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. `/design-page`는 sandbox 화면을 Figma 프레임으로 옮기고 링크를 보고한다. 절차는 각 `.claude/skills/<이름>/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다. 어느 명령도 commit·push·pull request를 만들지 않는다.
+- **한 working tree에는 명령 세션 하나만 돌린다.** 두 세션이 같은 tree에서 서로의 쓰는 중인 파일을 테스트하고 공용 파일을 함께 고친 적이 있다. 동시에 돌려야 하면 저장소를 따로 clone한다. `git worktree`는 stash·branch·remote 설정을 원래 checkout과 공유하므로 격리가 아니다.
+- **headless로 돌릴 때.** `claude -p "<프롬프트>" --model sonnet --allowedTools … < /dev/null`처럼 프롬프트를 `--allowedTools` 앞에 둔다. `--allowedTools`는 뒤따르는 인수를 모두 먹는다. 신뢰하지 않은 폴더의 headless 세션은 공용 `allow`를 무시하므로 필요한 도구를 `--allowedTools`로 좁게 준다. `Bash(pnpm *)`처럼 넓게 주면 `pnpm exec`·`pnpm dlx`까지 열린다. 결과를 기록할 때는 실제로 돈 모델의 전체 이름을 적는다.
+- **MCP.** Figma remote MCP는 `.mcp.json`이 생기기 전까지 기기마다 `claude mcp add --transport http --scope user figma https://mcp.figma.com/mcp`로 등록하고 `/mcp`에서 로그인한다. 세션을 시작한 뒤 등록한 서버는 새 세션부터 실린다. Figma 결과물의 위치와 다른 디자인 시스템(BKDS 등)을 섞지 않는 규칙은 `docs/process/figma-page-agent.md`를 따른다. Storybook MCP와 Story는 아직 없으며, 만들지는 `docs/process/ai-environment.md`의 순서 3이 정한다.
+
 ## 여러 환경에서 이어서 작업할 때
 
 - Git remote의 push된 commit만 다른 기기와 계정이 공유할 수 있는 상태로 간주한다. 대화 기록과 로컬 미커밋 변경에 의존하지 않는다.
@@ -94,5 +104,5 @@
 - `docs/process/working-context.md`는 changelog가 아니라 현재 상태 snapshot으로 유지한다. 더 이상 현재 이해에 필요 없는 완료·과거 과정은 제거하고, 현재 구현·진행 중인 사항·바로 다음 작업·유효한 주의사항만 남긴다. 장기 설계 결정은 해당 `docs/system/` 문서로 옮긴다.
 - 사용자가 commit/push를 요청하면 staging 전에 이번 작업과 대화에서 생긴 지속 가능한 결정이 repository에 반영됐는지 확인한다. 이전 대화를 보지 못한 다음 작업자가 잘못 판단할 수 있는 정보만 기록한다.
 - 누락을 발견하면 코드와 함께 적절한 기존 문서를 먼저 갱신한다. 시스템 정의는 `docs/system/`, 제작 절차는 `docs/process/`, 현재 구현과 다음 작업은 `docs/process/working-context.md`, 작업 운영 규칙은 `AGENTS.md`를 사용한다.
-- 기기를 바꾸기 전 `pnpm check`, diff 검토, commit과 push를 완료한다. commit/push 권한은 사용자의 명시적 요청을 따른다.
+- 기기를 바꾸기 전 `pnpm check`, diff 검토, commit과 push를 완료한다. commit·push·pull request 생성은 사용자의 명시적 요청을 따른다.
 - secret 값, 계정 정보와 기기별 절대경로를 repository에 기록하지 않는다.

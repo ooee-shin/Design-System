@@ -24,7 +24,8 @@ allowed-tools: Read, Grep, Glob, Write, Bash(curl:*), Bash(pnpm --filter @ooee/s
 
 ## 하지 않는 것
 
-- 저장소 코드 수정. 이 명령은 `.figma-work/`만 쓴다. 화면이나 `scripts/figma/`가 틀렸으면 고치지 않고 보고에 적는다.
+- 저장소 코드 수정과 `.figma-work/` 밖에 파일 쓰기. 이 명령은 `.figma-work/`만 쓴다. 대조용 스크립트나 이미지를 `/tmp` 같은 다른 자리에 만들지 않는다. 화면이나 `scripts/figma/`가 틀렸으면 고치지 않고 보고에 적는다.
+- 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꿔 되풀이하지 않고 보고의 「확인이 필요한 것」에 명령과 거부 메시지를 적는다.
 - BKDS·공차 ERP 같은 다른 Figma 라이브러리의 컴포넌트·변수·스타일 사용. ooee-ui와 다른 시스템이다.
 - 색이나 글자 크기를 Figma에서 직접 입력하기. 모든 칠은 `oe color`·`oe primitive` 변수, 모든 글자는 `oe/text-*` 스타일이다.
 - Pretendard가 아닌 글꼴을 새로 고르기. 승인된 대체는 `scripts/figma/setup-text-styles.js`의 Noto Sans KR 하나뿐이다.
@@ -78,6 +79,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - `missingFrames`가 비어 있다.
 - 모든 프레임에서 `unboundPaints`가 비어 있다(모든 칠이 변수에 묶였다).
 - 모든 프레임에서 `textsWithoutStyle`이 비어 있다(모든 글자가 텍스트 스타일이다).
+- 모든 프레임에서 `rootWithoutFill`이 `false`다(루트 프레임에 바탕 칠이 있다). 칠이 없는 루트는 `unboundPaints`에 잡히지 않는다.
 - 5단계에서 모은 `unmappedColors`·`unmappedText`·`defaultTextColor`가 비어 있다.
 
 하나라도 어기면 「완료」라고 쓰지 않고 「검사 실패」로 보고한다. `opacityOnToken`은 완료를 막지 않는다. 코드가 `border-[var(--brand-500)]/30`처럼 색에 투명도를 붙여 쓴 자리를 그대로 옮긴 것이지만 `figma-page-agent.md` 규칙 5(토큰에 임의 투명도 금지)와 부딪치므로 「확인이 필요한 것」에 적는다.

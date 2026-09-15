@@ -28,7 +28,7 @@ description: apps/sandbox 화면 코드를 docs/system/의 quality.md·tokens.md
 
 ## 검사 항목
 
-번호마다 판정 규칙이 있다. 규칙에 걸리면 위반이고, 규칙으로 가르기 어려우면 「판단이 필요한 것」이다. 위반만 센다.
+번호마다 판정 규칙이 있다. 규칙에 걸리면 위반이고, 규칙으로 가르기 어려우면 「판단이 필요한 것」이다. 위반만 센다. `apps/sandbox/src/screen-rules.ts`가 이 가운데 일부를 `pnpm --filter @ooee/sandbox test`에서 기계로 보지만, 이 명령은 그 결과에 기대지 않고 모든 항목을 직접 대조한다.
 
 1. **raw primitive color 0개** (quality.md 「코드」, tokens.md 「기본 원칙」). 다음 중 하나라도 있으면 위반이다.
    - `(bg|text|border|ring|fill|stroke|from|to|via|outline|shadow|decoration|placeholder|accent|caret|divide)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}`
@@ -51,18 +51,20 @@ description: apps/sandbox 화면 코드를 docs/system/의 quality.md·tokens.md
 8. **Disabled와 Read-only** (interaction.md). native 요소에 `disabled`를 두고 색만 흐리게 하거나 외곽선을 지웠으면 위반이다. `cursor-not-allowed`를 Read-only에 쓴 것도 위반이다.
 9. **선택 상태 위 Hover** (interaction.md 「선택 상태와 Hover·Pressed」). 선택된 상태에 `hover:bg-*`를 겹쳤으면 위반이다.
 10. **Form 층** (vocabulary.md 「Form 구성 층」, field.md). Label·도움말·오류를 Control과 묶는 자리에 `Field`를 쓰지 않고 `<label>`과 `<p>`를 직접 놓았으면 위반이다. 제출·검증 로직이 Control이나 Field 안에 들어갔으면 위반이다.
-11. **문구와 자리** (`/generate-code` 규칙). 영어 UI 문구는 위반이다. 머리말 주석의 요청이 「」로 정한 문구와 `Copyright © {…}. All rights reserved.` 같은 저작권 관용구는 언어와 관계없이 위반이 아니다. 환경설정이 소유하는 값(시스템명·브랜드명)을 실제 값으로 박은 것은 위반이다. `{…}` 자리는 위반이 아니다.
+11. **문구와 자리** (`/generate-code` 규칙, select.md 「Guidelines」). 영어 UI 문구는 위반이다. 머리말 주석의 요청이 「」로 정한 문구와 `Copyright © {…}. All rights reserved.` 같은 저작권 관용구는 언어와 관계없이 위반이 아니다. 환경설정이 소유하는 값(시스템명·브랜드명)을 실제 값으로 박은 것은 위반이다. `{…}` 자리는 위반이 아니다. `Select`·`InputButton`의 `placeholder`가 그 Control을 감싼 `Field`의 label과 같거나 label 뒤에 `선택`만 붙인 것(Label 「요청 유형」에 `요청 유형 선택`)은 위반이다.
 12. **import 경계** (AGENTS.md 「코드 소유 경계」). `packages/ui/src/...`를 경로로 직접 import한 것, `apps/studio`에서 import한 것은 위반이다. `@ooee/ui`에서만 가져온다.
 13. **아이콘** (icon.md 「스타일 규칙」·「크기 토큰」). 다음은 위반이다.
     - 아이콘에 `size-4`·`h-4 w-4`·`size-[18px]`처럼 숫자 크기를 직접 준 것. `size-oe-icon-*`여야 한다. `Button`의 `leadingIcon`, `Input`의 `leadingElement`처럼 컴포넌트가 크기를 정하는 자리에 크기 클래스 없이 넘긴 것은 위반이 아니다.
     - native 요소로 만든 클릭 가능한 아이콘에 `hover:bg-oe-interaction-hover` 또는 `hover:bg-oe-interaction-hover-subtle`이 없는 것
     - `Ri*Fill` 아이콘을 선택·활성·성공 상태 표시나 Navigation 항목이 아닌 자리에 쓴 것
+    - 글자를 대신하지 않는 아이콘에 `aria-hidden="true"`가 없는 것. `Button`의 `leadingIcon`, `Input`의 `leadingElement`처럼 컴포넌트에 넘긴 아이콘도 같다. 아이콘 자체에 `aria-label`이나 `title`을 준 것은 위반이 아니다.
 14. **초안 컴포넌트** (README.md 「Component」 표). 표에서 상태가 `초안`인 컴포넌트를 import했으면 위반이다. `packages/ui/src/index.ts`가 export해도 표가 기준이다.
 
 다음은 위반으로 세지 않고 「판단이 필요한 것」에 적는다.
 
 - 쓰인 컴포넌트 문서의 「역할과 경계」나 「Guidelines」가 그 자리에 다른 컴포넌트를 가리키는 경우. 문서의 문장과 대안 컴포넌트를 함께 적는다. 머리말의 요청이 그 컴포넌트를 지정했더라도 적는다. 예: 제출 버튼을 눌러야 값이 반영되는 `<form>` 안의 `SwitchField`(switch.md 「상태를 즉시 활성화할 때만 사용하기」는 Checkbox를 가리킨다), 데스크톱 화면의 `AppHeader`.
-- `Select`·`InputButton`의 `placeholder`가 Field label을 그대로 반복하거나 문장형인 것, `defaultValue`가 있는 `Select`에 `placeholder`를 준 것(select.md 「Guidelines」)
+- `Select`·`InputButton`의 `placeholder`가 문장형인 것, `defaultValue`가 있는 `Select`에 `placeholder`를 준 것(select.md 「Guidelines」, `/generate-code` 규칙). label 반복은 항목 11의 위반이다.
+- 머리말의 요청이 가운데라고 말하지 않은 요소에 `text-center`, 세로 방향 flex의 `items-center`, 가로 방향 flex의 `justify-center`를 쓴 것. 한 줄의 세로 맞춤으로 쓴 가로 방향 flex의 `items-center`는 적지 않는다.
 - 컴포넌트 문서에 「현재 정의하지 않은 항목」인 상태나 정책을 화면이 필요로 하는 경우
 - 코드가 필수로 요구하지만 컴포넌트 문서 「Properties」에 없는 Property. 문서 누락으로 적는다.
 - 테두리 역할이 tokens.md와 어긋나 보이는 것(상자 외곽에 `border-oe-border-secondary` 등)

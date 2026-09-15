@@ -1,6 +1,7 @@
 // Figma use_figma 에 넘겨 프레임의 연결을 센다. 파일을 바꾸지 않는다.
 // prepare.mjs 가 SCREEN(화면 페이지 이름)과 FRAMES(이번에 그린 프레임 이름 목록) 자리를 채운다.
-// 완료 조건: missingFrames 가 비어 있고, 모든 프레임에서 unboundPaints 와 textsWithoutStyle 가 비어 있다.
+// 완료 조건: missingFrames 가 비어 있고, 모든 프레임에서 unboundPaints 와 textsWithoutStyle 가 비어 있으며 rootWithoutFill 이 false 다.
+// 칠이 있는 것만 세면 바탕이 빠진 루트 프레임도 통과하므로 루트의 보이는 칠을 따로 본다.
 // opacityOnToken 은 완료를 막지 않지만 보고에 적어 확인받는다.
 const SCREEN = __SCREEN__;
 const FRAMES = __FRAMES__;
@@ -9,7 +10,8 @@ if (!page) return { error: `페이지 「${SCREEN}」 이 없다` };
 await figma.setCurrentPageAsync(page);
 const out = { page: page.name, missingFrames: FRAMES.filter((name) => !page.children.some((n) => n.name === name)), frames: [] };
 for (const frame of page.children.filter((n) => n.type === "FRAME" && FRAMES.includes(n.name))) {
-  const stats = { name: frame.name, id: frame.id, width: frame.width, height: frame.height, nodes: 0, autoLayoutFrames: 0, absoluteChildren: 0, solidPaints: 0, boundPaints: 0, unboundPaints: [], opacityOnToken: [], boundSizes: 0, texts: 0, textsWithStyle: 0, textsWithoutStyle: [], variables: new Set(), textStyles: new Set() };
+  const rootWithoutFill = frame.fills === figma.mixed || !frame.fills.some((paint) => paint.visible !== false && (paint.opacity ?? 1) > 0);
+  const stats = { name: frame.name, id: frame.id, width: frame.width, height: frame.height, rootWithoutFill, nodes: 0, autoLayoutFrames: 0, absoluteChildren: 0, solidPaints: 0, boundPaints: 0, unboundPaints: [], opacityOnToken: [], boundSizes: 0, texts: 0, textsWithStyle: 0, textsWithoutStyle: [], variables: new Set(), textStyles: new Set() };
   for (const node of [frame, ...frame.findAll(() => true)]) {
     stats.nodes++;
     if (node.type === "FRAME" && node.layoutMode && node.layoutMode !== "NONE") stats.autoLayoutFrames++;
