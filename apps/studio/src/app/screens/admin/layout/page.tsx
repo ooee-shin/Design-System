@@ -284,12 +284,12 @@ function MenuStyleSetting({
   const { seed, applySeed } = useBrandTheme();
 
   return (
-    <section className="flex w-fit flex-col gap-6">
+    <section className="flex w-[552px] flex-col gap-6">
       <h2 className="text-lg font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
 
       {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
           레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
-      <SettingRow label="메인 컬러" description="이 색에서 만들어진 팔레트를 메뉴 스타일이 가져다 씁니다.">
+      <SettingRow inline label="메인 컬러" description="이 색에서 만들어진 팔레트를 메뉴 스타일이 가져다 씁니다.">
         <MainColorInput value={seed} onChange={applySeed} />
       </SettingRow>
 
@@ -307,9 +307,10 @@ function MenuStyleSetting({
       </SettingRow>
 
       {/* 아이콘은 색과 상관없이 어느 스타일에서나 같게 동작하므로 자기 축을 갖는다. */}
-      <SettingRow label="메뉴 아이콘">
+      <SettingRow inline label="메뉴 아이콘">
         <SwitchField
           label={showRowIcons ? "보임" : "숨김"}
+          labelPosition="left"
           checked={showRowIcons}
           onCheckedChange={(next) => onRowIconsChange(Boolean(next))}
         />
@@ -359,14 +360,17 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
 function SettingRow({
   label,
   description,
+  inline = false,
   children,
 }: {
   label: string
   description?: string
+  /** 이름과 조작 장치를 좌우로 둘지. 장치가 좁을 때만 쓴다. */
+  inline?: boolean
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={inline ? "flex items-center justify-between gap-6" : "flex flex-col gap-2"}>
       <span className="flex flex-col gap-0.5">
         <span className="text-sm font-medium text-oe-foreground-primary">{label}</span>
         {description ? <span className="text-xs text-oe-foreground-tertiary">{description}</span> : null}
