@@ -4,14 +4,37 @@ import * as React from "react"
 
 import {
   RiArrowRightSLine,
-  RiBarChartBoxLine,
-  RiContractLine,
-  RiGroupLine,
-  RiSmartphoneLine,
+  RiBookLine,
+  RiBookOpenLine,
+  RiCalendarLine,
+  RiChat3Line,
+  RiCustomerServiceLine,
+  RiDatabase2Line,
+  RiDraftLine,
+  RiFileCheckLine,
+  RiFileListLine,
+  RiFlagLine,
+  RiHeadphoneLine,
+  RiLineChartLine,
+  RiListUnordered,
+  RiMap2Line,
+  RiMegaphoneLine,
+  RiNewspaperLine,
+  RiPulseLine,
+  RiQuestionAnswerLine,
+  RiQuestionLine,
+  RiQuestionnaireLine,
+  RiRunLine,
+  RiShieldCheckLine,
   RiStore2Line,
+  RiStoreLine,
   RiTaskLine,
-  RiToolsLine,
+  RiTruckLine,
   RiUserAddLine,
+  RiUserSettingsLine,
+  RiUserUnfollowLine,
+  RiVideoLine,
+  RiWindowLine,
 } from "@remixicon/react"
 
 import { SearchForm } from "@/components/candidates/search-form"
@@ -48,11 +71,13 @@ import {
  * 이름이 아니라 그 묶음을 설명하는 문장이라 그 아래 항목만 남겼다.
  */
 type NavLeaf = { title: string; isActive?: boolean }
-type NavItem = NavLeaf & { items?: NavLeaf[] }
+type NavItem = NavLeaf & {
+  /** 줄 앞에 서는 아이콘. 좌측 메뉴 스타일이 켤 때만 그린다. 지금 값은 자리 표시다. */
+  icon: typeof RiUserAddLine
+  items?: NavLeaf[]
+}
 type NavGroup = {
   title: string
-  /** 묶음 이름 앞에 서는 아이콘. 스타일이 켤 때만 그린다. */
-  icon: typeof RiUserAddLine
   items: NavItem[]
 }
 
@@ -60,20 +85,19 @@ const data: { navMain: NavGroup[] } = {
   navMain: [
     {
       title: "가맹영업",
-      icon: RiUserAddLine,
       items: [
-        { title: "신규가맹문의" },
-        { title: "가맹상담관리" },
-        { title: "제외문의" },
-        { title: "상권탐색" },
+        { title: "신규가맹문의", icon: RiUserAddLine },
+        { title: "가맹상담관리", icon: RiChat3Line },
+        { title: "제외문의", icon: RiUserUnfollowLine },
+        { title: "상권탐색", icon: RiMap2Line },
       ],
     },
     {
       title: "계약관리",
-      icon: RiContractLine,
       items: [
         {
           title: "계약대상",
+          icon: RiFileListLine,
           items: [
             { title: "신규" },
             { title: "재계약" },
@@ -83,69 +107,69 @@ const data: { navMain: NavGroup[] } = {
             { title: "폐점관리" },
           ],
         },
-        { title: "계약진행" },
-        { title: "계약완료" },
+        { title: "계약진행", icon: RiDraftLine },
+        { title: "계약완료", icon: RiFileCheckLine },
       ],
     },
     {
       title: "가맹점관리",
-      icon: RiStore2Line,
-      items: [{ title: "오픈매장관리" }, { title: "가맹점현황" }],
+      items: [{ title: "오픈매장관리", icon: RiStoreLine }, { title: "가맹점현황", icon: RiStore2Line }],
     },
     {
       title: "운영관리",
-      icon: RiToolsLine,
       items: [
-        { title: "지원요청관리" },
-        { title: "품질관리" },
-        { title: "미션관리" },
-        { title: "일정관리" },
-        { title: "활동관리" },
-        { title: "설문조사관리" },
+        { title: "지원요청관리", icon: RiCustomerServiceLine },
+        { title: "품질관리", icon: RiShieldCheckLine },
+        { title: "미션관리", icon: RiFlagLine },
+        { title: "일정관리", icon: RiCalendarLine },
+        { title: "활동관리", icon: RiRunLine },
+        { title: "설문조사관리", icon: RiQuestionnaireLine },
         {
           title: "파트너 & 고객센터",
+          icon: RiHeadphoneLine,
           items: [{ title: "고객의 소리" }, { title: "점주의 소리" }],
         },
-        { title: "발주관리" },
+        { title: "발주관리", icon: RiTruckLine },
       ],
     },
     {
       title: "앱관리",
-      icon: RiSmartphoneLine,
       items: [
-        { title: "가맹점 공지사항" },
-        { title: "교육자료" },
-        { title: "청년늬우스" },
-        { title: "홍보자료" },
-        { title: "팝업" },
-        { title: "FAQ" },
+        { title: "가맹점 공지사항", icon: RiMegaphoneLine },
+        // 공지사항을 뺀 다섯은 모두 같은 목록 아이콘을 쓴다. 성격이 같은 게시판이라 아이콘을
+        // 따로 두면 서로 다른 기능처럼 보인다.
+        { title: "교육자료", icon: RiListUnordered },
+        { title: "청년늬우스", icon: RiListUnordered },
+        { title: "홍보자료", icon: RiListUnordered },
+        { title: "팝업", icon: RiListUnordered },
+        { title: "FAQ", icon: RiListUnordered },
       ],
     },
     {
       title: "커뮤니티",
-      icon: RiGroupLine,
       items: [
-        { title: "전사공지사항" },
-        { title: "운영FAQ" },
-        { title: "운영관리매뉴얼" },
+        { title: "전사공지사항", icon: RiMegaphoneLine },
+        { title: "운영FAQ", icon: RiQuestionAnswerLine },
+        { title: "운영관리매뉴얼", icon: RiBookLine },
       ],
     },
     {
       title: "통계",
-      icon: RiBarChartBoxLine,
       items: [
         {
           title: "매출",
+          icon: RiLineChartLine,
           items: [
             { title: "일일실적" },
             { title: "Comp.S 순위" },
             { title: "MSR" },
           ],
         },
-        { title: "품질관리" },
-        { title: "운영", items: [{ title: "지원요청 현황" }] },
+        { title: "품질관리", icon: RiShieldCheckLine },
+        { title: "운영", icon: RiPulseLine, items: [{ title: "지원요청 현황" }] },
         {
           title: "데이터 관리",
+          icon: RiDatabase2Line,
           items: [
             { title: "목표 매출 업로드" },
             { title: "배달 매출 업로드" },
@@ -159,18 +183,17 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "업무 관리",
-      icon: RiTaskLine,
-      items: [{ title: "업무관리" }, { title: "업무관리 사용자별" }],
+      items: [{ title: "업무관리", icon: RiTaskLine }, { title: "업무관리 사용자별", icon: RiUserSettingsLine }],
     },
   ],
 }
 
 export function AppSidebar({
-  showGroupIcons = false,
+  showRowIcons = false,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
-  /** 묶음 이름 앞의 아이콘을 그릴지. 좌측 메뉴 스타일이 정한다. */
-  showGroupIcons?: boolean
+  /** 메뉴 줄 앞의 아이콘을 그릴지. 좌측 메뉴 스타일이 정한다. */
+  showRowIcons?: boolean
 }) {
   // 지금 보고 있는 메뉴가 어느 것인지 화면이 말해야 한다. 실제 경로가 아직 없으므로 누른 것을
   // 기억해 두고, 경로가 붙으면 주소에서 읽는 값으로 바꾼다.
@@ -193,8 +216,7 @@ export function AppSidebar({
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title} className="pt-5 pb-0.5">
-            <SidebarGroupLabel className="gap-1.5 px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
-              {showGroupIcons ? <group.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
+            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -210,7 +232,7 @@ export function AppSidebar({
                     // 자기 여백을 품고 있어서 같은 값을 주면 더 들어와 보인다.
                     <Collapsible key={item.title} className="group/collapsible">
                       <SidebarMenuItem>
-                        <SidebarMenuButton className="h-9 pr-3 pl-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
+                        <SidebarMenuButton className="h-9 gap-2 pr-3 pl-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]" isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {item.title}
                           <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
                         </SidebarMenuButton>
@@ -246,7 +268,7 @@ export function AppSidebar({
                   ) : (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
-                        className="h-9 px-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
+                        className="h-9 gap-2 px-4 font-medium transition-colors duration-150 hover:bg-[var(--menu-hover-bg)] hover:text-[var(--menu-hover-fg,inherit)] data-active:bg-[var(--menu-active-bg)] data-active:text-[var(--menu-active-fg)] hover:data-active:bg-[var(--menu-active-bg)] hover:data-active:text-[var(--menu-active-fg)]"
                         isActive={activeMenu === `${group.title}/${item.title}`}
                         onClick={(event) => {
                           event.preventDefault()
@@ -254,6 +276,7 @@ export function AppSidebar({
                         }}
                         render={<a href="#" />}
                       >
+                        {showRowIcons ? <item.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
                         {item.title}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
