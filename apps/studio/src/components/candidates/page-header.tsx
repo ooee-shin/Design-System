@@ -65,53 +65,55 @@ export function PageHeader({
       {...props}
     >
       {/* 경로는 제목보다 먼저 읽히고, 제목보다 작고 옅다. 마지막 항목은 지금 보고 있는 화면이라
-          누를 곳이 아니므로 링크가 아니다. 앞선 항목들도 아직 실제 경로가 없어 글자로만 둔다. */}
-      <nav aria-label="현재 위치">
-        <ol className="flex flex-wrap items-center gap-1 text-xs text-oe-foreground-tertiary">
-          {path.map((step, index) => (
-            <li key={step} className="flex items-center gap-1">
-              {index > 0 ? (
-                <RiArrowRightSLine
-                  className="size-3.5 shrink-0 text-oe-foreground-subtle"
-                  aria-hidden="true"
-                />
-              ) : null}
-              <span
-                aria-current={index === current ? "page" : undefined}
-                className={index === current ? "text-oe-foreground-secondary" : undefined}
-              >
-                {step}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </nav>
+          누를 곳이 아니므로 링크가 아니다. 앞선 항목들도 아직 실제 경로가 없어 글자로만 둔다.
+          별은 그 마지막 항목 바로 뒤에 선다. 담는 대상이 경로가 가리키는 이 화면이기 때문이다. */}
+      <div className="flex items-center">
+        <nav aria-label="현재 위치">
+          <ol className="flex flex-wrap items-center gap-1 text-xs text-oe-foreground-tertiary">
+            {path.map((step, index) => (
+              <li key={step} className="flex items-center gap-1">
+                {index > 0 ? (
+                  <RiArrowRightSLine
+                    className="size-3.5 shrink-0 text-oe-foreground-subtle"
+                    aria-hidden="true"
+                  />
+                ) : null}
+                <span
+                  aria-current={index === current ? "page" : undefined}
+                  className={index === current ? "text-oe-foreground-secondary" : undefined}
+                >
+                  {step}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </nav>
+        {favorite === undefined ? null : (
+          // 이름은 켜짐과 꺼짐에서 같은 것을 쓴다. 지금 담겨 있는지는 `aria-pressed` 가 이미
+          // 말하므로, 이름까지 바꾸면 상태와 누르면 일어날 일이 뒤섞인다.
+          //
+          // 버튼은 28px 이고 경로 글자 줄은 16px 이다. 그대로 두면 이 줄만 12px 높아져 제목이
+          // 함께 밀리므로, 넘치는 만큼을 위아래로 덜어 내어 줄 높이를 글자에 맞춰 둔다.
+          <ToggleButton
+            variant="ghost"
+            tone="custom"
+            color="favorite"
+            controlSize="xsmall"
+            icon={<RiStarLine />}
+            activeIcon={<RiStarFill />}
+            pressed={favorite}
+            onPressedChange={onFavoriteChange}
+            aria-label="즐겨찾기"
+            className="-my-1.5"
+          />
+        )}
+      </div>
 
       {/* 제목과 동작 버튼은 한 줄에서 좌우로 갈린다. 버튼이 여럿이면 제목 쪽이 먼저 줄어든다. */}
       <div className="mt-1.5 flex items-start justify-between gap-4">
-        {/* 별은 오른쪽 묶음이 아니라 제목에 붙는다. 저장이나 발행처럼 이 화면이 다루는 대상을
-            바꾸는 동작이 아니라, 이 화면 자체를 내 목록에 담아 두는 표시이기 때문이다. 오른쪽
-            끝에 두면 화면마다 동작 버튼 수가 달라 별의 자리가 옮겨 다니기도 한다. */}
-        <div className="flex min-w-0 items-center gap-0.5">
-          <h1 className="text-2xl leading-8 font-semibold tracking-tight text-oe-foreground-primary">
-            {title}
-          </h1>
-          {favorite === undefined ? null : (
-            // 이름은 켜짐과 꺼짐에서 같은 것을 쓴다. 지금 담겨 있는지는 `aria-pressed` 가
-            // 이미 말하므로, 이름까지 바꾸면 상태와 누르면 일어날 일이 뒤섞인다.
-            <ToggleButton
-              variant="ghost"
-              tone="custom"
-              color="favorite"
-              controlSize="small"
-              icon={<RiStarLine />}
-              activeIcon={<RiStarFill />}
-              pressed={favorite}
-              onPressedChange={onFavoriteChange}
-              aria-label="즐겨찾기"
-            />
-          )}
-        </div>
+        <h1 className="min-w-0 text-2xl leading-8 font-semibold tracking-tight text-oe-foreground-primary">
+          {title}
+        </h1>
         {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
       </div>
 
