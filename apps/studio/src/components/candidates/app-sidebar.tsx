@@ -29,6 +29,7 @@ import {
   RiStore2Line,
   RiStoreLine,
   RiTaskLine,
+  RiTimeLine,
   RiTruckLine,
   RiUserAddLine,
   RiUserSettingsLine,
@@ -108,7 +109,9 @@ const data: { navMain: NavGroup[] } = {
           ],
         },
         { title: "계약진행", icon: RiDraftLine },
-        { title: "계약완료", icon: RiFileCheckLine },
+        // 셋이 같은 네모 문서이고 완료에만 체크가 붙는다. 꼬리가 달린 문서는 앞의 둘과 계열이
+        // 어긋난다.
+        { title: "계약완료", icon: RiTaskLine },
       ],
     },
     {
@@ -184,7 +187,7 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "업무 관리",
-      items: [{ title: "업무관리", icon: RiTaskLine }, { title: "업무관리 사용자별", icon: RiUserSettingsLine }],
+      items: [{ title: "업무관리", icon: RiTimeLine }, { title: "업무관리 사용자별", icon: RiUserSettingsLine }],
     },
   ],
 }
