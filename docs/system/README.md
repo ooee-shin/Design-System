@@ -66,40 +66,32 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 ## Component
 
-각 컴포넌트의 상세 문서는 다음과 같다.
+컴포넌트는 `확정`과 `초안` 두 상태를 갖는다. **`확정`은 명세와 Studio 상세 화면을 갖추고 검수를 마친 것이고, `초안`은 아직 그 단계에 이르지 않은 것이다.** 품질 등급이 아니라 작업 단계이며, 확정된 것도 이관 전까지 바뀔 수 있다는 점은 모두 같다. `초안`은 다른 화면에서 쓰기 전에 검수를 거친다. 상태의 단일 원본은 `apps/studio/src/components/component-registry.ts`이다.
 
-| 컴포넌트 | 문서 | 용도 |
-| --- | --- | --- |
-| App Header | [app-header.md](components/app-header.md) | 모바일 화면 최상단의 한 줄. 제목과 좌우 아이콘 자리를 소유 |
-| Badge | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
-| Bottom Navigation | [bottom-navigation.md](components/bottom-navigation.md) | 모바일 화면 맨 아래에서 최상위 화면을 오가는 한 줄 |
-| Button | [button.md](components/button.md) | 누르면 실행되는 액션 |
-| Checkbox | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
-| Chip | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |
-| Combobox | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
-| Field | [field.md](components/field.md) | Label, 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸 |
-| Input | [input.md](components/input.md) | 한 줄 입력 |
-| Input Button | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
-| Message Bubble | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
-| Notification Badge | [notification-badge.md](components/notification-badge.md) | 아이콘·버튼·메뉴에 붙어 새 알림이나 읽지 않은 수를 표시 |
-| Number Input | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
-| Radio | [radio.md](components/radio.md) | 여러 항목 중 하나를 선택 |
-| Select | [select.md](components/select.md) | 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택 |
-| Select Box | [select-box.md](components/select-box.md) | 상세 정보를 펼쳐 놓고 비교하며 하나 이상의 값을 선택 |
-| Switch | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
-| Textarea | [textarea.md](components/textarea.md) | 여러 줄 입력 |
-| Toggle Button | [toggle-button.md](components/toggle-button.md) | 누른 표시가 화면에 남는 아이콘 버튼 |
+| 컴포넌트 | 상태 | 문서 | 용도 |
+| --- | --- | --- | --- |
+| App Header | 확정 | [app-header.md](components/app-header.md) | 모바일 화면 최상단의 한 줄. 제목과 좌우 아이콘 자리를 소유 |
+| Badge | 확정 | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
+| Bottom Navigation | 확정 | [bottom-navigation.md](components/bottom-navigation.md) | 모바일 화면 맨 아래에서 최상위 화면을 오가는 한 줄 |
+| Button | 확정 | [button.md](components/button.md) | 누르면 실행되는 액션 |
+| Checkbox | 확정 | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
+| Chip | 확정 | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |
+| Combobox | 확정 | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
+| Field | 확정 | [field.md](components/field.md) | Label, 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸 |
+| Input | 확정 | [input.md](components/input.md) | 한 줄 입력 |
+| Input Button | 확정 | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
+| Message Bubble | 확정 | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
+| Message Composer | 초안 | 없음 | 메시지를 입력하고 보내는 아래쪽 한 줄 |
+| Message File Attachment | 초안 | 없음 | 메시지에 붙는 파일 카드 |
+| Notification Badge | 확정 | [notification-badge.md](components/notification-badge.md) | 아이콘·버튼·메뉴에 붙어 새 알림이나 읽지 않은 수를 표시 |
+| Number Input | 확정 | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
+| Radio | 확정 | [radio.md](components/radio.md) | 여러 항목 중 하나를 선택 |
+| Select | 확정 | [select.md](components/select.md) | 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택 |
+| Select Box | 확정 | [select-box.md](components/select-box.md) | 상세 정보를 펼쳐 놓고 비교하며 하나 이상의 값을 선택 |
+| Switch | 확정 | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
+| Textarea | 확정 | [textarea.md](components/textarea.md) | 여러 줄 입력 |
+| Toggle Button | 확정 | [toggle-button.md](components/toggle-button.md) | 누른 표시가 화면에 남는 아이콘 버튼 |
 
-`packages/ui`는 위 외에 `PartialMaskedInput`, `MessageComposer`, `MessageFileAttachment`를 함께 제공한다.
+`packages/ui`는 위 외에 `PartialMaskedInput`을 함께 제공한다. 반복되는 부분 입력과 고정 마스킹을 소유하며 독립 컴포넌트로 세지 않고 [input.md](components/input.md)가 그 쓰임을 설명한다.
 
 모든 공용 컴포넌트는 `className`을 받아 바깥 요소에 class를 덧붙일 수 있다. 내부 요소를 따로 스타일링해야 하는 컴포넌트는 `containerClassName`, `indicatorClassName`처럼 대상을 앞에 붙인 추가 Property를 가지며 그 이름은 각 컴포넌트 문서에 적는다. 개별 문서의 `Properties`는 시각과 동작을 결정하는 Property만 다루므로 `className` 자체는 나열하지 않는다.
-
-## Example
-
-외부 화면을 공용 컴포넌트로 다시 만든 사례다. **컴포넌트가 실제 화면에서 어떻게 조합되는지 보여주는 참고 자료이며, 시스템이 확정한 Pattern이 아니다.** 여기서 반복되는 조합이 확인되면 그때 Pattern으로 추출한다.
-
-| 예시 | 문서 | 화면 |
-| --- | --- | --- |
-| Breadcrumb Page Header | [breadcrumb-page-header.md](examples/breadcrumb-page-header.md) | 경로와 페이지 제목을 함께 표시하는 화면 상단 |
-| Collapsible Sidebar Nav | [collapsible-sidebar-nav.md](examples/collapsible-sidebar-nav.md) | 접을 수 있는 좌측 내비게이션 |
-| Inbox Split View | 없음 | 목록과 상세를 좌우로 나눈 화면. 문서 작성 예정 |

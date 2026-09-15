@@ -64,10 +64,9 @@ const UNSELECTED_CLASS = "text-oe-foreground-tertiary"
 // 선택되지 않은 항목에서 아이콘만 라벨보다 한 단계 더 낮춘다. 아이콘이 라벨과 같은 무게로 서면
 // 선택되지 않은 항목이 다섯 개 나란히 있을 때 화면 아래쪽이 무거워진다.
 //
-// 중립 foreground 에는 `oe-foreground-tertiary` 아래 단계가 없다. `placeholder` 는 Dark 에서
-// tertiary 와 값이 같아 옅어지지 않고 `disabled` 는 꺼진 요소를 뜻한다. 그래서 `pipeline.md` 대로
-// 첫 사용은 로컬 값으로 두고 `open-questions.md` 가 token candidate 로 기록한다.
-const UNSELECTED_ICON_CLASS = "text-neutral-400 dark:text-neutral-600"
+// `subtle` 은 위계 줄인 primary·secondary·tertiary 를 잇는 네 번째 칸이 아니라, 그 아래가 국소적으로
+// 필요한 자리에만 쓰는 이름이다. `disabled` 와 값은 같지만 그쪽은 꺼진 요소를 뜻하므로 쓸 수 없다.
+const UNSELECTED_ICON_CLASS = "text-oe-foreground-subtle"
 
 const LABEL_CLASS = "max-w-full truncate text-[11px] leading-[14px] font-medium"
 

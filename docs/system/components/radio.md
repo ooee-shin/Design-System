@@ -50,6 +50,8 @@ Unchecked는 `oe-background-primary`와 `oe-border-primary`를 사용한다. Che
 
 Radio Group 위에 보이는 질문이나 제목은 Field의 전체 조작 영역이 아니라 실제로 보이는 Radio Indicator의 왼쪽 시작점에 맞춘다. 화면 또는 Surface의 20px 바깥 여백과 제목 시작점은 그대로 유지하고, 기본 RadioField의 8px 내부 조작 여백은 Field를 왼쪽으로 8px 보정해 바깥 방향으로 확보한다. 별도 콘텐츠와 Control만 결합한 구성에서는 불필요한 내부 들여쓰기를 제거해 제목과 Indicator의 시각 시작점을 맞춘다.
 
+**이 보정은 Group만의 규칙이 아니다.** RadioField가 Indicator의 왼쪽 시작점을 다른 요소와 맞춰야 하는 자리라면 단독으로 쓸 때도 같은 8px을 바깥으로 보정한다. **여백 자체를 없애지 않는다.** 그 8px은 행의 조작 영역이므로 지우면 누를 수 있는 영역이 줄어든다. 기준은 [checkbox.md](checkbox.md)와 같다.
+
 Read only는 Enabled와 같은 기본 시각과 Focus를 유지하지만 Pointer 또는 키보드 조작으로 선택값을 변경하지 않는다. 값 변경 가능성을 암시하는 Hover 배경·Hover shadow와 Pressed 피드백은 제거한다. Disabled와 달리 비활성 색상이나 `not-allowed` cursor는 사용하지 않는다.
 
 RadioField의 보이는 Label은 `aria-labelledby`로 Radio Control의 접근 가능한 이름에 연결한다. 선택값을 고정해 비교하는 경우에도 Pointer, Focus visible과 키보드 피드백은 차단하지 않는다. Disabled는 실제 조작 불가 상태를 유지하고 Read only는 Focus만 유지한 채 Hover·Pressed와 값 변경을 차단한다.

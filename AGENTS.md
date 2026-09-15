@@ -11,7 +11,8 @@
 | `docs/system/` | 시스템에 무엇이 있고 어떤 정의이며 어떻게 쓰는가. 블루키에 전달할 영구 자산 |
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
-| `.claude/` | Claude Code 도구 설정. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거 |
+| `.claude/` | Claude Code 도구 설정과 `/generate-code`·`/review-design` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거 |
+| `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 신주희가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
 
 `docs/process/`와 이 파일은 1차 컴포넌트를 완성하는 동안에만 필요한 작업 규칙을 담는다. `ㄱ`, `업무시작`, `퇴근백업` 같은 신호와 제작 절차는 시스템이 무엇인지 설명하지 않으므로 블루키 자산화 대상에서 제외한다. 반대로 시스템 정의를 이쪽에 두면 전달본에서 함께 사라지므로, 어느 쪽에 속하는지 먼저 판단한 뒤 기록한다.
 
@@ -24,7 +25,7 @@
 3. `docs/process/working-context.md`에서 현재 구현, 열린 결정과 다음 작업을 확인한다.
 4. 작업 대상과 관련된 `docs/system/foundations/*` 또는 `docs/system/components/*` 문서를 읽는다.
 5. 문서와 코드가 다르면 사용자에게 차이를 알리고, 임의로 기준을 확정하지 않는다.
-6. `상태: Provisional`로 표시된 Foundation 결정은 테스트할 수 있지만 확정된 것으로 다루지 않는다. 컴포넌트에는 등급을 매기지 않는다. 1차 컴포넌트는 전부 검증 중이며 이관 전까지 바뀔 수 있다.
+6. `상태: Provisional`로 표시된 Foundation 결정은 테스트할 수 있지만 확정된 것으로 다루지 않는다. 컴포넌트에는 품질 등급을 매기지 않는다. 다만 명세와 상세 화면을 갖추었는지를 뜻하는 `확정`·`초안` 두 작업 단계는 구분하며, 그 정의는 `docs/system/README.md`의 「Component」가 소유한다. 확정된 컴포넌트도 전부 검증 중이며 이관 전까지 바뀔 수 있다.
 
 ## 지켜야 할 시스템 규칙
 
@@ -84,8 +85,8 @@
 ## 여러 환경에서 이어서 작업할 때
 
 - Git remote의 push된 commit만 다른 기기와 계정이 공유할 수 있는 상태로 간주한다. 대화 기록과 로컬 미커밋 변경에 의존하지 않는다.
-- `main`은 항상 검사를 통과한 공식 원본으로 유지한다. 커밋하는 사람이 한 명이라 합치기 전에 다른 사람이 읽는 단계가 없으므로 작업은 `main`에서 바로 진행한다. `main` push에서도 GitHub `Quality` 검사가 돌며, 실패하면 즉시 되돌린다.
-- 공개된 이름이나 동작을 바꿔 소비자 코드가 깨지는 변경만 별도 branch와 pull request를 거친다. 이때도 branch를 오래 끌지 않고 목적 하나가 끝나면 합치고 지운다. 자세한 절차는 `docs/process/git-workflow.md`를 따른다.
+- branch는 `main` · `dev` · `feature/*` 세 층이다. 작업은 `dev`에서 뻗은 자기 `feature/*`에서 하고 pull request로 `dev`에 올린다. `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. `main`에 직접 push하지 않는다.
+- branch를 오래 끌지 않고 목적 하나가 끝나면 합치고 지운다. 담당 구분, 통합 검증 항목과 자세한 절차는 `docs/process/git-workflow.md`를 따른다.
 - 작업 시작 시 working tree가 깨끗한지 확인하고, 깨끗할 때만 `git pull --ff-only`로 최신화한다.
 - 두 기기에서 같은 branch를 동시에 수정하지 않는다. 동시에 작업해야 하면 기기별 branch를 사용하고 한쪽에서 merge한 뒤 다른 쪽이 다시 pull한다.
 - 의미 있는 구현·규칙·다음 작업이 바뀌면 관련 문서와 `docs/process/working-context.md`를 최소한으로 갱신한다.

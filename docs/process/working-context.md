@@ -13,8 +13,8 @@
 - 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
 - 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
 - 현재 repository에는 필수 환경변수가 없다.
-- `main`을 항상 정상 작동하는 공식 원본으로 사용한다. 커밋하는 사람이 한 명이므로 작업은 `main`에서 바로 진행하고, 공개된 이름이나 동작을 바꾸는 변경만 작업 branch와 pull request를 사용한다.
-- `main` push에서도 GitHub `Quality` 자동 검사가 돈다. 실패하면 즉시 되돌린다.
+- branch는 `main` · `dev` · `feature/*` 세 층이며 `2026-09-14`에 개발자와 정했다. 작업은 `dev`에서 뻗은 자기 `feature/*`에서 하고 pull request로 `dev`에 올린다. 절차는 [git-workflow.md](git-workflow.md)가 소유한다.
+- `Quality` 자동 검사는 모든 pull request와 `main`·`dev` push에서 돈다. 실패하면 즉시 되돌린다.
 
 ## 현재 기술 환경
 
@@ -29,25 +29,27 @@
 ## 현재 구현
 
 - 공용 자산 소유 구조
-  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Studio는 브랜드 seed를 바꿀 때만 런타임으로 변수를 주입한다
+  - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Brand만 예외다. `--brand-*`·`--brand-alpha-*`와 mode별 `--oe-brand-light-*`·`--oe-brand-dark-*`는 Studio의 `BrandThemeProvider`가 mount마다 `packages/tokens`의 생성 함수로 seed에서 만들어 런타임으로 주입하고, `--oe-brand-*`와 `--oe-focus-ring`은 `apps/studio/src/app/globals.css`가 그 mode별 주입값에 `--color-blue-*` 기본값을 붙여 정의한다. `packages/tokens`는 `DEFAULT_BRAND_SEED`와 생성 함수, `styles.css`의 `@theme inline`이 `--oe-brand-*`·`--oe-focus-ring`을 Tailwind 색으로 잇는 별칭만 갖고 `:root`·`.dark`의 실제 값은 갖지 않는다
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
-  - `packages/patterns`: BreadcrumbPageHeader, CollapsibleSidebarNav, InboxSplitView
+  - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
+  - `apps/studio`의 `/screens`: 제품 화면을 구현하는 작업장. 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. Studio 의 문서형 레이아웃을 따르지 않는 유일한 자리이며 규칙은 `docs/system/studio.md`의 「화면 프레임과 그 예외」가 소유한다. Studio 메뉴에 올리지 않고 주소로 연다
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
+  - 외부 자료를 받아 두고 작업하다가 컴포넌트나 패턴으로 올려보내는 자리는 `2026-09-14`에 Examples 에서 `/screens` 로 옮겼다. Examples 와 `packages/patterns` 는 함께 걷어냈고, 그 안에 확정된 Pattern 은 하나도 없었다. 화면 작업에서 패턴이 나오면 그때 패키지를 다시 만든다
   - Studio 공용 부품은 단일 원본을 사용한다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`, Playground 선택 버튼과 종속 control 표시는 `playground-element-control`이 소유하며 워크벤치에서 다시 만들지 않는다. `GuidelineList`는 `className`을 받고 기본값은 `mt-3`이다
   - Combobox Anatomy의 범위 표시선 3개만 예외로 로컬에 남아 있다. 그중 하나가 Popup 콘텐츠 높이에 맞춰 늘어나야 해서 마커 기준 고정 길이만 표현하는 `AnatomyBoundaryMarker`로 옮길 수 없다
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - 메뉴 순서는 `Home → Foundations → Components → Docs → Examples → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 참고 사례를 본다. 앞으로 추가할 `Patterns`는 Components와 Docs 사이에 들어간다
-  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Examples·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
+  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장인 `/screens`는 메뉴에 올리지 않고 주소로 연다
+  - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
   - 모든 화면이 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다. 밀도가 페이지 틀을 건드리면 화면을 옮길 때 본문이 위아래로 밀린다
   - 우측 `On this page` 목차는 공용 `OnThisPage` 하나를 컴포넌트 상세와 Presentation이 함께 사용한다. 최대 높이를 뷰포트 안으로 제한하고 넘치면 목차 안에서 스크롤한다
   - Foundations Color 화면의 탭은 주소 해시와 연결된다. `#primitive`·`#semantic`·`#brand`로 특정 탭을 바로 가리킬 수 있고 탭을 누르면 주소도 따라 바뀐다
   - 12px 글자 옆의 인라인 아이콘은 `oe-icon-xsmall`을 사용한다. `size-3.5`는 아이콘 Foundation의 크기 체계에 없는 값이라 쓰지 않는다. 내비게이션의 라이트·다크 토글만 예외로 남아 있다
   - 각 그룹 index에서 현재 접근 가능한 모든 자산을 확인하고 상세 화면으로 이동
-  - Components index와 Docs 목록은 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations·Examples index는 기본 밀도를 유지
+  - Components index와 Docs 목록은 한 화면에서 더 많은 자산을 비교할 수 있도록 Compact catalog 밀도를 사용. 모바일 1열, 태블릿 2열, 데스크톱 최대 4열과 2줄 설명을 적용하며 Foundations index는 기본 밀도를 유지
   - 컴포넌트에는 등급 badge를 달지 않는다. 아직 확정되지 않은 Foundation 결정만 `Provisional` 표시를 단다
   - 공통 검수 설정인 `PC/TB/MB`, `라이트/다크`, `KO/EN`을 sticky Studio header에서 변경하며 route 이동과 새로고침 후에도 유지
   - viewport 설정은 Studio chrome이 아니라 상세 화면의 검수 콘텐츠만 fluid desktop, 768px tablet, 390px mobile 너비로 변경
@@ -63,12 +65,6 @@
   - Studio의 Violet 측정 Annotation은 width·height·min/max·Target area, padding·gap·inset, radius와 font-size·line-height·letter-spacing 등 수치 치수에 공통 사용. 숫자 Pill은 border 없이 Violet tonal 배경과 글자로 표시하며 semantic color·state·Anatomy·Swap에는 사용하지 않음
   - 상세 페이지의 연관 컴포넌트 영역은 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않음. Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 표시하고, 전체 Form 목록이 아니라 코드와 사용 사례로 확인된 관계만 연결
 
-- `/examples/inbox-split-view`
-  - VibePrompt의 Inbox split view를 React로 변환한 첫 화면 실험
-  - 대화 검색, 읽지 않은 메시지 count, 답장, 모바일 전환
-  - Light/Dark 및 국문/영문/일어 콘텐츠 검수
-  - Neutral OE semantic mapping을 첫 실제 검증 대상으로 Provisional 적용
-  - canvas, surface, foreground 위계, border 위계, bold fill, inverse, focus ring을 사용
 - `/foundations/color`
   - Tailwind CSS v4의 white/black과 22개 기본 primitive palette 전체 표시
   - 실제 oe Neutral·Brand·Accent·Status semantic token의 Light/Dark mapping 표시
@@ -247,17 +243,6 @@
   - 배타적 선택의 잘못된 예시는 `사용할 알림 기능` 아래 동시에 켤 수 있는 로그인·결제 알림을 Radio로 제한한 형태로 표시해 질문과 오류 이유를 함께 드러냄
   - Radio 결합 예시는 왼쪽 16px Radio Control 단독과 오른쪽 상단 미리보기·하단 왼쪽 Radio와 Label을 결합한 3개의 가로 선택 항목을 2-grid로 비교. 오른쪽 시각 예시 제목은 `콘텐츠 결합 예시`이고 실제 UI는 GuideVisual의 단일 `oe-background-primary` Surface 안에 20px 패딩, 16px Semibold `테마 설정` 제목과 `시스템 설정`·`밝은 모드`·`어두운 모드` 선택지를 직접 배치. 별도 내부 Surface를 중첩하지 않고 Light/Dark를 그대로 따르며 이미지 외곽선은 Light Black 10%/Dark White 16% alpha로 전환. 각 모드를 설명하는 미리보기 자체의 색은 유지. 일반 콘텐츠가 선택 동작을 소유하고 Radio Control만 재사용하는 조합이며, 항목 전체에는 border·surface·Hover를 두지 않고 미리보기 그림자도 사용하지 않음. 선택한 항목의 미리보기 이미지에는 3px 간격을 둔 2px `brand-alpha-40` ring을 표시하고 ring–Radio/Label 행 간격은 4px. Radio/Label 행 왼쪽에는 4px 여백을 둬 시각적인 시작점을 맞춤. 키보드 Focus에서는 링을 중첩하지 않고 같은 2px ring을 `oe-focus-ring` 색으로 교체하며 Focus 해제 시 150ms 동안 선택 색으로 복귀. RadioGroup이 한 항목만 선택하며 다중 선택은 Checkbox Control을 같은 방식으로 조합
   - Radio 전용 회귀 검사는 Label과 결합 콘텐츠 클릭, 방향키 선택·roving tab index, Read only와 Disabled의 값 보존, Focus class와 Flipped 배치를 보호함
-- `/examples/breadcrumb-page-header`
-  - VibePrompt의 breadcrumb page header를 기반으로 한 Navigation 화면 실험
-  - 축약 breadcrumb, record metadata/action, section tab과 responsive wrap 검수
-  - 구현 원본은 `@ooee/patterns`가 소유하고 Studio는 locale과 검수 context만 전달
-  - 일반 surface는 oe Neutral semantic token을 사용하고 Draft는 공용 Badge의 warning tonal 조합을 사용
-- `/examples/collapsible-sidebar-nav`
-  - VibePrompt의 collapsible sidebar navigation을 기반으로 한 Navigation 화면 실험
-  - 260px/72px rail, group disclosure, active row, count badge, search와 user chip 검수
-  - navigation 패턴을 먼저 축적한 뒤 active state, row, badge와 trigger의 반복 규칙을 비교해 공용 자산을 추출
-  - 구현 원본은 `@ooee/patterns`가 소유하며 내부 navigation row는 비교 사례가 더 쌓일 때까지 예시 내부에 유지
-
 ## 확정된 결정
 
 - 모양의 공통 어휘는 `Square`, `Rounded`, `Circle(Pill)`이며 각 컴포넌트가 `shape` Property로 소유한다. 선택 단위는 시스템 전체가 아니라 서비스와 컴포넌트의 조합이고, 같은 컴포넌트를 한 서비스 안에서 섞어 쓰지 않기를 권장하는 수준이다. 강제 규칙이 아니다.
@@ -323,11 +308,11 @@
 | 날짜 (2026) | 내용 | 담당 |
 | --- | --- | --- |
 | 9/3 | 기존 환경 공유 | 신주희 |
-| ~9/4 | 기존 리뷰, 배포 환경 세팅과 GitHub Pages 호스팅 | 유진식 |
+| ~9/4 | 기존 리뷰, 배포 환경 세팅. GitHub Pages 호스팅은 성립하지 않았고 호스팅은 [ai-environment.md](ai-environment.md)의 스파이크 R4가 정한다 | 유진식 |
 | ~9/11 | shadcn + Panda CSS 동시 사용 시 번들 용량 확인 | 유진식 |
 | ~9/14 | 1차 컴포넌트 마무리 및 공유 | 신주희 |
 | ~9/14 | 블루키 이관 테스트 | 공통 |
-| 9/14~ | Figma MCP·스토리북 MCP 연동 | 유진식 |
+| 9/14~ | AI 개발 환경 트랙. 순서와 일정은 [ai-environment.md](ai-environment.md)가 소유한다 | 유진식 |
 | 9/14~ | 화면 개선 작업 (약 1주) | 신주희 |
 | 9/20~23 | 4·5단계 에이전트 룰 테스트와 A/B 비교 검증 | 공통 |
 | 9/28~30 | 작업 마무리 | 공통 |
@@ -342,7 +327,7 @@
 
 **이 절은 각 문서가 소유한 결정을 다시 적지 않는다.** 컴포넌트의 공개 API와 시각·접근성 결정은 `docs/system/components/*.md`가, 토큰과 공통 규칙은 `docs/system/`의 해당 문서가, 아직 정하지 못한 것은 [open-questions.md](open-questions.md)가, 검토 항목의 세부는 [component-audit.md](component-audit.md)가 갖는다. 여기에는 지금 어디까지 왔고 다음에 무엇을 하는지만 남긴다.
 
-**새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 pull request #22로 `main`에 합쳤다. BottomNavigation은 `main`에서 뻗은 `feature/bottom-navigation` branch에 있다.
+**새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 `main`에 합쳤고 BottomNavigation은 `2026-09-14`에 `dev`에 합쳤다.
 
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
@@ -356,7 +341,7 @@
 2. **Anatomy 안 흰색 내부 Container 5곳.** `studio.md`가 정한 규칙과 어느 다섯 곳이 다른지 화면에서 확인한다.
 3. **Structure map이 없는 화면 여섯.** Anatomy가 있는 열한 화면 중 여섯 곳에 없다. 한번에 몰아서 할 작업으로 [component-audit.md](component-audit.md)에 있다.
 4. **Message Bubble 말줄임 기능.** `maxLines` 3~10 범위, 넘칠 때만 더보기·접기 노출, 라벨은 prop으로 받아 언어 전환에 대응, `aria-expanded`와 자동 테스트를 함께 추가한 뒤 Studio 화면과 명세를 갱신한다. 없던 prop을 더하는 non-breaking 변경이라 이관 이후에 해도 기존 코드가 깨지지 않는다.
-5. **옛 Badge를 쓰던 일곱 자리.** `packages/patterns` 세 파일과 Studio workbench 세 파일에 하드코딩해 두었고, 새 Badge의 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. 어느 자리를 새 Badge로 되돌릴지는 사용자가 화면에서 직접 확인한다.
+5. **옛 Badge를 쓰던 자리.** Studio workbench 세 파일에 하드코딩해 두었고, 새 Badge의 크기 체계가 24px 하나뿐이라 아직 교체하지 않았다. `packages/patterns`에 있던 세 자리는 `2026-09-14`에 그 패키지를 걷어내며 함께 사라졌다. 어느 자리를 새 Badge로 되돌릴지는 사용자가 화면에서 직접 확인한다.
 6. **Chip의 Filter 쓰임.** 다섯 가지가 남아 있으며 [component-audit.md](component-audit.md)의 「Chip 진행 상황」에 있다. 그중 셋은 Filter Bar를 별도 컴포넌트로 분리할 때 함께 다루는 편이 낫고, 미정 셋은 [open-questions.md](open-questions.md)에 있다. Chip의 정보 표시 쓰임을 Badge로 대체할 수 있으면 Chip에서 걷어낼지도 함께 판단한다.
 7. **Chip 확정 후 Combobox 잔여 작업.** Combobox의 선택값 Container가 Chip을 렌더링하므로 Chip 디자인이 바뀌면 Container를 두 번 만들게 된다. Chip을 먼저 처리한다. 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
 8. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
@@ -384,15 +369,19 @@ pnpm visual --path /components/badge \
   --measure "[data-slot=badge]"
 ```
 
-### 2026-09-14 오전에 branch 방식을 논의한다
+### 2026-09-14 branch 방식을 정했다
 
-개발자가 합류하면서 branch를 어떻게 나눌지 `2026-09-14` 월요일 오전에 논의한다. **그때까지는 지금 방식을 그대로 유지한다.** 규칙을 미리 고치면 논의 뒤에 다시 고치게 되고 그 사이에 문서와 실제가 또 어긋난다.
+개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-개발자 제안은 `main` 기준으로 `dev_1`·`dev_2`를 만들어 사람마다 하나씩 쓰는 방식이다. 확인해 보니 지금까지 열린 pull request 13개가 전부 작업 단위 branch에서 왔으므로, 실제 관행은 이미 작업 단위이고 [git-workflow.md](git-workflow.md)의 「작업 branch를 따로 만들지 않는다」만 한 명 기준에 머물러 있다. 정할 항목과 현재 상태를 정리한 논의 자료는 <https://claude.ai/code/artifact/6a30a671-efdd-4a10-9a92-5ba00d0eaf54>에 있다.
+담당은 신주희가 Component·Variant, Token·UI 개선과 Story 작성이고, 유진식이 Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill·Plugin이다.
 
-**논의에서 확인할 제약 둘.** `main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다(API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다). 그리고 `Quality` workflow가 `pull_request`와 `main` push에서만 돌므로 branch에 push만 하는 동안에는 검사가 돌지 않는다.
+**통합 검증 항목 다섯 중 넷은 아직 대상이 없다.** Storybook, Figma MCP, Storybook MCP, Skill·Agent가 저장소에 없으므로 지금 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 유진식의 작업이 들어오는 순서대로 채운다.
 
-정해지면 git-workflow.md의 「작업을 시작할 때」·「branch와 pull request를 사용하는 경우」와 AGENTS.md의 「여러 환경에서 이어서 작업할 때」를 한 번에 고친다.
+**`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
+
+### 2026-09-14 AI 개발 환경 트랙을 시작했다
+
+유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Storybook과 Figma 확인이다. Studio가 이미 문서와 Playground를 제공하므로 Storybook을 만들지 자체를 A/B 검증 뒤 함께 다시 정하며, 그때까지 `apps/storybook` 골격은 Skill v0 결과로 필요할 때만 유진식이 `9/17~18`에 만든다. 확정 컴포넌트마다 최소 `Default` Story 하나를 그 pull request에 한 번에 넣는 것은 신주희가 `9/16`까지 동의하면 유진식이 하는 제안이고, Story 파일 위치와 기본 브랜드 값의 자리(Storybook decorator 또는 `packages/tokens`)는 그 pull request 전에 함께 정한다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

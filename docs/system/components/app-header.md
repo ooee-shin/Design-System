@@ -9,7 +9,6 @@
 - `AppHeader`는 Container와 Title, 선택 요소인 Description, Leading element, Trailing element을 소유한다. 한 화면에 하나만 둔다.
 - **모바일 화면에서만 쓴다.** 데스크톱 화면의 전역 바에는 쓰지 않는다. 데스크톱 상단 바는 로고와 전역 내비게이션, 계정 메뉴가 함께 서는 다른 구조이며 아직 시스템에 없다.
 - 화면 안쪽 영역의 제목에는 쓰지 않는다. 그 제목은 해당 영역이 직접 갖는다.
-- 경로와 페이지 제목, 페이지 단위 action과 tab을 함께 담는 넓은 화면의 상단은 [breadcrumb-page-header.md](../examples/breadcrumb-page-header.md)가 보여 주는 화면 예시다. 확정된 자산이 아니며 `AppHeader`와 같은 자리를 다투지 않는다.
 - 좌우 아이콘 자리에 놓는 버튼은 [button.md](button.md)가 소유한다. `AppHeader`는 자기 버튼을 따로 만들지 않는다.
 - 아이콘의 `Line`과 `Fill` 선택 규칙은 [icon.md](../foundations/icon.md)가 소유한다.
 
