@@ -1,0 +1,45 @@
+// packages/tokens 의 oe 토큰(Light·Dark)과 브랜드 단계를 Figma 변수에 넣을 RGBA JSON 으로 뽑는다.
+// 사용: node --import tsx scripts/figma/token-export.ts .figma-work/oe-tokens.json (저장소 루트에서)
+import { readFileSync, writeFileSync } from "node:fs";
+import { CORE_SEMANTIC_TOKENS, DEFAULT_BRAND_SEED, createBrandPalette, createBrandSemanticMapping, BRAND_STEPS } from "../../packages/tokens/src/index.ts";
+import { globSync } from "node:fs";
+
+const theme = readFileSync(globSync("node_modules/.pnpm/tailwindcss@4*/node_modules/tailwindcss/theme.css").sort().at(-1)!, "utf8");
+const colors: Record<string, string> = {};
+for (const m of theme.matchAll(/--color-([a-z]+-\d+|white|black):\s*([^;]+);/g)) colors[m[1]] = m[2].trim();
+
+function oklchToRgb(str: string) {
+  const m = str.match(/oklch\(\s*([\d.]+)%?\s+([\d.]+)\s+([\d.]+|none)/);
+  if (!m) throw new Error("bad oklch " + str);
+  let L = parseFloat(m[1]); if (str.includes("%")) L = L / 100;
+  const C = parseFloat(m[2]); const h = ((m[3] === "none" ? 0 : parseFloat(m[3])) * Math.PI) / 180;
+  const a = C * Math.cos(h), b = C * Math.sin(h);
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+  const l = l_ ** 3, mm = m_ ** 3, s = s_ ** 3;
+  const lin = [4.0767416621 * l - 3.3077115913 * mm + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * mm - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * mm + 1.707614701 * s];
+  return lin.map((c) => { const v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055; return Math.min(1, Math.max(0, v)); });
+}
+const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+function primitive(p: string) {
+  const alpha = p.match(/^(white|black|neutral-950) \/ (\d+)%$/);
+  if (alpha) { const base = alpha[1] === "white" ? [1, 1, 1] : alpha[1] === "black" ? [0, 0, 0] : [10 / 255, 10 / 255, 10 / 255]; return { r: base[0], g: base[1], b: base[2], a: +alpha[2] / 100, source: p }; }
+  if (p === "white") return { r: 1, g: 1, b: 1, a: 1, source: p };
+  if (p === "black") return { r: 0, g: 0, b: 0, a: 1, source: p };
+  const v = colors[p]; if (!v) throw new Error("missing " + p);
+  const [r, g, b] = oklchToRgb(v); return { r, g, b, a: 1, source: p };
+}
+const out: Record<string, { light: any; dark: any }> = {};
+for (const t of CORE_SEMANTIC_TOKENS) out[t.name] = { light: primitive(t.light), dark: primitive(t.dark) };
+const palette = createBrandPalette(DEFAULT_BRAND_SEED);
+const L = createBrandSemanticMapping(palette, "light"), D = createBrandSemanticMapping(palette, "dark");
+const brandNames: Record<string, string> = { foregroundPrimary: "oe-brand-foreground-primary", foregroundSecondary: "oe-brand-foreground-secondary", backgroundPrimary: "oe-brand-background-primary", backgroundSecondary: "oe-brand-background-secondary", backgroundBoldPrimary: "oe-brand-background-bold-primary", borderPrimary: "oe-brand-border-primary", borderSecondary: "oe-brand-border-secondary", focusRing: "oe-focus-ring" };
+for (const [k, name] of Object.entries(brandNames)) {
+  const l = (L as any)[k], d = (D as any)[k];
+  const [lr, lg, lb] = hexToRgb(l.value), [dr, dg, db] = hexToRgb(d.value);
+  out[name] = { light: { r: lr, g: lg, b: lb, a: 1, source: l.primitive }, dark: { r: dr, g: dg, b: db, a: 1, source: d.primitive } };
+}
+const brandSolid = Object.fromEntries(BRAND_STEPS.map((s) => [`brand-${s}`, palette.solid[s]]));
+writeFileSync(process.argv[2], JSON.stringify({ seed: DEFAULT_BRAND_SEED, tokens: out, brandSolid }, null, 1));
+console.log(Object.keys(out).length, "tokens");

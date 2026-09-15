@@ -213,3 +213,13 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **Skill에서 고친 것.** 링크는 목적지가 없어도 `<a href="#">`, 유형 3 Focus 문자열에 offset, `icon.md` 읽기와 `size-oe-icon-*`, 요청이 말하지 않은 정렬은 왼쪽, 요청과 문서가 어긋나면 문서를 따르고 보고, 세 파일 밖 수정과 캐시 삭제 금지, 검사가 실패하면 「검사 실패」로 보고, 요청 문단을 머리말에 그대로, `원본:` 경로를 `screens.ts`의 `source`에, 테스트 넷째 항목(요청이 정한 값과 동작). `/review-design`은 컴포넌트 문서 전체와 `icon.md`를 읽고 아이콘·초안 컴포넌트 항목과 「역할과 경계」 판단을 더했다.
 - **docs/system/만으로 부족했던 것.** 둘이다. 폼 안의 짧은 단일 선택에서 `Select`와 `RadioField`를 가르는 문장이 select.md·radio.md에 없고 select-box.md에만 있다. checkbox.md 「Properties」에 필수 Property `label`이 없다. 둘 다 Storybook이 아니라 문서 한 줄로 채울 공백이며, 순서 3(Storybook)을 열 근거는 되지 않는다.
 - **실행 방법.** 두 세션을 같은 working tree에서 동시에 돌려 서로의 쓰는 중인 테스트를 돌렸고 `screens.ts`를 함께 고쳤다. 다음부터 v0 세션은 하나가 「pull request 준비 완료」에 닿은 뒤 다음을 돌린다.
+
+### 2026-09-15 고객의 소리: 코드에서 Figma 변수·텍스트 스타일로
+
+- **화면.** `/generate-code`로 관리자 웹 「고객의 소리」(`apps/sandbox/src/app/voc`)를 만들었다. 필터 줄·처리 상태 칩·표·상세 답변 패널·페이지 이동이다. 사람이 고친 자리는 하나다. 상세 패널이 열리면 표가 남은 폭(약 736px)보다 넓어져 상태·담당자 열이 가로 스크롤에 가려져서, 유진식의 결정으로 패널이 열린 동안 고객·담당자 열을 숨겼다. `/review-design` 위반 0건, 테스트 16건, `pnpm check` 통과.
+- **Figma 파일.** `ooee · 고객의 소리 · 2026-09-15`(file key `Iw2MXs9sfqtJFze7F9vGf5`)에 목록과 상세 열림 두 프레임을 만들었다. 칠 248개가 전부 변수에, 글자 146개가 전부 텍스트 스타일에 묶였다. auto-layout 프레임 100개, DOM 위치와 어긋나 absolute로 둔 자식 6개, 아이콘 14개(Remix SVG).
+- **변수.** `oe color`(Light·Dark) 61개와 `oe size` 17개는 `packages/tokens`에서 옮겨 적었다. Button·Badge처럼 코드가 primitive 단계를 직접 쓰는 자리(`bg-blue-100`, `bg-[var(--brand-600)]`, Chip의 `--brand-alpha-*`)는 `oe primitive` 컬렉션에 필요한 것만 만들어 묶었다. 이 자리는 코드가 `dark:` class로 따로 두므로 Figma에서 모드를 바꿔도 뒤집히지 않는다.
+- **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체했고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다. 유진식이 승인했고 텍스트 스타일 설명에 적었다. 글자 폭이 넓어져 「내보내기」 버튼의 마지막 글자가 조금 잘린다.
+- **다시 읽기.** `get_design_context`가 `bg-[var(--oe-background-secondary,#f5f5f5)]`처럼 변수 이름을 먼저 내고 hex는 대체값으로만 붙인다. 스파이크 R1에서 hex만 나오던 것이 풀렸으므로, 순서 6의 매핑표는 레이어 이름이 아니라 이 변수 이름을 1차 근거로 삼는다. Code Connect는 여전히 없어 컴포넌트(`Button`·`Select`)는 레이어 이름(`button`, `select-trigger` 등 `data-slot`)으로만 알 수 있다.
+- **변환 도구.** `scripts/figma/`에 두었다. 브라우저에 뜬 화면을 `scripts/visual/inspect.mjs --eval`로 트리로 읽고, 조각으로 나눠 `use_figma`에 넘긴다. 만들며 부딪힌 것: Chrome이 Tailwind v4 색을 `lab()`·`oklab()`로 돌려줘 처음엔 테두리와 배지 배경이 빠졌다. 두 프레임의 조각 경로 이름이 같아 한쪽 요소가 다른 프레임에 들어갔다. Select의 숨은 1px input 값이 글자로 딸려 왔다. 모두 도구에서 고쳤다. `use_figma`는 50,000자 제한이 있고 `setPluginData` 대신 `setSharedPluginData`만 된다.
+- **판단이 필요한 것.** 처리 상태 칩이 「하나만 켜짐」인데 chip.md는 그 동작을 Tab의 역할로 규정하고 Tab 컴포넌트는 없다. 매장·유형 Select를 Field 없이 필터 줄에 단독으로 썼다. 기간은 요청대로 Trigger 하나인데 input-button.md는 둘로 나누라고 한다. Table 컴포넌트가 없어 native `table`이다.
