@@ -11,6 +11,7 @@ import {
   createCoreSemanticCssVariables,
   CONTROL_HEIGHTS,
   ICON_SIZES,
+  PADDINGS,
   RADII,
 } from "./index.ts";
 
@@ -32,6 +33,22 @@ test("every control height matches the css variable that exposes it", () => {
     const found = css.match(new RegExp(`--spacing-oe-control-${name}:\\s*([0-9.]+)rem`));
     assert.ok(found, `--spacing-oe-control-${name} 가 styles.css 에 없다`);
     assert.equal(Number(found[1]) * 16, px, `--spacing-oe-control-${name} 의 값이 CONTROL_HEIGHTS 와 다르다`);
+  }
+});
+
+test("screen paddings expose the two steps a screen chooses between", () => {
+  assert.deepEqual(PADDINGS, {
+    default: 16,
+    wide: 40,
+  });
+});
+
+test("every screen padding matches the css variable that exposes it", () => {
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  for (const [name, px] of Object.entries(PADDINGS)) {
+    const found = css.match(new RegExp(`--spacing-oe-padding-${name}:\\s*([0-9.]+)rem`));
+    assert.ok(found, `--spacing-oe-padding-${name} 가 styles.css 에 없다`);
+    assert.equal(Number(found[1]) * 16, px, `--spacing-oe-padding-${name} 의 값이 PADDINGS 와 다르다`);
   }
 });
 

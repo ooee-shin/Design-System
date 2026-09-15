@@ -144,6 +144,10 @@
   }
   html {
     @apply font-sans;
+    /* 국문은 단어 중간에서 줄이 바뀌면 읽는 사람이 앞 조각을 다시 붙여 읽어야 한다. 어절
+       단위로만 넘긴다. 규칙은 docs/system/quality.md 의 「반응형과 테마」가 소유한다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 }
 

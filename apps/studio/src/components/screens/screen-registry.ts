@@ -43,6 +43,7 @@ export const screenRoots: ScreenRoot[] = [
     note: "사장님용 앱입니다. 웹에서 접근하면 모바일 뷰가 화면 가운데에 섭니다.",
     items: [
       { key: "test", name: "테스트", href: "/screens/sto/test" },
+      { key: "login", name: "로그인", href: "/screens/sto/login" },
     ],
   },
   {

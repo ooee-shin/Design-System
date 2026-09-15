@@ -121,6 +121,16 @@ try {
   targetId = page.targetId;
   const { session } = page;
 
+  // 창 크기만으로는 좁은 폭을 잴 수 없다. 크롬 창은 500px 아래로 줄어들지 않아서, 그보다 좁은
+  // 값을 주면 조용히 500px 로 잰 결과가 나온다. 앱의 최소 폭은 280px 이므로 뷰포트를 창이
+  // 아니라 기기 값으로 덮어쓴다.
+  await session.send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+
   if (opts.theme) report.theme = await session.eval(THEME(opts.theme));
 
   const settle = () => new Promise((r) => setTimeout(r, opts.wait));

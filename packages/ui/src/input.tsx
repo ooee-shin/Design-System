@@ -12,7 +12,7 @@ import { cn } from "./utils"
 // `InputButton` 이 이 스타일을 함께 쓴다. 그쪽은 초점을 받는 요소가 자신이라 `:has()` 로는 걸리지
 // 않으므로, 바닥 밝기만 `focus` 로 따로 잡아 준다.
 const inputContainerVariants = cva(
-  "group/input flex w-full min-w-0 items-center rounded-oe-control border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] has-[[data-slot=input]:focus-visible]:border-oe-focus-ring has-[[data-slot=input]:focus-visible]:ring-1 has-[[data-slot=input]:focus-visible]:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
+  "group/input flex w-full min-w-0 items-center rounded-oe-control border text-oe-foreground-primary transition-[border-color,box-shadow,background-color] has-[[data-slot=input]:focus-visible]:border-oe-focus-ring has-[[data-slot=input]:focus-visible]:ring-1 has-[[data-slot=input]:focus-visible]:ring-oe-focus-ring has-[[aria-invalid=true]]:border-oe-danger-border-primary has-[[aria-invalid=true]]:ring-1 has-[[aria-invalid=true]]:ring-oe-danger-border-primary has-[[aria-invalid=true]]:has-[[data-slot=input]:focus-visible]:border-oe-danger-border-primary has-[[aria-invalid=true]]:has-[[data-slot=input]:focus-visible]:ring-oe-danger-border-primary data-[disabled=true]:cursor-not-allowed data-[disabled=true]:bg-oe-background-disabled data-[disabled=true]:text-oe-foreground-disabled",
   {
     variants: {
       variant: {
