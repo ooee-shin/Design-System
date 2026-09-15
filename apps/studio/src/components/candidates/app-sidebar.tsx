@@ -35,7 +35,7 @@ const MENU_ROW_CLASS =
  * 메뉴 한 줄이다. 3depth 는 아이콘을 갖지 않으므로 이름만 있는 `NavLeaf` 이고, 2depth 는 아이콘을
  * 갖고 하위 목록을 가질 수 있다. 1depth 는 페이지가 아니라 묶음이라 `NavGroup` 이 따로 있다.
  *
- * **메뉴의 내용은 이 부품이 갖지 않는다.** 어떤 메뉴가 쌓이는지는 그 시스템이 정하는 것이므로
+ * **메뉴의 내용은 이 컴포넌트가 갖지 않는다.** 어떤 메뉴가 쌓이는지는 그 시스템이 정하는 것이므로
  * 쓰는 쪽에서 받는다.
  */
 export type NavLeaf = { title: string; isActive?: boolean }

@@ -12,9 +12,9 @@ import { cn } from "@/lib/utils"
  * 받은 코드는 고른 탭의 좌표와 너비를 JavaScript 로 재어 밑줄에 옮겨 적는데, Base UI 의
  * `Tabs.Indicator` 가 같은 값을 CSS 변수로 내어 주므로 그것을 읽어 쓴다.
  *
- * **탭 줄 아래 선은 이 부품이 긋지 않는다.** 그 선이 어디에서 시작해 어디까지 가는지는 탭을
+ * **탭 줄 아래 선은 이 컴포넌트가 긋지 않는다.** 그 선이 어디에서 시작해 어디까지 가는지는 탭을
  * 놓는 자리가 정하기 때문이다. 화면의 머리에서는 좌우 끝까지 가고, 본문 안에서는 그 상자의
- * 폭까지만 간다. 이 부품은 그 선 위에 밑줄을 얹는 일만 한다.
+ * 폭까지만 간다. 이 컴포넌트는 그 선 위에 밑줄을 얹는 일만 한다.
  */
 function Tabs({ className, ...props }: TabsPrimitive.Root.Props) {
   return <TabsPrimitive.Root data-slot="tabs" className={cn(className)} {...props} />
