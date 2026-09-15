@@ -24,7 +24,7 @@ import {
   RiSettings3Line,
 } from "@remixicon/react"
 
-import { Badge, Button, InputButton, NotificationBadge, Radio, RadioGroup, SwitchField } from "@ooee/ui"
+import { Badge, Button, InputButton, NotificationBadge, Radio, RadioField, RadioGroup } from "@ooee/ui"
 
 import { useBrandTheme } from "@/components/brand-theme-provider"
 import { ColorSwatch } from "@/components/color-swatch"
@@ -309,12 +309,18 @@ function MenuStyleSetting({
 
       {/* 아이콘은 색과 상관없이 어느 스타일에서나 같게 동작하므로 자기 축을 갖는다. */}
       <SettingRow inline label="메뉴 아이콘" description="메뉴 이름 앞에 아이콘을 함께 보여 줍니다.">
-        <SwitchField
-          label={showRowIcons ? "보임" : "숨김"}
-          labelPosition="left"
-          checked={showRowIcons}
-          onCheckedChange={(next) => onRowIconsChange(Boolean(next))}
-        />
+        {/* Switch 가 아니라 Radio 다. `switch.md` 는 토글한 즉시 결과가 나타나는 자리에만 Switch 를
+            쓰라고 하고, 저장을 눌러 반영하는 화면에서는 Checkbox 로 가라고 한다. 이 설정은 나중에
+            환경설정으로 옮겨 가므로, 저장 여부가 정해져도 바뀌지 않는 Radio 로 둔다. */}
+        <RadioGroup
+          className="flex items-center gap-2"
+          value={showRowIcons ? "사용" : "미사용"}
+          onValueChange={(next) => onRowIconsChange(next === "사용")}
+          aria-label="메뉴 아이콘"
+        >
+          <RadioField value="사용" label="사용" />
+          <RadioField value="미사용" label="미사용" />
+        </RadioGroup>
       </SettingRow>
     </section>
   );
@@ -373,7 +379,7 @@ function SettingRow({
   children: React.ReactNode
 }) {
   return (
-    <div className={inline ? "flex items-center justify-between gap-6" : "flex flex-col gap-2"}>
+    <div className={inline ? "flex items-center justify-between gap-6" : "flex flex-col gap-4"}>
       <span className="flex flex-col gap-0.5">
         <span className="text-sm font-medium text-oe-foreground-primary">{label}</span>
         {description ? <span className="text-xs text-oe-foreground-tertiary">{description}</span> : null}
