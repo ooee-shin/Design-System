@@ -46,6 +46,11 @@
 - **Select Box의 남은 정책** — Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수를 정하지 않았다.
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
+- **관리자 레이아웃에서 뽑은 네 초안** — `/screens/admin/layout`에서 Admin Header, Side Navigation, Page Header와 Tabs 넷을 뽑아 `candidates/`에 두고 Studio에 초안으로 올렸다. 명세와 상세 화면이 없고, 넷 다 아직 `oe` 토큰으로 정규화하지 않았다. 남은 것은 다음과 같다.
+  - **Page Header의 설명이 아직 그려지지 않는다.** 제목 옆 아이콘만 세워 두었고 누르면 펼쳐지는 자리를 붙이지 않았다. 팝오버를 받아 두었다가 지웠으므로 붙일 때 다시 받는다.
+  - **Tabs는 `underline` 한 모양뿐이다.** 아래 「Tab 컴포넌트」가 적어 둔 `filled`는 만들지 않았다.
+  - **Admin Header의 Utility 넷이 컴포넌트 안에 박혀 있다.** 알림·설정·조직도·로그아웃이 어느 화면에서나 같아서 그렇게 두었는데, 시스템마다 달라지면 밖에서 받아야 한다.
+  - **Page Header의 설명 아이콘이 버튼 색을 덮어쓴다.** `Button`의 ghost neutral이 주는 `neutral-800` 대신 화면에서 `oe-foreground-tertiary`를 얹었다. 「눌러도 되지만 먼저 읽힐 필요는 없는」 아이콘 버튼이 몇 군데 더 나오면 `Button`에 그 단계를 둘지 판단한다.
 - **Tab 컴포넌트** — 지금 서비스에 밑줄 Tab과 검정 Filled 형태의 Tab이 따로 쓰이고 있고, 후자를 Chip으로 합칠지 검토했다. 합치지 않기로 했다. Tab은 항상 하나가 켜져 있고 끌 수 없는 위치 표시이며 `role="tab"`과 방향키 이동을 갖는다. Chip은 여러 개를 켜고 끌 수 있고 아무것도 켜지지 않은 상태가 기본이다. 한 컴포넌트에 담으면 Property 하나가 키보드 동작과 필수 속성까지 바꾼다. Tab을 별도 컴포넌트로 만들 때 `underline`과 `filled` 두 모양을 갖게 하고, 검정 Filled는 그쪽으로 옮긴다. Chip의 Active는 brand alpha를 유지한다.
 - **Filter Bar의 남은 정책** — Chip을 Filter로 쓰는 규칙을 Chip 페이지에서 다듬는 중이다. 초기화의 자리(지금은 맨 앞), Label에 적용된 값을 담는 표기 방식, 적용 시점(누르는 즉시인지 열리는 필터에서 확정이 필요한지)을 정하지 않았다. 이 셋이 정해지면 `filter-bar.tsx`로 분리하고 Chip 쪽에는 쓰임 한 줄과 링크만 남긴다.
 - **Chip의 Disabled와 Color** — 제공하지 않기로 두었다. 필요한 사례가 확인되면 검토한다.

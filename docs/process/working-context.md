@@ -329,6 +329,8 @@
 
 **새로 만든 컴포넌트 일곱.** Chip(`2026-09-08`), Badge(`2026-09-08`), NotificationBadge(`2026-09-09`), Button(`2026-09-09`), ToggleButton(`2026-09-10`), AppHeader(`2026-09-11`), BottomNavigation(`2026-09-14`)이다. 구현·Studio 화면·명세를 함께 두었다. Badge에 남아 있던 미정 셋은 `2026-09-11`에 정리해 미정이 없다. AppHeader는 `2026-09-11`에 `main`에 합쳤고 BottomNavigation은 `2026-09-14`에 `dev`에 합쳤다.
 
+**관리자 웹 화면 하나와 초안 컴포넌트 넷.** `2026-09-15`에 `/screens/admin/layout`에 환경설정의 테마설정 화면을 세웠다. 좌측 메뉴의 스타일 셋(다크·브랜드·라이트)과 메인 컬러, 메뉴 아이콘을 고르고 저장하면 함께 반영된다. 그 과정에서 Admin Header·Side Navigation·Page Header·Tabs를 뽑아 `candidates/`에 두고 Studio의 「초안」에 올렸으며, 넷을 감싸는 `AdminLayout`도 함께 두어 다음 관리자 화면이 본문만 쓰면 되게 했다. 좌측 내비게이션이 쓰던 shadcn의 `--sidebar-*`는 `--nav-*`로 옮겼다. 넷 다 명세와 상세 화면이 없으며 남은 것은 [open-questions.md](open-questions.md)에 있다.
+
 **하나씩 검토가 끝난 컴포넌트 아홉.** Checkbox·Input·Input Button·Number Input·Radio·Select·Select Box·Switch·Textarea다. 그 과정에서 다섯 개의 기본값과 Property가 바뀌었고 각 컴포넌트 문서에 반영했다. 무엇을 고쳤는지는 [component-audit.md](component-audit.md)의 「하나씩 검토 진행 상황」에 있다.
 
 `2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 폼 요소 10개의 84건을 처리했다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건 중 앞의 둘은 새로 만들면서 함께 해소했다.

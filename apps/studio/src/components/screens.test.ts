@@ -73,20 +73,29 @@ test("목록의 범위 문구는 비어 있지 않거나 아예 없다", () => {
 // 관리자는 뷰포트를 전부 쓰고 앱은 기기 폭 상자 안에 선다.
 test("제품 화면은 카탈로그의 프레임을 쓰지 않는다", () => {
   for (const screen of SCREENS) {
-    const source = read(`apps/studio/src/app/screens/${screen}/layout/page.tsx`);
+    const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
     assert.doesNotMatch(source, /max-w-6xl/, `${screen} 이 카탈로그 프레임을 쓰고 있다`);
   }
 });
 
-// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 대신 각 화면이 돌아가는 링크를
+// Studio 내비게이션을 얹으면 풀 화면이 풀 화면이 아니게 된다. 대신 앱 화면이 돌아가는 링크를
 // 스스로 갖는다.
+//
+// 관리자는 예외다. 뷰포트를 전부 쓰는 화면이라 바닥에 고정된 링크가 실제 화면 요소를 가려서,
+// 무엇을 보고 있는지 확인하는 일을 방해한다. 앱 화면은 모바일 뷰가 가운데에 서고 좌우가 비므로
+// 링크가 그 빈 자리에 놓인다.
 test("Studio 내비게이션은 제품 화면에서 물러난다", () => {
   const navigation = read("apps/studio/src/components/studio-navigation.tsx");
   assert.match(navigation, /\/screens/);
 
-  for (const screen of SCREENS) {
-    const source = read(`apps/studio/src/app/screens/${screen}/layout/page.tsx`);
+  for (const screen of APPS) {
+    const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
     assert.match(source, /ScreenExitLink/, `${screen} 에 Studio 로 돌아가는 링크가 없다`);
+  }
+
+  for (const path of ["admin/layout", "admin/test", "admin/login"]) {
+    const source = read(`apps/studio/src/app/screens/${path}/page.tsx`);
+    assert.doesNotMatch(source, /ScreenExitLink/, `${path} 이 화면을 가리는 고정 링크를 두고 있다`);
   }
 });
 
@@ -94,7 +103,7 @@ test("Studio 내비게이션은 제품 화면에서 물러난다", () => {
 // 기준이 갈린다.
 test("앱 화면은 공용 모바일 뷰를 함께 쓴다", () => {
   for (const screen of APPS) {
-    const source = read(`apps/studio/src/app/screens/${screen}/layout/page.tsx`);
+    const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
     assert.match(source, /MobileWebView/, `${screen} 이 공용 모바일 뷰를 쓰지 않는다`);
     assert.doesNotMatch(source, /max-w-\[\d+px\]/, `${screen} 이 폭을 직접 적고 있다`);
   }
@@ -116,7 +125,7 @@ test("모바일 뷰는 기기 상자로 그리지 않는다", () => {
 // 그것이 결정처럼 굳는다.
 test("앱 화면은 아직 정하지 않은 구성을 미리 채우지 않는다", () => {
   for (const screen of APPS) {
-    const source = read(`apps/studio/src/app/screens/${screen}/layout/page.tsx`);
+    const source = read(`apps/studio/src/app/screens/${screen}/test/page.tsx`);
     assert.doesNotMatch(source, /BottomNavigation/, `${screen} 이 정해지지 않은 하단 내비게이션을 두고 있다`);
     assert.doesNotMatch(source, /AppHeader/, `${screen} 이 정해지지 않은 상단 줄을 두고 있다`);
   }
