@@ -11,8 +11,9 @@
 | `docs/system/` | 시스템에 무엇이 있고 어떤 정의이며 어떻게 쓰는가. 블루키에 전달할 영구 자산 |
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
-| `.claude/` | Claude Code 도구 설정과 `/generate-code`·`/review-design` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거 |
+| `.claude/` | Claude Code 도구 설정과 `/generate-code`·`/review-design`·`/design-page` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거 |
 | `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 신주희가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
+| `scripts/figma/` | `/design-page`가 `apps/sandbox` 화면을 Figma 프레임으로 옮기는 도구. 중간 산출물은 `.figma-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/figma/README.md` |
 
 `docs/process/`와 이 파일은 1차 컴포넌트를 완성하는 동안에만 필요한 작업 규칙을 담는다. `ㄱ`, `업무시작`, `퇴근백업` 같은 신호와 제작 절차는 시스템이 무엇인지 설명하지 않으므로 블루키 자산화 대상에서 제외한다. 반대로 시스템 정의를 이쪽에 두면 전달본에서 함께 사라지므로, 어느 쪽에 속하는지 먼저 판단한 뒤 기록한다.
 
