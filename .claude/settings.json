@@ -1,3 +1,64 @@
 {
-  "enabledPlugins": {}
+  "enabledPlugins": {},
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch --show-current)",
+      "Bash(pnpm check)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm test)",
+      "Bash(pnpm build)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm visual *)",
+      "Bash(pnpm --filter @ooee/sandbox build)",
+      "Bash(pnpm --filter @ooee/sandbox test)",
+      "Bash(pnpm --filter @ooee/sandbox dev)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh run list *)"
+    ],
+    "ask": [
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git reset --hard)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean *)",
+      "Bash(git checkout .)",
+      "Bash(git checkout -- *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force)",
+      "Bash(git push * --force *)",
+      "Bash(git push * -f)",
+      "Bash(rm -r *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Edit(/apps/sandbox/package.json)",
+      "Edit(/apps/sandbox/src/test-setup.ts)",
+      "Edit(/apps/sandbox/src/screen-rules.ts)",
+      "Edit(/apps/sandbox/src/screen-rules.test.tsx)",
+      "Edit(/apps/sandbox/src/app/layout.tsx)",
+      "Edit(/apps/sandbox/src/app/page.tsx)",
+      "Edit(/apps/sandbox/src/app/globals.css)"
+    ],
+    "deny": [
+      "Bash(git push origin main)",
+      "Bash(git push origin main *)",
+      "Bash(git push * origin main)",
+      "Bash(git push * origin main *)",
+      "Bash(git push *:main)",
+      "Bash(git push *:main *)",
+      "Bash(git push *:refs/heads/main*)",
+      "Bash(git push --all*)",
+      "Bash(git push * --all*)",
+      "Bash(git push --mirror*)",
+      "Bash(git push * --mirror*)"
+    ]
+  }
 }

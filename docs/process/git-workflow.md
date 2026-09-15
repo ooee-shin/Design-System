@@ -79,13 +79,13 @@ feat(badge)!: 색을 프리미티브 단계 규칙으로 정리하고 크기·�
 4. Storybook MCP 조회가 정상인가
 5. Skill과 Agent가 동작하는가
 
-**다섯 중 넷은 아직 검증할 대상이 저장소에 없다.** 지금 저장소에는 Storybook도 MCP 연동도 Skill도 없으며, 전부 유진식의 `feature/*`가 들어온 뒤에 성립한다. 그때까지 `dev → main`에서 실제로 도는 것은 `pnpm check` 하나다. 대상이 생기는 순서대로 이 목록을 채워 간다.
+**다섯 중 셋은 아직 검증할 대상이 저장소에 없다.** Storybook, Storybook MCP와 `.mcp.json`의 Figma MCP 설정이 없다. 2번은 `pnpm check`가 맡고, 5번의 대상인 Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔다. 5번은 `dev → main` diff에 `.claude/`나 `AGENTS.md`가 있을 때만 유진식이 [ai-environment.md](ai-environment.md)의 「통합 검증 항목 채우기」에 적힌 명령을 돌리고 결과를 pull request 본문에 남긴다. 컴포넌트만 바뀐 pull request는 이 항목을 기다리지 않는다. 대상이 생기는 순서대로 이 목록을 채워 간다.
 
 ## 자동 검사가 도는 자리
 
 `Quality` workflow는 모든 pull request와 `main`·`dev` push에서 돈다. `feature/*`에 push만 하는 동안에는 돌지 않으므로, 올리기 전에 로컬에서 `pnpm check`를 통과시킨다.
 
-`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다. 기본 branch를 `dev`로 둔 것도 같은 이유다. 막을 수 없다면 실수하기 어려운 쪽을 기본값으로 만든다.
+`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다. 기본 branch를 `dev`로 둔 것도 같은 이유다. 막을 수 없다면 실수하기 어려운 쪽을 기본값으로 만든다. `.claude/settings.json`의 `deny`가 저장소 루트에서 시작한 Claude Code 세션의 `git push origin main` 같은 명령을 거부하지만, 명령 문자열을 대조할 뿐이라 형태를 바꾸면 통과하고 사람이 터미널에서 친 명령에는 걸리지 않는다. branch 보호를 대신하지 않는다.
 
 ## 다른 기기로 이동할 때
 
