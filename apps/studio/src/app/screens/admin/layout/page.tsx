@@ -126,13 +126,14 @@ function MenuStyleSetting({
       <span className="flex items-start justify-between gap-4">
         <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
 
-        <span className="flex items-center gap-2">
+        {/* 나란히 선 버튼 사이는 6px 로 둔다. */}
+        <span className="flex items-center gap-1.5">
           {/* 잘못 골랐을 때 돌아올 자리다. 고른 값을 기본값으로 되돌릴 뿐이고, 화면에 반영하려면
               저장을 눌러야 한다. */}
           <Button
             variant="outline"
             tone="neutral"
-            controlSize="small"
+            controlSize="regular"
             onClick={() => setEdited({ seed: DEFAULT_BRAND_SEED, styleName: SIDEBAR_STYLES[0].name, showRowIcons: true })}
           >
             기본값 초기화
@@ -141,7 +142,7 @@ function MenuStyleSetting({
               따라간다. */}
           <Button
             variant="fill"
-            controlSize="small"
+            controlSize="regular"
             onClick={() => {
               onSave(draft);
               setEdited(null);
