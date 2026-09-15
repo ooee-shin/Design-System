@@ -2,7 +2,17 @@
 
 import * as React from "react"
 
-import { RiArrowRightSLine, RiUserAddLine } from "@remixicon/react"
+import {
+  RiArrowRightSLine,
+  RiBarChartBoxLine,
+  RiContractLine,
+  RiGroupLine,
+  RiSmartphoneLine,
+  RiStore2Line,
+  RiTaskLine,
+  RiToolsLine,
+  RiUserAddLine,
+} from "@remixicon/react"
 
 import { SearchForm } from "@/components/candidates/search-form"
 import {
@@ -41,8 +51,8 @@ type NavLeaf = { title: string; isActive?: boolean }
 type NavItem = NavLeaf & { items?: NavLeaf[] }
 type NavGroup = {
   title: string
-  /** 묶음 이름 앞에 서는 아이콘. 지금은 첫 묶음에만 달아 두고 모습을 본다. */
-  icon?: typeof RiUserAddLine
+  /** 묶음 이름 앞에 서는 아이콘. 스타일이 켤 때만 그린다. */
+  icon: typeof RiUserAddLine
   items: NavItem[]
 }
 
@@ -60,6 +70,7 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "계약관리",
+      icon: RiContractLine,
       items: [
         {
           title: "계약대상",
@@ -78,10 +89,12 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "가맹점관리",
+      icon: RiStore2Line,
       items: [{ title: "오픈매장관리" }, { title: "가맹점현황" }],
     },
     {
       title: "운영관리",
+      icon: RiToolsLine,
       items: [
         { title: "지원요청관리" },
         { title: "품질관리" },
@@ -98,6 +111,7 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "앱관리",
+      icon: RiSmartphoneLine,
       items: [
         { title: "가맹점 공지사항" },
         { title: "교육자료" },
@@ -109,6 +123,7 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "커뮤니티",
+      icon: RiGroupLine,
       items: [
         { title: "전사공지사항" },
         { title: "운영FAQ" },
@@ -117,6 +132,7 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "통계",
+      icon: RiBarChartBoxLine,
       items: [
         {
           title: "매출",
@@ -143,12 +159,19 @@ const data: { navMain: NavGroup[] } = {
     },
     {
       title: "업무 관리",
+      icon: RiTaskLine,
       items: [{ title: "업무관리" }, { title: "업무관리 사용자별" }],
     },
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  showGroupIcons = false,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  /** 묶음 이름 앞의 아이콘을 그릴지. 좌측 메뉴 스타일이 정한다. */
+  showGroupIcons?: boolean
+}) {
   // 지금 보고 있는 메뉴가 어느 것인지 화면이 말해야 한다. 실제 경로가 아직 없으므로 누른 것을
   // 기억해 두고, 경로가 붙으면 주소에서 읽는 값으로 바꾼다.
   //
@@ -171,7 +194,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title} className="pt-5 pb-0.5">
             <SidebarGroupLabel className="gap-1.5 px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
-              {group.icon ? <group.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
+              {showGroupIcons ? <group.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>

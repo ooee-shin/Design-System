@@ -92,7 +92,7 @@ export default function Page() {
             따로 두면 접을 때 하나가 사라지고 다른 하나가 생겨서, 유지되는 것이 아니라 새로
             만들어지는 것처럼 보인다. */}
         <SidebarToggle />
-        <AppSidebar />
+        <AppSidebar showGroupIcons={style.groupIcons} />
         <SidebarInset className="min-h-0">
           <AdminHeader />
           <div className="flex flex-1 flex-col gap-6 p-6">
@@ -194,12 +194,15 @@ type SidebarStyle = {
   vars: React.CSSProperties
   /** 미리보기의 좌측 띠와 본문 색. */
   preview?: { band: string; body: string }
+  /** 묶음 이름 앞에 아이콘을 그릴지. */
+  groupIcons?: boolean
 }
 
 const SIDEBAR_STYLES: SidebarStyle[] = [
   {
     // 이름이 아직 정해지지 않은 가제다.
     name: "다크",
+    groupIcons: true,
     vars: {
       "--sidebar": "var(--brand-950)",
       // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
