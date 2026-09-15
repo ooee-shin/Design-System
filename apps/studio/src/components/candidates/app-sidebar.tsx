@@ -136,13 +136,14 @@ const data: { navMain: NavGroup[] } = {
       title: "앱관리",
       items: [
         { title: "가맹점 공지사항", icon: RiMegaphoneLine },
-        // 공지사항을 뺀 다섯은 모두 같은 목록 아이콘을 쓴다. 성격이 같은 게시판이라 아이콘을
-        // 따로 두면 서로 다른 기능처럼 보인다.
+        // 교육자료·청년늬우스·홍보자료는 같은 목록 아이콘을 쓴다. 성격이 같은 게시판이라
+        // 아이콘을 따로 두면 서로 다른 기능처럼 보인다. 공지사항·팝업·FAQ 는 게시판이 아니라
+        // 각자 다른 쓰임이라 자기 아이콘을 갖는다.
         { title: "교육자료", icon: RiListUnordered },
         { title: "청년늬우스", icon: RiListUnordered },
         { title: "홍보자료", icon: RiListUnordered },
-        { title: "팝업", icon: RiListUnordered },
-        { title: "FAQ", icon: RiListUnordered },
+        { title: "팝업", icon: RiWindowLine },
+        { title: "FAQ", icon: RiQuestionLine },
       ],
     },
     {
