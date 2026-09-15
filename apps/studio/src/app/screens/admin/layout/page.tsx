@@ -26,6 +26,8 @@ import {
 
 import { Badge, Button, InputButton, NotificationBadge, Radio, RadioField, RadioGroup } from "@ooee/ui"
 
+import { DEFAULT_BRAND_SEED } from "@ooee/tokens"
+
 import { useBrandTheme } from "@/components/brand-theme-provider"
 import { ColorSwatch } from "@/components/color-swatch"
 
@@ -205,12 +207,14 @@ type SidebarStyle = {
   vars: React.CSSProperties
   /** 미리보기의 좌측 띠와 본문 색. */
   preview?: { band: string; body: string }
+  /** 이 스타일이 어떤 모습인지 한 줄. 미리보기를 볼 수 없는 사람에게 전한다. */
+  hint: string
 }
 
 const SIDEBAR_STYLES: SidebarStyle[] = [
   {
-    // 이름이 아직 정해지지 않은 가제다.
     name: "다크",
+    hint: "브랜드의 가장 짙은 색을 씁니다.",
     vars: {
       "--sidebar": "var(--brand-950)",
       // 고르지 않은 줄은 온전한 흰색이 아니라 알파를 먹여 한 단계 옅게 둔다. 그래야 고른 줄의
@@ -232,7 +236,8 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   },
   {
     // 「다크」와 두 값이 뒤집힌 스타일이다. 바탕이 밝은 브랜드 단계이고 고른 줄이 짙다.
-    name: "라벨 A",
+    name: "브랜드",
+    hint: "브랜드 색이 그대로 드러납니다.",
     vars: {
       "--sidebar": "var(--brand-800)",
       "--sidebar-foreground": "rgb(255 255 255 / 0.8)",
@@ -253,7 +258,8 @@ const SIDEBAR_STYLES: SidebarStyle[] = [
   },
   {
     // 브랜드를 쓰지 않는 회색조다. 나머지 둘과 얼개는 같고 색 계열만 중립이다.
-    name: "라벨 C",
+    name: "라이트",
+    hint: "브랜드 색을 쓰지 않는 밝은 회색입니다. 메인 컬러를 바꿔도 이 스타일은 달라지지 않습니다.",
     vars: {
       "--sidebar": "var(--color-neutral-100)",
       // 바탕이 밝으므로 얹는 알파도 검정이다. 나머지 둘과 얼개는 같고 방향만 뒤집힌다.
@@ -282,11 +288,32 @@ function MenuStyleSetting({
   onRowIconsChange: (next: boolean) => void
 }) {
   const { seed, applySeed } = useBrandTheme();
+  const isDefault =
+    seed.toUpperCase() === DEFAULT_BRAND_SEED.toUpperCase() &&
+    styleName === SIDEBAR_STYLES[0].name &&
+    showRowIcons;
 
   return (
     // 카드 셋과 사이 간격을 더한 폭이다. 176 × 3 + 12 × 2 = 552 이다.
     <section className="flex w-[552px] flex-col gap-6">
-      <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+      <span className="flex items-baseline justify-between gap-4">
+        <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
+        {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. */}
+        <Button
+          variant="ghost"
+          tone="neutral"
+          controlSize="small"
+          onClick={() => {
+            applySeed(DEFAULT_BRAND_SEED);
+            onStyleChange(SIDEBAR_STYLES[0].name);
+            onRowIconsChange(true);
+          }}
+          disabled={isDefault}
+        >
+          기본값으로 되돌리기
+        </Button>
+      </span>
+      <p className="-mt-4 text-sm text-oe-foreground-secondary">고른 즉시 적용됩니다.</p>
 
       {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
           레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
@@ -302,7 +329,13 @@ function MenuStyleSetting({
           aria-label="메뉴 스타일"
         >
           {SIDEBAR_STYLES.map((item) => (
-            <StyleOptionCard key={item.name} value={item.name} label={item.name} preview={item.preview} />
+            <StyleOptionCard
+              key={item.name}
+              value={item.name}
+              label={item.name}
+              hint={item.hint}
+              preview={item.preview}
+            />
           ))}
         </RadioGroup>
       </SettingRow>
@@ -344,7 +377,6 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
         value={value.toUpperCase()}
         leadingElement={<ColorSwatch color={value} />}
         aria-label="메인 컬러"
-        aria-haspopup="dialog"
         onClick={() => picker.current?.click()}
         // shadcn 의 `--input` 이 이미 200 이라 폼 요소의 경계로는 그 값이 기준이다. 공용 `Input`
         // 의 값을 바꾸면 저장소의 모든 폼 요소가 함께 따라오므로, 여기서 먼저 200 으로 두고 본다.
@@ -399,10 +431,12 @@ function SettingRow({
 function StyleOptionCard({
   value,
   label,
+  hint,
   preview,
 }: {
   value: string
   label: string
+  hint: string
   preview?: { band: string; body: string }
 }) {
   const labelId = `sidebar-style-${value}`;
@@ -429,7 +463,11 @@ function StyleOptionCard({
       {/* 라디오가 미리보기의 왼쪽 끝과 같은 자리에서 시작한다. 링을 바깥으로 빼면서 이미지가
           카드 끝까지 왔으므로, 예전에 이미지의 안쪽 여백을 맞추려고 두었던 4px 은 걷어낸다. */}
       <span className="flex min-h-7 items-center gap-2">
-        <Radio value={value} aria-labelledby={labelId} className="focus-visible:ring-0 focus-visible:ring-offset-0" />
+        <Radio
+          value={value}
+          aria-label={`${label}. ${hint}`}
+          className="focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
         <span id={labelId} className="text-sm leading-5 font-medium whitespace-nowrap text-oe-foreground-primary">
           {label}
         </span>
