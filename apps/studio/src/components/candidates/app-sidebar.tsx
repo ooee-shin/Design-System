@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { RiArrowRightSLine } from "@remixicon/react"
+import { RiArrowRightSLine, RiUserAddLine } from "@remixicon/react"
 
 import { SearchForm } from "@/components/candidates/search-form"
 import {
@@ -39,12 +39,18 @@ import {
  */
 type NavLeaf = { title: string; isActive?: boolean }
 type NavItem = NavLeaf & { items?: NavLeaf[] }
-type NavGroup = { title: string; items: NavItem[] }
+type NavGroup = {
+  title: string
+  /** 묶음 이름 앞에 서는 아이콘. 지금은 첫 묶음에만 달아 두고 모습을 본다. */
+  icon?: typeof RiUserAddLine
+  items: NavItem[]
+}
 
 const data: { navMain: NavGroup[] } = {
   navMain: [
     {
       title: "가맹영업",
+      icon: RiUserAddLine,
       items: [
         { title: "신규가맹문의" },
         { title: "가맹상담관리" },
@@ -164,7 +170,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             그 아래는 늘 펼쳐져 있다. */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title} className="pt-5 pb-0.5">
-            <SidebarGroupLabel className="px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
+            <SidebarGroupLabel className="gap-1.5 px-4 text-[length:var(--text-oe-label)] font-normal tracking-[0.01em] text-[var(--menu-group-fg)]">
+              {group.icon ? <group.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
