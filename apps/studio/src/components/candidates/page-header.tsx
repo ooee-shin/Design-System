@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-import { Tabs } from "@base-ui/react/tabs"
 import {
   RiArrowRightSLine,
   RiInformationLine,
@@ -11,6 +10,8 @@ import {
 } from "@remixicon/react"
 
 import { Button, ToggleButton } from "@ooee/ui"
+
+import { TabsList, TabsTab } from "@/components/candidates/tabs"
 
 import { cn } from "@/lib/utils"
 
@@ -27,8 +28,9 @@ import { cn } from "@/lib/utils"
  *
  * 탭과 동작 버튼은 둘 다 없어도 된다. 없으면 그 줄이 통째로 서지 않는다.
  *
- * **탭을 쓸 때는 쓰는 쪽이 `Tabs.Root` 로 이 부품과 본문을 함께 감싼다.** 탭 줄과 그 탭이 여는
- * 내용은 서로를 가리켜야 하는데, 내용은 이 부품의 바깥에 있기 때문이다.
+ * 탭 줄 자체는 `tabs.tsx` 가 갖는다. **탭을 쓸 때는 쓰는 쪽이 `Tabs` 로 이 부품과 본문을 함께
+ * 감싼다.** 탭 줄과 그 탭이 여는 내용은 서로를 가리켜야 하는데, 내용은 이 부품의 바깥에 있기
+ * 때문이다.
  */
 export type PageHeaderTab = {
   value: string
@@ -151,30 +153,13 @@ export function PageHeader({
       </div>
 
       {tabs ? (
-        // 밑줄은 고른 탭의 왼쪽 끝과 너비를 그대로 받아 그 자리로 미끄러진다. 좌표를 직접 재지
-        // 않는 이유는 Base UI 의 Indicator 가 그 값을 CSS 변수로 내어 주기 때문이다.
-        // 탭이 좌우로 4px 씩 내어 준 만큼 줄 전체를 왼쪽으로 당긴다. 그러지 않으면 첫 탭의 글자
-        // 시작점이 제목보다 4px 안으로 들어간다. 사이 간격도 그 8px 만큼 줄여, 글자와 글자
-        // 사이는 그대로 28px 로 둔다.
-        <Tabs.List className="relative -ml-1 mt-4 flex gap-5">
+        <TabsList className="mt-4">
           {tabs.map((tab) => (
-            <Tabs.Tab
-              key={tab.value}
-              value={tab.value}
-              // 글자 폭에 딱 맞추면 밑줄이 글자에 붙어 시작하고 끝난다. 좌우로 4px 씩 내어 주어
-              // 밑줄이 글자를 조금 넘어서게 둔다. 누를 수 있는 자리도 그만큼 넓어진다.
-              className="cursor-pointer rounded-t-sm px-1 pb-3 text-sm text-oe-foreground-tertiary transition-colors duration-150 outline-none hover:text-oe-foreground-secondary focus-visible:ring-2 focus-visible:ring-oe-focus-ring data-active:font-medium data-active:text-oe-foreground-primary"
-            >
+            <TabsTab key={tab.value} value={tab.value}>
               {tab.label}
-            </Tabs.Tab>
+            </TabsTab>
           ))}
-          {/* 아래 경계선 위에 겹쳐 앉아 그 자리를 브랜드 색으로 덮는다. 색은 면을 채우는 값이
-              아니라 선을 긋는 값이다. 버튼이 쓰는 짙은 단계로 두면 2px 짜리 선이 검게 읽힌다. */}
-          <Tabs.Indicator
-            renderBeforeHydration
-            className="absolute -bottom-px left-[var(--active-tab-left)] h-0.5 w-[var(--active-tab-width)] rounded-full bg-oe-brand-border-primary transition-[left,width] duration-200 ease-out"
-          />
-        </Tabs.List>
+        </TabsList>
       ) : null}
     </div>
   )

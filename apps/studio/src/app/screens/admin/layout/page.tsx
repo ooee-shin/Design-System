@@ -16,8 +16,6 @@ import { useRef, useState } from "react"
 
 import Image from "next/image"
 
-import { Tabs } from "@base-ui/react/tabs"
-
 import {
   RiLogoutBoxRLine,
   RiMenuLine,
@@ -36,6 +34,7 @@ import { ColorSwatch } from "@/components/color-swatch"
 
 import { AppSidebar } from "@/components/candidates/app-sidebar"
 import { PageHeader, type PageHeaderTab } from "@/components/candidates/page-header"
+import { Tabs, TabsPanel } from "@/components/candidates/tabs"
 import {
   SidebarInset,
   SidebarProvider,
@@ -135,7 +134,7 @@ export default function Page() {
           <AdminHeader />
           {/* 탭 줄은 머리에 서고 그 탭이 여는 내용은 그 아래 본문이다. 둘이 서로를 가리켜야 하므로
               `Tabs.Root` 가 머리와 본문을 함께 감싼다. */}
-          <Tabs.Root defaultValue={THEME_TABS[0].value} className="flex min-h-0 flex-1 flex-col">
+          <Tabs defaultValue={THEME_TABS[0].value} className="flex min-h-0 flex-1 flex-col">
             <PageHeader
               path={PAGE_PATH}
               title="테마설정"
@@ -144,7 +143,7 @@ export default function Page() {
               onFavoriteChange={setFavorite}
               description={PAGE_DESCRIPTION}
             />
-            <Tabs.Panel value={THEME_TABS[0].value} className="flex flex-1 flex-col gap-6 p-6">
+            <TabsPanel value={THEME_TABS[0].value} className="flex flex-1 flex-col gap-6 p-6">
               <MenuStyleSetting
                 applied={{ seed, ...applied }}
                 onSave={(next) => {
@@ -152,13 +151,13 @@ export default function Page() {
                   setApplied({ styleName: next.styleName, showRowIcons: next.showRowIcons });
                 }}
               />
-            </Tabs.Panel>
+            </TabsPanel>
             {THEME_TABS.slice(1).map((tab) => (
-              <Tabs.Panel key={tab.value} value={tab.value} className="p-6 text-sm text-oe-foreground-tertiary">
+              <TabsPanel key={tab.value} value={tab.value} className="p-6 text-sm text-oe-foreground-tertiary">
                 아직 만들지 않았습니다.
-              </Tabs.Panel>
+              </TabsPanel>
             ))}
-          </Tabs.Root>
+          </Tabs>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
