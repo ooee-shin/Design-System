@@ -143,7 +143,7 @@ test("the excel colour reaches every variant", () => {
 test("a disabled outline button trades its tone border for a neutral one", () => {
   const className = renderButton(<Button variant="outline" disabled>Label</Button>)
 
-  assertHas(className, ["disabled:border-oe-border-primary", "dark:disabled:border-oe-border-primary"], "Disabled outline")
+  assertHas(className, ["disabled:border-oe-border-secondary", "dark:disabled:border-oe-border-secondary"], "Disabled outline")
 })
 
 // `disabled:` 로 시작하는 클래스는 native disabled 속성이 실제로 붙어야 걸린다. Base UI 의

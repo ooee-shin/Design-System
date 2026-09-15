@@ -214,9 +214,7 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
         leadingElement={<ColorSwatch color={value} />}
         aria-label="메인 컬러"
         onClick={() => picker.current?.click()}
-        // shadcn 의 `--input` 이 이미 200 이라 폼 요소의 경계로는 그 값이 기준이다. 공용 `Input`
-        // 의 값을 바꾸면 저장소의 모든 폼 요소가 함께 따라오므로, 여기서 먼저 200 으로 두고 본다.
-        className="border-oe-border-secondary font-mono tabular-nums uppercase"
+        className="font-mono tabular-nums uppercase"
       />
       <input
         ref={picker}

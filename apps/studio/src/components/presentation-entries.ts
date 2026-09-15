@@ -22,8 +22,13 @@ export type PresentationSection = {
   body: string;
 };
 
+/** 꼭지가 무엇을 다루는지. Presentation 화면의 두 탭이 이 값으로 갈린다. */
+export type PresentationKind = "component" | "screen";
+
 export type PresentationEntry = {
   id: string;
+  /** 컴포넌트 하나를 다루면 `component`, 화면이나 레이아웃을 다루면 `screen`이다. */
+  kind: PresentationKind;
   title: string;
   /** 최소 두 개. 효과가 따로 설 만하면 세 번째를 둔다. */
   sections: PresentationSection[];
@@ -34,6 +39,7 @@ export type PresentationEntry = {
 export const presentationEntries: PresentationEntry[] = [
   {
     id: "button-tones",
+    kind: "component",
     title: "삭제처럼 되돌릴 수 없는 액션은 Button 색으로 구분해요",
     sections: [
       {
@@ -48,6 +54,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "badge-tones",
+    kind: "component",
     title: "색이 아니라 뜻으로 Badge를 골라요",
     sections: [
       {
@@ -62,6 +69,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "notification-badge",
+    kind: "component",
     title: "붙어서 알리는 표시는 Notification Badge가 담당해요",
     sections: [
       {
@@ -76,6 +84,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "toggle-button",
+    kind: "component",
     title: "Button은 Action에만 쓰도록, 상태를 나타내는 버튼은 ToggleButton으로 나눴어요",
     sections: [
       {
@@ -90,6 +99,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "chip",
+    kind: "component",
     title: "따로 만들던 표시를 Chip으로 정의하고 다섯 역할로 나눴어요",
     sections: [
       {
@@ -104,6 +114,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "field",
+    kind: "component",
     title: "라벨과 안내 문구를 Field가 맡아, 폼 한 칸을 한 곳에서 다뤄요",
     sections: [
       {
@@ -123,6 +134,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "select-box",
+    kind: "component",
     title: "별도 액션 없이 비교할 수 있는 Select Box를 추가했어요",
     sections: [
       {
@@ -142,6 +154,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "select-custom-list",
+    kind: "component",
     title: "브라우저가 그리던 Select 목록을 우리가 직접 그려요",
     sections: [
       {
@@ -156,6 +169,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "radio-shape",
+    kind: "component",
     title: "모양만으로 선택 방식이 읽히도록, Radio를 원형으로 되돌렸어요",
     sections: [
       {
@@ -170,6 +184,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "brand-palette-and-semantic-tokens",
+    kind: "component",
     title: "명도를 단계로 나눠 브랜드 색이 바뀌어도 대비를 지켜요",
     sections: [
       {
@@ -188,6 +203,7 @@ export const presentationEntries: PresentationEntry[] = [
   },
   {
     id: "input-and-input-button",
+    kind: "component",
     title: "하는 일이 다른 Input과 Input Button을 나눴어요",
     sections: [
       {
