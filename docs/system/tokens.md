@@ -56,7 +56,9 @@ oe-focus-ring
 - `disabled`: 사용할 수 없는 상태
 - `inverse`: 진한 표면 위의 범용 반전 foreground
 
-Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다. Light Neutral background는 primary에서 secondary 순으로 어두워지며, Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다. `border-primary`는 비교적 명확한 외곽이나 컨트롤 경계, `border-secondary`는 내부의 약한 divider로 정의한다.
+Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다. Light Neutral background는 primary에서 secondary 순으로 어두워지며, Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다. **두 경계선은 선이 무엇을 하는지로 갈린다.** `border-primary`는 선 자체가 컨트롤의 모양을 만드는 자리에 쓴다. Checkbox의 네모와 Radio의 원이 그것이며, 16px 안에서 그 선이 사라지면 고를 것이 있다는 사실 자체가 보이지 않는다. `border-secondary`는 이미 면으로 서 있는 것의 테두리와 면을 가르는 divider에 쓴다. Input과 Textarea의 상자, Select·Combobox·Select Box의 트리거, 떠 있는 Popup, 그 사이의 divider가 여기에 해당한다.
+
+`2026-09-15`에 뒤쪽을 한 단계 옅은 `border-secondary`로 옮겼다. 폼 요소의 테두리가 한 단계 진해 보인다는 판단이었고, 그때 Checkbox와 Radio는 `border-primary`에 남겼다. 상자는 안쪽의 글자와 바탕이 이미 그것이 입력란임을 말하지만, 선택 컨트롤은 선 말고 말해 줄 것이 없기 때문이다.
 
 `foreground-tertiary`는 leading icon, timestamp와 더 약한 메타 정보의 실제 용례가 확인되어 사용한다.
 

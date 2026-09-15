@@ -16,7 +16,7 @@ const inputContainerVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border-oe-border-primary bg-oe-background-primary",
+        outline: "border-oe-border-secondary bg-oe-background-primary",
         // 바닥이 밝아지는 것은 그 자리를 쓰고 있는 동안의 표시다. focus-within 으로 두면 Trailing
         // element 의 버튼에 초점이 가도 같은 모습이 되므로, 대상을 둘로 좁힌다. `focus` 는 이
         // 스타일을 직접 두른 요소가 초점을 받는 InputButton 이고, `has` 는 컨테이너 안의 입력란이

@@ -1,26 +1,7 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { RiArrowLeftLine } from "@remixicon/react";
 
-import { OnThisPage } from "@/components/component-detail-navigation";
-import { presentationEntries } from "@/components/presentation-entries";
-
-/** 본문의 `[표시할 말](경로)`을 링크로 바꾼다. 링크는 문장 안에서만 나타나고 별도 목록을 만들지 않는다. */
-function withLinks(text: string): ReactNode[] {
-  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, index) => {
-    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-    if (!match) return part;
-    return (
-      <Link
-        key={`${match[2]}-${index}`}
-        href={match[2]}
-        className="text-foreground underline decoration-foreground/40 underline-offset-4 outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {match[1]}
-      </Link>
-    );
-  });
-}
+import { PresentationEntryList } from "@/components/presentation-entry-list";
 
 export default function PresentationPage() {
   return (
@@ -39,48 +20,7 @@ export default function PresentationPage() {
           </div>
         </header>
 
-        {/* 컨테이너 쿼리는 조상 컨테이너를 기준으로 하므로 @container 는 그리드보다 바깥에 둔다. */}
-        <div className="@container">
-          <div className="grid items-start gap-6 @min-[1120px]:grid-cols-[minmax(0,1fr)_11rem]">
-            {/* 하단 여백은 OnThisPage 의 rootMargin 아래쪽 값과 같은 55vh 다. 이만큼 더 스크롤할 수 있어야
-                마지막 꼭지가 활성 판정 구간까지 올라온다. 관찰 범위를 바꾸면 이 값도 함께 바꾼다. */}
-            <ol className="flex min-w-0 flex-col gap-3 pb-[55vh]" aria-label="변경 기록">
-            {presentationEntries.map((entry) => (
-              <li key={entry.id} id={entry.id} className="scroll-mt-20 rounded-2xl border bg-background p-6 sm:p-8">
-                <article aria-labelledby={`${entry.id}-title`}>
-                  <h2 id={`${entry.id}-title`} className="text-2xl font-semibold tracking-tight">
-                    {entry.title}
-                  </h2>
-                  {/* 제목에서 첫 칸까지를 칸 사이보다 벌린다. 같은 간격이면 제목이 소제목과 나란히 놓인 것처럼 읽힌다. */}
-                  <div className="relative mt-8 flex flex-col gap-6 pl-6">
-                    {/* border 로는 끝을 둥글릴 수 없어 실제 막대를 그린다. absolute 라 flex 흐름과 gap 에 끼어들지 않는다. */}
-                    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] rounded-full bg-oe-border-secondary/60" />
-                    {entry.sections.map((section) => (
-                      <section key={section.heading}>
-                        {/* 꼭지 제목과 본문 사이의 중간 위계다. 소제목이 제목과 같은 검정이면 카드 하나에 제목이 여럿 있는 것처럼 읽힌다. */}
-                        <h3 className="max-w-3xl text-lg font-semibold leading-7 tracking-tight text-oe-foreground-secondary">
-                          {section.heading}
-                        </h3>
-                        <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{withLinks(section.body)}</p>
-                      </section>
-                    ))}
-                  </div>
-                  {/* 소제목 없이 카드 전체에 붙는 주석이다. 좌측 선 안에 두면 네 번째 칸처럼 읽히므로 바깥에 둔다. */}
-                  {entry.caption ? (
-                    <p className="mt-6 flex max-w-3xl gap-0.5 pl-6 text-xs leading-5 text-oe-foreground-tertiary">
-                      {/* 칸 묶음과 같은 24px 을 들여써서 별표가 소제목·본문과 같은 지점에서 시작한다. */}
-                      <span aria-hidden="true">*</span>
-                      <span>{withLinks(entry.caption)}</span>
-                    </p>
-                  ) : null}
-                </article>
-              </li>
-            ))}
-          </ol>
-
-            <OnThisPage items={presentationEntries.map((entry) => ({ id: entry.id, label: entry.title }))} />
-          </div>
-        </div>
+        <PresentationEntryList />
       </div>
     </main>
   );

@@ -8,7 +8,7 @@ const textareaContainerVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border-oe-border-primary bg-oe-background-primary",
+        outline: "border-oe-border-secondary bg-oe-background-primary",
         filled: "border-transparent bg-oe-background-secondary focus-within:bg-oe-background-primary",
       },
     },

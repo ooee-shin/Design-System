@@ -19,7 +19,7 @@ export type MessageComposerProps = {
 export function MessageComposer({ value, onValueChange, onSubmit, placeholder, attachLabel, sendLabel, className = "border-t border-oe-border-secondary p-3 sm:p-4" }: MessageComposerProps) {
   return (
     <form onSubmit={onSubmit} className={className}>
-      <div className="rounded-xl border border-oe-border-primary bg-oe-background-primary transition-shadow focus-within:border-oe-focus-ring focus-within:ring-3 focus-within:ring-oe-focus-ring/20">
+      <div className="rounded-xl border border-oe-border-secondary bg-oe-background-primary transition-shadow focus-within:border-oe-focus-ring focus-within:ring-3 focus-within:ring-oe-focus-ring/20">
         <Textarea
           value={value}
           onChange={(event) => onValueChange(event.target.value)}

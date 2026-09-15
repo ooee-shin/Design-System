@@ -171,7 +171,7 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner align="start" sideOffset={4} className="z-50 w-[var(--anchor-width)] max-w-[var(--available-width)]">
-        <ComboboxPrimitive.Popup aria-label={ariaLabel} initialFocus className="max-h-[min(20rem,var(--available-height))] overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 text-sm text-oe-foreground-primary shadow-lg outline-none">
+        <ComboboxPrimitive.Popup aria-label={ariaLabel} initialFocus className="max-h-[min(20rem,var(--available-height))] overflow-hidden rounded-xl border border-oe-border-secondary bg-oe-background-primary p-2 text-sm text-oe-foreground-primary shadow-lg outline-none">
           <div className={comboboxSearchContainerVariants()}>
             <RiSearchLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
             <ComboboxPrimitive.Input aria-label={searchPlaceholder} placeholder={searchPlaceholder} className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-oe-foreground-placeholder" />

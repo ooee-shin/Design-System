@@ -10,7 +10,7 @@ type ChipShape = "rounded" | "circle"
 type ChipSize = "xsmall" | "small" | "regular" | "large" | "xlarge"
 
 const chipVariants = cva(
-  "inline-flex max-w-full shrink-0 items-center border border-oe-border-primary bg-oe-background-primary text-oe-foreground-secondary transition-[background-color,border-color,color] duration-[60ms]",
+  "inline-flex max-w-full shrink-0 items-center border border-oe-border-secondary bg-oe-background-primary text-oe-foreground-secondary transition-[background-color,border-color,color] duration-[60ms]",
   {
     variants: {
       controlSize: {
