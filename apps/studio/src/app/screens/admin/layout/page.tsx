@@ -339,9 +339,10 @@ function MainColorInput({ value, onChange }: { value: string; onChange: (hex: st
         aria-label="메인 컬러"
         aria-haspopup="dialog"
         onClick={() => picker.current?.click()}
-        // 한 단계 옅은 선을 이 자리에서만 시험한다. 공용 `Input` 의 값을 바꾸면 저장소의 모든
-        // 폼 요소가 함께 따라오므로, 괜찮다고 판단된 뒤에 그쪽을 옮긴다.
-        className="border-oe-border-secondary font-mono tabular-nums uppercase"
+        // 200 과 300 의 가운데를 이 자리에서만 시험한다. `neutral` 에 250 단계가 없어서 두 값을
+        // 섞어 만든다. 공용 `Input` 의 값을 바꾸면 저장소의 모든 폼 요소가 함께 따라오므로,
+        // 괜찮다고 판단된 뒤에 그쪽을 옮긴다.
+        className="border-[color-mix(in_oklab,var(--color-neutral-200),var(--color-neutral-300))] font-mono tabular-nums uppercase"
       />
       <input
         ref={picker}
