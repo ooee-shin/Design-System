@@ -288,32 +288,31 @@ function MenuStyleSetting({
   onRowIconsChange: (next: boolean) => void
 }) {
   const { seed, applySeed } = useBrandTheme();
-  const isDefault =
-    seed.toUpperCase() === DEFAULT_BRAND_SEED.toUpperCase() &&
-    styleName === SIDEBAR_STYLES[0].name &&
-    showRowIcons;
 
   return (
     // 카드 셋과 사이 간격을 더한 폭이다. 176 × 3 + 12 × 2 = 552 이다.
     <section className="flex w-[552px] flex-col gap-6">
       <span className="flex items-baseline justify-between gap-4">
         <h2 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">메뉴 스타일 설정</h2>
-        {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. */}
+        {/* 잘못 골랐을 때 돌아올 자리가 없으면 사용자가 원래 값을 기억하고 있어야 한다. 기본값과
+            같은 상태에서도 끄지 않는다. 눌러도 달라지지 않을 뿐이고, 꺼져 있으면 왜 못 누르는지
+            설명할 자리가 필요해진다. */}
         <Button
           variant="ghost"
           tone="neutral"
           controlSize="small"
+          // 버튼의 오른쪽 여백 12px 만큼 바깥으로 빼서 글자가 영역의 오른쪽 끝에 선다. 상자를
+          // 기준으로 맞추면 글자만 안쪽으로 들어가 보인다.
+          className="-mr-3"
           onClick={() => {
             applySeed(DEFAULT_BRAND_SEED);
             onStyleChange(SIDEBAR_STYLES[0].name);
             onRowIconsChange(true);
           }}
-          disabled={isDefault}
         >
-          기본값으로 되돌리기
+          기본값 초기화
         </Button>
       </span>
-      <p className="-mt-4 text-sm text-oe-foreground-secondary">고른 즉시 적용됩니다.</p>
 
       {/* 메인 컬러가 가장 위의 축이다. 이 값에서 브랜드 팔레트가 만들어지고, 아래 세 스타일의
           레일 색이 그 팔레트의 단계를 가져다 쓴다. */}
