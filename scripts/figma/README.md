@@ -15,6 +15,9 @@ Figma 쪽 호출은 Figma remote MCP의 `use_figma`로 한다. `prepare.mjs`가 
 | `setup-text-styles.js` | `oe/text-*/<weight>` 텍스트 스타일을 맞춘다. 글꼴 대체가 이 파일 한 곳에 있다 |
 | `builder.js` | 조각으로 auto-layout 프레임을 만든다. primitive 변수는 `oe primitive` 컬렉션에 필요할 때 만들고 값을 맞춘다 |
 | `audit.js` | 읽기만 한다. 빠진 프레임, 변수에 묶이지 않은 칠, 스타일 없는 글자, 투명도를 더한 칠을 센다 |
+| `reread.js` | 되읽기(④)에서 프레임을 JSON으로 읽는다. 파일을 바꾸지 않는다 |
+| `reread.mjs` | `step`은 위 단계 파일을 만들고, `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
+| `reread.test.mjs` | 차이 판정 시험. `pnpm test`에 들어 있어 Figma 없이 돈다 |
 
 ## 사람이 직접 돌릴 때
 
@@ -40,6 +43,22 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - **옮겨 적기.** 모델이 단계 파일을 `use_figma`에 옮기다 숫자 하나를 바꿔도 문법은 그대로다. 단계마다 조각 내용의 해시를 Figma 쪽에서 다시 재서 다르면 아무것도 그리지 않고 `error`를 낸다.
 - **다른 화면.** 조각 경로는 `<key>:s<상태 순서>`로 시작하고 부모는 같은 이름의 루트 프레임 안에서만 찾는다. 변수는 `oe color`·`oe primitive`·`oe size` 컬렉션 안에서만 찾아 다른 라이브러리의 같은 이름 변수에 묶지 않는다.
 - **위치.** auto-layout 부모 안에서 DOM과 2px 넘게 어긋난 자식만 absolute로 빼고, 한 자식을 빼면 형제를 다시 잰다.
+
+## 되읽기 (④)
+
+사람이 Figma에서 고친 것을 화면 코드로 되돌리는 흐름이다. `/design-page`의 「되읽기」 절이 이 순서를 따른다.
+
+```bash
+pnpm --filter @ooee/sandbox dev                                   # 기준을 다시 재려면 화면이 떠 있어야 한다
+node scripts/figma/prepare.mjs --key voc --name "고객의 소리" …    # spec-<상태>.json 을 남긴다(Figma 는 부르지 않는다)
+node scripts/figma/reread.mjs step --key voc --name "고객의 소리" --frame "고객의 소리 / 목록 · Desktop 1440"
+# 만들어진 steps/reread.js 를 use_figma 에 넘기고, 돌려받은 JSON 을 .figma-work/voc/figma-0.json 에 저장한다
+node scripts/figma/reread.mjs diff --key voc --state 0 --figma .figma-work/voc/figma-0.json
+```
+
+`diff`는 변화마다 `auto`를 매긴다. `true`는 색 토큰 교체·문구·글자 크기·아이콘처럼 코드로 그대로 되돌릴 수 있는 것이고, `false`는 크기·모서리·위치·추가·삭제·변수에 묶이지 않은 색처럼 사람이 정할 것이다. 판정 근거는 [`docs/process/figma-component-map.md`](../../docs/process/figma-component-map.md)다.
+
+프레임에는 ②가 그릴 때 `<key>|s<상태>|<커밋>|<날짜>`를 남긴다. 그 커밋이 지금 코드와 다르면 그사이 색 규칙이 바뀌었을 수 있으므로 색 변화를 자동으로 되돌리지 않는다.
 
 ## 다시 읽을 때 남는 것
 

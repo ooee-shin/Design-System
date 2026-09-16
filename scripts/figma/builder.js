@@ -180,13 +180,14 @@ async function build(spec, parent, parentBox) {
     }
     node.resize(Math.max(1, spec.w), Math.max(1, spec.h));
     bindSize(node, spec.sz, `frame:${spec.n}`);
-    node.setSharedPluginData(TAG, "p", spec.path);
     if (!spec.stub) {
       for (const kid of spec.k || []) await build(kid, node, { x: spec.x, y: spec.y });
       settle(node);
     }
   }
   report.created++;
+  // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
+  if (spec.path) node.setSharedPluginData(TAG, "p", spec.path);
   if (parent.type !== "PAGE") place(node, spec, parentBox, parent);
   return node;
 }
@@ -204,7 +205,13 @@ for (CHUNK of RUN) {
   }
   for (const item of CHUNK.nodes) {
     const node = await build(item, parent, CHUNK.parentBox || { x: 0, y: 0 });
-    if (CHUNK.rootFrame) { node.x = CHUNK.rootFrame.x; node.y = CHUNK.rootFrame.y; node.name = CHUNK.rootFrame.name; }
+    if (CHUNK.rootFrame) {
+      node.x = CHUNK.rootFrame.x;
+      node.y = CHUNK.rootFrame.y;
+      node.name = CHUNK.rootFrame.name;
+      // 되읽기가 「이 프레임을 어느 코드로 그렸는지」를 알아야 색 규칙을 믿을 수 있다.
+      node.setSharedPluginData(TAG, "build", CHUNK.rootFrame.build || "");
+    }
   }
   if (CHUNK.lastForParent && parent.type === "FRAME") settle(parent);
 }
