@@ -12,6 +12,7 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
   { href: "/foundations", label: "Foundations" },
   { href: "/components", label: "Components" },
   { href: "/docs", label: "Docs" },
+  { href: "/screens", label: "Screens" },
   { href: "/presentation", label: "Presentation" },
 ];
 
@@ -24,7 +25,10 @@ export function StudioNavigation() {
   // 차지하는 높이를 볼 수 없고 앱 화면은 기기 상자 밖에 다른 것이 서게 된다. 그 자리를 고정
   // 링크로 대신 채우지도 않으며, 돌아가는 길은 브라우저 뒤로 가기가 갖는다. 범위는
   // `docs/system/studio.md` 가 소유한다.
-  if (pathname.startsWith("/screens")) return null;
+  //
+  // 루트마다의 작업 목록인 `/screens/admin` 같은 경로는 제품 화면이 아니므로 이 바를 그대로 쓴다.
+  // 물러나는 것은 그 아래의 개별 화면뿐이다.
+  if (/^\/screens\/[^/]+\/.+/.test(pathname)) return null;
 
   return (
     <>
