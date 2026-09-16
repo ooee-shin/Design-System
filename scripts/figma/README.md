@@ -41,6 +41,10 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - **다른 화면.** 조각 경로는 `<key>:s<상태 순서>`로 시작하고 부모는 같은 이름의 루트 프레임 안에서만 찾는다. 변수는 `oe color`·`oe primitive`·`oe size` 컬렉션 안에서만 찾아 다른 라이브러리의 같은 이름 변수에 묶지 않는다.
 - **위치.** auto-layout 부모 안에서 DOM과 2px 넘게 어긋난 자식만 absolute로 빼고, 한 자식을 빼면 형제를 다시 잰다.
 
+## 다시 읽을 때 남는 것
+
+Figma를 다시 읽으면(`get_design_context`) 레이어 이름, 칠·테두리·글자에 묶인 변수 이름, 숫자로 된 크기, 자식 구성 넷만 남는다. `oe size` 변수는 묶여 있어도 이름이 아니라 px로 돌아오고, `data-variant`·`data-tone`·`data-size` 같은 DOM 속성은 애초에 옮겨지지 않는다. 그래서 되짚기는 이름과 변수와 px의 조합으로 한다. 규칙은 [`docs/process/figma-component-map.md`](../../docs/process/figma-component-map.md)에 있다.
+
 ## 알려진 제약
 
 - **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체하고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다(2026-09-15 유진식 승인). 스타일 설명에 적혀 있다. 글자 폭이 달라 좁은 자리에서 끝 글자가 조금 잘릴 수 있다. Pretendard가 Figma에 생기면 `setup-text-styles.js`가 멈추고 알린다.

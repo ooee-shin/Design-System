@@ -29,7 +29,7 @@
 | --- | --- | --- |
 | Storybook과 Story | 없음 | `.storybook/`, `*.stories.*`, storybook 의존성이 어느 package에도 없다. `.gitignore`의 `storybook-static/`과 문서의 언급만 있다 |
 | Storybook MCP | 없음 | 위와 같다 |
-| Figma MCP와 Figma 라이브러리 | 없음 | `.mcp.json`이 없다. Figma 팀과 결과물 폴더는 [figma-page-agent.md](figma-page-agent.md)에 있지만 `@ooee/ui`를 반영한 라이브러리는 없다(스파이크 R1에서 확인). Obra 자료는 참고용이다 |
+| Figma MCP와 Figma 라이브러리 | 없음 | `.mcp.json`이 없다. Figma 팀과 결과물 폴더는 [figma-page-agent.md](figma-page-agent.md)에 있지만 `@ooee/ui`를 반영한 라이브러리는 없다(스파이크 R1에서 확인). Obra 자료는 참고용이다. 순서 6이 `.mcp.json`을 만들었고 라이브러리는 여전히 없다 |
 | Agent Rules와 `AGENTS.md` | 운영 규칙만 있음 | MCP 사용, Story 작성, 명령어, 자동 pull request에 관한 규칙이 없다. 순서 4가 「Claude Code 명령과 권한」 절과 공용 권한을 넣었다 |
 | Skill과 Plugin | 없음 | `.claude/settings.json`은 `{ "enabledPlugins": {} }` 하나다. [tooling.md](tooling.md)가 프로젝트 전용 Skill의 내용 목록을 적어 두었다. Skill 셋은 순서 2·7이 넣었고 Plugin은 아직 없다 |
 | 배포와 CI | `Quality`만 있음 | `pnpm check`만 돌고 배포 job이 없다. GitHub Pages는 공식 문서 기준으로 비공개 저장소의 무료 플랜에서 쓸 수 없으므로 [working-context.md](working-context.md) 「일정과 분담」의 `~9/4` GitHub Pages 호스팅은 성립하지 않았고, 호스팅은 스파이크 R4가 정한다 |
@@ -58,7 +58,7 @@
   ↓
 5 Storybook 배포와 CI                             호스팅 결정 뒤
   ↓
-6 Figma MCP 읽기 + 컴포넌트 매핑표                 라이브러리와 seat가 있어야 함
+6 Figma MCP 읽기 + 컴포넌트 매핑표                 seat가 있어야 함. 라이브러리는 없는 채로 간다
   ↓
 7 /design-page                                    ② 쓰기(6보다 먼저 만들었다) + ④ 재조회(6 뒤)
   ↓
@@ -76,11 +76,11 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 0 | `docs/ai-environment-plan` | 이 문서, [figma-page-agent.md](figma-page-agent.md), [README.md](README.md) 색인 두 행, [working-context.md](working-context.md) 「현재 구현」 `packages/tokens` 항목의 Brand 변수 위치 수정, 새 절 하나, 「일정과 분담」의 `~9/4`·`9/14~` 두 행 | pull request가 `dev`에 합쳐진다 |
 | 1 | `docs/figma-spike-r1` | Figma 항목 답변과 스파이크 R1 결과를 담은 「스파이크 결과」 한 절 | 그 절이 적히고 「아직 정하지 않은 것」의 Figma 행이 답으로 바뀐다 |
 | 2 | `feature/skill-generate-code` | `.claude/skills/generate-code/SKILL.md`, `.claude/skills/review-design/SKILL.md`, `apps/sandbox`, v0가 틀린 사례를 적은 결과 절 | Sonnet 수준의 모델로 화면 둘을 만들어 `pnpm check`, `pnpm --filter @ooee/sandbox build`, `pnpm --filter @ooee/sandbox test` 통과, `/review-design` 위반 0건, 「pull request 준비 완료」까지 도달 |
-| 3 | `feature/storybook`, 그 뒤 `feature/storybook-mcp` | 순서 2의 결과 절에 `docs/system/`만으로 부족했던 것이 적힐 때만 진행한다. `feature/storybook`: `apps/storybook`, 확정 컴포넌트마다 `Default` Story 하나(「아직 정하지 않은 것」의 신주희 확인 뒤), 브랜드 변수 주입 decorator. `feature/storybook-mcp`: `.mcp.json`, `apps/storybook`에 `@storybook/addon-mcp`와 `features.componentsManifest` 추가 | `feature/storybook`: `pnpm build-storybook` 성공, Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 Studio 없이 보임. `feature/storybook-mcp`: `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있음(대조 방법은 「통합 검증 항목 채우기」) |
+| 3 | `feature/storybook`, 그 뒤 `feature/storybook-mcp` | 순서 2의 결과 절에 `docs/system/`만으로 부족했던 것이 적힐 때만 진행한다. `feature/storybook`: `apps/storybook`, 확정 컴포넌트마다 `Default` Story 하나(「아직 정하지 않은 것」의 신주희 확인 뒤), 브랜드 변수 주입 decorator. `feature/storybook-mcp`: `.mcp.json`에 storybook 항목 추가(파일은 순서 6이 만들었다), `apps/storybook`에 `@storybook/addon-mcp`와 `features.componentsManifest` 추가 | `feature/storybook`: `pnpm build-storybook` 성공, Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 Studio 없이 보임. `feature/storybook-mcp`: `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있음(대조 방법은 「통합 검증 항목 채우기」) |
 | 4 | `feature/agent-rules` | `AGENTS.md` 한 절, `SKILL.md` 규칙, `.claude/settings.json` 공용 권한, `apps/sandbox/src/screen-rules.ts`와 그 테스트, 결과 절 | 순서 2의 결과 절에 적힌 틀린 사례가 규칙으로 막힌다 |
 | 5 | `feature/storybook-ci` | `.github/workflows/storybook.yml`, 호스팅 | pull request마다 `build-storybook` 검사, `dev`·`main`에 주소가 생긴다 |
-| 6 | `feature/figma-mcp` | `.mcp.json` Figma 항목, Figma 컴포넌트 → `@ooee/ui` 매핑표 | `get_metadata`가 라이브러리 파일을 읽는다 |
-| 7 | `feature/skill-design-page` | ②: `.claude/skills/design-page/SKILL.md`, `scripts/figma/`의 `prepare.mjs`·`audit.js`와 보강한 변환 도구, 결과 절. ④는 순서 6 뒤에 같은 명령에 더한다. 규칙의 출발점은 [figma-page-agent.md](figma-page-agent.md) | ②: Sonnet 수준의 모델이 `/design-page`를 돌려 audit의 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 보고까지 간다. ④: 수정 뒤 다시 읽혀 코드로 돌아온다 |
+| 6 | `feature/figma-mcp` | `.mcp.json` Figma 항목, [figma-component-map.md](figma-component-map.md), 관련 문서 갱신 | 저장소 루트에서 연 세션이 `.mcp.json`의 figma 서버를 싣고, `get_metadata`가 `Iw2MXs9sfqtJFze7F9vGf5`의 「고객의 소리」 프레임을 돌려주며, 그 레이어 이름이 매핑표의 항목으로 풀린다(풀리지 않는 이름은 표의 「되짚지 않는 것」에 있다) |
+| 7 | `feature/skill-design-page` | ②: `.claude/skills/design-page/SKILL.md`, `scripts/figma/`의 `prepare.mjs`·`audit.js`와 보강한 변환 도구, 결과 절. ④는 순서 6 뒤에 같은 명령에 더한다. ④의 산출물은 `scripts/figma/`의 재조회·차이 판정 도구와 그 픽스처 테스트, `SKILL.md`의 「되읽기」 절, ②가 남기는 기준선(프레임을 그린 커밋과 파일 key)이며 근거는 [figma-component-map.md](figma-component-map.md)다. 규칙의 출발점은 [figma-page-agent.md](figma-page-agent.md) | ②: Sonnet 수준의 모델이 `/design-page`를 돌려 audit의 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 보고까지 간다. ④: 사람이 Figma에서 고친 것 셋을 다시 읽어 그 셋만 화면 코드에 반영하고, 되짚을 수 없는 것은 「사람이 정할 것」으로 낸다 |
 | 8 | `feature/agent-kit` | Plugin 디렉터리 | 다른 저장소에서 설치해 `/generate-code`가 돈다 |
 
 ## 이 문서가 제안하는 기본값
@@ -116,7 +116,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | --- | --- | --- |
 | Storybook이 정상으로 뜨는가 | `pnpm build-storybook` (pull request 자동 검사) | 3, 5 |
 | 컴포넌트가 서로 충돌하지 않는가 | `pnpm check`. 순서 3부터는 `pnpm build-storybook` 뒤 `storybook-static/index.json`(공식 문서 기준 항목마다 `title`·`importPath`를 가진다. 스파이크 R2의 결과물로 확인)에서 같은 `title`이 서로 다른 `importPath`에 나오지 않음 | 지금부터, 3 |
-| Figma MCP 조회가 정상인가 | `get_metadata`가 라이브러리 파일을 읽는다 | 6 |
+| Figma MCP 조회가 정상인가 | 저장소 루트에서 연 세션이 `.mcp.json`의 figma 서버를 싣고 `get_metadata`가 `Iw2MXs9sfqtJFze7F9vGf5`의 「고객의 소리」 프레임을 돌려준다. 레이어 이름은 [figma-component-map.md](figma-component-map.md)로 푼다 | 6 |
 | Storybook MCP 조회가 정상인가 | `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있다. 대응은 그 Story가 import하는 `packages/ui/src/<key>.tsx`로 확인한다(registry `key`는 그 파일 이름과 같다). 응답의 어느 필드를 registry의 어느 필드와 맞출지는 스파이크 R2 결과와 Story 위치 결정 뒤 순서 3의 pull request 본문에 적고 이 칸을 그 규칙으로 고친다 | 3 |
 | Skill과 Agent가 동작하는가 | `pnpm --filter @ooee/sandbox test`(`screen-rules` 포함) 통과. `/generate-code`를 「이 문서가 제안하는 기본값」의 관리자 로그인 프롬프트로 저장소 루트에서 연 세션에서 한 번 돌려 `admin-login-2` 같은 새 key로 「pull request 준비 완료」까지 간다. 같은 세션의 `/permissions`에 `.claude/settings.json` 출처의 `ask`·`deny` 규칙이 보인다 | 2, 4 |
 
@@ -127,7 +127,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 안 | 방식 | 준비되는 순서 |
 | --- | --- | --- |
 | B | Skill v0. `docs/system/` + `@ooee/ui`만으로 코드 생성 | 2 |
-| A | Figma를 경유. 비교 시점에는 순서 6이 아직 없으므로, 「이 문서가 제안하는 기본값」의 화면 둘을 `/design-page`(순서 7의 ②)로 옮긴 frame을 사람이 고치고 다시 읽은 결과만으로 돌린다. 재조회한 `get_design_context` 결과(변수 이름)와 레이어 이름을 화면 설명 대신 Skill v0의 `/generate-code`에 입력으로 주어 코드를 만들고, 그 코드에 `/review-design`을 돌린다. 「Figma가 원본」과 「코드에서 만든 캔버스를 사람이 고친 뒤 재조회」 중 어느 쪽인지는 그 결과가 정한다 | 2, 7 |
+| A | Figma를 경유. 「이 문서가 제안하는 기본값」의 화면 둘을 `/design-page`(순서 7의 ②)로 옮긴 frame을 사람이 고치고 다시 읽은 결과로 돌린다. 재조회한 `get_design_context` 결과(변수 이름)와 레이어 이름을 화면 설명 대신 Skill v0의 `/generate-code`에 입력으로 주고, 그것을 컴포넌트와 Property로 되짚는 근거로 [figma-component-map.md](figma-component-map.md)를 함께 준다. 만든 코드에 `/review-design`을 돌린다. 매핑표가 없으면 레이어 이름이 무엇을 가리키는지 알 길이 없어 A안의 판정 지표(위반 수, `@ooee/ui` 재사용 비율)가 「사전이 없어서」 나빠지므로, 순서 6을 A/B보다 먼저 했다. 「Figma가 원본」과 「코드에서 만든 캔버스를 사람이 고친 뒤 재조회」 중 어느 쪽인지는 그 결과가 정한다 | 2, 7 |
 
 판정 기준은 두 안이 만든 코드에 대한 `/review-design`의 위반 수, `@ooee/ui` 재사용 비율, Sonnet 수준의 모델로 돌렸을 때의 결과다. 재사용 비율은 화면에서 `docs/system/README.md` 컴포넌트 표의 확정 컴포넌트가 맡는 역할(버튼·입력·선택 등)을 가진 요소 가운데 `@ooee/ui` import로 만든 것의 수를 그 요소 전체 수로 나눈 값이며, 레이아웃용 요소는 세지 않는다. 결과는 roadmap.md의 「A/B 비교 검증」에 적는다.
 
@@ -146,6 +146,8 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | Figma의 역할: 디자인 원본 또는 검토용 캔버스. A/B 검증 결과로 정한다 | 유진식 | `2026-09-23` |
 | roadmap.md 4·5단계의 「1차 범위: 제외」와 루트 `README.md`의 1차 범위 문구를 검증용 실험 구현으로 고칠지. 팀이 정한 프로젝트 범위라 유진식 혼자 고치지 않는다 | 신주희·유진식 | `2026-09-23` |
 | 이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치: `packages/` 안의 Plugin 디렉터리 또는 별도 저장소 | 유진식 | `2026-09-25` |
+| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 신주희 | `2026-09-23` |
+| `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 신주희 | `2026-09-23` |
 | 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8만 막는다 | 유진식 | 미정 |
 
 ## 일정
@@ -159,8 +161,9 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 9/16 | Skill v0 완료, Sonnet 수준의 모델로 화면 둘 |
 | 9/17~18 | 순서 2의 결과에 따라 Storybook 골격·Storybook MCP (R2)·최소 Story(신주희가 `9/16`까지 동의하면), 또는 Studio 조회 route 스파이크 |
 | 9/19 | Agent Rules, 호스팅 결정 (R4) |
-| 9/20~23 | A/B 검증 |
-| 9/24~25 | Storybook 배포와 CI, Figma MCP 읽기와 매핑표, `/design-page`의 ④, 이관 시 남기는 것 (R3). `/design-page`의 ②는 `9/15`에 먼저 만들었다 |
+| 9/16 | Figma MCP 읽기와 매핑표 (순서 6). A/B의 A안이 매핑표를 입력으로 쓰므로 앞당겼다 |
+| 9/20~23 | A/B 검증. 그 전에 `/design-page`의 ④(순서 7)와 STO 지원요청 화면 옮기기 |
+| 9/24~25 | Storybook 배포와 CI, 이관 시 남기는 것 (R3). `/design-page`의 ②는 `9/15`에 먼저 만들었다 |
 | 9/28~30 | 패키지화 방향, 마무리 |
 
 ## 갱신 대상 문서
@@ -172,7 +175,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | [roadmap.md](roadmap.md) | 「A/B 비교 검증」에 결과. 4·5단계의 「1차 범위: 제외」를 고칠지는 「아직 정하지 않은 것」에 있다 | A/B 뒤 |
 | [tooling.md](tooling.md) | 「테스트 배치 규칙」에 Story 위치, 검증 명령에 `pnpm storybook`·`build-storybook`. `apps/sandbox` 검사는 순서 2에서, `screen-rules` 테스트와 `.next` 삭제를 Skill이 하지 않는다는 문장은 순서 4에서 넣었다 | 3 |
 | [git-workflow.md](git-workflow.md) | 「dev에서 main으로 올릴 때」 항목마다 명령과 컴포넌트·Story만 바뀐 pull request의 예외 | 각 순서 |
-| `AGENTS.md` | 「문서 구조」의 `.claude/` 제거 규칙, MCP 사용과 명령 규칙 한 절. `apps/sandbox` 행은 순서 2에서, `scripts/figma/` 행은 순서 7에서, 「Claude Code 명령과 권한」 절은 순서 4에서 넣었다. `.claude/`를 전달 시 어떻게 남길지는 R3 뒤에 고친다 | 4, R3 |
+| `AGENTS.md` | 「문서 구조」의 `.claude/` 제거 규칙, MCP 사용과 명령 규칙 한 절. `apps/sandbox` 행은 순서 2에서, `scripts/figma/` 행은 순서 7에서, 「Claude Code 명령과 권한」 절은 순서 4에서 넣었고 그 절의 MCP 문단은 순서 6이 `.mcp.json` 기준으로 고쳤다. `.claude/`를 전달 시 어떻게 남길지는 R3 뒤에 고친다 | 4, 6, R3 |
 | 루트 `README.md` | 첫 환경변수가 생길 때 `.env.example`. 1차 범위 문구는 roadmap.md와 같은 결정을 따른다 | 6, A/B 뒤 |
 | [working-context.md](working-context.md) | 「일정과 분담」의 `~9/4` 행에 R4에서 정한 호스팅 이름 | 5 |
 | `.github/pull_request_template.md` | Storybook·MCP를 건드린 pull request의 확인 항목 | 3 |
@@ -272,3 +275,15 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
   - 에이전트가 검사 로그를 `/tmp`에 쓴다.
   - 2단계 「코드를 쓰기 전에 대화에 표를 먼저 낸다」와 6단계 검수는 보고에 결과만 남아 실제로 했는지 확인하기 어렵다.
   - `/design-page` frontmatter의 경로 없는 `Write`와 `Bash(curl:*)`를 좁히는 일은 권한 설정이라 이번에 하지 않았다.
+
+### 2026-09-16 순서 6: Figma MCP 읽기와 매핑표
+
+- **만든 것.** 저장소 루트의 `.mcp.json`(figma 항목 하나, URL만)과 [figma-component-map.md](figma-component-map.md). `AGENTS.md`의 MCP 문단, `scripts/figma/README.md`의 「다시 읽을 때 남는 것」, `docs/process/README.md` 색인을 맞췄다.
+- **순서를 당긴 이유.** A/B 검증의 A안이 재조회 결과를 `/generate-code`의 입력으로 쓰는데, 레이어 이름과 변수 이름을 컴포넌트·Property로 되짚는 사전이 없으면 A안은 「Figma 경유가 나쁘다」가 아니라 「사전이 없어 실패했다」를 재게 된다. 그래서 일정의 `9/24~25`에 있던 순서 6을 `9/16`으로 옮겼다.
+- **되짚기의 근거는 넷뿐이다.** 레이어 이름(`data-slot`), 칠·테두리·글자에 묶인 변수 이름, 숫자로 남는 크기, 자식 구성이다. `oe size` 변수는 Figma 안에서는 묶여 있지만 재조회는 이름이 아니라 px를 돌려주고, `data-variant`·`data-tone`·`data-size`는 애초에 옮겨지지 않는다. 그래서 `controlSize`는 28·32·36·40·48 대조로, `variant`·`tone`은 칠·테두리·글자의 팔레트 단계로 되짚는다.
+- **되짚을 수 없는 것.** `layout`·`fixedWidth`·`readOnly`·`textAlign`, `Input`의 `clearable`(쉬는 상태에서 폭이 0이라 옮겨지지 않는다), `Textarea`의 `autoSize`, 꺼진 `ToggleButton`의 `variant`, 누름형과 정적 `Chip`의 구별, `tone="custom"`의 hex 색, 그림자와 Focus ring이다. `Select`↔`MultiSelect`처럼 레이어 이름이 같은 짝도 갈리지 않는다. 표의 「되짚지 않는 것」과 「이름이 같아 갈리지 않는 짝」에 모아 두었고, ④는 이 값들을 코드에서 그대로 둔다.
+- **표의 주장을 코드와 대조했다.** 138건 가운데 28건이 틀려 고쳤다. `Textarea`에는 `controlSize`가 없고, `Switch`의 단계 이름만 `small`·`medium`·`large`이며, `Field`에는 `invalid` Property가 없고(오류는 `errorMessage`), `Radio`에는 `indeterminate`·`shape`가 없다. `checkbox-leading`·`radio-leading`은 Control의 자식이 아니라 Field 바깥 `label` 아래 형제라 오히려 Field를 가리키는 근거였고, `outline` 테두리는 `{p}-500`이 아니라 그 30%였다. `textAlign`은 되짚을 수 없다고 적었으나 실제로는 글자 정렬로 남는다.
+- **`MessageBubble`은 표에서 빈칸이다.** `data-slot`이 하나도 없어 Figma에서 `div`로만 남는다. 「아직 정하지 않은 것」에 담당과 기한을 붙였다.
+- **색 규칙은 커밋마다 바뀐다.** `97bbdd2`(`2026-09-15`)가 Control 테두리를 `oe-border-primary`에서 `oe-border-secondary`로 바꿨다. 매핑표는 머리에 기준 커밋을 적고, ④는 프레임이 그 커밋보다 먼저 그려졌으면 색으로 되짚지 않는다.
+- **아직 확인하지 못한 것.** 이 표는 코드만 읽어 적었고 실제 재조회 값과 대조하지 않았다. 이 세션에는 Figma MCP가 없고 headless 하위 세션은 순서 4에서와 같은 이유로 띄울 수 없다. 사람이 저장소 루트에서 Claude Code를 열어 `.mcp.json` 승인과 `/mcp` 로그인을 한 뒤 `get_metadata`로 `Iw2MXs9sfqtJFze7F9vGf5`의 「고객의 소리」 프레임을 읽어, 레이어 이름이 표로 풀리는지 한 번 확인한다. 그것이 순서 6의 완료 기준이다.
+- **다음.** 순서 7의 ④를 만들 때 `dom-extract.js`가 레이어 이름에 `data-variant`·`data-tone`·`data-size`를 접미사로 실을지 함께 정한다. 실으면 이 표의 추정 상당수가 확정으로 바뀐다.
