@@ -33,9 +33,9 @@ const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
 const duplicate = states.map((s) => s.label).find((label, i, labels) => labels.indexOf(label) !== i);
 if (duplicate !== undefined) throw new Error(`--state 이름이 겹친다: ${duplicate}. 프레임 이름이 같아 뒤 상태를 그릴 때 앞 프레임이 지워진다`);
 
-const STEP_LIMIT = 42000; // use_figma 한도는 50,000자다. 모델이 옮겨 적는 부담을 줄이려고 여유를 둔다
-const LINE_LIMIT = 1900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 적게
-const CHUNK_LIMIT = 12000; // 조각 하나의 노드 JSON 글자 수
+const STEP_LIMIT = 19000; // use_figma 한도는 50,000자지만, 모델이 20,000자쯤을 옮기다 줄바꿈을 하나 더해 문법이 깨진 적이 있다
+const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
+const CHUNK_LIMIT = 4000; // 조각 하나의 노드 JSON 글자 수. builder.js(약 11,000자)가 단계마다 함께 들어가므로 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
@@ -156,7 +156,7 @@ function fold(node, isRoot = false) {
   if (node.t === "x" || node.t === "svg") return node;
   const kids = node.k || [];
   if (!kids.length && (node.bg || node.bd) && !node.slot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
-  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !isRoot;
+  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !node.component && !isRoot;
   if (!plain || kids.length !== 1) return node;
   const kid = kids[0];
   const near = (a, b) => Math.abs(a - b) <= 1;

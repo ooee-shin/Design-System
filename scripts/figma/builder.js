@@ -204,6 +204,13 @@ async function build(spec, parent, parentBox) {
     }
   }
   report.created++;
+  // 카탈로그의 항목은 프레임이 아니라 Figma 컴포넌트로 만든다. 화면을 그릴 때 인스턴스로 놓을 수 있다.
+  if (spec.component) {
+    node = figma.createComponentFromNode(node);
+    node.name = `${spec.component.name}/${spec.component.props}`;
+    node.description = `${spec.component.name} ${spec.component.props}. packages/ui 의 코드에서 그대로 옮겼다.`;
+    report.components = (report.components || 0) + 1;
+  }
   // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
   if (spec.path) node.setSharedPluginData(TAG, "p", spec.path);
   if (parent.type !== "PAGE") place(node, spec, parentBox, parent);
