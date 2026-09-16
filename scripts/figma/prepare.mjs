@@ -24,6 +24,8 @@ if (!key || !screenName) {
 }
 const base = opt("base", "http://localhost:3001");
 const width = Number(opt("width", "1440"));
+// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 인스턴스를 만드는 단계가 매우 느리다(아래 주석).
+const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
 // 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
 const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
@@ -35,7 +37,7 @@ if (duplicate !== undefined) throw new Error(`--state 이름이 겹친다: ${dup
 
 const STEP_LIMIT = 19000; // use_figma 한도는 50,000자지만, 모델이 20,000자쯤을 옮기다 줄바꿈을 하나 더해 문법이 깨진 적이 있다
 const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
-const CHUNK_LIMIT = 4000; // 조각 하나의 노드 JSON 글자 수. builder.js(약 11,000자)가 단계마다 함께 들어가므로 작게 둔다
+const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. builder.js(약 11,000자)가 단계마다 함께 들어가므로 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
@@ -129,6 +131,8 @@ const runs = [];
 const unknownIcons = [];
 function prep(node, nodePath, icons, primitives) {
   node.path = nodePath;
+  // 인스턴스는 --instances 를 줄 때만 쓴다. Figma 쪽에서 인스턴스 하나를 만드는 데 몇 분이 걸린다.
+  if (!useInstances) delete node.inst;
   const where = `${nodePath} ${node.n || node.s || ""}`.slice(0, 60);
   if (node.bg) node.bg = resolve(node.bg, `bg ${where}`) || undefined;
   if (node.c) node.c = resolve(node.c, `color ${where}`) || undefined;
