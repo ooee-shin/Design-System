@@ -30,6 +30,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @
 - 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꿔 되풀이하지 않고 보고의 「확인이 필요한 것」에 명령과 거부 메시지를 적는다.
 - BKDS·공차 ERP 같은 다른 Figma 라이브러리의 컴포넌트·변수·스타일 사용. ooee-ui와 다른 시스템이다.
 - 색이나 글자 크기를 Figma에서 직접 입력하기. 모든 칠은 `oe color`·`oe primitive` 변수, 모든 글자는 `oe/text-*` 스타일이다.
+- DOM의 감싸개를 그대로 Frame으로 옮기기. **배치하는 곳만 Frame이다.** 글자 하나만 감싼 상자와 그대로 통과시키는 상자는 `prepare.mjs`가 없애고, 칠·테두리만 있는 잎은 Rectangle로 만든다. `data-slot`이 붙은 컴포넌트 노드는 되짚기의 근거라 접지 않는다. 규칙은 `scripts/figma/README.md`의 「Figma에서 무엇이 Frame이 되나」에 있고, 접은 수는 manifest의 `folded`에 나온다. 보고의 「연결」에 그 수를 적는다.
 - Pretendard가 아닌 글꼴을 새로 고르기. 승인된 대체는 `scripts/figma/setup-text-styles.js`의 Noto Sans KR 하나뿐이다.
 - `projectId` `651781449` 없이 파일을 만들거나, 만들기에 실패한 뒤 다른 위치에 만들고 완료라고 말하기.
 - `use_figma`에 넘기는 코드를 줄이거나 고치기. 단계마다 내용 해시를 검사하므로 한 글자라도 바뀌면 그 단계가 `error`로 끝난다.
@@ -115,6 +116,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 쓴 변수: <variables>
 - 쓴 텍스트 스타일: <textStyles>
 - auto-layout 프레임 <autoLayoutFrames>개, DOM 위치와 어긋나 absolute로 둔 자식 <absoluteChildren>개
+- 접은 감싸개: 글자 <folded.text>개, 아이콘 <folded.icon>개, 통과 <folded.pass>개, Rectangle로 바꾼 잎 <folded.rect>개
 - 변수 값은 prepare.mjs를 돌린 시점의 `packages/tokens`에서 옮겨 적었고 원본과 자동 동기화되지 않는다. 색 매핑과 brand seed는 Provisional이다.
 
 ## 참조한 것

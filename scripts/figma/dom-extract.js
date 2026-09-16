@@ -151,6 +151,8 @@
       n: nameOf(el),
       x: Math.round(b.left - rootBox.left), y: Math.round(b.top - rootBox.top), w: Math.round(b.width), h: Math.round(b.height),
     };
+    // data-slot 은 컴포넌트를 가리키는 이름이다. 감싸개를 접을 때 이 노드는 건드리지 않는다.
+    if (el.getAttribute("data-slot")) node.slot = 1;
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";
       node.svg = el.outerHTML.replace(/ class="[^"]*"/g, "");
