@@ -15,8 +15,8 @@ Figma 쪽 호출은 Figma remote MCP의 `use_figma`로 한다. `prepare.mjs`가 
 | `setup-text-styles.js` | `oe/text-*/<weight>` 텍스트 스타일을 맞춘다. 글꼴 대체가 이 파일 한 곳에 있다 |
 | `builder.js` | 조각으로 auto-layout 프레임을 만든다. primitive 변수는 `oe primitive` 컬렉션에 필요할 때 만들고 값을 맞춘다 |
 | `audit.js` | 읽기만 한다. 빠진 프레임, 변수에 묶이지 않은 칠, 스타일 없는 글자, 투명도를 더한 칠을 센다 |
-| `reread.js` | 되읽기(④)에서 프레임을 JSON으로 읽는다. 파일을 바꾸지 않는다 |
-| `reread.mjs` | `step`은 위 단계 파일을 만들고, `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
+| `reread.js` | 되읽기(④)에서 프레임을 줄(`rows`)로 읽는다. 파일을 바꾸지 않는다. `use_figma` 응답이 20,000자에서 잘려 자리를 아끼려고 객체 대신 줄로 돌려준다 |
+| `reread.mjs` | `step`은 위 단계 파일을 만들고(`--parts`로 나눌 수 있다), `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
 | `reread.test.mjs` | 차이 판정 시험. `pnpm test`에 들어 있어 Figma 없이 돈다 |
 
 ## 사람이 직접 돌릴 때
@@ -51,8 +51,9 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 ```bash
 pnpm --filter @ooee/sandbox dev                                   # 기준을 다시 재려면 화면이 떠 있어야 한다
 node scripts/figma/prepare.mjs --key voc --name "고객의 소리" …    # spec-<상태>.json 을 남긴다(Figma 는 부르지 않는다)
-node scripts/figma/reread.mjs step --key voc --name "고객의 소리" --frame "고객의 소리 / 목록 · Desktop 1440"
-# 만들어진 steps/reread.js 를 use_figma 에 넘기고, 돌려받은 JSON 을 .figma-work/voc/figma-0.json 에 저장한다
+node scripts/figma/reread.mjs step --key voc --name "고객의 소리" --frame "고객의 소리 / 목록 · Desktop 1440" --parts 1
+# 만들어진 steps/reread-0.js 를 그대로 use_figma 에 넘기고, 돌려받은 JSON 을 .figma-work/voc/figma-0.json 에 저장한다
+# 응답이 잘리면 --parts 3 으로 나눠 읽고 조각을 모두 --figma 로 넘긴다
 node scripts/figma/reread.mjs diff --key voc --state 0 --figma .figma-work/voc/figma-0.json
 ```
 

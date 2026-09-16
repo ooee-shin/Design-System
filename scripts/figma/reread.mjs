@@ -1,7 +1,9 @@
 // Figma 를 다시 읽는 ④의 로컬 도구다. Figma 는 부르지 않는다.
 //
-//   node scripts/figma/reread.mjs step --key voc --name "고객의 소리" --frame "고객의 소리 / 목록 · Desktop 1440"
-//   node scripts/figma/reread.mjs diff --key voc --state 0 --figma .figma-work/voc/figma-0.json
+//   node scripts/figma/reread.mjs step --key voc --name "고객의 소리" --frame "고객의 소리 / 목록 · Desktop 1440" [--parts 3]
+//   node scripts/figma/reread.mjs diff --key voc --state 0 --figma .figma-work/voc/figma-0.json [--figma …]
+//
+// use_figma 응답은 20,000자쯤에서 잘린다. --parts 로 나눠 읽고 조각 파일을 모두 --figma 로 준다.
 //
 // step 은 use_figma 에 넘길 단계 파일을 만든다. diff 는 그 결과(JSON)를 prepare.mjs 가 남긴
 // spec-<상태>.json 과 견주어 무엇이 바뀌었는지, 코드로 되돌릴 수 있는지를 낸다.
@@ -26,6 +28,23 @@ const classHint = (field, name) => {
   if (isPrimitive(name)) return `${prefix}-[var(--${name})]`;
   return null;
 };
+
+/** reread.js 는 자리를 아끼려고 노드를 줄로 돌려준다. 그 줄을 다시 객체로 편다. 변수 이름은 `#` 로 시작하지 않는다. */
+export function fromRows(frame) {
+  const paint = (value) => (!value ? null : value.startsWith("#") ? { hex: value } : { v: value });
+  const nodes = (frame.rows || []).map(([p, n, t, w, h, bg, c, bd, r, s, fs, st]) => {
+    const node = { p: p || undefined, n, t, w, h };
+    if (bg) node.bg = paint(bg);
+    if (c) node.c = paint(c);
+    if (bd) node.bd = { c: paint(bd) };
+    if (r) node.r = r;
+    if (s) node.s = s;
+    if (fs) node.fs = fs;
+    if (st) node.st = st;
+    return node;
+  });
+  return { ...frame, nodes };
+}
 
 function flatten(node, out = new Map()) {
   if (node.path) out.set(node.path, node);
@@ -75,7 +94,8 @@ export function diffFrame(spec, figma) {
     if (s.icon && /^Ri[A-Z]/.test(node.n) && s.icon !== node.n) add(node.p, "아이콘", s.icon, node.n, true, `@remixicon/react 의 ${node.n} 로 바꾼다`);
 
     const near = (a, b) => Math.abs((a ?? 0) - (b ?? 0)) <= 1;
-    if (!near(s.w, node.w) || !near(s.h, node.h)) add(node.p, "크기", `${Math.round(s.w)}×${Math.round(s.h)}`, `${node.w}×${node.h}`, false, "크기는 토큰 단계와 레이아웃이 함께 정한다. 사람이 정한다");
+    // 글자 칸의 크기는 글꼴 대체(Noto Sans KR)만으로도 달라진다. 사람이 고친 자리로 세지 않는다.
+    if (s.t !== "x" && (!near(s.w, node.w) || !near(s.h, node.h))) add(node.p, "크기", `${Math.round(s.w)}×${Math.round(s.h)}`, `${node.w}×${node.h}`, false, "크기는 토큰 단계와 레이아웃이 함께 정한다. 사람이 정한다");
     if (!near(s.r || 0, node.r || 0)) add(node.p, "모서리", s.r || 0, node.r || 0, false, "모서리는 사람이 정한다");
   }
 
@@ -98,27 +118,47 @@ if (!directRun) {
     console.error('사용: node scripts/figma/reread.mjs step --key <sandbox key> --name <화면 이름> --frame <프레임 이름>...');
     process.exit(1);
   }
-  const code = readFileSync(path.join(here, "reread.js"), "utf8")
-    .replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(name)};`)
-    .replace("const FRAMES = __FRAMES__;", () => `const FRAMES = ${JSON.stringify(frames)};`);
-  if (code.includes("__SCREEN__") || code.includes("__FRAMES__")) throw new Error("치환하지 못한 자리가 남았다");
+  const parts = Number(opt("parts", "3"));
   const dir = path.join(".figma-work", key, "steps");
   mkdirSync(dir, { recursive: true });
-  const file = path.join(dir, "reread.js");
-  writeFileSync(file, code);
-  console.log(JSON.stringify({ file, chars: code.length, frames }, null, 2));
+  const template = readFileSync(path.join(here, "reread.js"), "utf8");
+  const files = [];
+  for (let i = 0; i < parts; i++) {
+    const code = template
+      .replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(name)};`)
+      .replace("const FRAMES = __FRAMES__;", () => `const FRAMES = ${JSON.stringify(frames)};`)
+      .replace("const PART = __PART__;", () => `const PART = { i: ${i}, n: ${parts} };`);
+    if (/__(SCREEN|FRAMES|PART)__/.test(code)) throw new Error("치환하지 못한 자리가 남았다");
+    const file = path.join(dir, `reread-${i}.js`);
+    writeFileSync(file, code);
+    files.push(file);
+  }
+  console.log(JSON.stringify({ files, parts, frames, note: "조각마다 use_figma 에 넘기고 결과를 figma-read-<i>.json 으로 저장한 뒤 diff 에 모두 넘긴다" }, null, 2));
 } else if (mode === "diff") {
   const key = opt("key");
   const state = opt("state", "0");
-  const figmaPath = opt("figma");
-  if (!key || !figmaPath) {
-    console.error("사용: node scripts/figma/reread.mjs diff --key <sandbox key> --state <상태 순서> --figma <use_figma 결과 JSON 경로>");
+  const figmaPaths = all("figma");
+  const frameName = opt("프레임", opt("frame"));
+  if (!key || !figmaPaths.length) {
+    console.error("사용: node scripts/figma/reread.mjs diff --key <sandbox key> --state <상태 순서> --figma <조각 JSON>... [--frame <프레임 이름>]");
     process.exit(1);
   }
   const spec = JSON.parse(readFileSync(path.join(".figma-work", key, `spec-${state}.json`), "utf8"));
-  const read = JSON.parse(readFileSync(figmaPath, "utf8"));
-  const frame = (read.frames || []).find((f) => !f.missing) || {};
-  if (frame.missing || !frame.nodes) throw new Error(`읽은 프레임이 없다: ${figmaPath}`);
+  // 조각으로 나눠 읽은 결과를 프레임 이름으로 합친다.
+  const merged = new Map();
+  for (const file of figmaPaths) {
+    for (const raw of JSON.parse(readFileSync(file, "utf8")).frames || []) {
+      if (raw.missing) continue;
+      const f = raw.rows ? fromRows(raw) : raw;
+      const found = merged.get(f.name);
+      if (found) found.nodes.push(...(f.nodes || []));
+      else merged.set(f.name, { ...f, nodes: [...(f.nodes || [])] });
+    }
+  }
+  const frame = frameName ? merged.get(frameName) : [...merged.values()][0];
+  if (!frame || !frame.nodes.length) throw new Error(`읽은 프레임이 없다: ${frameName || figmaPaths.join(",")}`);
+  // 루트가 없으면 조각을 다 읽지 않았거나 단계 코드가 바뀐 것이다. 그대로 견주면 화면 전체가 「삭제」로 보인다.
+  if (!frame.nodes.some((n) => n.p === spec.path)) throw new Error(`읽은 결과에 루트(${spec.path})가 없다. 조각을 모두 넘겼는지, 단계 코드를 고치지 않았는지 본다`);
   const changes = diffFrame(spec, frame);
   const auto = changes.filter((c) => c.auto);
   console.log(JSON.stringify({
