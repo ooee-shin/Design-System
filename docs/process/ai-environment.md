@@ -360,3 +360,11 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **Plugin이 못 하는 것.** 권한 규칙을 싣지 못한다. Plugin 루트의 `settings.json`은 `agent`와 `subagentStatusLine` 두 키만 받는다. 그래서 공용 권한은 설치하는 저장소의 `.claude/settings.json`이 계속 소유하고, 붙여 넣을 조각을 Plugin의 README가 갖는다.
 - **순서 8에 `/design-page`는 넣지 않는다.** `scripts/figma/`는 `packages/tokens` 상대 import, `scripts/visual` 실행 위치, `node_modules/.pnpm/*` 탐색, 3001 포트 개발 서버에 동시에 기댄다. `/generate-code`·`/review-design` 둘로 완료 기준을 채우고, Figma 쪽은 `data-slot` 승격 결정 뒤에 옮긴다.
 - **함께 정해야 하는 것 둘을 「아직 정하지 않은 것」에 더했다.** import 경계 문장을 `docs/system/quality.md`로 승격할지(신주희), 전달본 사본을 만드는 절차(유진식)다.
+
+### 2026-09-16 순서 8: 하네스를 Plugin 으로 묶었다
+
+- **만든 것.** `plugins/ooee-harness/`(Claude Code Plugin)와 저장소 루트 `.claude-plugin/marketplace.json`. Plugin 은 `skills/generate-code`·`skills/review-design`, 규칙 판정기 `lib/screen-rules.mjs`, 화면을 훑는 `lib/check-screens.mjs`, 그 시험, 설치 문서 `README.md`를 갖는다. 이 저장소의 `.claude/skills/`에는 `/design-page`만 남았다.
+- **경로를 설정값으로 뺐다.** `screens_dir`·`docs_root`·`check_command` 셋이다. `SKILL.md` 본문에서 `${user_config.…}`로 쓰고, 설정이 비어 있으면 요청에 적힌 값이나 저장소 구조에서 찾아 쓰고 보고에 적는다. 화면 규칙 판정기는 `typescript` 를 설치한 저장소에서 찾아 쓰므로 Plugin 자체에는 의존성이 없다.
+- **완료 기준을 채웠다.** `docs/system/`·`packages/`·화면 앱만 담은 사본 저장소를 만들어 Plugin 을 띄우고 `/ooee-harness:generate-code`로 STO 지원요청 화면을 만들었다. build·test·화면 규칙 검사가 모두 통과했고 「pull request 준비 완료」까지 갔다. 사본에는 `AGENTS.md`도 `docs/process/`도 `.claude/`도 없다.
+- **사본 시험에서 드러난 것 둘.** ① 화면 앱의 빌드 산출물이 `.gitignore` 에 없으면 보고의 「세 파일만 바뀌었다」 확인이 언제나 실패한다. Plugin README 의 요구 조건에 적었다. ② 화면 규칙 검사 명령이 승인 요청에 막히자 세션이 절대 경로를 상대 경로로 바꿔 다시 돌렸다. 경로 표기를 바꾸는 것도 「막힌 명령 다시 시도」라고 `SKILL.md`에 적고, 늘 쓰려면 저장소가 `permissions.allow` 에 한 줄을 두도록 README 에 넣었다.
+- **남은 것.** `/design-page`와 `scripts/figma/`는 저장소 구조에 기대므로 옮기지 않았다(R3 의 결정). marketplace 설치(`/plugin marketplace add`)는 대화형 명령이라 사본 시험에서는 `--plugin-dir`로 확인했다.

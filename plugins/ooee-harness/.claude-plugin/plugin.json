@@ -1,0 +1,26 @@
+{
+  "name": "ooee-harness",
+  "description": "ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 명령 모음. /ooee-harness:generate-code 와 /ooee-harness:review-design 이다.",
+  "version": "0.1.0",
+  "author": { "name": "유진식" },
+  "userConfig": {
+    "screens_dir": {
+      "type": "directory",
+      "title": "화면을 둘 자리",
+      "description": "만든 화면을 <screens_dir>/<key>/page.tsx 로 둔다. 예: apps/sandbox/src/app",
+      "default": "apps/sandbox/src/app"
+    },
+    "docs_root": {
+      "type": "directory",
+      "title": "디자인 시스템 문서 자리",
+      "description": "README.md 와 components/ 를 가진 자리. 예: docs/system",
+      "default": "docs/system"
+    },
+    "check_command": {
+      "type": "string",
+      "title": "검사 명령",
+      "description": "화면을 만든 뒤 돌릴 명령. 세미콜론으로 여러 개를 줄 수 있다.",
+      "default": "pnpm --filter @ooee/sandbox build; pnpm --filter @ooee/sandbox test; pnpm check"
+    }
+  }
+}
