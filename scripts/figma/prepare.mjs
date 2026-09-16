@@ -141,6 +141,31 @@ function prep(node, nodePath, icons, primitives) {
   }
   (node.k || []).forEach((kid, i) => prep(kid, `${nodePath}.${i}`, icons, primitives));
 }
+/**
+ * 배치하는 곳만 Frame 으로 남긴다(2026-09-16 유진식 결정).
+ * DOM 의 감싸개를 그대로 옮기면 모든 요소가 Frame 이 되어 Figma 에서 다루기 어렵다.
+ * - 글자·아이콘 하나만 감싼 상자와 자식을 그대로 통과시키는 상자는 없애고 그 자식을 위로 올린다.
+ *   자식은 제 크기를 그대로 지킨다. 감싸개의 상자를 글자에 씌우면 글꼴 대체(Noto Sans KR)가 더 넓어
+ *   줄바꿈이 생긴다. 감싸개가 하던 여백만큼 자리가 어긋나면 builder 의 settle 이 absolute 로 잡는다.
+ * - 자식이 없고 칠·테두리만 있는 상자는 Rectangle 로 만든다.
+ * `data-slot` 이 붙은 노드(컴포넌트를 가리키는 이름)와 루트, 칠·테두리·모서리를 가진 상자는 접지 않는다.
+ */
+const folded = { text: 0, icon: 0, pass: 0, rect: 0 };
+function fold(node, isRoot = false) {
+  if (node.k) node.k = node.k.map((kid) => fold(kid));
+  if (node.t === "x" || node.t === "svg") return node;
+  const kids = node.k || [];
+  if (!kids.length && (node.bg || node.bd) && !node.slot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
+  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !isRoot;
+  if (!plain || kids.length !== 1) return node;
+  const kid = kids[0];
+  const near = (a, b) => Math.abs(a - b) <= 1;
+  if (kid.t === "x") { folded.text++; return kid; }
+  if (kid.t === "svg") { folded.icon++; return kid; }
+  if (near(kid.w, node.w) && near(kid.h, node.h)) { folded.pass++; return kid; }
+  return node;
+}
+
 // 조각이 실제로 쓰는 아이콘·primitive 만 싣는다.
 function uses(nodes, all, acc = { icons: {}, primitives: {} }) {
   for (const n of nodes) {
@@ -182,6 +207,7 @@ const builtAt = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" 
 trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
+  tree = fold(tree, true);
   // 해석이 끝난 사양을 남긴다. 되읽기가 Figma 에서 읽은 값을 이 사양과 견준다.
   writeFileSync(path.join(work, `spec-${i}.json`), JSON.stringify(tree));
   const frameName = `${screenName} / ${state.label} · ${device} ${width}`;
@@ -257,7 +283,7 @@ if (args.includes("--version") || madeFiles.some((f) => f.fileName === fileName)
   for (let v = 2; ; v++) { const candidate = `ooee · ${screenName} · ${today} · v${v}`; if (!madeFiles.some((f) => f.fileName === candidate)) { fileName = candidate; break; } }
 }
 
-const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
+const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, folded, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
 writeFileSync(path.join(work, "manifest.json"), JSON.stringify(manifest, null, 2));
 const tooBig = steps.filter((s) => s.chars > STEP_LIMIT || s.lines > LINE_LIMIT).map((s) => s.file);
 console.log(JSON.stringify({ manifest: path.join(work, "manifest.json"), steps: steps.length, frames: frames.map((f) => f.name), fileName, unresolvedColors: unresolved.length, unknownIcons: unknownIcons.length, tooBig }, null, 2));

@@ -140,6 +140,24 @@ async function build(spec, parent, parentBox) {
     // 폭을 먼저 정하고 높이 자동 맞춤을 켠다. resize 가 textAutoResize 를 되돌리지 않게 하려는 순서다.
     if (!spec.lh || spec.h <= spec.lh * 1.5) node.textAutoResize = "WIDTH_AND_HEIGHT";
     else { node.resize(spec.w, node.height); node.textAutoResize = "HEIGHT"; }
+  } else if (spec.t === "rect") {
+    // 자식 없이 칠·테두리만 있는 상자다. 배치할 것이 없으므로 Frame 이 아니라 Rectangle 로 둔다.
+    node = figma.createRectangle();
+    parent.appendChild(node);
+    node.name = spec.n;
+    node.fills = spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : [];
+    if (spec.bd) {
+      const p = paintFor(spec.bd.c, `border:${spec.n}`);
+      if (p) {
+        node.strokes = [p];
+        node.strokeAlign = "INSIDE";
+        if (spec.bd.ds) node.dashPattern = [4, 4];
+        node.strokeWeight = spec.bd.w[0];
+      }
+    }
+    if (spec.r) node.cornerRadius = spec.r;
+    node.resize(Math.max(1, spec.w), Math.max(1, spec.h));
+    bindSize(node, spec.sz, `rect:${spec.n}`);
   } else if (spec.t === "svg") {
     node = figma.createNodeFromSvg(CHUNK.icons[spec.icon] || spec.svg);
     parent.appendChild(node);
