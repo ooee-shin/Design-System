@@ -149,20 +149,23 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 ### R2. Figma에서 읽는다
 
 ```bash
-node scripts/figma/reread.mjs step --key <key> --name "<화면 이름>" --frame "<프레임 이름>"
+node scripts/figma/reread.mjs step --key <key> --name "<화면 이름>" --frame "<프레임 이름>" --parts 1
 ```
 
-만들어진 `.figma-work/<key>/steps/reread.js`를 `Read`로 처음부터 끝까지 읽어 `mcp__figma__use_figma`에 `fileKey`와 함께 그대로 넘긴다. 이 단계는 파일을 바꾸지 않고 프레임을 JSON으로 돌려준다. 결과에 `error`가 있거나 프레임이 `missing`이면 멈추고 보고한다.
+만들어진 `.figma-work/<key>/steps/reread-0.js`를 `Read`로 처음부터 끝까지 읽어 `mcp__figma__use_figma`에 `fileKey`와 함께 **그대로** 넘긴다. 이 단계는 파일을 바꾸지 않고 프레임을 줄(`rows`)로 돌려준다.
 
-결과를 `Write`로 `.figma-work/<key>/figma-<상태>.json`에 그대로 저장한다. `Write`는 이 파일과 `.figma-work/files.json`에만 쓴다.
+- **코드를 고치지 않는다.** 줄이거나 나누거나 보태지 않는다. 고치면 루트 프레임이 빠지는 식으로 결과가 조용히 어긋난다.
+- 결과를 `Write`로 `.figma-work/<key>/figma-<상태>.json`에 **그대로** 저장한다. JSON을 손으로 손질하지 않는다. `Write`는 이 파일과 `.figma-work/files.json`에만 쓴다.
+- 결과에 `error`가 있거나 프레임이 `missing`이면 멈추고 보고한다.
+- `use_figma` 응답은 20,000자쯤에서 잘린다. 응답이 잘렸으면 `--parts 3`처럼 나눠 다시 만들어 조각마다 부르고 `figma-<상태>-<조각>.json`으로 각각 저장한 뒤, 다음 단계에서 `--figma`를 여러 번 준다. 화면 하나(노드 200개쯤)는 한 번에 들어간다.
 
 ### R3. 차이를 낸다
 
 ```bash
-node scripts/figma/reread.mjs diff --key <key> --state <상태 순서> --figma .figma-work/<key>/figma-<상태>.json
+node scripts/figma/reread.mjs diff --key <key> --state <상태 순서> --figma .figma-work/<key>/figma-<상태>.json [--figma <조각>...]
 ```
 
-출력은 변화 목록이다. `auto`가 `true`면 코드로 되돌릴 수 있는 것이고, `false`면 사람이 정할 것이다.
+출력은 변화 목록이다. 읽은 결과에 루트가 없으면 이 명령이 멈춘다. 조각을 다 넘기지 않았거나 단계 코드가 바뀐 것이다. `auto`가 `true`면 코드로 되돌릴 수 있는 것이고, `false`면 사람이 정할 것이다.
 
 - **`build`를 먼저 본다.** `<key>|s<상태>|<커밋>|<날짜>` 꼴이며, 그 커밋이 지금 `git rev-parse --short HEAD`와 다르면 그 사이에 색 규칙이 바뀌었을 수 있다. 이때는 색 변화를 자동으로 반영하지 않고 전부 「사람이 정할 것」으로 옮겨 적는다.
 - `build`가 비어 있으면 ②로 그린 프레임이 아니거나 옛 도구로 그린 것이다. 멈추고 보고한다.

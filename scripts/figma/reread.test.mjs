@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { diffFrame } from "./reread.mjs";
+import { diffFrame, fromRows } from "./reread.mjs";
 
 /** 코드에서 그린 사양: 루트 프레임 > 버튼(칠 토큰) > 글자, 그리고 아이콘 하나. */
 const spec = () => ({
@@ -91,4 +91,20 @@ test("Figma 에서 지운 자리와 새로 만든 자리는 사람이 정한다"
   assert.deepEqual(removed.map((c) => [c.kind, c.p]), [["삭제", "voc:s0.0.1"]]);
   const added = diffFrame(spec(), figma({ extra: [{ n: "새 배지", t: "f", x: 0, y: 0, w: 40, h: 20 }] }));
   assert.deepEqual(added.map((c) => [c.kind, c.auto]), [["추가", false]]);
+});
+
+test("줄로 온 결과를 객체로 편다", () => {
+  const frame = fromRows({
+    name: "f",
+    cols: ["p", "n", "t", "w", "h", "bg", "c", "bd", "r", "s", "fs", "st"],
+    rows: [
+      ["voc:s0", "main", "f", 1440, 900, "oe-background-primary", "", "", 0, "", 0, ""],
+      ["voc:s0.0", "button", "f", 78, 36, "#217346", "", "oe-border-secondary", 8, "", 0, ""],
+      ["voc:s0.0.0", "", "x", 48, 20, "", "oe-foreground-inverse", "", 0, "내보내기", 14, "oe/text-sm/medium"],
+    ],
+  });
+  assert.deepEqual(frame.nodes[0], { p: "voc:s0", n: "main", t: "f", w: 1440, h: 900, bg: { v: "oe-background-primary" } });
+  assert.deepEqual(frame.nodes[1].bg, { hex: "#217346" });
+  assert.deepEqual(frame.nodes[1].bd, { c: { v: "oe-border-secondary" } });
+  assert.deepEqual(frame.nodes[2], { p: "voc:s0.0.0", n: "", t: "x", w: 48, h: 20, c: { v: "oe-foreground-inverse" }, s: "내보내기", fs: 14, st: "oe/text-sm/medium" });
 });
