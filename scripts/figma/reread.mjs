@@ -48,6 +48,8 @@ export function fromRows(frame) {
 
 function flatten(node, out = new Map()) {
   if (node.path) out.set(node.path, node);
+  // 인스턴스로 그린 자리의 안쪽은 Figma 에서 컴포넌트가 그린다. 화면의 자리로 견주지 않는다.
+  if (node.inst) return out;
   for (const kid of node.k || []) flatten(kid, out);
   return out;
 }
@@ -92,6 +94,9 @@ export function diffFrame(spec, figma) {
       }
     }
     if (s.icon && /^Ri[A-Z]/.test(node.n) && s.icon !== node.n) add(node.p, "아이콘", s.icon, node.n, true, `@remixicon/react 의 ${node.n} 로 바꾼다`);
+    // 인스턴스는 주 컴포넌트 이름이 곧 어떤 컴포넌트인지다. 이름이 다르면 사람이 정한다.
+    if (node.t === "i" && s.inst && node.st && node.st !== s.inst)
+      add(node.p, "컴포넌트", s.inst, node.st, false, `Figma 에서 다른 컴포넌트로 바꿨다. 코드에서 어떤 Property 로 옮길지는 사람이 정한다`);
 
     const near = (a, b) => Math.abs((a ?? 0) - (b ?? 0)) <= 1;
     // 글자 칸의 크기는 글꼴 대체(Noto Sans KR)만으로도 달라진다. 사람이 고친 자리로 세지 않는다.

@@ -108,3 +108,44 @@ test("줄로 온 결과를 객체로 편다", () => {
   assert.deepEqual(frame.nodes[1].bd, { c: { v: "oe-border-secondary" } });
   assert.deepEqual(frame.nodes[2], { p: "voc:s0.0.0", n: "", t: "x", w: 48, h: 20, c: { v: "oe-foreground-inverse" }, s: "내보내기", fs: 14, st: "oe/text-sm/medium" });
 });
+
+test("인스턴스는 주 컴포넌트 이름으로 견주고 안쪽은 보지 않는다", () => {
+  const spec = {
+    path: "voc:s0",
+    n: "main",
+    t: "f",
+    w: 100,
+    h: 40,
+    k: [
+      {
+        path: "voc:s0.0",
+        n: "button",
+        t: "f",
+        w: 80,
+        h: 36,
+        inst: "Button/fill·brand·regular",
+        k: [{ path: "voc:s0.0.0", n: "button-label", t: "x", w: 40, h: 20, s: "보내기" }],
+      },
+    ],
+  };
+  const same = diffFrame(spec, {
+    name: "f",
+    nodes: [
+      { p: "voc:s0", n: "main", t: "f", w: 100, h: 40 },
+      { p: "voc:s0.0", n: "button", t: "i", w: 80, h: 36, st: "Button/fill·brand·regular" },
+    ],
+  });
+  assert.deepEqual(same, []);
+
+  const swapped = diffFrame(spec, {
+    name: "f",
+    nodes: [
+      { p: "voc:s0", n: "main", t: "f", w: 100, h: 40 },
+      { p: "voc:s0.0", n: "button", t: "i", w: 80, h: 36, st: "Button/outline·brand·regular" },
+    ],
+  });
+  assert.deepEqual(
+    swapped.map((c) => [c.kind, c.from, c.to, c.auto]),
+    [["컴포넌트", "Button/fill·brand·regular", "Button/outline·brand·regular", false]],
+  );
+});
