@@ -91,7 +91,7 @@
 - **명령 셋의 쓰임과 멈추는 자리.** `/generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. `/design-page`는 sandbox 화면을 Figma 프레임으로 옮기고 링크를 보고한다. 절차는 각 `.claude/skills/<이름>/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다. 어느 명령도 commit·push·pull request를 만들지 않는다.
 - **한 working tree에는 명령 세션 하나만 돌린다.** 두 세션이 같은 tree에서 서로의 쓰는 중인 파일을 테스트하고 공용 파일을 함께 고친 적이 있다. 동시에 돌려야 하면 저장소를 따로 clone한다. `git worktree`는 stash·branch·remote 설정을 원래 checkout과 공유하므로 격리가 아니다.
 - **headless로 돌릴 때.** `claude -p "<프롬프트>" --model sonnet --allowedTools … < /dev/null`처럼 프롬프트를 `--allowedTools` 앞에 둔다. `--allowedTools`는 뒤따르는 인수를 모두 먹는다. 신뢰하지 않은 폴더의 headless 세션은 공용 `allow`를 무시하므로 필요한 도구를 `--allowedTools`로 좁게 준다. `Bash(pnpm *)`처럼 넓게 주면 `pnpm exec`·`pnpm dlx`까지 열린다. 결과를 기록할 때는 실제로 돈 모델의 전체 이름을 적는다.
-- **MCP.** Figma remote MCP는 `.mcp.json`이 생기기 전까지 기기마다 `claude mcp add --transport http --scope user figma https://mcp.figma.com/mcp`로 등록하고 `/mcp`에서 로그인한다. 세션을 시작한 뒤 등록한 서버는 새 세션부터 실린다. Figma 결과물의 위치와 다른 디자인 시스템(BKDS 등)을 섞지 않는 규칙은 `docs/process/figma-page-agent.md`를 따른다. Storybook MCP와 Story는 아직 없으며, 만들지는 `docs/process/ai-environment.md`의 순서 3이 정한다.
+- **MCP.** Figma remote MCP는 저장소 루트의 `.mcp.json`에 URL만 적어 두었다. 저장소 루트에서 Claude Code를 처음 열 때 이 서버를 쓸지 한 번 묻고, 그 답은 기기의 `~/.claude.json`에 남는다. 로그인은 `/mcp`에서 하며 토큰은 기기에만 있다. `claude -p`는 묻지 않고 싣지만 로그인이 되어 있어야 한다. 기기마다 `claude mcp add --scope user`로 따로 등록해 둔 같은 이름의 서버가 있으면 그쪽이 먼저 실린다. Figma 결과물의 위치와 다른 디자인 시스템(BKDS 등)을 섞지 않는 규칙은 `docs/process/figma-page-agent.md`, 재조회 결과를 컴포넌트로 되짚는 근거는 `docs/process/figma-component-map.md`를 따른다. Storybook MCP와 Story는 아직 없으며, 만들지는 `docs/process/ai-environment.md`의 순서 3이 정한다.
 
 ## 여러 환경에서 이어서 작업할 때
 
