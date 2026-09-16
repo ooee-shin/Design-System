@@ -70,7 +70,10 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
       "--nav-hover-foreground": "var(--color-neutral-50)",
       // 검색창은 줄 위의 면보다 한 단계 더 밝다. 늘 떠 있는 면이라 같은 값으로는 레일에 묻힌다.
       "--nav-search-background": "rgb(255 255 255 / 0.12)",
-      "--nav-active-background": "var(--brand-700)",
+      // 고른 줄도 브랜드 단계를 쓰지 않고 흰 알파를 얹는다. 짙은 바탕 위에서 브랜드 색을 한 줄에만
+      // 두면 그 줄이 어느 화면인지 알리는 표시가 아니라 강조로 읽힌다. 고르지 않은 줄의 hover 가
+      // 0.08 이므로 그 두 배를 써서 둘이 갈린다.
+      "--nav-active-background": "rgb(255 255 255 / 0.16)",
       "--nav-active-foreground": "var(--color-white)",
       // 짙은 바탕에서는 흰 글자가 더 또렷하게 보이므로, 묶음 이름을 한 단계 더 옅게 둔다.
       "--nav-group-foreground": "rgb(255 255 255 / 0.5)",
@@ -111,7 +114,7 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
       "--nav-hover-foreground": "rgb(0 0 0 / 0.8)",
       // 바탕이 회색조인 스타일이므로 고른 줄에도 브랜드를 쓰지 않는다. 같은 검정을 hover 보다
       // 한 단계 더 얹고 글자를 온전한 검정으로 올린다.
-      "--nav-active-background": "rgb(0 0 0 / 0.1)",
+      "--nav-active-background": "rgb(0 0 0 / 0.08)",
       "--nav-active-foreground": "rgb(0 0 0 / 0.95)",
     } as React.CSSProperties,
     preview: { band: "bg-neutral-100", body: "bg-white text-neutral-900" },
