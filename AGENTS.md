@@ -11,8 +11,9 @@
 | `docs/system/` | 시스템에 무엇이 있고 어떤 정의이며 어떻게 쓰는가. 블루키에 전달할 영구 자산 |
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
-| `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/generate-code`·`/review-design`·`/design-page` Skill. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거하며, Plugin으로 분리할지는 `docs/process/ai-environment.md`의 스파이크 R3가 정한다 |
+| `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/design-page` Skill. 화면을 만들고 검수하는 두 명령은 `plugins/ooee-harness/`로 옮겼다. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거하며, Plugin으로 분리할지는 `docs/process/ai-environment.md`의 스파이크 R3가 정한다 |
 | `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 신주희가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
+| `plugins/ooee-harness/` | `/ooee-harness:generate-code`·`/ooee-harness:review-design` 을 싣는 Claude Code Plugin. **전달 대상이다.** 설치·설정·권한 조각은 그 안의 `README.md`가 갖는다 |
 | `scripts/figma/` | `/design-page`가 `apps/sandbox` 화면을 Figma 프레임으로 옮기는 도구. 중간 산출물은 `.figma-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/figma/README.md` |
 
 `docs/process/`와 이 파일은 1차 컴포넌트를 완성하는 동안에만 필요한 작업 규칙을 담는다. `ㄱ`, `업무시작`, `퇴근백업` 같은 신호와 제작 절차는 시스템이 무엇인지 설명하지 않으므로 블루키 자산화 대상에서 제외한다. 반대로 시스템 정의를 이쪽에 두면 전달본에서 함께 사라지므로, 어느 쪽에 속하는지 먼저 판단한 뒤 기록한다.
@@ -88,9 +89,10 @@
 - **Claude Code는 저장소 루트에서 시작한다.** 공용 권한 `.claude/settings.json`은 세션을 시작한 폴더에서만 읽힌다. 하위 폴더나 홈에서 시작한 세션은 Skill은 보이지만 아래 권한이 걸리지 않는다.
 - **공용 권한이 막는 것.** `deny`는 `main`으로 직접 push하는 명령이다. `ask`는 작업을 되돌리거나 지우는 명령(`git stash`, `git reset --hard`, `git clean`, `git checkout -- …`, `rm -r`), force push, `apps/sandbox`의 공용 파일(`package.json`, `test-setup.ts`, `screen-rules.*`, 첫 화면) 수정이다. `ask`와 `deny`는 개인 설정·`--allowedTools`·권한 모드로 풀리지 않고, 확인을 물을 수 없는 headless 세션에서는 거부된다. 규칙은 명령 문자열을 대조할 뿐이라 `git -C . push`처럼 형태를 바꾸면 걸리지 않으며 GitHub의 branch 보호가 아니다. 규칙을 바꾸는 pull request는 상대에게 먼저 알린다.
 - **막힌 명령은 형태를 바꿔 다시 시도하지 않는다.** 권한 규칙이나 확인 요청에 막히면 경로·옵션·도구를 바꿔 같은 일을 되풀이하지 않고, 막힌 명령과 거부 메시지를 사용자에게 알린다.
-- **명령 셋의 쓰임과 멈추는 자리.** `/generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. `/design-page`는 sandbox 화면을 Figma 프레임으로 옮기고 링크를 보고한다. 절차는 각 `.claude/skills/<이름>/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다. 어느 명령도 commit·push·pull request를 만들지 않는다.
+- **명령 셋의 쓰임과 멈추는 자리.** `/ooee-harness:generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/ooee-harness:review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. `/design-page`는 sandbox 화면을 Figma 프레임으로 옮기고 링크를 보고한다. 절차는 `plugins/ooee-harness/skills/<이름>/SKILL.md`와 `.claude/skills/design-page/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다. 어느 명령도 commit·push·pull request를 만들지 않는다.
 - **한 working tree에는 명령 세션 하나만 돌린다.** 두 세션이 같은 tree에서 서로의 쓰는 중인 파일을 테스트하고 공용 파일을 함께 고친 적이 있다. 동시에 돌려야 하면 저장소를 따로 clone한다. `git worktree`는 stash·branch·remote 설정을 원래 checkout과 공유하므로 격리가 아니다.
 - **headless로 돌릴 때.** `claude -p "<프롬프트>" --model sonnet --allowedTools … < /dev/null`처럼 프롬프트를 `--allowedTools` 앞에 둔다. `--allowedTools`는 뒤따르는 인수를 모두 먹는다. 신뢰하지 않은 폴더의 headless 세션은 공용 `allow`를 무시하므로 필요한 도구를 `--allowedTools`로 좁게 준다. `Bash(pnpm *)`처럼 넓게 주면 `pnpm exec`·`pnpm dlx`까지 열린다. 결과를 기록할 때는 실제로 돈 모델의 전체 이름을 적는다.
+- **Plugin.** 화면 명령 둘은 `plugins/ooee-harness/`의 Plugin으로 산다. 이 저장소에서도 설치해 쓰며, 고치는 중에는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우고 `/reload-plugins`로 다시 읽는다. Plugin은 권한 규칙을 싣지 못하므로 공용 권한은 `.claude/settings.json`이 계속 소유한다.
 - **MCP.** Figma remote MCP는 저장소 루트의 `.mcp.json`에 URL만 적어 두었다. 저장소 루트에서 Claude Code를 처음 열 때 이 서버를 쓸지 한 번 묻고, 그 답은 기기의 `~/.claude.json`에 남는다. 로그인은 `/mcp`에서 하며 토큰은 기기에만 있다. `claude -p`는 묻지 않고 싣지만 로그인이 되어 있어야 한다. 기기마다 `claude mcp add --scope user`로 따로 등록해 둔 같은 이름의 서버가 있으면 그쪽이 먼저 실린다. Figma 결과물의 위치와 다른 디자인 시스템(BKDS 등)을 섞지 않는 규칙은 `docs/process/figma-page-agent.md`, 재조회 결과를 컴포넌트로 되짚는 근거는 `docs/process/figma-component-map.md`를 따른다. Storybook MCP와 Story는 아직 없으며, 만들지는 `docs/process/ai-environment.md`의 순서 3이 정한다.
 
 ## 여러 환경에서 이어서 작업할 때

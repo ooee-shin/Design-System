@@ -9,14 +9,29 @@
  */
 
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import ts from "typescript";
+/**
+ * `typescript` 는 화면을 둔 저장소의 것을 쓴다. Plugin 자체는 의존성을 갖지 않는다.
+ * 화면 파일이 있는 자리에서 위로 올라가며 찾고, 없으면 Plugin 이 놓인 자리에서 찾는다.
+ */
+let ts = null;
+function loadTypeScript(fromPath) {
+  if (ts) return ts;
+  for (const base of [path.resolve(fromPath || "."), path.join(process.cwd(), "package.json"), fileURLToPath(import.meta.url)]) {
+    try {
+      ts = createRequire(base)("typescript");
+      return ts;
+    } catch {
+      // 다음 자리에서 찾는다
+    }
+  }
+  throw new Error("typescript 를 찾지 못했다. 화면을 둔 저장소에 typescript 가 설치돼 있어야 한다");
+}
 
-export type RuleHit = { rule: string; line: number; detail: string };
 
-type ClassToken = { variants: string[]; utility: string; opacity: string | null; raw: string };
-type ClassInfo = { tokens: ClassToken[]; opaque: boolean };
 
 const PALETTE =
   "slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|mauve|mist|olive|taupe";
@@ -37,8 +52,8 @@ const RE_NUMERIC_SIZE = /^(size|w|h)-(\d+(\.\d+)?|px|\[[^\]]+\])$/;
 const SLOT_PROPS = /^(trailingElement|leadingElement|leadingIcon|trailingIcon)$/;
 
 /** `hover:focus-visible:ring-2/50` 을 variant·utility·opacity로 나눈다. 대괄호·괄호 안의 `:` 는 자르지 않는다. */
-function splitToken(raw: string): ClassToken {
-  const variants: string[] = [];
+function splitToken(raw) {
+  const variants = [];
   let depth = 0;
   let current = "";
   for (const ch of raw) {
@@ -50,7 +65,7 @@ function splitToken(raw: string): ClassToken {
     } else current += ch;
   }
   let utility = current.replace(/^!|!$/g, "").replace(/^-/, "");
-  let opacity: string | null = null;
+  let opacity = null;
   const match = utility.match(/^(.*?)\/(\d+|\[[^\]]+\]|\([^)]+\))$/);
   if (match) {
     utility = match[1];
@@ -59,31 +74,31 @@ function splitToken(raw: string): ClassToken {
   return { variants, utility, opacity, raw };
 }
 
-function tokensOf(strings: string[]): ClassToken[] {
+function tokensOf(strings) {
   return strings.flatMap((s) => s.split(/\s+/).filter(Boolean)).map(splitToken);
 }
 
-function walk(node: ts.Node, visit: (node: ts.Node, parents: ts.Node[]) => void, parents: ts.Node[] = []) {
+function walk(node, visit, parents = []) {
   visit(node, parents);
   const next = [...parents, node];
   ts.forEachChild(node, (child) => walk(child, visit, next));
 }
 
-function openingOf(node: ts.Node): ts.JsxOpeningLikeElement | undefined {
+function openingOf(node) {
   if (ts.isJsxElement(node)) return node.openingElement;
   if (ts.isJsxSelfClosingElement(node)) return node;
   return undefined;
 }
 
-function attributeNamed(el: ts.JsxOpeningLikeElement, name: string): ts.JsxAttribute | undefined {
-  return el.attributes.properties.find((a): a is ts.JsxAttribute => ts.isJsxAttribute(a) && a.name.getText() === name);
+function attributeNamed(el, name) {
+  return el.attributes.properties.find((a) => ts.isJsxAttribute(a) && a.name.getText() === name);
 }
 
-function attributeNames(el: ts.JsxOpeningLikeElement): string[] {
+function attributeNames(el) {
   return el.attributes.properties.filter(ts.isJsxAttribute).map((a) => a.name.getText());
 }
 
-function stringValue(attribute: ts.JsxAttribute | undefined): string | undefined {
+function stringValue(attribute) {
   const init = attribute?.initializer;
   if (!init) return undefined;
   if (ts.isStringLiteral(init)) return init.text;
@@ -92,10 +107,10 @@ function stringValue(attribute: ts.JsxAttribute | undefined): string | undefined
 }
 
 /** className 식에서 문자열 조각을 모은다. `cn`·`clsx` 인자, 조건식, 같은 파일의 const는 풀고 나머지는 opaque로 둔다. */
-function classInfo(el: ts.JsxOpeningLikeElement, consts: Map<string, ts.Expression>): ClassInfo {
-  const strings: string[] = [];
+function classInfo(el, consts) {
+  const strings = [];
   let opaque = false;
-  const visit = (e: ts.Node | undefined, depth: number): void => {
+  const visit = (e, depth) => {
     if (!e) return;
     if (ts.isStringLiteralLike(e)) strings.push(e.text);
     else if (ts.isTemplateExpression(e)) {
@@ -125,7 +140,7 @@ function classInfo(el: ts.JsxOpeningLikeElement, consts: Map<string, ts.Expressi
 }
 
 /** `docs/system/README.md` 「Component」 표에서 상태가 `초안`인 행의 이름을 export 이름 꼴(`MessageComposer`)로 돌려준다. */
-export function draftComponentNames(readme: string): string[] {
+export function draftComponentNames(readme) {
   const section = readme.split(/^## Component$/m)[1]?.split(/^## /m)[0] ?? "";
   return [...section.matchAll(/^\| ([^|]+?) \| 초안 \|/gm)].map((m) => m[1].replace(/\s+/g, ""));
 }
@@ -134,13 +149,14 @@ export function draftComponentNames(readme: string): string[] {
  * 화면 소스 하나를 검사한다. `filePath` 는 상대 import가 `packages/ui`·`apps/studio`로 풀리는지 볼 때만 쓴다.
  * `drafts` 는 `draftComponentNames` 의 결과다.
  */
-export function checkScreenSource(source: string, filePath: string, drafts: string[]): RuleHit[] {
+export function checkScreenSource(source, filePath, drafts) {
+  loadTypeScript(filePath);
   const sf = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-  const hits: RuleHit[] = [];
-  const add = (rule: string, node: ts.Node | number, detail: string) =>
+  const hits = [];
+  const add = (rule, node, detail) =>
     hits.push({ rule, line: typeof node === "number" ? node : sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1, detail });
 
-  const consts = new Map<string, ts.Expression>();
+  const consts = new Map();
   walk(sf, (n) => {
     if (ts.isVariableDeclaration(n) && ts.isIdentifier(n.name) && n.initializer) consts.set(n.name.text, n.initializer);
   });
@@ -164,13 +180,13 @@ export function checkScreenSource(source: string, filePath: string, drafts: stri
       add("1 raw primitive color", n, JSON.stringify(text));
   });
 
-  const iconNames = new Set<string>();
+  const iconNames = new Set();
   walk(sf, (n) => {
     if (!ts.isImportDeclaration(n) || !ts.isStringLiteral(n.moduleSpecifier) || n.moduleSpecifier.text !== "@remixicon/react") return;
     const bindings = n.importClause?.namedBindings;
     if (bindings && ts.isNamedImports(bindings)) bindings.elements.forEach((e) => iconNames.add(e.name.text));
   });
-  const isIcon = (el: ts.JsxOpeningLikeElement) => ts.isIdentifier(el.tagName) && iconNames.has(el.tagName.text);
+  const isIcon = (el) => ts.isIdentifier(el.tagName) && iconNames.has(el.tagName.text);
 
   walk(sf, (node, parents) => {
     const el = openingOf(node);
@@ -220,7 +236,7 @@ export function checkScreenSource(source: string, filePath: string, drafts: stri
     if (intrinsic && (tag === "button" || tag === "a") && ts.isJsxElement(node) && !cls.opaque) {
       let icons = 0;
       let other = 0;
-      const scan = (child: ts.Node): void => {
+      const scan = (child) => {
         if (ts.isJsxText(child)) {
           if (child.text.trim()) other++;
         } else if (ts.isJsxExpression(child)) {
@@ -283,9 +299,10 @@ const RE_ENGLISH_SENTENCE = /(^|[^A-Za-z])(the|an|as|is|are|has|have|shows|rende
  * 한글이 없거나, `shows 지원요청 as the screen heading`처럼 영어 기능어로 문장을 짠 이름이다.
  * `heading으로 잡힌다`처럼 한국어 문장에 섞인 용어는 걸리지 않는다.
  */
-export function checkTestTitles(source: string, filePath: string): RuleHit[] {
+export function checkTestTitles(source, filePath) {
+  loadTypeScript(filePath);
   const sf = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-  const hits: RuleHit[] = [];
+  const hits = [];
   walk(sf, (n) => {
     if (!ts.isCallExpression(n) || !/^(test|it|describe)(\.(only|skip|todo))?$/.test(n.expression.getText())) return;
     const title = n.arguments[0];
@@ -296,6 +313,6 @@ export function checkTestTitles(source: string, filePath: string): RuleHit[] {
 }
 
 /** 저장소의 README를 읽어 `checkScreenSource` 를 부른다. */
-export function checkScreenFile(filePath: string, readmePath: string): RuleHit[] {
+export function checkScreenFile(filePath, readmePath) {
   return checkScreenSource(readFileSync(filePath, "utf8"), filePath, draftComponentNames(readFileSync(readmePath, "utf8")));
 }
