@@ -27,7 +27,10 @@ export function ScreenWorkList({ root: key }: { root: ScreenRoot["key"] }) {
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-oe-foreground-primary">Screens</h1>
             <p className="mt-1 text-sm leading-6 text-oe-foreground-secondary">
-              제품 화면을 구현하는 작업장입니다. 기능 화면을 한 건씩 만들며, 화면끼리 이어지는 데모가 아니므로 각 항목은 적어 둔 범위까지만 동작합니다.
+              제품 화면을 구현하는 작업장입니다. 기능 화면을 한 건씩 만들며, 화면끼리 이어지는 데모가 아닙니다.{" "}
+              <strong className="font-medium text-oe-foreground-primary">
+                각 화면은 눈으로 확인하려고 만든 것이므로, 화면에 보이는 요소가 실제로 동작하지 않을 수 있습니다.
+              </strong>
             </p>
           </div>
         </header>
