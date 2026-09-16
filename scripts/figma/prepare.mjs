@@ -174,9 +174,16 @@ const fits = (chunks) => { const code = buildCode(chunks); return code.length <=
 const size = (v) => JSON.stringify(v).length;
 const device = width <= 480 ? "Mobile" : "Desktop";
 
+// 프레임을 어느 커밋으로 그렸는지 남긴다. 되읽기(④)가 색 규칙을 믿어도 되는지 이것으로 가른다.
+let builtCommit = "unknown";
+try { builtCommit = run("git", ["rev-parse", "--short", "HEAD"]).trim(); } catch { /* 저장소 밖에서 돌릴 수도 있다 */ }
+const builtAt = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+
 trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
+  // 해석이 끝난 사양을 남긴다. 되읽기가 Figma 에서 읽은 값을 이 사양과 견준다.
+  writeFileSync(path.join(work, `spec-${i}.json`), JSON.stringify(tree));
   const frameName = `${screenName} / ${state.label} · ${device} ${width}`;
   frames.push({ name: frameName, state: state.label, script: state.script });
   const chunks = [];
@@ -196,7 +203,7 @@ trees.forEach(({ state, tree }, i) => {
     }
     flush();
   };
-  split(tree, null, { x: 0, y: 0 }, { x: i * (width + 100), y: 0, name: frameName });
+  split(tree, null, { x: 0, y: 0 }, { x: i * (width + 100), y: 0, name: frameName, build: `${key}|s${i}|${builtCommit}|${builtAt}` });
   // 한 부모의 자식이 여러 조각에 나뉘면 마지막 조각에서 위치를 다시 잰다.
   const lastIndex = new Map();
   chunks.forEach((c, index) => { if (c.parentPath) lastIndex.set(c.parentPath, index); });
@@ -250,7 +257,7 @@ if (args.includes("--version") || madeFiles.some((f) => f.fileName === fileName)
   for (let v = 2; ; v++) { const candidate = `ooee · ${screenName} · ${today} · v${v}`; if (!madeFiles.some((f) => f.fileName === candidate)) { fileName = candidate; break; } }
 }
 
-const manifest = { key, screenName, fileName, filesJson: filesPath, frames, browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
+const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
 writeFileSync(path.join(work, "manifest.json"), JSON.stringify(manifest, null, 2));
 const tooBig = steps.filter((s) => s.chars > STEP_LIMIT || s.lines > LINE_LIMIT).map((s) => s.file);
 console.log(JSON.stringify({ manifest: path.join(work, "manifest.json"), steps: steps.length, frames: frames.map((f) => f.name), fileName, unresolvedColors: unresolved.length, unknownIcons: unknownIcons.length, tooBig }, null, 2));
