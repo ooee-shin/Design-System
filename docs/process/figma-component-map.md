@@ -11,6 +11,8 @@ Figma 프레임을 다시 읽었을 때 남는 것으로 `@ooee/ui` 컴포넌트
 
 `data-variant`·`data-tone`·`data-size` 같은 DOM 속성은 Figma로 옮겨지지 않는다. 그래서 variant·tone은 색 변수로, 크기는 px로 되짚는다.
 
+**Figma에는 배치하는 곳만 Frame으로 남는다**(`2026-09-16` 결정, `scripts/figma/README.md`). 글자 하나만 감싼 상자와 그대로 통과시키는 상자는 없애고 글자·아이콘이 그 자리를 차지하며, 칠·테두리만 있는 잎은 Rectangle이다. `data-slot`이 붙은 노드는 접지 않으므로 아래 표의 이름은 그대로 남는다. 다만 컴포넌트 안의 이름 없는 감싸개(예: `select-trigger` 안의 값 `span`)는 사라져 있을 수 있다.
+
 ## 이 표의 기준
 
 | 항목 | 값 |
