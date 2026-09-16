@@ -59,6 +59,17 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 
 `manifest.json` 의 `folded` 가 이번에 접은 수를 센다. 「고객의 소리」는 Frame 124개가 69개로 줄었다.
 
+## 컴포넌트 카탈로그
+
+`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
+
+```bash
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 1600
+# manifest 의 steps 를 use_figma 에 순서대로 넘긴다
+```
+
+변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다.
+
 ## 되읽기 (④)
 
 사람이 Figma에서 고친 것을 화면 코드로 되돌리는 흐름이다. `/design-page`의 「되읽기」 절이 이 순서를 따른다.
