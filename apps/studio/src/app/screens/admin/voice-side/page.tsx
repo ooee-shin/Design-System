@@ -31,8 +31,10 @@ import {
   PERIOD_OPTIONS,
   SOURCE_OPTIONS,
   STATUS_OPTIONS,
-  REGION_OPTIONS,
-  STORE_OPTIONS,
+  REGIONS,
+  STORES,
+  regionOf,
+  storesIn,
   SUPERVISOR_OPTIONS,
   countsFor,
   isFiltered,
@@ -69,11 +71,14 @@ function FilterSection({
   );
 
   return (
-    // 축을 가르는 선은 패널 폭을 끝까지 가로지른다. 여백만큼 짧게 끊기면 선이 무엇을 나누는
-    // 것인지 흐려지고 패널 안에 또 하나의 상자가 있는 것처럼 보인다. 여백은 선이 아니라 그
-    // 안의 내용이 갖는다.
-    <Collapsible open={open} onOpenChange={setOpen} className="border-b border-oe-border-secondary last:border-b-0">
-      <div className="flex items-center gap-1.5 px-5 py-2">
+    // 축을 가르는 선은 좌우 16px 을 남기고 긋는다. 패널 폭을 끝까지 가로지르면 선이 벽에
+    // 닿아 답답하고, 패널 오른쪽의 세로선과 만나 격자처럼 보인다.
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="relative after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-oe-border-tertiary last:after:hidden"
+    >
+      <div className="flex items-center gap-1.5 px-5 py-2.5">
         <button
           type="button"
           onClick={toggle}
@@ -109,22 +114,132 @@ function FilterSection({
       {/* 펼치고 접을 때 높이가 미끄러진다. Base UI 가 펼친 높이를 `--collapsible-panel-height`
           로 넘겨 주므로, 열릴 때 그 값까지 늘리고 닫힐 때 0으로 되돌린다. */}
       <CollapsibleContent
-        className="h-[var(--collapsible-panel-height)] overflow-hidden opacity-100 transition-[height,opacity] duration-200 ease-out data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0 motion-reduce:transition-none"
+        // 높이를 미끄러뜨리는 동안에만 넘치는 것을 자른다. 다 펴진 뒤에도 자르면 안쪽 칸의 포커스
+        // 링이 이 영역의 위아래 경계에서 잘린다. 링은 칸 바깥으로 번지기 때문이다.
+        className="h-[var(--collapsible-panel-height)] opacity-100 transition-[height,opacity] duration-200 ease-out not-data-open:overflow-hidden data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0 motion-reduce:transition-none"
       >
-        <div className="px-5 pb-3">{children}</div>
+        <div className="px-5 pb-4">{children}</div>
       </CollapsibleContent>
     </Collapsible>
   );
 }
 
+/**
+ * 지역을 먼저 고르고 그 안에서 점포를 고른다.
+ *
+ * 점포는 실제로 천 곳을 넘어 한 목록에 늘어놓을 수 없다. 왼쪽에서 지역을 옮겨 다니고 오른쪽에서
+ * 그 지역의 점포를 고르며, 맨 위의 「전체」가 그 지역 전부를 함께 켜고 끈다. 얼개는 Combobox 의
+ * 2단계 예시에서 가져왔다.
+ *
+ * 고르는 것은 지역이 아니라 점포다. 왼쪽을 옮겨 다녀도 앞서 고른 점포는 그대로 남는다.
+ */
+function StorePicker({
+  chosen,
+  counts,
+  onChange,
+}: {
+  chosen: string[];
+  counts: Record<string, number>;
+  onChange: (next: string[]) => void;
+}) {
+  const [activeRegion, setActiveRegion] = useState(REGIONS[0]);
+  const [query, setQuery] = useState("");
+  const keyword = query.trim();
+  // 점포명을 치면 지역을 가리지 않고 전부에서 찾는다. 천 곳 가운데 이름만 아는 한 곳을 찾을 때
+  // 그것이 어느 지역인지까지 알아야 한다면 검색이 하는 일이 없다. 대신 결과마다 지역을 붙인다.
+  const stores = keyword ? STORES.filter((item) => item.name.includes(keyword)).map((item) => item.name) : storesIn(activeRegion);
+  const picked = stores.filter((name) => chosen.includes(name));
+  const all = stores.length > 0 && picked.length === stores.length;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Input
+        variant="filled"
+        controlSize="small"
+        aria-label="점포 찾기"
+        placeholder="점포명으로 찾기"
+        leadingElement={<RiSearchLine />}
+        clearable
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        onClear={() => setQuery("")}
+      />
+
+    {/* 안에서 쓰는 쌓임 순서가 바깥과 겨루지 않도록 이 상자에서 새로 시작한다. 고른 지역이
+        세로선 위로 올라오려고 쓰는 값이 화면 전체의 순서에 끼어들면, 위에 붙어 있는 머리 줄을
+        덮는다. */}
+    <div className="isolate grid grid-cols-[minmax(4.5rem,0.7fr)_minmax(0,1.3fr)] overflow-hidden rounded-oe-control border border-oe-border-secondary">
+      {/* 왼쪽은 지역이다. 두 칸을 가르는 세로선은 이 칸이 갖고, 고른 지역만 그 선 위로 올라와
+          오른쪽 칸과 이어져 보인다. 선을 지우고 고른 줄만 흰 바닥으로 두면 두 칸의 경계가
+          사라져서 어디까지가 지역인지 읽히지 않는다. */}
+      <div className={`relative flex max-h-60 flex-col overflow-y-auto bg-oe-background-secondary${keyword ? " opacity-50" : ""} [scrollbar-width:none] after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary p-1 [&::-webkit-scrollbar]:hidden`}>
+        {REGIONS.map((region) => (
+          <button
+            key={region}
+            type="button"
+            onClick={() => setActiveRegion(region)}
+            // 줄마다 모서리를 두고 칸 안쪽으로 살짝 들인다. 각진 채로 두면 포커스 링이 칸
+            // 경계에 사각으로 붙고, 고른 줄의 흰 바닥도 벽에 닿아 보인다.
+            className={`flex min-h-9 shrink-0 items-center gap-1 rounded-md pr-1.5 pl-2.5 text-left text-oe-label outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${
+              activeRegion === region
+                ? "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary"
+                : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"
+            }`}
+          >
+            <span className="min-w-0 flex-1 truncate">{region}</span>
+            <RiArrowDownSLine className="size-4 shrink-0 -rotate-90 text-oe-foreground-tertiary" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+
+      {/* 오른쪽은 고른 지역의 점포다. */}
+      <div className="flex max-h-60 flex-col overflow-y-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <CheckboxField
+          layout="fill"
+          isParent
+          label="전체"
+          className="shrink-0 rounded-none px-3"
+          checked={all}
+          indeterminate={picked.length > 0 && !all}
+          onCheckedChange={(checked) =>
+            onChange(checked ? Array.from(new Set([...chosen, ...stores])) : chosen.filter((name) => !stores.includes(name)))
+          }
+        />
+        {stores.length === 0 ? (
+          <p className="px-3 py-2 text-sm text-oe-foreground-tertiary">데이터가 없습니다.</p>
+        ) : null}
+        {stores.map((name) => (
+          <CheckboxField
+            key={name}
+            layout="fill"
+            label={name}
+            rightDescription={keyword ? regionOf(name) : undefined}
+            className="shrink-0 rounded-none px-3 [&_[data-slot=checkbox-trailing]]:ml-auto"
+            checked={chosen.includes(name)}
+            onCheckedChange={() => onChange(toggleValue(chosen, name))}
+            trailingElement={<span className="text-xs tabular-nums text-oe-foreground-tertiary">{counts[name] ?? 0}</span>}
+          />
+        ))}
+      </div>
+    </div>
+    </div>
+  );
+}
+
 export default function Page() {
+  // 고르는 동안에는 `draft` 에만 쌓이고, 조회를 눌러야 `filter` 로 넘어가 목록이 다시 선다.
+  // 한 번 고를 때마다 서버에 묻지 않고 다 고른 뒤 한 번에 묻는다.
+  //
+  // **값 옆의 건수는 조회한 조건을 기준으로 센다.** 아직 묻지 않은 조건까지 반영하면 화면에
+  // 서 있는 목록과 건수가 서로 다른 것을 말하게 된다.
   const [filter, setFilter] = useState<Filter>(EMPTY_FILTER);
+  const [draft, setDraft] = useState<Filter>(EMPTY_FILTER);
+  const dirty = JSON.stringify(draft) !== JSON.stringify(filter);
   const [panelOpen, setPanelOpen] = useState(true);
   // 담당자는 다섯이 넘어가면 눈으로 훑기 어려워진다. 고른 조건이 아니라 목록을 찾는 도구이므로
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
-  const [storeQuery, setStoreQuery] = useState("");
-  const edit = (patch: Partial<Filter>) => setFilter((previous) => ({ ...previous, ...patch }));
+  const edit = (patch: Partial<Filter>) => setDraft((previous) => ({ ...previous, ...patch }));
 
   /** 한 축의 값 목록이다. 값마다 몇 건이 걸리는지 오른쪽 끝에 붙는다. */
   const valueList = (
@@ -139,7 +254,10 @@ export default function Page() {
       // 한 축의 값들을 상자로 묶는다. 축을 가르는 선이 패널 폭을 가로지르므로, 그 사이에 놓인
       // 값들이 어디까지 한 묶음인지 따로 말해 주어야 한다. 모서리는 바로 위 검색 칸과 같은
       // 컨트롤 값을 써서, 둘이 한 묶음으로 읽히게 한다.
-      <div className={`flex flex-col divide-y divide-oe-border-secondary overflow-hidden rounded-oe-control border border-oe-border-secondary${scroll ? " max-h-60 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" : ""}`}>
+      //
+      // 값 사이에는 선을 두지 않는다. 체크박스가 이미 줄마다 앞에 서서 어디서 한 줄이 시작하는지
+      // 말하고 있어, 선을 더하면 같은 것을 두 번 말하면서 패널의 선만 늘어난다.
+      <div className={`flex flex-col overflow-hidden rounded-oe-control border border-oe-border-secondary${scroll ? " max-h-60 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" : ""}`}>
         {options.length === 0 ? (
           <p className="px-3 py-2.5 text-sm text-oe-foreground-tertiary">데이터가 없습니다.</p>
         ) : null}
@@ -154,8 +272,8 @@ export default function Page() {
             label={option.label}
             // 이름만으로 누구인지 갈리지 않을 때가 있어 팀을 옆에 붙인다.
             rightDescription={option.description}
-            checked={filter[axis].includes(option.value)}
-            onCheckedChange={() => edit({ [axis]: toggleValue(filter[axis], option.value) })}
+            checked={draft[axis].includes(option.value)}
+            onCheckedChange={() => edit({ [axis]: toggleValue(draft[axis], option.value) })}
             trailingElement={
               <span className="text-xs tabular-nums text-oe-foreground-tertiary">{counts[option.value] ?? 0}</span>
             }
@@ -205,11 +323,11 @@ export default function Page() {
               panelOpen ? "w-[18.25rem] border-r border-oe-border-secondary opacity-100" : "w-0 opacity-0"
             }`}
           >
-            <div className="h-full w-[18.25rem]">
+            <div className="flex h-full w-[18.25rem] flex-col">
               {/* 스크롤 막대를 콘텐츠 위에 겹쳐 그린다. 막대가 자리를 차지하면 축을 가르는
                   선이 그 앞에서 멈추고 오른쪽 여백만 넓어지며, 필요할 때만 생기게 두면 축을
                   펼치고 접을 때마다 안쪽 폭이 흔들린다. */}
-              <ScrollArea className="h-full" viewportClassName="pb-4">
+              <ScrollArea className="min-h-0 flex-1" viewportClassName="pb-4">
               {/* 스크롤해도 맨 위에 남는다. 조건을 여럿 펼쳐 아래로 내려간 상태에서도 지금
                   무엇이 걸려 있는지 되돌릴 길이 손에 닿아야 한다.
 
@@ -220,14 +338,17 @@ export default function Page() {
                 <h2 className="text-sm font-semibold text-oe-foreground-primary">필터</h2>
                 {/* 되돌릴 것이 있을 때만 선다. 아무것도 고르지 않은 화면에 초기화가 서 있으면
                     무엇을 되돌리는 것인지 읽는 사람이 먼저 헤아려야 한다. */}
-                {isFiltered(filter) ? (
+                {isFiltered(draft) ? (
                   <Button
                     variant="ghost"
                     tone="neutral"
                     controlSize="xsmall"
                     leadingIcon={<RiResetLeftLine />}
                     className="-mr-2"
-                    onClick={() => setFilter((previous) => ({ ...EMPTY_FILTER, showMoved: previous.showMoved }))}
+                    onClick={() => {
+                      setDraft(EMPTY_FILTER);
+                      setFilter(EMPTY_FILTER);
+                    }}
                   >
                     초기화
                   </Button>
@@ -250,7 +371,7 @@ export default function Page() {
                         key={option.value}
                         shape="rounded"
                         controlSize="small"
-                        active={filter.period === option.value}
+                        active={draft.period === option.value}
                         onClick={() => edit({ period: option.value })}
                       >
                         {option.label}
@@ -266,15 +387,17 @@ export default function Page() {
                       **누르면 열릴 달력은 아직 없다.** 날짜를 고르는 공용 컴포넌트를 만들 차례가
                       되면 이 자리가 그 첫 소비자가 된다. 지금은 값이 어떻게 보이고 어느 자리에
                       서는지만 정해 둔다. */}
-                  <Collapsible open={filter.period === CUSTOM}>
-                    <CollapsibleContent className="h-[var(--collapsible-panel-height)] overflow-hidden opacity-100 transition-[height,opacity] duration-200 ease-out data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0 motion-reduce:transition-none">
+                  <Collapsible open={draft.period === CUSTOM}>
+                    <CollapsibleContent // 높이를 미끄러뜨리는 동안에만 넘치는 것을 자른다. 다 펴진 뒤에도 자르면 안쪽 칸의 포커스
+        // 링이 이 영역의 위아래 경계에서 잘린다. 링은 칸 바깥으로 번지기 때문이다.
+        className="h-[var(--collapsible-panel-height)] opacity-100 transition-[height,opacity] duration-200 ease-out not-data-open:overflow-hidden data-ending-style:h-0 data-ending-style:opacity-0 data-starting-style:h-0 data-starting-style:opacity-0 motion-reduce:transition-none">
                       <div className="pt-2">
                         <InputButton
                           controlSize="small"
                           className="w-full"
                           aria-label="기간"
                           placeholder="시작일 ~ 종료일"
-                          value={filter.from && filter.to ? `${filter.from} ~ ${filter.to}` : ""}
+                          value={draft.from && draft.to ? `${draft.from} ~ ${draft.to}` : ""}
                           leadingElement={<RiCalendarLine />}
                         />
                       </div>
@@ -283,65 +406,27 @@ export default function Page() {
                 </div>
               </FilterSection>
 
-              <FilterSection label="처리상태" count={filter.status.length} onClear={() => edit({ status: [] })} defaultOpen>
+              <FilterSection label="처리상태" count={draft.status.length} onClear={() => edit({ status: [] })} defaultOpen>
                 {valueList("status", STATUS_OPTIONS)}
               </FilterSection>
 
-              <FilterSection label="카테고리" count={filter.category.length} onClear={() => edit({ category: [] })}>
+              <FilterSection label="카테고리" count={draft.category.length} onClear={() => edit({ category: [] })}>
                 {valueList("category", CATEGORY_OPTIONS)}
               </FilterSection>
 
-              {/* 지역은 점포가 가진 값이므로 따로 세우지 않고 이 축 안에서 한 단계 위에 둔다.
-                  천 곳 가운데 하나를 고르는 일이 지역으로 먼저 좁히고 그 안에서 고르는 두
-                  단계가 된다. 지역만 골라 두고 점포를 고르지 않아도 그 지역 전체로 걸러진다. */}
-              <FilterSection
-                label="점포"
-                count={filter.region.length + filter.store.length}
-                onClear={() => edit({ region: [], store: [] })}
-              >
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-wrap gap-1">
-                    {REGION_OPTIONS.map((option) => (
-                      <Chip
-                        key={option.value}
-                        shape="rounded"
-                        controlSize="small"
-                        active={filter.region.includes(option.value)}
-                        onClick={() => edit({ region: toggleValue(filter.region, option.value), store: [] })}
-                      >
-                        {option.label}
-                      </Chip>
-                    ))}
-                  </div>
-
-                  <Input
-                    controlSize="small"
-                    aria-label="점포 찾기"
-                    placeholder="점포명이나 지역으로 찾기"
-                    leadingElement={<RiSearchLine />}
-                    clearable
-                    value={storeQuery}
-                    onChange={(event) => setStoreQuery(event.target.value)}
-                    onClear={() => setStoreQuery("")}
-                  />
-                  {valueList(
-                    "store",
-                    // 점포명과 지역 어느 쪽으로도 찾는다. 위에서 지역을 골라 두었다면 그
-                    // 지역의 점포만 남는다.
-                    STORE_OPTIONS.filter((option) => {
-                      const keyword = storeQuery.trim();
-                      const matchesKeyword = option.label.includes(keyword) || option.description.includes(keyword);
-                      return matchesKeyword && (filter.region.length === 0 || filter.region.includes(option.description));
-                    }),
-                    true,
-                  )}
-                </div>
+              <FilterSection label="점포" count={draft.store.length} onClear={() => edit({ store: [] })}>
+                <StorePicker
+                  chosen={draft.store}
+                  counts={countsFor("store", filter)}
+                  onChange={(next) => edit({ store: next })}
+                />
               </FilterSection>
 
-              <FilterSection label="담당SV" count={filter.sv.length} onClear={() => edit({ sv: [] })}>
+              <FilterSection label="담당SV" count={draft.sv.length} onClear={() => edit({ sv: [] })}>
                 <div className="flex flex-col gap-2">
                   {/* 이름과 팀 어느 쪽으로도 찾는다. 「2팀」을 치면 그 팀만 남는다. */}
                   <Input
+                    variant="filled"
                     controlSize="small"
                     aria-label="담당자 찾기"
                     placeholder="이름이나 팀으로 찾기"
@@ -362,10 +447,26 @@ export default function Page() {
                 </div>
               </FilterSection>
 
-              <FilterSection label="유입 경로" count={filter.source.length} onClear={() => edit({ source: [] })}>
+              <FilterSection label="유입 경로" count={draft.source.length} onClear={() => edit({ source: [] })}>
                 {valueList("source", SOURCE_OPTIONS)}
               </FilterSection>
               </ScrollArea>
+
+              {/* 조회는 패널 맨 아래에 붙어 있다. 조건을 고르다 보면 목록이 길어져 위로 올라간
+                  머리 줄까지 돌아가야 하는데, 다 고른 뒤 누르는 것이므로 마지막에 닿는 자리에
+                  둔다.
+
+                  고친 것이 없으면 누를 이유가 없으므로 그때만 눌린다. */}
+              <div className="shrink-0 border-t border-oe-border-secondary bg-oe-background-primary px-5 py-3">
+                <Button
+                  layout="fill"
+                  disabled={!dirty}
+                  leadingIcon={<RiSearchLine />}
+                  onClick={() => setFilter(draft)}
+                >
+                  조회
+                </Button>
+              </div>
             </div>
           </aside>
 

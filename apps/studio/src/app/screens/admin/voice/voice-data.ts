@@ -44,6 +44,11 @@ export function regionOf(store: string) {
   return STORES.find((item) => item.name === store)?.region ?? "";
 }
 
+/** 한 지역에 속한 점포의 이름이다. */
+export function storesIn(region: string) {
+  return STORES.filter((item) => item.region === region).map((item) => item.name);
+}
+
 export const CATEGORIES = ["운영 관련", "메뉴 관련", "물류 관련", "마케팅 및 프로모션", "사장님 앱 관련", "기타"];
 
 /**
@@ -227,7 +232,6 @@ const PERIOD_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
 
 export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
 export const CATEGORY_OPTIONS = CATEGORIES.map((name) => ({ value: name, label: name }));
-export const REGION_OPTIONS = REGIONS.map((name) => ({ value: name, label: name }));
 export const STORE_OPTIONS = STORES.map(({ name, region }) => ({ value: name, label: name, description: region }));
 export const SUPERVISOR_OPTIONS = SUPERVISORS.map(({ name, team }) => ({ value: name, label: name, description: team }));
 export const SOURCE_OPTIONS = Object.entries(SOURCE).map(([value, label]) => ({ value, label }));
@@ -247,7 +251,6 @@ export const EMPTY_FILTER = {
   keyword: "",
   status: [] as string[],
   category: [] as string[],
-  region: [] as string[],
   store: [] as string[],
   sv: [] as string[],
   source: [] as string[],
@@ -256,7 +259,7 @@ export const EMPTY_FILTER = {
 
 export type Filter = typeof EMPTY_FILTER;
 /** 값을 여러 개 고를 수 있는 축의 이름이다. */
-export type FilterAxis = "status" | "category" | "region" | "store" | "sv" | "source";
+export type FilterAxis = "status" | "category" | "store" | "sv" | "source";
 
 /** 오늘에서 `months` 달 앞선 날짜를 `YYYY-MM-DD` 로 돌려준다. */
 function monthsAgo(months: number) {
@@ -289,7 +292,6 @@ export function matches(voice: Voice, filter: Filter) {
 
   if (!chosen(filter.status, voice.status)) return false;
   if (!chosen(filter.category, voice.category)) return false;
-  if (!chosen(filter.region, regionOf(voice.store))) return false;
   if (!chosen(filter.store, voice.store)) return false;
   if (!chosen(filter.sv, voice.sv)) return false;
   if (!chosen(filter.source, voice.source)) return false;
@@ -299,7 +301,6 @@ export function matches(voice: Voice, filter: Filter) {
 const AXIS_VALUE: Record<FilterAxis, (voice: Voice) => string> = {
   status: (voice) => voice.status,
   category: (voice) => voice.category,
-  region: (voice) => regionOf(voice.store),
   store: (voice) => voice.store,
   sv: (voice) => voice.sv,
   source: (voice) => voice.source,
@@ -328,7 +329,6 @@ export function isFiltered(filter: Filter) {
   return (
     filter.status.length +
       filter.category.length +
-      filter.region.length +
       filter.store.length +
       filter.sv.length +
       filter.source.length >
