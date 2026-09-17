@@ -33,6 +33,7 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - 모바일 화면은 `--width 390 --height 844`를 준다. 헤드리스 Chrome 창은 500px보다 좁아지지 않아서 창은 500으로 두고 문서 폭을 줄여 읽는다. 프레임 이름의 기기 표기는 폭 480 이하면 `Mobile`이다.
 - `--version`은 같은 날 같은 화면의 새 파일 이름에 ` · v2`처럼 버전을 붙인다. 이 기기에서 만든 이름은 `.figma-work/files.json`에 쌓여 같은 이름을 자동으로 피한다.
 - 돌릴 때마다 `.figma-work/<key>/`를 지우고 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- **두 개를 한꺼번에 돌리지 않는다.** 화면을 읽을 때 띄우는 Chrome 이 디버깅 포트 9222 를 쓰므로 서로 막혀 멈춘다. 굳이 나란히 돌려야 하면 `CDP_PORT=9301` 처럼 실행마다 다른 포트를 준다.
 
 `manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
 
@@ -64,13 +65,15 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 `apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
 
 ```bash
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 1600
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
 
 변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
+
+`--height` 는 화면 전체가 들어갈 만큼 준다. 항목을 더해 화면이 길어졌으면 그만큼 올린다. 작게 주면 브라우저 스크린샷이 잘려 눈으로 대조할 때 아래쪽을 보지 못한다.
 
 ## 컴포넌트 인스턴스 (실험)
 
