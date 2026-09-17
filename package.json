@@ -14,7 +14,7 @@
     "typecheck": "pnpm -r typecheck",
     "visual": "node scripts/visual/inspect.mjs",
     "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts apps/studio/src/lib/*.test.ts scripts/figma/*.test.mjs plugins/ooee-harness/lib/*.test.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @ooee/sandbox test && pnpm build"
   },
   "devDependencies": {
     "tsx": "^4.23.12"

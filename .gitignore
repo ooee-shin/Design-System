@@ -27,3 +27,5 @@ next-env.d.ts
 
 # 에이전트 설정 중 기기별 값만 제외한다. .claude/settings.json 은 저장소가 공유한다.
 .claude/settings.local.json
+# 에이전트를 나란히 돌릴 때 여기에 git worktree 가 생긴다. 저장소 안의 또 다른 저장소라 커밋되면 안 된다.
+.claude/worktrees/

@@ -72,7 +72,10 @@ export function diffFrame(spec, figma) {
     const s = specNodes.get(node.p);
     if (!s) { add(node.p, "추가", null, node.n, false, "코드에 없는 경로다. 사람이 정한다"); continue; }
 
-    for (const [field, specRef, figmaPaint] of [
+    // 인스턴스의 칠·모서리는 컴포넌트가 가진 값이다. 화면 사양에는 싣지 않으므로 견주지 않는다.
+    // 이 자리에서 볼 것은 「어느 컴포넌트인가」와 크기뿐이다.
+    const isInstance = node.t === "i" || Boolean(s.inst);
+    for (const [field, specRef, figmaPaint] of isInstance ? [] : [
       ["bg", s.bg, node.bg],
       ["c", s.c, node.c],
       ["bd", s.bd && s.bd.c, node.bd && node.bd.c],
@@ -101,7 +104,7 @@ export function diffFrame(spec, figma) {
     const near = (a, b) => Math.abs((a ?? 0) - (b ?? 0)) <= 1;
     // 글자 칸의 크기는 글꼴 대체(Noto Sans KR)만으로도 달라진다. 사람이 고친 자리로 세지 않는다.
     if (s.t !== "x" && (!near(s.w, node.w) || !near(s.h, node.h))) add(node.p, "크기", `${Math.round(s.w)}×${Math.round(s.h)}`, `${node.w}×${node.h}`, false, "크기는 토큰 단계와 레이아웃이 함께 정한다. 사람이 정한다");
-    if (!near(s.r || 0, node.r || 0)) add(node.p, "모서리", s.r || 0, node.r || 0, false, "모서리는 사람이 정한다");
+    if (!isInstance && !near(s.r || 0, node.r || 0)) add(node.p, "모서리", s.r || 0, node.r || 0, false, "모서리는 사람이 정한다");
   }
 
   for (const [p, s] of specNodes) {
