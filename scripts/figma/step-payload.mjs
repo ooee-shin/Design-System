@@ -85,21 +85,44 @@ export function fnv(s) {
  *
  * 코드는 한 줄짜리 긴 문자열 대신 줄 배열로 싣는다. 모델이 옮겨 적을 때 긴 줄이 접히면 문법이 깨지기 때문이다.
  */
-export function loaderCode(builderSource) {
-  const lines = builderSource.split("\n").map((line) => JSON.stringify(line)).join(",\n");
-  return `const TAG = ${JSON.stringify(TAG)};
+export function loaderSteps(builderSource, maxChars) {
+  const all = builderSource.split("\n");
+  const expect = fnv(builderSource);
+  // 한 단계가 maxChars 를 넘지 않게 줄을 나눈다. 줄 하나가 그보다 길면 어쩔 수 없이 그 줄만 담는다.
+  const groups = [];
+  let group = [], size = 0;
+  for (const line of all) {
+    const cost = JSON.stringify(line).length + 2;
+    if (group.length && size + cost > maxChars) { groups.push(group); group = []; size = 0; }
+    group.push(line);
+    size += cost;
+  }
+  if (group.length) groups.push(group);
+
+  return groups.map((lines, i) => `const TAG = ${JSON.stringify(TAG)};
 const KEY = ${JSON.stringify(BUILDER_KEY)};
-const EXPECT = ${fnv(builderSource)};
+const PART = ${i};
+const LAST = ${i === groups.length - 1};
+const EXPECT = ${expect};
 const CODE = [
-${lines}
+${lines.map((line) => JSON.stringify(line)).join(",\n")}
 ].join("\\n");
 const fnv = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return h >>> 0; };
-if (fnv(CODE) !== EXPECT) return { error: "옮기는 중 builder 가 바뀌었다. 이 단계 파일을 처음부터 다시 읽어 그대로 넘긴다" };
-figma.root.setSharedPluginData(TAG, KEY, CODE);
+const prev = PART === 0 ? "" : figma.root.getSharedPluginData(TAG, KEY);
+if (PART !== 0 && !prev) return { error: "앞의 「builder 를 문서에 둔다」 조각이 없다. 그 단계부터 다시 돌린다" };
+const next = prev ? prev + "\\n" + CODE : CODE;
+figma.root.setSharedPluginData(TAG, KEY, next);
 const back = figma.root.getSharedPluginData(TAG, KEY);
-if (back !== CODE) return { error: "문서에 저장한 builder 가 넣은 것과 다르다" };
-return { stored: CODE.length, hash: EXPECT };
-`;
+if (back !== next) return { error: "문서에 저장한 builder 가 넣은 것과 다르다" };
+if (!LAST) return { part: PART, stored: next.length };
+if (fnv(next) !== EXPECT) return { error: "옮기는 중 builder 가 바뀌었다. 「builder 를 문서에 둔다」 조각을 처음부터 다시 돌린다" };
+return { stored: next.length, hash: EXPECT };
+`);
+}
+
+/** 조각이 하나뿐일 때 쓰는 편의 함수. 시험이 이 자리를 본다. */
+export function loaderCode(builderSource) {
+  return loaderSteps(builderSource, Number.MAX_SAFE_INTEGER)[0];
 }
 
 /**

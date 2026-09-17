@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { buildDriver, fnv, foldInstances, INSTANCE_FIELDS, loaderCode, stripComments, stripLineComment } from "./step-payload.mjs";
+import { buildDriver, fnv, foldInstances, INSTANCE_FIELDS, loaderCode, loaderSteps, stripComments, stripLineComment } from "./step-payload.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const builder = readFileSync(path.join(here, "builder.js"), "utf8");
@@ -92,6 +92,33 @@ test("build 단계는 조각만 싣고 문서의 builder 를 꺼내 쓴다", () 
   assert.ok(code.includes("const EXPECT = 111;"), "조각 내용도 해시로 지킨다");
   assert.ok(code.length < 1500, `driver 는 작아야 한다. 지금 ${code.length}자`);
   assert.doesNotThrow(() => new AsyncFunction(code));
+});
+
+test("builder 가 한 단계에 안 들어가면 조각으로 나눠 보낸다", () => {
+  const source = stripComments(builder);
+  const parts = loaderSteps(source, 4000);
+  assert.ok(parts.length >= 3, `4,000자 한도면 여러 조각이어야 한다. 지금 ${parts.length}개`);
+  for (const [i, code] of parts.entries()) {
+    assert.ok(code.length < 5200, `${i}번 조각이 너무 크다: ${code.length}자`);
+    assert.ok(code.includes(`const PART = ${i};`));
+    assert.ok(code.includes(`const LAST = ${i === parts.length - 1};`));
+    assert.doesNotThrow(() => new AsyncFunction(code));
+  }
+  // 첫 조각만 처음부터 쓰고 나머지는 앞에 이어 붙인다. 순서를 건너뛰면 멈춘다.
+  assert.ok(parts[0].includes('const prev = PART === 0 ? "" : figma.root.getSharedPluginData(TAG, KEY);'));
+  assert.ok(parts[1].includes("앞의 「builder 를 문서에 둔다」 조각이 없다"));
+});
+
+test("조각을 이어 붙이면 원본과 글자까지 같다", () => {
+  const source = stripComments(builder);
+  const joined = loaderSteps(source, 4000)
+    .map((code) => {
+      const body = code.slice(code.indexOf("const CODE = [") + "const CODE = [".length, code.indexOf('].join("\\n");'));
+      return JSON.parse(`[${body}]`).join("\n");
+    })
+    .join("\n");
+  assert.equal(joined, source);
+  assert.ok(loaderSteps(source, 4000).at(-1).includes(`const EXPECT = ${fnv(source)};`), "마지막 조각이 전체 해시를 본다");
 });
 
 test("loader 가 실은 코드를 그대로 되돌려 준다", () => {
