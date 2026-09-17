@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @
 
 `$ARGUMENTS`가 「되읽기」로 시작하면 ④, 아니면 ②다.
 
-`figma-page-agent.md`의 규칙 1~3과 「제작과 검수」 1~3(컴포넌트 모음 읽기, 모음이 없으면 요청, 컴포넌트·토큰 대응 정리)은 이 명령보다 앞에서 채워진다. Figma에는 `@ooee/ui`를 반영한 컴포넌트 모음이 없고(`ai-environment.md` 「스파이크 결과」의 R1), 그 자리는 `docs/system/README.md`의 「Component」 표가 맡는다. 컴포넌트 선택은 `/generate-code`가, 재사용 검사는 `/review-design`이 이미 했다. 이 명령은 그 코드의 `data-slot`을 레이어 이름으로, class의 `oe-*` 이름을 변수로 옮길 뿐이므로 컴포넌트 모음을 다시 묻지 않는다.
+`figma-page-agent.md`의 규칙 1~3과 「제작과 검수」 1~3(컴포넌트 모음 읽기, 모음이 없으면 요청, 컴포넌트·토큰 대응 정리)은 이 명령보다 앞에서 채워진다. Figma에 `@ooee/ui`를 반영한 컴포넌트 모음은 카탈로그(`apps/sandbox/src/app/catalog`)로 만들어 두었지만 화면은 `--instances`로 돌린 자리만 그 인스턴스이고, 나머지 자리는 `docs/system/README.md`의 「Component」 표가 맡는다. 컴포넌트 선택은 `/generate-code`가, 재사용 검사는 `/review-design`이 이미 했다. 이 명령은 그 코드의 `data-slot`을 레이어 이름으로, class의 `oe-*` 이름을 변수로 옮길 뿐이므로 컴포넌트 모음을 다시 묻지 않는다.
 
 ## 입력
 
@@ -84,6 +84,12 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 모든 프레임에서 `textsWithoutStyle`이 비어 있다(모든 글자가 텍스트 스타일이다).
 - 모든 프레임에서 `rootWithoutFill`이 `false`다(루트 프레임에 바탕 칠이 있다). 칠이 없는 루트는 `unboundPaints`에 잡히지 않는다.
 - 5단계에서 모은 `unmappedColors`·`unmappedText`·`defaultTextColor`가 비어 있다.
+`--instances`로 돌렸을 때 build 단계가 「컴포넌트를 찾지 못했다」 또는 「컴포넌트의 글자 수가 다르다」 `error`를 돌려주면, 그 파일에 카탈로그가 없거나 낡은 것이다. 3번의 「멈추고 보고한다」를 그대로 따르되, 사람에게 아래를 먼저 하도록 보고에 적는다. 카탈로그는 `screens.ts`의 화면이 아니므로 이 명령으로 부르지 않고 도구를 직접 돌린다.
+
+```bash
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
+# manifest 의 steps 를 use_figma 에 fileKey 와 함께 순서대로 넘긴다
+```
 
 하나라도 어기면 「완료」라고 쓰지 않고 「검사 실패」로 보고한다. `opacityOnToken`은 완료를 막지 않는다. 코드가 `border-[var(--brand-500)]/30`처럼 색에 투명도를 붙여 쓴 자리를 그대로 옮긴 것이지만 `figma-page-agent.md` 규칙 5(토큰에 임의 투명도 금지)와 부딪치므로 「확인이 필요한 것」에 적는다.
 
@@ -96,7 +102,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 글꼴 대체로 생긴 글자 폭 차이와 그 때문에 끝 글자가 조금 잘리는 자리
 - 그림자(`shadow-*`): 옮기지 않는다. oe 토큰에 그림자 색이 없다
 - 레이어 이름: `data-slot`, 없으면 role, 없으면 태그 이름이라 `div`·`td`·`span`이 많다
-- 컴포넌트는 인스턴스가 아니라 프레임이다(Code Connect 없음)
+- 컴포넌트는 기본적으로 인스턴스가 아니라 프레임이다(Code Connect 없음). `--instances`로 돌린 자리만 카탈로그 컴포넌트의 인스턴스다
 
 ### 8. 보고한다
 
@@ -120,7 +126,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 변수 값은 prepare.mjs를 돌린 시점의 `packages/tokens`에서 옮겨 적었고 원본과 자동 동기화되지 않는다. 색 매핑과 brand seed는 Provisional이다.
 
 ## 참조한 것
-- 컴포넌트 모음: Figma에 없음(스파이크 R1). `docs/system/README.md`의 「Component」 표와 화면 코드(`apps/sandbox/src/app/<key>`)가 대신한다.
+- 컴포넌트 모음: 카탈로그(`apps/sandbox/src/app/catalog`)로 Figma에 만들어 둔 컴포넌트가 있지만, 화면은 `--instances`로 돌린 자리만 그 인스턴스다. 나머지는 `docs/system/README.md`의 「Component」 표와 화면 코드(`apps/sandbox/src/app/<key>`)가 대신한다.
 
 ## 승인된 예외
 - 글꼴: Pretendard Variable 대신 Noto Sans KR, semibold는 Bold (2026-09-15 유진식 승인)

@@ -12,6 +12,8 @@ import { existsSync, globSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { foldInstances, stripComments } from "./step-payload.mjs";
+
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback; };
 const all = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] : []));
@@ -24,7 +26,7 @@ if (!key || !screenName) {
 }
 const base = opt("base", "http://localhost:3001");
 const width = Number(opt("width", "1440"));
-// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 인스턴스를 만드는 단계가 매우 느리다(아래 주석).
+// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 까닭은 아래 prep() 의 주석에 있다.
 const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
 // 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
@@ -37,7 +39,7 @@ if (duplicate !== undefined) throw new Error(`--state 이름이 겹친다: ${dup
 
 const STEP_LIMIT = 19000; // use_figma 한도는 50,000자지만, 모델이 20,000자쯤을 옮기다 줄바꿈을 하나 더해 문법이 깨진 적이 있다
 const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
-const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. builder.js(약 11,000자)가 단계마다 함께 들어가므로 작게 둔다
+const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. 주석을 뺀 builder.js(약 13,400자)가 단계마다 함께 들어가므로 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
@@ -131,7 +133,9 @@ const runs = [];
 const unknownIcons = [];
 function prep(node, nodePath, icons, primitives) {
   node.path = nodePath;
-  // 인스턴스는 --instances 를 줄 때만 쓴다. Figma 쪽에서 인스턴스 하나를 만드는 데 몇 분이 걸린다.
+  // 인스턴스는 --instances 를 줄 때만 쓴다. 느려서가 아니라(2026-09-17 측정: 하나에 0.2초),
+  // 카탈로그를 Figma 에 먼저 올려 둔 파일에서만 맞기 때문이다. 그 이름의 컴포넌트가 없으면
+  // 안쪽을 싣지 않은 탓에 대신 그릴 것이 없으므로 builder 가 error 로 멈춘다.
   if (!useInstances) delete node.inst;
   const where = `${nodePath} ${node.n || node.s || ""}`.slice(0, 60);
   if (node.bg) node.bg = resolve(node.bg, `bg ${where}`) || undefined;
@@ -226,7 +230,10 @@ const chunkText = (c) => {
   const { nodes, icons, primitives, ...meta } = c;
   return `${JSON.stringify(meta).slice(0, -1)},"primitives":${JSON.stringify(primitives)},\n"icons":{${Object.entries(icons).map(([n, s]) => `\n${JSON.stringify(n)}:${JSON.stringify(s)}`).join(",")}},\n"nodes":[\n${nodes.map(format).join(",\n")}\n]}`;
 };
-const builder = readFileSync(path.join(here, "builder.js"), "utf8");
+// 단계 파일에 실을 builder 는 주석과 빈 줄을 뺀다. 한 단계의 8할이 builder 이고, 모델이 그것을
+// 한 글자도 틀리지 않게 다시 쳐서 use_figma 에 넘긴다. 짧을수록 단계가 줄고 옮겨 적다 틀릴 자리도 준다.
+// 저장소의 builder.js 는 그대로 두므로 읽을 때는 주석이 있는 원본을 본다. 규칙은 step-payload.mjs 에 있다.
+const builder = stripComments(readFileSync(path.join(here, "builder.js"), "utf8"));
 const buildCode = (chunks) => {
   const body = `[\n${chunks.map(chunkText).join(",\n")}\n]`;
   const expect = fnv(JSON.stringify(JSON.parse(body)));
@@ -249,6 +256,7 @@ trees.forEach(({ state, tree }, i) => {
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
   tree = fold(tree, true);
   inferLayout(tree);
+  foldInstances(tree);
   // 해석이 끝난 사양을 남긴다. 되읽기가 Figma 에서 읽은 값을 이 사양과 견준다.
   writeFileSync(path.join(work, `spec-${i}.json`), JSON.stringify(tree));
   const frameName = `${screenName} / ${state.label} · ${device} ${width}`;

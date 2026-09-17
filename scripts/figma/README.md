@@ -33,6 +33,7 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - 모바일 화면은 `--width 390 --height 844`를 준다. 헤드리스 Chrome 창은 500px보다 좁아지지 않아서 창은 500으로 두고 문서 폭을 줄여 읽는다. 프레임 이름의 기기 표기는 폭 480 이하면 `Mobile`이다.
 - `--version`은 같은 날 같은 화면의 새 파일 이름에 ` · v2`처럼 버전을 붙인다. 이 기기에서 만든 이름은 `.figma-work/files.json`에 쌓여 같은 이름을 자동으로 피한다.
 - 돌릴 때마다 `.figma-work/<key>/`를 지우고 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- **두 개를 한꺼번에 돌리지 않는다.** 화면을 읽을 때 띄우는 Chrome 이 디버깅 포트 9222 를 쓰므로 서로 막혀 멈춘다. 굳이 나란히 돌려야 하면 `CDP_PORT=9301` 처럼 실행마다 다른 포트를 준다.
 
 `manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
 
@@ -64,19 +65,34 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 `apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
 
 ```bash
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 1600
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
+
+**이 실행은 지금 42단계 702,691자다(2026-09-17, 컴포넌트 139개).** 화면 하나가 5~6단계인 것과 견주면 크다. 단계마다 `builder.js` 가 통째로 들어가므로 그 글자의 74%(521,586자)는 39번 되풀이되는 같은 코드이고, 카탈로그 노드 자체는 18만 자뿐이다. 옮겨 적는 데 걸리는 시간이 곧 이 글자 수라, 컴포넌트를 더할수록 단계가 선형으로 는다.
+
+줄이려면 반복분을 건드려야 한다. 두 갈래가 있고 아직 하지 않았다.
+
+- 카탈로그를 컴포넌트 종류별로 쪼개 한 번에 한 종류만 옮긴다(`--only Button` 같은 옵션).
+- `builder.js` 를 첫 단계에서 한 번만 보내고 이후 단계는 조각만 싣는다. Figma plugin 은 호출마다 새 함수 본문이라 지금 구조로는 안 되고, 코드를 문서에 저장해 두고 되읽는 식이 필요하다.
 
 변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
 
+`--height` 는 화면 전체가 들어갈 만큼 준다. 항목을 더해 화면이 길어졌으면 그만큼 올린다. 작게 주면 브라우저 스크린샷이 잘려 눈으로 대조할 때 아래쪽을 보지 못한다.
+
 ## 컴포넌트 인스턴스 (실험)
 
-`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/fill·brand·xlarge` 같은 이름을 만들고, 그 이름의 컴포넌트가 있으면 인스턴스를, 없으면 지금처럼 프레임을 그린다(`instanceMiss` 에 남는다). 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
+`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/fill·brand·xlarge` 같은 이름을 만든다. 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
 
-**기본은 꺼 둔다.** Figma 쪽에서 인스턴스를 만드는 단계가 매우 느리다. 인스턴스 둘을 놓는 단계 하나가 23분 걸린 적이 있다(같은 크기의 보통 단계는 1~2분). 원인은 카탈로그 페이지를 불러오는 비용으로 보이며, 컴포넌트 id 를 미리 뽑아 `getNodeByIdAsync` 로 가져오는 방식이 다음 후보다.
+**인스턴스로 놓을 자리는 안쪽을 단계에 싣지 않는다.** 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은 글자뿐이고, 노드 자신의 칠·테두리·모서리·오토 레이아웃도 컴포넌트가 가진 값이라 뗀다. 그만큼 옮겨 적을 글자가 준다(관리자 로그인: 6단계 67,456자 → 5단계 50,095자).
+
+**그래서 그 이름의 컴포넌트가 없으면 그리지 않고 멈춘다.** 안쪽을 싣지 않았으니 대신 그릴 것이 없다. build 단계가 `error` 로 「컴포넌트를 찾지 못했다: `<이름>`」 또는 「컴포넌트의 글자 수가 다르다」를 돌려준다. 카탈로그를 그 파일에 먼저 올리고 그 단계부터 다시 돌린다. 그때까지 그린 것은 남는다.
+
+**기본은 꺼 둔다.** 느려서가 아니라, 카탈로그를 이미 올려 둔 파일에서만 맞기 때문이다. 예전에 적어 둔 「인스턴스 둘에 23분」은 틀린 기록이었다. 2026-09-17 에 `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 훑기 17ms(그때 카탈로그는 77개였다. 지금은 135개이고 이 비용만 개수에 비례한다), `createInstance` 131ms, 글자 바꾸기 11ms 로 **인스턴스 하나에 0.2초**다. 그 23분은 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다(그 실행은 11단계 157,897자).
+
+**전제 하나.** 글자를 슬롯에 넣을 때 `instance.findAllWithCriteria({types:["TEXT"]})` 가 돌려주는 차례가 화면 사양을 전위 순회한 차례와 같다고 본다. 카탈로그와 화면이 같은 React 컴포넌트에서 나오므로 지금은 맞지만, 코드로 확인할 수 있는 것이 아니다. 인스턴스 안 글자가 뒤바뀌어 보이면 이 전제를 먼저 의심한다.
 
 되읽기는 인스턴스를 만나면 안쪽으로 내려가지 않고 주 컴포넌트 이름으로 어떤 컴포넌트인지 확정한다. 사람이 Figma 에서 다른 컴포넌트로 바꾸면 「컴포넌트」 변화로 나오며 사람이 정할 것으로 분류된다.
 
@@ -110,5 +126,5 @@ Figma를 다시 읽으면(`get_design_context`) 레이어 이름, 칠·테두리
 - **글자 크기.** `oe/text-*`에 없는 크기는 가장 가까운 스타일에 묶고 `unmappedText`에 적는다. Skill은 이 경우를 검사 실패로 본다.
 - **자동 동기화가 아니다.** 변수 값은 `prepare.mjs`를 돌린 시점의 `packages/tokens`에서 옮겨 적은 것이다. 색 매핑과 brand seed는 Provisional이다.
 - **Figma plugin 실행 환경.** 코드는 async 함수 본문으로 돌고 한 번에 50,000자까지다. `setPluginData` 대신 `setSharedPluginData`만 된다. 세션을 시작한 뒤 등록한 MCP 서버는 그 세션에 실리지 않는다.
-- **Code Connect.** bluekey 팀이 Pro 플랜이라 쓸 수 없다. 컴포넌트는 인스턴스가 아니라 `data-slot` 이름을 가진 프레임이다.
+- **Code Connect.** bluekey 팀이 Pro 플랜이라 쓸 수 없다. 화면의 컴포넌트는 기본적으로 인스턴스가 아니라 `data-slot` 이름을 가진 프레임이다. 위 「컴포넌트 인스턴스」 절대로 `--instances` 를 준 자리만 인스턴스다.
 - **폴더.** `create_new_file`은 파일이 들어간 폴더를 돌려주지 않는다. 결과물 폴더에서 사람이 확인한다.
