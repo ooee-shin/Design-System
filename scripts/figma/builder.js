@@ -126,6 +126,14 @@ function place(node, spec, parentBox, parent) {
   if (spec.portal) { node.layoutPositioning = "ABSOLUTE"; node.x = ex; node.y = ey; }
 }
 
+// 이 페이지에 이미 있는 컴포넌트 이름. 이름이 같은 프레임을 지운 **뒤에** 처음 세므로,
+// 다시 그리는 프레임의 것은 여기에 들어오지 않는다. 다른 프레임에 있던 것만 남는다.
+let componentNames = null;
+function existingComponentNames() {
+  if (!componentNames) componentNames = new Set(page.findAllWithCriteria({ types: ["COMPONENT"] }).map((c) => c.name));
+  return componentNames;
+}
+
 // 카탈로그로 만들어 둔 컴포넌트를 이름으로 찾는다. 한 번 찾은 것은 기억한다.
 // 문서 전체를 뒤지면 모든 페이지를 불러오느라 한 단계가 몇십 분씩 걸린다. 「컴포넌트」 페이지만 본다.
 let componentIndex = null;
@@ -259,9 +267,17 @@ async function build(spec, parent, parentBox) {
   report.created++;
   // 카탈로그의 항목은 프레임이 아니라 Figma 컴포넌트로 만든다. 화면을 그릴 때 인스턴스로 놓을 수 있다.
   if (spec.component) {
+    const name = `${spec.component.name}/${spec.component.props}`;
+    // 같은 이름이 이 페이지에 이미 있으면 만들지 않고 멈춘다. 이름이 겹치면 Assets 에서 어느 쪽이 나올지
+    // 알 수 없고, 되읽기도 이름으로 컴포넌트를 찾으므로 조용히 틀린다. 실제로 --only 로 나눠 올리다
+    // 예전 프레임에 있던 것과 26개가 겹친 적이 있다(2026-09-17).
+    if (existingComponentNames().has(name)) {
+      throw new Error(`같은 이름의 컴포넌트가 이 페이지에 이미 있다: ${name}. 예전 프레임을 지우고 다시 올린다`);
+    }
     node = figma.createComponentFromNode(node);
-    node.name = `${spec.component.name}/${spec.component.props}`;
+    node.name = name;
     node.description = `${spec.component.name} ${spec.component.props}. packages/ui 의 코드에서 그대로 옮겼다.`;
+    existingComponentNames().add(name);
     report.components = (report.components || 0) + 1;
   }
   // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
