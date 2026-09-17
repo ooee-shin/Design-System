@@ -68,7 +68,9 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 1600
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
 
-변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다.
+변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
+
+한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
 
 ## 컴포넌트 인스턴스 (실험)
 

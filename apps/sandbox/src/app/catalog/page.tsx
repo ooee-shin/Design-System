@@ -11,11 +11,42 @@
  * 비워 둔 자리: 없음. 이 화면은 요구사항이 아니라 코드의 변형 정의에서 나온다.
  */
 
-import { Badge, Button, Checkbox, Chip, Field, Input, Select } from "@ooee/ui";
+import { RiArrowLeftLine, RiHeart3Fill, RiHeart3Line, RiHomeFill, RiSearchLine, RiStarFill, RiStarLine, RiUser3Line } from "@remixicon/react";
+
+import {
+  AppHeader,
+  Badge,
+  BottomNavigation,
+  Button,
+  Checkbox,
+  Chip,
+  Combobox,
+  Field,
+  Input,
+  InputButton,
+  NotificationBadge,
+  NumberInput,
+  Radio,
+  RadioGroup,
+  Select,
+  SelectBox,
+  SelectBoxGroup,
+  Switch,
+  Textarea,
+  ToggleButton,
+} from "@ooee/ui";
 
 type Item = { props: string; node: React.ReactNode };
 
 function Group({ component, items }: { component: string; items: Item[] }) {
+  // 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고, 인스턴스가 어느 쪽에 붙을지 알 수 없다.
+  // 이 화면은 미리 그려지므로 여기서 멈추면 빌드가 실패해 바로 드러난다.
+  const seen = new Set<string>();
+  for (const item of items) {
+    if (seen.has(item.props)) throw new Error(`${component} 의 변형 이름이 겹친다: ${item.props}`);
+    seen.add(item.props);
+  }
+
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-oe-label font-medium text-oe-foreground-secondary">{component}</h2>
@@ -37,6 +68,11 @@ const BADGE_VARIANTS = ["fill", "tonal", "outlined"] as const;
 const BADGE_TONES = ["brand", "neutral", "warning", "danger", "success", "info"] as const;
 const INPUT_VARIANTS = ["outline", "filled"] as const;
 const INPUT_SIZES = ["small", "regular", "large", "xlarge"] as const;
+const SWITCH_SIZES = ["small", "medium", "large"] as const; // Switch만 크기 이름이 다르다
+const SELECT_OPTIONS = [
+  { value: "a", label: "첫째" },
+  { value: "b", label: "둘째" },
+];
 
 export default function CatalogPage() {
   return (
@@ -54,7 +90,8 @@ export default function CatalogPage() {
               ),
             })),
           ),
-          ...CONTROL_SIZES.map((controlSize) => ({
+          // regular 은 위 변형 묶음에 이미 있다. 여기서 또 만들면 이름이 같은 컴포넌트가 둘이 된다.
+          ...CONTROL_SIZES.filter((controlSize) => controlSize !== "regular").map((controlSize) => ({
             props: `fill·brand·${controlSize}`,
             node: (
               <Button controlSize={controlSize}>버튼</Button>
@@ -141,6 +178,179 @@ export default function CatalogPage() {
           { props: "required", node: <Field label="이름" required><Input aria-label="필수 이름" placeholder="입력" /></Field> },
           { props: "helper", node: <Field label="이름" helperText="도움말"><Input aria-label="도움말 이름" placeholder="입력" /></Field> },
           { props: "error", node: <Field label="이름" errorMessage="오류 문구"><Input aria-label="오류 이름" placeholder="입력" aria-invalid /></Field> },
+        ]}
+      />
+
+      <Group
+        component="Switch"
+        items={[
+          ...SWITCH_SIZES.map((controlSize) => ({ props: `${controlSize}·off`, node: <Switch controlSize={controlSize} aria-label={`${controlSize} 끄기`} /> })),
+          ...SWITCH_SIZES.map((controlSize) => ({ props: `${controlSize}·on`, node: <Switch controlSize={controlSize} defaultChecked aria-label={`${controlSize} 켜기`} /> })),
+          { props: "medium·disabled", node: <Switch disabled aria-label="비활성" /> },
+        ]}
+      />
+
+      <Group
+        component="Radio"
+        items={[
+          { props: "off", node: <RadioGroup defaultValue="b"><Radio value="a" aria-label="끄기" /></RadioGroup> },
+          { props: "on", node: <RadioGroup defaultValue="a"><Radio value="a" aria-label="켜기" /></RadioGroup> },
+          { props: "disabled", node: <RadioGroup defaultValue="b"><Radio value="a" disabled aria-label="비활성" /></RadioGroup> },
+        ]}
+      />
+
+      <Group
+        component="Textarea"
+        items={[
+          ...INPUT_VARIANTS.map((variant) => ({
+            props: `${variant}·기본`,
+            node: <Textarea variant={variant} aria-label={`${variant} 내용`} placeholder="입력" />,
+          })),
+          { props: "outline·값", node: <Textarea aria-label="값" defaultValue="입력한 내용" /> },
+          { props: "outline·disabled", node: <Textarea aria-label="비활성" placeholder="입력" disabled /> },
+        ]}
+      />
+
+      <Group
+        component="InputButton"
+        items={[
+          ...INPUT_VARIANTS.flatMap((variant) =>
+            INPUT_SIZES.map((controlSize) => ({
+              props: `${variant}·${controlSize}`,
+              node: <InputButton variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="선택" />,
+            })),
+          ),
+          { props: "outline·regular·값", node: <InputButton aria-label="값" value="2026-09-17" /> },
+          { props: "outline·regular·disabled", node: <InputButton aria-label="비활성" placeholder="선택" disabled /> },
+        ]}
+      />
+
+      <Group
+        component="NumberInput"
+        items={[
+          ...INPUT_SIZES.map((controlSize) => ({
+            props: `outline·${controlSize}`,
+            node: <NumberInput controlSize={controlSize} aria-label={`수량 ${controlSize}`} defaultValue={1} />,
+          })),
+          { props: "outline·regular·split", node: <NumberInput aria-label="나눠 놓기" defaultValue={1} controlsPosition="split" /> },
+          { props: "outline·regular·컨트롤없음", node: <NumberInput aria-label="컨트롤 없음" defaultValue={1} hideControls /> },
+        ]}
+      />
+
+      <Group
+        component="Combobox"
+        items={INPUT_VARIANTS.flatMap((variant) =>
+          INPUT_SIZES.map((controlSize) => ({
+            props: `${variant}·${controlSize}`,
+            node: <Combobox variant={variant} controlSize={controlSize} ariaLabel={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />,
+          })),
+        )}
+      />
+
+      <Group
+        component="ToggleButton"
+        items={[
+          ...CONTROL_SIZES.map((controlSize) => ({
+            props: `ghost·brand·${controlSize}`,
+            node: <ToggleButton controlSize={controlSize} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label={`즐겨찾기 ${controlSize}`} />,
+          })),
+          { props: "ghost·brand·regular·pressed", node: <ToggleButton defaultPressed icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 켬" /> },
+          { props: "ghost·custom·regular", node: <ToggleButton tone="custom" color="like" icon={<RiHeart3Line aria-hidden />} activeIcon={<RiHeart3Fill aria-hidden />} aria-label="좋아요" /> },
+          { props: "tonal·brand·regular", node: <ToggleButton variant="tonal" icon={<RiStarLine aria-hidden />} aria-label="즐겨찾기 담기" /> },
+          { props: "ghost·brand·regular·수", node: <ToggleButton count={12} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 수" /> },
+        ]}
+      />
+
+      <Group
+        component="NotificationBadge"
+        items={[
+          { props: "dot", node: <NotificationBadge /> },
+          { props: "count·accent", node: <NotificationBadge count={5} /> },
+          { props: "count·neutral", node: <NotificationBadge count={5} tone="neutral" /> },
+          { props: "count·넘침", node: <NotificationBadge count={120} /> },
+        ]}
+      />
+
+      <Group
+        component="SelectBox"
+        items={[
+          {
+            props: "single·radio",
+            node: (
+              <SelectBoxGroup ariaLabel="한 개 고르기" defaultValue="a">
+                <SelectBox value="a" title="첫째" description="설명" />
+              </SelectBoxGroup>
+            ),
+          },
+          {
+            props: "multiple·checkbox",
+            node: (
+              <SelectBoxGroup ariaLabel="여러 개 고르기" selectionMode="multiple" defaultValue={["a"]}>
+                <SelectBox value="a" title="첫째" description="설명" />
+              </SelectBoxGroup>
+            ),
+          },
+          {
+            props: "single·none",
+            node: (
+              <SelectBoxGroup ariaLabel="표시 없음" trailingElement="none">
+                <SelectBox value="a" title="첫째" />
+              </SelectBoxGroup>
+            ),
+          },
+        ]}
+      />
+
+      <Group
+        component="AppHeader"
+        items={[
+          { props: "center", node: <div className="w-[390px]"><AppHeader title="지원요청" sticky={false} /></div> },
+          { props: "start", node: <div className="w-[390px]"><AppHeader title="지원요청" titleAlign="start" sticky={false} /></div> },
+          {
+            props: "center·양옆",
+            node: (
+              <div className="w-[390px]">
+                <AppHeader title="지원요청" sticky={false} leadingElement={<Button variant="ghost" controlSize="small" aria-label="뒤로"><RiArrowLeftLine aria-hidden /></Button>} trailingElement={<NotificationBadge count={3} />} />
+              </div>
+            ),
+          },
+        ]}
+      />
+
+      <Group
+        component="BottomNavigation"
+        items={[
+          {
+            props: "bar·라벨없음",
+            node: (
+              <div className="w-[390px]">
+                <BottomNavigation
+                  value="home"
+                  items={[
+                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
+                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
+                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden /> },
+                  ]}
+                />
+              </div>
+            ),
+          },
+          {
+            props: "bar·라벨",
+            node: (
+              <div className="w-[390px]">
+                <BottomNavigation
+                  value="home"
+                  showLabels
+                  items={[
+                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
+                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
+                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden />, badge: { count: 2 } },
+                  ]}
+                />
+              </div>
+            ),
+          },
         ]}
       />
     </main>
