@@ -40,4 +40,12 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "블루키 관리자 웹의 고객의 소리 화면. 필터·상태 칩·표·상세 답변 패널·페이지 이동.",
     createdAt: "2026-09-15",
   },
+  {
+    key: "sto-my-page",
+    name: "사용자 마이페이지",
+    href: "/sto-my-page",
+    prompt:
+      "STO 사장님 앱의 마이페이지. 아이디·비밀번호·점포·이름·권한을 보여 주고, 수정 가능한 비밀번호만 현재 비밀번호를 확인해 조회한다.",
+    createdAt: "2026-09-16",
+  },
 ];
