@@ -123,13 +123,13 @@ export const SIDEBAR_STYLES: SidebarStyle[] = [
 
 export function AdminLayout({
   menuStyle = SIDEBAR_STYLES[0].name,
-  showRowIcons = true,
+  showRowIcons = false,
   favorites = [],
   children,
 }: {
   /** 좌측 메뉴 스타일의 이름. `SIDEBAR_STYLES` 중 하나다. */
   menuStyle?: string
-  /** 메뉴 줄 앞에 아이콘을 그릴지. */
+  /** 메뉴 줄 앞에 아이콘을 그릴지. 기본은 그리지 않는 쪽이며, 환경설정에서 켤 수 있다. */
   showRowIcons?: boolean
   /** 즐겨찾기에 담은 화면들. */
   favorites?: FavoriteItem[]

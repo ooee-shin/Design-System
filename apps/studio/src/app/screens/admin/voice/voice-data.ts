@@ -23,6 +23,27 @@ export const SOURCE = {
   request_transfer: "지원요청 전환",
 } as const;
 
+export const REGIONS = ["서울", "경기", "인천", "부산", "대구", "광주"];
+
+/** 점포는 실제로 천 곳을 넘는다. 예시는 열 곳이며 담당 SV 와 하나씩 짝지어 둔다. */
+export const STORES = [
+  { name: "마천동점", region: "서울" },
+  { name: "아현점", region: "서울" },
+  { name: "명동점", region: "서울" },
+  { name: "가재울점", region: "서울" },
+  { name: "동의대역점", region: "부산" },
+  { name: "부천원종점", region: "경기" },
+  { name: "인천검단신도시점", region: "인천" },
+  { name: "수원행궁점", region: "경기" },
+  { name: "광주상무점", region: "광주" },
+  { name: "대구월배점", region: "대구" },
+];
+
+/** 점포명으로 그 점포가 속한 지역을 찾는다. */
+export function regionOf(store: string) {
+  return STORES.find((item) => item.name === store)?.region ?? "";
+}
+
 export const CATEGORIES = ["운영 관련", "메뉴 관련", "물류 관련", "마케팅 및 프로모션", "사장님 앱 관련", "기타"];
 
 /**
@@ -206,6 +227,8 @@ const PERIOD_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
 
 export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
 export const CATEGORY_OPTIONS = CATEGORIES.map((name) => ({ value: name, label: name }));
+export const REGION_OPTIONS = REGIONS.map((name) => ({ value: name, label: name }));
+export const STORE_OPTIONS = STORES.map(({ name, region }) => ({ value: name, label: name, description: region }));
 export const SUPERVISOR_OPTIONS = SUPERVISORS.map(({ name, team }) => ({ value: name, label: name, description: team }));
 export const SOURCE_OPTIONS = Object.entries(SOURCE).map(([value, label]) => ({ value, label }));
 
@@ -224,6 +247,8 @@ export const EMPTY_FILTER = {
   keyword: "",
   status: [] as string[],
   category: [] as string[],
+  region: [] as string[],
+  store: [] as string[],
   sv: [] as string[],
   source: [] as string[],
   showMoved: false,
@@ -231,7 +256,7 @@ export const EMPTY_FILTER = {
 
 export type Filter = typeof EMPTY_FILTER;
 /** 값을 여러 개 고를 수 있는 축의 이름이다. */
-export type FilterAxis = "status" | "category" | "sv" | "source";
+export type FilterAxis = "status" | "category" | "region" | "store" | "sv" | "source";
 
 /** 오늘에서 `months` 달 앞선 날짜를 `YYYY-MM-DD` 로 돌려준다. */
 function monthsAgo(months: number) {
@@ -264,6 +289,8 @@ export function matches(voice: Voice, filter: Filter) {
 
   if (!chosen(filter.status, voice.status)) return false;
   if (!chosen(filter.category, voice.category)) return false;
+  if (!chosen(filter.region, regionOf(voice.store))) return false;
+  if (!chosen(filter.store, voice.store)) return false;
   if (!chosen(filter.sv, voice.sv)) return false;
   if (!chosen(filter.source, voice.source)) return false;
   return inPeriod(voice, filter);
@@ -272,6 +299,8 @@ export function matches(voice: Voice, filter: Filter) {
 const AXIS_VALUE: Record<FilterAxis, (voice: Voice) => string> = {
   status: (voice) => voice.status,
   category: (voice) => voice.category,
+  region: (voice) => regionOf(voice.store),
+  store: (voice) => voice.store,
   sv: (voice) => voice.sv,
   source: (voice) => voice.source,
 };
@@ -296,7 +325,15 @@ export function countsFor(axis: FilterAxis, filter: Filter) {
 export function isFiltered(filter: Filter) {
   if (filter.period !== EMPTY_FILTER.period || filter.from || filter.to) return true;
   if (filter.keyword) return true;
-  return filter.status.length + filter.category.length + filter.sv.length + filter.source.length > 0;
+  return (
+    filter.status.length +
+      filter.category.length +
+      filter.region.length +
+      filter.store.length +
+      filter.sv.length +
+      filter.source.length >
+    0
+  );
 }
 
 /** 축 하나에서 값을 켜고 끈다. */

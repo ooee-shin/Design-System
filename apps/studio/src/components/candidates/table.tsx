@@ -23,7 +23,10 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       <table
         data-slot="table"
         className={cn(
-          "w-full border-collapse text-sm whitespace-nowrap text-oe-foreground-primary",
+          // 열 폭을 내용이 정하지 않게 한다. 내용을 따르면 페이지를 옮길 때마다 글자 수에 따라
+          // 열 경계가 움직여서, 같은 자리를 훑던 눈이 매번 열을 다시 찾는다. 폭은 각 열이
+          // `width` 로 정하고, 정하지 않은 열이 남는 폭을 가져간다.
+          "w-full table-fixed border-collapse text-sm whitespace-nowrap text-oe-foreground-primary",
           className,
         )}
         {...props}
@@ -76,12 +79,18 @@ function TableRow({
 function TableHeaderCell({
   className,
   align = "center",
+  width,
   ...props
-}: React.ComponentProps<"th"> & { align?: "start" | "center" }) {
+}: React.ComponentProps<"th"> & {
+  align?: "start" | "center"
+  /** 이 열의 폭. 주지 않은 열이 남는 폭을 나눠 갖는다. */
+  width?: number
+}) {
   return (
     <th
       data-slot="table-header-cell"
       scope="col"
+      style={width ? { width } : undefined}
       className={cn(
         // 머리줄은 아래 경계선을 값 줄보다 진하게 두어 제목과 값이 한 덩어리로 읽히지 않게 한다.
         "border-b border-oe-border-primary bg-oe-background-secondary px-3 py-2.5 font-medium text-oe-foreground-secondary",

@@ -80,14 +80,14 @@ export function VoiceList({
             layout="fixed"
             fixedWidth="16rem"
             aria-label="점포명·제목 검색"
-            placeholder="점포명이나 제목으로 찾기"
+            placeholder="검색"
             leadingElement={<RiSearchLine />}
             clearable
             value={filter.keyword}
             onChange={(event) => onFilterChange({ keyword: event.target.value })}
             onClear={() => onFilterChange({ keyword: "" })}
           />
-          <Button variant="outline" tone="custom" color="excel" controlSize="small" leadingIcon={<RiDownloadLine />}>
+          <Button variant="fill" tone="custom" color="excel" controlSize="small" leadingIcon={<RiDownloadLine />}>
             엑셀 다운로드
           </Button>
         </span>
@@ -97,23 +97,27 @@ export function VoiceList({
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell>NO</TableHeaderCell>
-              <TableHeaderCell>점포명</TableHeaderCell>
-              <TableHeaderCell>담당SV</TableHeaderCell>
-              <TableHeaderCell>카테고리</TableHeaderCell>
-              <TableHeaderCell align="start">제목</TableHeaderCell>
-              <TableHeaderCell>첨부</TableHeaderCell>
-              <TableHeaderCell>처리상태</TableHeaderCell>
-              <TableHeaderCell>유입 경로</TableHeaderCell>
-              <TableHeaderCell>등록일</TableHeaderCell>
-              <TableHeaderCell>답변일</TableHeaderCell>
+              {/* 폭은 그 열에 들어올 수 있는 가장 긴 값을 기준으로 정한다. 제목만 폭을 두지
+                  않아 남는 자리를 모두 가져간다. */}
+              <TableHeaderCell width={56}>NO</TableHeaderCell>
+              <TableHeaderCell align="start" width={124}>점포명</TableHeaderCell>
+              <TableHeaderCell width={80}>담당SV</TableHeaderCell>
+              <TableHeaderCell width={132}>카테고리</TableHeaderCell>
+              <TableHeaderCell align="start" width={240}>제목</TableHeaderCell>
+              <TableHeaderCell width={52}>첨부</TableHeaderCell>
+              <TableHeaderCell width={104}>처리상태</TableHeaderCell>
+              <TableHeaderCell width={92}>유입 경로</TableHeaderCell>
+              <TableHeaderCell width={104}>등록일</TableHeaderCell>
+              <TableHeaderCell width={104}>답변일</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {shown.map((voice) => (
               <TableRow key={voice.no} interactive muted={Boolean(voice.movedTo)}>
                 <TableCell className="tabular-nums">{voice.no}</TableCell>
-                <TableCell>{voice.store}</TableCell>
+                {/* 글자 수가 제각각인 값은 왼쪽에 붙인다. 가운데로 두면 줄마다 시작점이
+                    달라져 눈이 매번 글자 앞을 다시 찾는다. */}
+                <TableCell align="start" className="truncate">{voice.store}</TableCell>
                 <TableCell>
                   {voice.sv}
                   <span className="block text-xs text-oe-foreground-tertiary">{teamOf(voice.sv)}</span>
@@ -122,7 +126,7 @@ export function VoiceList({
                   <Badge variant="outlined">{voice.category}</Badge>
                 </TableCell>
                 {/* 제목만 길이가 제각각이라 왼쪽에 붙이고, 이 열이 남는 폭을 가져간다. */}
-                <TableCell align="start" className="w-full max-w-0 truncate">
+                <TableCell align="start" className="truncate">
                   {voice.title}
                   {voice.movedTo ? (
                     <span className="ml-1.5 text-xs text-oe-foreground-tertiary">→ 지원요청 {voice.movedTo}</span>
@@ -136,14 +140,28 @@ export function VoiceList({
                   </span>
                 </TableCell>
                 <TableCell className="text-xs text-oe-foreground-tertiary">{SOURCE[voice.source]}</TableCell>
-                <TableCell className="tabular-nums">{voice.createdAt}</TableCell>
-                <TableCell className="tabular-nums">{voice.answeredAt ?? "-"}</TableCell>
+                {/* 날짜와 시각을 두 줄로 나눈다. 한 줄로 두면 이 두 열만 146px 을 쓰고 정작
+                    무슨 건인지 말하는 제목이 그만큼 좁아진다. */}
+                <TableCell className="tabular-nums">
+                  {voice.createdAt.slice(0, 10)}
+                  <span className="block text-xs text-oe-foreground-tertiary">{voice.createdAt.slice(11)}</span>
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {voice.answeredAt ? (
+                    <>
+                      {voice.answeredAt.slice(0, 10)}
+                      <span className="block text-xs text-oe-foreground-tertiary">{voice.answeredAt.slice(11)}</span>
+                    </>
+                  ) : (
+                    "-"
+                  )}
+                </TableCell>
               </TableRow>
             ))}
             {shown.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={10} className="py-10 text-oe-foreground-tertiary">
-                  조건에 맞는 건이 없습니다.
+                  데이터가 없습니다.
                 </TableCell>
               </TableRow>
             ) : null}

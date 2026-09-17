@@ -31,6 +31,8 @@ import {
   PERIOD_OPTIONS,
   SOURCE_OPTIONS,
   STATUS_OPTIONS,
+  REGION_OPTIONS,
+  STORE_OPTIONS,
   SUPERVISOR_OPTIONS,
   countsFor,
   isFiltered,
@@ -121,16 +123,23 @@ export default function Page() {
   // 담당자는 다섯이 넘어가면 눈으로 훑기 어려워진다. 고른 조건이 아니라 목록을 찾는 도구이므로
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
+  const [storeQuery, setStoreQuery] = useState("");
   const edit = (patch: Partial<Filter>) => setFilter((previous) => ({ ...previous, ...patch }));
 
   /** 한 축의 값 목록이다. 값마다 몇 건이 걸리는지 오른쪽 끝에 붙는다. */
-  const valueList = (axis: FilterAxis, options: { value: string; label: string; description?: string }[]) => {
+  const valueList = (
+    axis: FilterAxis,
+    options: { value: string; label: string; description?: string }[],
+    // 값이 많은 축은 상자에 높이를 준다. 다 뿌리면 그 축 하나가 패널을 차지해서 아래 축들이
+    // 화면 밖으로 밀려난다.
+    scroll = false,
+  ) => {
     const counts = countsFor(axis, filter);
     return (
       // 한 축의 값들을 상자로 묶는다. 축을 가르는 선이 패널 폭을 가로지르므로, 그 사이에 놓인
       // 값들이 어디까지 한 묶음인지 따로 말해 주어야 한다. 모서리는 바로 위 검색 칸과 같은
       // 컨트롤 값을 써서, 둘이 한 묶음으로 읽히게 한다.
-      <div className="flex flex-col divide-y divide-oe-border-secondary overflow-hidden rounded-oe-control border border-oe-border-secondary">
+      <div className={`flex flex-col divide-y divide-oe-border-secondary overflow-hidden rounded-oe-control border border-oe-border-secondary${scroll ? " max-h-60 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" : ""}`}>
         {options.length === 0 ? (
           <p className="px-3 py-2.5 text-sm text-oe-foreground-tertiary">데이터가 없습니다.</p>
         ) : null}
@@ -280,6 +289,53 @@ export default function Page() {
 
               <FilterSection label="카테고리" count={filter.category.length} onClear={() => edit({ category: [] })}>
                 {valueList("category", CATEGORY_OPTIONS)}
+              </FilterSection>
+
+              {/* 지역은 점포가 가진 값이므로 따로 세우지 않고 이 축 안에서 한 단계 위에 둔다.
+                  천 곳 가운데 하나를 고르는 일이 지역으로 먼저 좁히고 그 안에서 고르는 두
+                  단계가 된다. 지역만 골라 두고 점포를 고르지 않아도 그 지역 전체로 걸러진다. */}
+              <FilterSection
+                label="점포"
+                count={filter.region.length + filter.store.length}
+                onClear={() => edit({ region: [], store: [] })}
+              >
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap gap-1">
+                    {REGION_OPTIONS.map((option) => (
+                      <Chip
+                        key={option.value}
+                        shape="rounded"
+                        controlSize="small"
+                        active={filter.region.includes(option.value)}
+                        onClick={() => edit({ region: toggleValue(filter.region, option.value), store: [] })}
+                      >
+                        {option.label}
+                      </Chip>
+                    ))}
+                  </div>
+
+                  <Input
+                    controlSize="small"
+                    aria-label="점포 찾기"
+                    placeholder="점포명이나 지역으로 찾기"
+                    leadingElement={<RiSearchLine />}
+                    clearable
+                    value={storeQuery}
+                    onChange={(event) => setStoreQuery(event.target.value)}
+                    onClear={() => setStoreQuery("")}
+                  />
+                  {valueList(
+                    "store",
+                    // 점포명과 지역 어느 쪽으로도 찾는다. 위에서 지역을 골라 두었다면 그
+                    // 지역의 점포만 남는다.
+                    STORE_OPTIONS.filter((option) => {
+                      const keyword = storeQuery.trim();
+                      const matchesKeyword = option.label.includes(keyword) || option.description.includes(keyword);
+                      return matchesKeyword && (filter.region.length === 0 || filter.region.includes(option.description));
+                    }),
+                    true,
+                  )}
+                </div>
               </FilterSection>
 
               <FilterSection label="담당SV" count={filter.sv.length} onClear={() => edit({ sv: [] })}>

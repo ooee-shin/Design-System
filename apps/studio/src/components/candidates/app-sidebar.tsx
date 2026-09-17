@@ -86,7 +86,10 @@ export function AppSidebar({
         <div className="h-14 shrink-0" />
         <SearchForm />
       </SidebarHeader>
-      <SidebarContent className="gap-0">
+      {/* 맨 아래 묶음이 바닥에 닿지 않도록 아래를 비운다. 묶음마다 갖는 2px 만으로는 끝까지
+          내렸을 때 마지막 줄이 레일 밑변에 붙어, 목록이 거기서 끝난 것인지 잘린 것인지 읽히지
+          않는다. */}
+      <SidebarContent className="gap-0 pb-6">
         {/* 즐겨찾기는 사용자가 직접 담은 화면들이라 정해진 묶음보다 위에 선다. 하나도 담지 않은
             동안에는 이름만 남은 빈 묶음이 되므로 통째로 그리지 않는다. 안쪽은 2depth 와 같은
             줄이며, 담긴 것이 어느 묶음에서 왔든 여기서는 한 층으로 나란히 선다. */}
