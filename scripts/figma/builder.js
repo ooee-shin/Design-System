@@ -130,7 +130,14 @@ function place(node, spec, parentBox, parent) {
 // 다시 그리는 프레임의 것은 여기에 들어오지 않는다. 다른 프레임에 있던 것만 남는다.
 let componentNames = null;
 function existingComponentNames() {
-  if (!componentNames) componentNames = new Set(page.findAllWithCriteria({ types: ["COMPONENT"] }).map((c) => c.name));
+  if (!componentNames) {
+    componentNames = new Set();
+    for (const c of page.findAllWithCriteria({ types: ["COMPONENT"] })) {
+      // 묶인 것은 부모 Component Set 의 이름이, 아직 안 묶인 것은 남겨 둔 plugin data 가 세트 이름이다.
+      const set = c.parent && c.parent.type === "COMPONENT_SET" ? c.parent.name : c.getSharedPluginData(TAG, "set");
+      componentNames.add(`${set || ""}/${c.name}`);
+    }
+  }
   return componentNames;
 }
 
@@ -275,8 +282,11 @@ async function build(spec, parent, parentBox) {
       throw new Error(`같은 이름의 컴포넌트가 이 페이지에 이미 있다: ${name}. 예전 프레임을 지우고 다시 올린다`);
     }
     node = figma.createComponentFromNode(node);
-    node.name = name;
+    // 이름은 축=값 짝만 둔다. Figma 는 Variant 를 묶을 때 이 이름에서 옵션을 읽는다.
+    // 어느 세트에 들어갈지는 아래 plugin data 로 남기고, 마지막 combine 단계가 그것으로 묶는다.
+    node.name = spec.component.props;
     node.description = `${spec.component.name} ${spec.component.props}. packages/ui 의 코드에서 그대로 옮겼다.`;
+    node.setSharedPluginData(TAG, "set", spec.component.name);
     existingComponentNames().add(name);
     report.components = (report.components || 0) + 1;
   }

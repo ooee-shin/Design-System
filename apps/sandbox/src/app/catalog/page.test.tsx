@@ -26,7 +26,7 @@ afterEach(() => {
 function catalogNames(container: HTMLElement): Set<string> {
   const names = new Set<string>();
   for (const el of container.querySelectorAll<HTMLElement>("[data-component]")) {
-    names.add(`${el.dataset.component}/${el.dataset.variantProps || "기본"}`);
+    names.add(`${el.dataset.component}/${el.dataset.variantProps}`);
   }
   return names;
 }
@@ -41,14 +41,18 @@ function instanceNames(container: HTMLElement): Set<string> {
     const slot = el.dataset.slot;
     const attr = (name: string) => el.getAttribute(name);
     if (slot === "button" && attr("data-variant")) {
-      names.add(`Button/${attr("data-variant")}·${attr("data-tone") || "brand"}·${attr("data-size") || "regular"}`);
+      const state = el.hasAttribute("disabled") || attr("data-disabled") === "true" ? "disabled" : "기본";
+      names.add(`Button/variant=${attr("data-variant")}, tone=${attr("data-tone") || "brand"}, controlSize=${attr("data-size") || "regular"}, state=${state}`);
     }
     if (slot === "input-container" && attr("data-variant")) {
-      names.add(`Input/${attr("data-variant")}·${attr("data-size") || "regular"}`);
+      const input = el.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+      const state = input && input.disabled ? "disabled" : input && input.value ? "값 있음" : "비어 있음";
+      names.add(`Input/variant=${attr("data-variant")}, controlSize=${attr("data-size") || "regular"}, state=${state}`);
     }
     if (slot === "checkbox") {
       const checked = attr("data-checked");
-      names.add(`Checkbox/rounded·${checked === "true" ? "on" : checked === "indeterminate" ? "indeterminate" : "off"}`);
+      const state = attr("data-disabled") === "true" ? "disabled" : checked === "true" ? "on" : checked === "indeterminate" ? "indeterminate" : "off";
+      names.add(`Checkbox/shape=${attr("data-shape") || "rounded"}, state=${state}`);
     }
   }
   return names;
