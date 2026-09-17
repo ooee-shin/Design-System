@@ -219,6 +219,9 @@ export const EMPTY_FILTER = {
   period: "1m",
   from: "",
   to: "",
+  // 점포명과 제목을 한 칸에서 함께 찾는다. 나누면 찾는 낱말이 어느 쪽에 있는지 먼저 정해야
+  // 하는데, 대개 모른다.
+  keyword: "",
   status: [] as string[],
   category: [] as string[],
   sv: [] as string[],
@@ -255,6 +258,10 @@ function inPeriod(voice: Voice, filter: Filter) {
 
 export function matches(voice: Voice, filter: Filter) {
   if (!filter.showMoved && voice.movedTo) return false;
+
+  const keyword = filter.keyword.trim();
+  if (keyword && !voice.store.includes(keyword) && !voice.title.includes(keyword)) return false;
+
   if (!chosen(filter.status, voice.status)) return false;
   if (!chosen(filter.category, voice.category)) return false;
   if (!chosen(filter.sv, voice.sv)) return false;
@@ -288,6 +295,7 @@ export function countsFor(axis: FilterAxis, filter: Filter) {
 /** 되돌릴 것이 있는지. 목록에 무엇까지 담을지 정하는 전환 표시는 여기서 세지 않는다. */
 export function isFiltered(filter: Filter) {
   if (filter.period !== EMPTY_FILTER.period || filter.from || filter.to) return true;
+  if (filter.keyword) return true;
   return filter.status.length + filter.category.length + filter.sv.length + filter.source.length > 0;
 }
 

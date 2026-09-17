@@ -159,7 +159,24 @@ export default function Page() {
   return (
     <AdminLayout>
       <div className="flex min-h-0 flex-1 flex-col">
-        <PageHeader path={PAGE_PATH} title="점주의 소리" description={PAGE_DESCRIPTION} />
+        <PageHeader
+          path={PAGE_PATH}
+          title="점주의 소리"
+          description={PAGE_DESCRIPTION}
+          actions={
+            // 조건 패널을 여닫는 길이다. 목록 위가 아니라 화면 머리에 두어, 표 위 줄은 결과를
+            // 다루는 것들만 남긴다.
+            <Button
+              variant="outline"
+              tone="neutral"
+              leadingIcon={<RiSideBarLine />}
+              aria-expanded={panelOpen}
+              onClick={() => setPanelOpen((previous) => !previous)}
+            >
+              필터
+            </Button>
+          }
+        />
 
         <div className="flex min-h-0 flex-1">
           {/* 조건은 본문 위에 얹힌 상자가 아니라 본문 옆의 한 칸이다. 그래서 페이지 헤더가
@@ -299,23 +316,7 @@ export default function Page() {
           {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
               읽히지 않는다. */}
           <div className="flex min-w-0 flex-1 items-start overflow-auto px-6 pt-6 pb-16">
-            <VoiceList
-              filter={filter}
-              leading={
-                // 여닫는 길은 이 한 자리다. 표 위에 두어야 패널이 닫힌 뒤에도 같은 자리에서 다시
-                // 열 수 있고, 여는 버튼과 닫는 버튼이 화면을 오가지 않는다.
-                <Button
-                  variant="ghost"
-                  tone="neutral"
-                  controlSize="small"
-                  leadingIcon={<RiSideBarLine />}
-                  aria-expanded={panelOpen}
-                  onClick={() => setPanelOpen((previous) => !previous)}
-                >
-                  필터
-                </Button>
-              }
-            />
+            <VoiceList filter={filter} onFilterChange={edit} />
           </div>
         </div>
       </div>

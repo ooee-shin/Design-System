@@ -83,7 +83,7 @@ export default function Page() {
             ) : null}
           </div>
 
-          <VoiceList filter={filter} />
+          <VoiceList filter={filter} onFilterChange={edit} />
         </div>
       </div>
     </AdminLayout>
