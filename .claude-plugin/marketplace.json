@@ -1,0 +1,11 @@
+{
+  "name": "ooee",
+  "owner": { "name": "유진식" },
+  "plugins": [
+    {
+      "name": "ooee-harness",
+      "source": "./plugins/ooee-harness",
+      "description": "ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 명령 모음"
+    }
+  ]
+}

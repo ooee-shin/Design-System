@@ -59,6 +59,25 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 
 `manifest.json` 의 `folded` 가 이번에 접은 수를 센다. 「고객의 소리」는 Frame 124개가 69개로 줄었다.
 
+## 컴포넌트 카탈로그
+
+`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
+
+```bash
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 1600
+# manifest 의 steps 를 use_figma 에 순서대로 넘긴다
+```
+
+변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다.
+
+## 컴포넌트 인스턴스 (실험)
+
+`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/fill·brand·xlarge` 같은 이름을 만들고, 그 이름의 컴포넌트가 있으면 인스턴스를, 없으면 지금처럼 프레임을 그린다(`instanceMiss` 에 남는다). 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
+
+**기본은 꺼 둔다.** Figma 쪽에서 인스턴스를 만드는 단계가 매우 느리다. 인스턴스 둘을 놓는 단계 하나가 23분 걸린 적이 있다(같은 크기의 보통 단계는 1~2분). 원인은 카탈로그 페이지를 불러오는 비용으로 보이며, 컴포넌트 id 를 미리 뽑아 `getNodeByIdAsync` 로 가져오는 방식이 다음 후보다.
+
+되읽기는 인스턴스를 만나면 안쪽으로 내려가지 않고 주 컴포넌트 이름으로 어떤 컴포넌트인지 확정한다. 사람이 Figma 에서 다른 컴포넌트로 바꾸면 「컴포넌트」 변화로 나오며 사람이 정할 것으로 분류된다.
+
 ## 되읽기 (④)
 
 사람이 Figma에서 고친 것을 화면 코드로 되돌리는 흐름이다. `/design-page`의 「되읽기」 절이 이 순서를 따른다.

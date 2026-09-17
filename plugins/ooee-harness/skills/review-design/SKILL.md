@@ -1,34 +1,36 @@
 ---
 name: review-design
-description: apps/sandbox 화면 코드를 docs/system/의 quality.md·tokens.md·interaction.md·icon.md·컴포넌트 문서에 대조해 위반 목록과 건수를 낸다. 화면 코드 검수 요청에 쓴다. 고치지 않고 보고만 한다. 인수는 검수할 파일 경로이며 비우면 apps/sandbox 아래 바뀌거나 새로 생긴 .tsx 파일이다.
+description: 화면 코드를 디자인 시스템 문서(quality·tokens·interaction·icon·컴포넌트)에 대조해 위반 목록과 건수를 낸다. 화면 코드 검수 요청에 쓴다. 고치지 않고 보고만 한다. 인수는 검수할 파일 경로이며 비우면 화면 자리에서 바뀌거나 새로 생긴 .tsx 파일이다.
 ---
 
 # /review-design
 
-`docs/process/ai-environment.md`의 ③ 검수다. 화면 코드를 `docs/system/`의 규칙에 하나씩 대조해 위반 목록을 내고 건수를 센다. Figma 없이 돈다. 이 명령은 고치지 않는다. 고치는 것은 `/generate-code`나 사람이 한다.
+`docs/process/ai-environment.md`의 ③ 검수다. 화면 코드를 `${user_config.docs_root}`의 규칙에 하나씩 대조해 위반 목록을 내고 건수를 센다. Figma 없이 돈다. 이 명령은 고치지 않는다. 고치는 것은 `/generate-code`나 사람이 한다.
 
 ## 입력
 
-`$ARGUMENTS`가 파일 경로다. 여러 개면 공백으로 나눈다. 비어 있으면 `git status --porcelain --untracked-files=all apps/sandbox`로 바뀌거나 새로 생긴 `.tsx` 파일을 잡는다. `--untracked-files=all`이 없으면 새 디렉터리가 한 줄로만 나와 파일을 찾지 못한다. `*.test.tsx`는 검수하지 않는다.
+`$ARGUMENTS`가 파일 경로다. 여러 개면 공백으로 나눈다. 비어 있으면 `git status --porcelain --untracked-files=all ${user_config.screens_dir}`로 바뀌거나 새로 생긴 `.tsx` 파일을 잡는다. `--untracked-files=all`이 없으면 새 디렉터리가 한 줄로만 나와 파일을 찾지 못한다. `*.test.tsx`는 검수하지 않는다.
 
-`apps/studio`나 `packages/*`의 파일을 넘기면 검수하되, 그쪽은 `docs/process/pipeline.md` 「단계별 코드 규칙」의 시점에 따라 primitive가 허용될 수 있음을 결과에 적는다.
+화면 자리 밖(`packages/*` 등)의 파일을 넘기면 검수하되, 그쪽은 `docs/process/pipeline.md` 「단계별 코드 규칙」의 시점에 따라 primitive가 허용될 수 있음을 결과에 적는다.
 
 ## 읽는다
 
+본문의 `${user_config.…}`가 값으로 바뀌지 않고 그대로 보이면 설정이 비어 있는 것이다. 그때는 요청에 적힌 값을 쓰고, 요청에도 없으면 저장소에서 찾아 쓴 값을 결과 첫머리에 적는다.
+
 파일을 열기 전에 규칙 문서를 연다.
 
-- `docs/system/quality.md` 전체
-- `docs/system/tokens.md`의 「기본 원칙」·「Neutral semantic token」·「사용 규칙」
-- `docs/system/interaction.md` 전체
-- `docs/system/foundations/icon.md`의 「스타일 규칙」·「크기 토큰」
-- `docs/system/README.md`의 「Component」 표
-- 검수 대상이 쓰는 컴포넌트마다 `docs/system/components/<이름>.md` 전체. 「Properties」는 검사 항목 4의 근거이고, 「역할과 경계」와 「Guidelines」는 「판단이 필요한 것」의 근거다.
+- `${user_config.docs_root}/quality.md` 전체
+- `${user_config.docs_root}/tokens.md`의 「기본 원칙」·「Neutral semantic token」·「사용 규칙」
+- `${user_config.docs_root}/interaction.md` 전체
+- `${user_config.docs_root}/foundations/icon.md`의 「스타일 규칙」·「크기 토큰」
+- `${user_config.docs_root}/README.md`의 「Component」 표
+- 검수 대상이 쓰는 컴포넌트마다 `${user_config.docs_root}/components/<이름>.md` 전체. 「Properties」는 검사 항목 4의 근거이고, 「역할과 경계」와 「Guidelines」는 「판단이 필요한 것」의 근거다.
 
 파일 머리말 주석에 요청 문단이 있으면 함께 읽는다. 요청이 「」로 정한 문구와 요청이 지정한 요소 종류(링크·버튼)의 근거다.
 
 ## 검사 항목
 
-번호마다 판정 규칙이 있다. 규칙에 걸리면 위반이고, 규칙으로 가르기 어려우면 「판단이 필요한 것」이다. 위반만 센다. `apps/sandbox/src/screen-rules.ts`가 이 가운데 일부를 `pnpm --filter @ooee/sandbox test`에서 기계로 보지만, 이 명령은 그 결과에 기대지 않고 모든 항목을 직접 대조한다.
+번호마다 판정 규칙이 있다. 규칙에 걸리면 위반이고, 규칙으로 가르기 어려우면 「판단이 필요한 것」이다. 위반만 센다. `${CLAUDE_PLUGIN_ROOT}/lib/check-screens.mjs`가 이 가운데 일부를 기계로 보지만, 이 명령은 그 결과에 기대지 않고 모든 항목을 직접 대조한다.
 
 1. **raw primitive color 0개** (quality.md 「코드」, tokens.md 「기본 원칙」). 다음 중 하나라도 있으면 위반이다.
    - `(bg|text|border|ring|fill|stroke|from|to|via|outline|shadow|decoration|placeholder|accent|caret|divide)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}`
@@ -68,7 +70,7 @@ description: apps/sandbox 화면 코드를 docs/system/의 quality.md·tokens.md
 - 컴포넌트 문서에 「현재 정의하지 않은 항목」인 상태나 정책을 화면이 필요로 하는 경우
 - 코드가 필수로 요구하지만 컴포넌트 문서 「Properties」에 없는 Property. 문서 누락으로 적는다.
 - 테두리 역할이 tokens.md와 어긋나 보이는 것(상자 외곽에 `border-oe-border-secondary` 등)
-- Light/Dark, Mobile/Tablet/Desktop, 긴 콘텐츠와 overflow. 실제 확인은 `pnpm --filter @ooee/sandbox dev`를 띄우고 `pnpm visual --base http://localhost:3001 --path /<key>`로 사람이 한다.
+- Light/Dark, Mobile/Tablet/Desktop, 긴 콘텐츠와 overflow. 실제 확인은 화면을 띄우고 사람이 한다.
 - 대비 4.5:1 / 3:1. 토큰 조합이 문서의 조합과 다를 때만 적는다.
 - 컴포넌트가 없어서 native로 만든 요소가 공용 자산이 될 만한지
 
@@ -79,7 +81,7 @@ description: apps/sandbox 화면 코드를 docs/system/의 quality.md·tokens.md
 
 | # | 파일:행 | 항목 | 내용 | 고치는 법 |
 | --- | --- | --- | --- | --- |
-| 1 | apps/sandbox/src/app/admin-login/page.tsx:41 | 1 raw primitive color | `text-white` | `text-oe-foreground-inverse` |
+| 1 | <screens_dir>/<key>/page.tsx:41 | 1 raw primitive color | `text-white` | `text-oe-foreground-inverse` |
 
 위반 N건.
 

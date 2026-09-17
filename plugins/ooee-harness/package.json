@@ -1,0 +1,13 @@
+{
+  "name": "@ooee/harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ooee-ui 화면을 만드는 Claude Code Plugin. 설치한 저장소의 typescript 를 쓴다.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test lib/*.test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

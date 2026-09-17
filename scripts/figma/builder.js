@@ -124,8 +124,56 @@ function place(node, spec, parentBox, parent) {
   if (spec.portal) { node.layoutPositioning = "ABSOLUTE"; node.x = ex; node.y = ey; }
 }
 
+// 카탈로그로 만들어 둔 컴포넌트를 이름으로 찾는다. 한 번 찾은 것은 기억한다.
+// 문서 전체를 뒤지면 모든 페이지를 불러오느라 한 단계가 몇십 분씩 걸린다. 「컴포넌트」 페이지만 본다.
+let componentIndex = null;
+async function componentNamed(name) {
+  if (!componentIndex) {
+    componentIndex = new Map();
+    const catalog = figma.root.children.find((p) => p.name === "컴포넌트");
+    if (catalog) {
+      await catalog.loadAsync();
+      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) if (!componentIndex.has(c.name)) componentIndex.set(c.name, c);
+    }
+  }
+  return componentIndex.get(name) || null;
+}
+// 인스턴스 안의 글자를 화면의 글자로 바꾼다. 수가 다르면 바꾸지 않고 프레임으로 돌아간다.
+function textsOf(spec, acc = []) {
+  if (spec.t === "x") acc.push(spec);
+  for (const kid of spec.k || []) textsOf(kid, acc);
+  return acc;
+}
+
 async function build(spec, parent, parentBox) {
   let node;
+  if (spec.inst) {
+    const component = await componentNamed(spec.inst);
+    const wanted = textsOf(spec);
+    if (component) {
+      const instance = component.createInstance();
+      parent.appendChild(instance);
+      const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
+      if (slots.length === wanted.length) {
+        for (const [i, text] of slots.entries()) {
+          await figma.loadFontAsync(text.fontName);
+          text.characters = wanted[i].s;
+        }
+        instance.name = spec.n;
+        instance.resize(Math.max(1, spec.w), Math.max(1, spec.h));
+        // 인스턴스 안쪽은 카탈로그의 경로를 물고 온다. 지우지 않으면 되읽기가 화면의 자리로 착각한다.
+        for (const inner of instance.findAll(() => true)) inner.setSharedPluginData(TAG, "p", "");
+        report.instances = (report.instances || 0) + 1;
+        if (spec.path) instance.setSharedPluginData(TAG, "p", spec.path);
+        place(instance, spec, parentBox, parent);
+        return instance;
+      }
+      instance.remove();
+      report.instanceMiss = [...new Set([...(report.instanceMiss || []), `${spec.inst} 글자 ${wanted.length}개≠${slots.length}개`])];
+    } else {
+      report.instanceMiss = [...new Set([...(report.instanceMiss || []), `${spec.inst} 없음`])];
+    }
+  }
   if (spec.t === "x") {
     node = figma.createText();
     parent.appendChild(node);
@@ -204,6 +252,13 @@ async function build(spec, parent, parentBox) {
     }
   }
   report.created++;
+  // 카탈로그의 항목은 프레임이 아니라 Figma 컴포넌트로 만든다. 화면을 그릴 때 인스턴스로 놓을 수 있다.
+  if (spec.component) {
+    node = figma.createComponentFromNode(node);
+    node.name = `${spec.component.name}/${spec.component.props}`;
+    node.description = `${spec.component.name} ${spec.component.props}. packages/ui 의 코드에서 그대로 옮겼다.`;
+    report.components = (report.components || 0) + 1;
+  }
   // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
   if (spec.path) node.setSharedPluginData(TAG, "p", spec.path);
   if (parent.type !== "PAGE") place(node, spec, parentBox, parent);

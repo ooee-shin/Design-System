@@ -24,6 +24,8 @@ if (!key || !screenName) {
 }
 const base = opt("base", "http://localhost:3001");
 const width = Number(opt("width", "1440"));
+// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 인스턴스를 만드는 단계가 매우 느리다(아래 주석).
+const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
 // 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
 const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
@@ -33,9 +35,9 @@ const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
 const duplicate = states.map((s) => s.label).find((label, i, labels) => labels.indexOf(label) !== i);
 if (duplicate !== undefined) throw new Error(`--state 이름이 겹친다: ${duplicate}. 프레임 이름이 같아 뒤 상태를 그릴 때 앞 프레임이 지워진다`);
 
-const STEP_LIMIT = 42000; // use_figma 한도는 50,000자다. 모델이 옮겨 적는 부담을 줄이려고 여유를 둔다
-const LINE_LIMIT = 1900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 적게
-const CHUNK_LIMIT = 12000; // 조각 하나의 노드 JSON 글자 수
+const STEP_LIMIT = 19000; // use_figma 한도는 50,000자지만, 모델이 20,000자쯤을 옮기다 줄바꿈을 하나 더해 문법이 깨진 적이 있다
+const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
+const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. builder.js(약 11,000자)가 단계마다 함께 들어가므로 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
@@ -129,6 +131,8 @@ const runs = [];
 const unknownIcons = [];
 function prep(node, nodePath, icons, primitives) {
   node.path = nodePath;
+  // 인스턴스는 --instances 를 줄 때만 쓴다. Figma 쪽에서 인스턴스 하나를 만드는 데 몇 분이 걸린다.
+  if (!useInstances) delete node.inst;
   const where = `${nodePath} ${node.n || node.s || ""}`.slice(0, 60);
   if (node.bg) node.bg = resolve(node.bg, `bg ${where}`) || undefined;
   if (node.c) node.c = resolve(node.c, `color ${where}`) || undefined;
@@ -156,7 +160,7 @@ function fold(node, isRoot = false) {
   if (node.t === "x" || node.t === "svg") return node;
   const kids = node.k || [];
   if (!kids.length && (node.bg || node.bd) && !node.slot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
-  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !isRoot;
+  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !node.component && !isRoot;
   if (!plain || kids.length !== 1) return node;
   const kid = kids[0];
   const near = (a, b) => Math.abs(a - b) <= 1;
@@ -164,6 +168,42 @@ function fold(node, isRoot = false) {
   if (kid.t === "svg") { folded.icon++; return kid; }
   if (near(kid.w, node.w) && near(kid.h, node.h)) { folded.pass++; return kid; }
   return node;
+}
+
+/**
+ * flex 가 아니어도 자식이 한 방향으로 나란히 서 있으면 오토 레이아웃을 붙인다(2026-09-16 유진식 요청).
+ * CSS 의 block 흐름은 세로로 쌓이므로 Figma 에서도 세로 오토 레이아웃과 같은 뜻이다.
+ * 간격이 자리마다 다르면 붙이지 않는다. 억지로 붙이면 builder 의 settle 이 자식을 absolute 로 빼서
+ * 오히려 오토 레이아웃이 아닌 것만 못하다.
+ */
+const inferred = { v: 0, h: 0 };
+function inferLayout(node) {
+  for (const kid of node.k || []) inferLayout(kid);
+  const kids = (node.k || []).filter((k) => !k.portal);
+  if (node.l || node.t === "x" || node.t === "svg" || node.t === "rect" || !kids.length) return;
+  const gapsIn = (axis, size) => {
+    const sorted = [...kids].sort((a, b) => a[axis] - b[axis]);
+    const gaps = [];
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i][axis] - (sorted[i - 1][axis] + sorted[i - 1][size]);
+      if (gap < -1) return null; // 겹친다
+      gaps.push(Math.max(0, Math.round(gap)));
+    }
+    return Math.max(...gaps) - Math.min(...gaps) <= 1 ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : null;
+  };
+  // 자식이 하나면 방향이 뜻을 갖지 않는다. 여백만 살려 세로로 둔다.
+  const vertical = kids.length === 1 ? 0 : gapsIn("y", "h");
+  const horizontal = vertical === null ? gapsIn("x", "w") : null;
+  if (vertical === null && horizontal === null) return;
+  const d = vertical === null ? "H" : "V";
+  const g = vertical === null ? horizontal : vertical;
+  const left = Math.min(...kids.map((k) => k.x)) - node.x;
+  const top = Math.min(...kids.map((k) => k.y)) - node.y;
+  const right = node.x + node.w - Math.max(...kids.map((k) => k.x + k.w));
+  const bottom = node.y + node.h - Math.max(...kids.map((k) => k.y + k.h));
+  if ([left, top, right, bottom].some((v) => v < -1)) return; // 자식이 상자를 넘는다
+  node.l = { d, g, p: [top, right, bottom, left].map((v) => Math.max(0, Math.round(v))), j: "flex-start", a: "flex-start", wr: 0 };
+  inferred[d === "V" ? "v" : "h"]++;
 }
 
 // 조각이 실제로 쓰는 아이콘·primitive 만 싣는다.
@@ -208,6 +248,7 @@ trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
   tree = fold(tree, true);
+  inferLayout(tree);
   // 해석이 끝난 사양을 남긴다. 되읽기가 Figma 에서 읽은 값을 이 사양과 견준다.
   writeFileSync(path.join(work, `spec-${i}.json`), JSON.stringify(tree));
   const frameName = `${screenName} / ${state.label} · ${device} ${width}`;
@@ -283,7 +324,7 @@ if (args.includes("--version") || madeFiles.some((f) => f.fileName === fileName)
   for (let v = 2; ; v++) { const candidate = `ooee · ${screenName} · ${today} · v${v}`; if (!madeFiles.some((f) => f.fileName === candidate)) { fileName = candidate; break; } }
 }
 
-const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, folded, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
+const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, folded, inferredLayout: inferred, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
 writeFileSync(path.join(work, "manifest.json"), JSON.stringify(manifest, null, 2));
 const tooBig = steps.filter((s) => s.chars > STEP_LIMIT || s.lines > LINE_LIMIT).map((s) => s.file);
 console.log(JSON.stringify({ manifest: path.join(work, "manifest.json"), steps: steps.length, frames: frames.map((f) => f.name), fileName, unresolvedColors: unresolved.length, unknownIcons: unknownIcons.length, tooBig }, null, 2));

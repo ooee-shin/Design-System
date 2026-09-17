@@ -153,6 +153,16 @@
     };
     // data-slot 은 컴포넌트를 가리키는 이름이다. 감싸개를 접을 때 이 노드는 건드리지 않는다.
     if (el.getAttribute("data-slot")) node.slot = 1;
+    // 카탈로그 화면은 항목마다 어떤 컴포넌트의 어떤 변형인지를 적어 둔다. Figma 컴포넌트 이름이 된다.
+    const component = el.getAttribute("data-component");
+    if (component) node.component = { name: component, props: el.getAttribute("data-variant-props") || "기본" };
+    // 화면 쪽에서는 컴포넌트가 DOM 에 남긴 변형 속성으로 카탈로그의 어느 컴포넌트인지 찾는다.
+    // 이름이 맞는 컴포넌트가 Figma 에 있으면 builder 가 프레임 대신 인스턴스를 놓는다.
+    const slot = el.getAttribute("data-slot");
+    const attr = (name) => el.getAttribute(name);
+    if (slot === "button" && attr("data-variant")) node.inst = `Button/${attr("data-variant")}·${attr("data-tone") || "brand"}·${attr("data-size") || "regular"}`;
+    if (slot === "input-container" && attr("data-variant")) node.inst = `Input/${attr("data-variant")}·${attr("data-size") || "regular"}`;
+    if (slot === "checkbox") node.inst = `Checkbox/rounded·${attr("data-checked") === "true" ? "on" : attr("data-checked") === "indeterminate" ? "indeterminate" : "off"}`;
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";
       node.svg = el.outerHTML.replace(/ class="[^"]*"/g, "");

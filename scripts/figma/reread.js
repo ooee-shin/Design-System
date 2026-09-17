@@ -54,7 +54,7 @@ for (const frameName of FRAMES) {
     const item = {
       p: node.getSharedPluginData(TAG, "p") || "",
       n: node.type === "TEXT" ? "" : node.name, // 글자 노드의 이름은 문구와 같아 싣지 않는다
-      t: node.type === "TEXT" ? "x" : node.type === "FRAME" ? "f" : node.type.slice(0, 3).toLowerCase(),
+      t: node.type === "TEXT" ? "x" : node.type === "FRAME" ? "f" : node.type === "INSTANCE" ? "i" : node.type.slice(0, 3).toLowerCase(),
       w: Math.round(node.width),
       h: Math.round(node.height),
     };
@@ -75,9 +75,11 @@ for (const frameName of FRAMES) {
         if (c) { item.c = c; break; }
       }
     }
+    // 인스턴스는 어느 컴포넌트인지가 곧 되짚기의 답이다. 안쪽으로는 내려가지 않는다.
+    if (node.type === "INSTANCE") item.st = node.mainComponent ? node.mainComponent.name : "";
     // 자리를 아끼려고 줄로 싣는다. COLS 가 칸 이름이고, 빈 칸은 "" 또는 0 이다.
     info.rows.push([item.p, item.n, item.t, item.w, item.h, item.bg ? item.bg.v || item.bg.hex : "", item.c ? item.c.v || item.c.hex : "", item.bd ? item.bd.c.v || item.bd.c.hex : "", item.r || 0, item.s || "", item.fs || 0, item.st || ""]);
-    if (/^Ri[A-Z]/.test(node.name) || node.type === "VECTOR") return;
+    if (/^Ri[A-Z]/.test(node.name) || node.type === "VECTOR" || node.type === "INSTANCE") return;
     for (const kid of node.children || []) await visit(kid);
   };
   await visit(frame);

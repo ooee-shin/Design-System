@@ -1,6 +1,6 @@
 ---
 name: generate-code
-description: 기획자의 화면 요청을 docs/system/과 @ooee/ui만으로 apps/sandbox의 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> [원본: <저장소 경로>]」이다.
+description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/ui만으로 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> [원본: <저장소 경로>]」이다.
 ---
 
 # /generate-code
@@ -12,16 +12,16 @@ description: 기획자의 화면 요청을 docs/system/과 @ooee/ui만으로 app
 `$ARGUMENTS`가 화면 이름과 요구사항이다. 예: `관리자 로그인. 왼쪽에 로그인 폼, 오른쪽에 브랜드 패널… 원본: apps/studio/src/app/screens/admin/login/page.tsx`. 대조할 원본 코드가 있으면 요청 끝에 `원본: <저장소 경로>`로 적는다. 요구사항이 비어 있으면 무엇을 만들지 묻고 멈춘다.
 
 - 요구사항에 없는 것은 지어내지 않고 「판단이 필요한 것」에 적는다. 정렬·글자 크기·간격처럼 코드를 쓰려면 정해야만 하는 값은 3단계의 「정렬과 간격」을 따른다.
-- 요구사항이 적은 것이 `docs/system/`의 기준과 어긋나면 2단계의 「요구사항과 문서가 어긋날 때」를 따른다.
+- 요구사항이 적은 것이 `${user_config.docs_root}`의 기준과 어긋나면 2단계의 「요구사항과 문서가 어긋날 때」를 따른다.
 
 ## 하지 않는 것
 
 - commit, push, pull request 생성. 마지막 단계에서 멈추고 사용자가 요청할 때만 한다.
-- 세 파일 밖의 수정. 고치는 파일은 `apps/sandbox/src/app/<key>/page.tsx`, 같은 디렉터리의 `page.test.tsx`, `apps/sandbox/src/screens.ts` 셋뿐이다. `apps/sandbox`의 공용 파일(`test-setup.ts`, `screen-rules.ts`, `screen-rules.test.tsx`, `package.json`, `src/app/layout.tsx`, `src/app/page.tsx`, `globals.css`), 다른 화면의 디렉터리, `apps/studio`, `packages/*`, `docs/system/`은 고치지 않는다. 그쪽을 고쳐야만 검사가 통과하면 5단계의 「검사가 실패하면」을 따른다.
+- 세 파일 밖의 수정. 고치는 파일은 `${user_config.screens_dir}/<key>/page.tsx`, 같은 디렉터리의 `page.test.tsx`, `${user_config.screens_dir}/../screens.ts` 셋뿐이다. 화면 자리의 공용 파일(`test-setup.ts`, `package.json`, `layout.tsx`, 첫 화면, `globals.css`), 다른 화면의 디렉터리, `packages/*`, `${user_config.docs_root}`, Plugin 자신은 고치지 않는다. 그쪽을 고쳐야만 검사가 통과하면 5단계의 「검사가 실패하면」을 따른다.
 - 빌드 캐시 삭제(`rm -rf .next` 등)와 working tree를 되돌리는 명령(`git stash`, `git checkout`, `git reset`, `git clean`). `docs/process/tooling.md`가 적은 `apps/studio/.next` 삭제는 사람이 확인하고 하는 절차이며 이 명령은 하지 않는다.
 - 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꾸거나(`./` 경로, `rm -fr`, `node -e`, `dangerouslyDisableSandbox`) 같은 일을 하는 다른 명령으로 되풀이하지 않는다. 막힌 명령과 거부 메시지를 7단계 보고의 「막힌 명령」에 그대로 적는다.
 - 원본 파일 읽기. `원본:` 경로는 3단계에서 `screens.ts`의 `source`에 적기만 하고 열지 않는다. `apps/studio/src/app/screens/` 아래는 언제나 읽지 않는다. 원본과의 대조는 사람이 한다.
-- 다른 화면의 코드 읽기. `apps/sandbox/src/app/<다른 key>/` 아래 파일은 열지 않는다. `admin-login`·`sto-support-request`는 Skill v0의 틀린 사례를 고치지 않고 둔 기록이라, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `docs/system/`과 `packages/ui/src/`에서만 찾는다.
+- 다른 화면의 코드 읽기. `${user_config.screens_dir}/<다른 key>/` 아래 파일은 열지 않는다. 이미 있는 화면은 고치지 않고 둔 기록일 수 있어, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `${user_config.docs_root}`과 `@ooee/ui`의 소스에서만 찾는다.
 - Tailwind primitive 색(`bg-blue-700`, `text-neutral-500`, `text-white`, `bg-black`), hex 값, shadcn 토큰(`bg-background`, `text-muted-foreground`, `bg-primary`). 색은 `oe-*` semantic token 클래스만 쓴다.
 - 서버 호출, 실제 제출 동작, 라우팅 로직. 제출은 `<form onSubmit={(event) => event.preventDefault()}>`까지, 목적지가 정해지지 않은 링크는 `<a href="#">`까지만 둔다. 목적지 없는 `<a href="#">`는 라우팅 로직이 아니다.
 
@@ -29,22 +29,29 @@ description: 기획자의 화면 요청을 docs/system/과 @ooee/ui만으로 app
 
 ### 0. 시작 전에 확인한다
 
+**설정값을 먼저 확인한다.** 이 Skill은 `screens_dir`·`docs_root`·`check_command` 세 설정값으로 경로와 명령을 만든다. 본문에 `${user_config.…}`가 값으로 바뀌지 않고 그대로 보이면 설정이 비어 있는 것이다. 그때는 요청에 적힌 값을 쓰고, 요청에도 없으면 저장소에서 찾아 쓴 값을 보고의 첫머리에 적는다. 찾는 방법은 `README.md`와 `components/`를 가진 디렉터리가 `docs_root`, 화면 파일(`page.tsx`)이 모인 디렉터리가 `screens_dir`, 그 화면 앱의 `package.json`이 가진 `build`·`test` script가 `check_command`다.
+
+
 ```bash
-git status --porcelain --untracked-files=all apps/sandbox
+git status --porcelain --untracked-files=all ${user_config.screens_dir}
 ```
 
-출력이 한 줄이라도 있으면 파일을 만들지 않고 멈춘다. 다른 세션이나 사람이 같은 working tree에서 `apps/sandbox`를 고치는 중이거나, 앞선 화면이 아직 commit되지 않은 상태다. 이 상태에서 시작하면 5단계 검사가 남의 변경으로 실패하고 7단계의 「세 파일」 확인이 성립하지 않는다. 보고 첫 제목을 「## 시작하지 않음」으로 하고 출력 전문을 붙인다.
+**이 명령의 첫 도구 호출이 이것이어야 한다.** 파일을 하나라도 만든 뒤에 돌린 결과는 쓰지 않는다. 늦게 돌리면 자기가 만든 파일이 출력에 섞여 남의 변경으로 보인다.
+
+출력이 한 줄이라도 있으면 파일을 만들지 않고 멈춘다. 다른 세션이나 사람이 같은 working tree에서 화면 자리를 고치는 중이거나, 앞선 화면이 아직 commit되지 않은 상태다. 이 상태에서 시작하면 5단계 검사가 남의 변경으로 실패하고 7단계의 「세 파일」 확인이 성립하지 않는다. 보고 첫 제목을 「## 시작하지 않음」으로 하고 출력 전문을 붙인다.
+
+**「시작하지 않음」은 파일을 하나도 만들지 않았을 때만 쓴다.** 출력의 경로가 이번에 만들 화면의 것뿐이면 그것은 자기 산출물이므로 멈출 이유가 아니다. 0단계를 늦게 돌린 것이니 절차를 끝까지 마치고, 늦게 돌렸다는 사실을 7단계의 「판단이 필요한 것」에 적는다.
 
 ### 1. 읽는다 — ① 디자인 시스템 검색
 
 다음을 이 순서로 읽는다. 요약본을 기억에서 꺼내지 않고 파일을 연다.
 
 1. `AGENTS.md`의 「코드 소유 경계」와 「변경 원칙」.
-2. `docs/system/README.md`의 「이 문서의 독자」와 「Component」 표. 표에서 요구사항의 요소마다 쓸 컴포넌트를 고른다. 상태가 `초안`인 컴포넌트는 `packages/ui/src/index.ts`가 export해도 쓰지 않는다. 표의 용도가 한 요소에 둘 이상 맞으면(예: 하나를 고르는 항목에 `Radio`와 `Select`) 둘 다 고르고 3번에서 두 문서를 모두 연다.
-3. 고른 컴포넌트마다 `docs/system/components/<이름>.md` 전체. Property 이름과 값은 문서에 적힌 코드 문자열 그대로 쓴다. 「역할과 경계」, 「Guidelines」, 「현재 정의하지 않은 항목」을 함께 읽고, 읽은 기준은 2단계에서 요소마다 대조한다.
-4. `docs/system/vocabulary.md`의 「Form 구성 층」, `docs/system/tokens.md`의 「Neutral semantic token」·「사용 규칙」, `docs/system/interaction.md` 전체, `docs/system/quality.md` 전체, `docs/system/foundations/icon.md`의 「스타일 규칙」·「크기 토큰」.
+2. `${user_config.docs_root}/README.md`의 「이 문서의 독자」와 「Component」 표. 표에서 요구사항의 요소마다 쓸 컴포넌트를 고른다. 상태가 `초안`인 컴포넌트는 `packages/ui/src/index.ts`가 export해도 쓰지 않는다. 표의 용도가 한 요소에 둘 이상 맞으면(예: 하나를 고르는 항목에 `Radio`와 `Select`) 둘 다 고르고 3번에서 두 문서를 모두 연다.
+3. 고른 컴포넌트마다 `${user_config.docs_root}/components/<이름>.md` 전체. Property 이름과 값은 문서에 적힌 코드 문자열 그대로 쓴다. 「역할과 경계」, 「Guidelines」, 「현재 정의하지 않은 항목」을 함께 읽고, 읽은 기준은 2단계에서 요소마다 대조한다.
+4. `${user_config.docs_root}/vocabulary.md`의 「Form 구성 층」, `${user_config.docs_root}/tokens.md`의 「Neutral semantic token」·「사용 규칙」, `${user_config.docs_root}/interaction.md` 전체, `${user_config.docs_root}/quality.md` 전체, `${user_config.docs_root}/foundations/icon.md`의 「스타일 규칙」·「크기 토큰」.
 5. `packages/ui/src/index.ts`. 여기서 export하지 않는 이름은 import하지 않는다.
-6. `apps/sandbox/src/screens.ts`와 `apps/sandbox/src/app/page.tsx`. 등록 형식과 기존 화면의 key를 본다.
+6. `${user_config.screens_dir}/../screens.ts`와 `${user_config.screens_dir}/page.tsx`. 등록 형식과 기존 화면의 key를 본다.
 
 Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번 뒤에 같은 컴포넌트를 한 번 더 조회한다. 없으면 건너뛴다. 파일이 원본이고 MCP는 덧붙이는 것이다.
 
@@ -71,12 +78,12 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 
 **파일과 등록**
 
-- 위치는 `apps/sandbox/src/app/<key>/page.tsx`. `<key>`는 소문자 kebab-case 영문이다. 예: `admin-login`, `sto-support-request`.
-- 고른 key가 `screens.ts`에 이미 있거나 `apps/sandbox/src/app/<key>/`가 이미 있으면 그 화면을 덮어쓰지 않고 `admin-login-2`처럼 끝에 번호를 붙인 새 key를 쓴다. `name`은 요청의 화면 이름 그대로 두고, 「판단이 필요한 것」에 「key `admin-login`이 이미 있어 `admin-login-2`로 만듦」을 적는다.
+- 위치는 `${user_config.screens_dir}/<key>/page.tsx`. `<key>`는 소문자 kebab-case 영문이다. 예: `admin-login`, `sto-support-request`.
+- 고른 key가 `screens.ts`에 이미 있거나 `${user_config.screens_dir}/<key>/`가 이미 있으면 그 화면을 덮어쓰지 않고 `admin-login-2`처럼 끝에 번호를 붙인 새 key를 쓴다. `name`은 요청의 화면 이름 그대로 두고, 「판단이 필요한 것」에 「key `admin-login`이 이미 있어 `admin-login-2`로 만듦」을 적는다.
 - 상태(`useState`)를 쓰면 첫 줄에 `"use client"`를 둔다. `@ooee/ui`의 Control은 소비자 쪽 `"use client"`를 전제한다.
 - import는 `react`(hook), `@ooee/ui`(컴포넌트), `@remixicon/react`(아이콘, Line variant 우선), `@/lib/utils`(`cn`)만 쓴다. `next/link`·`next/navigation`은 쓰지 않는다.
 - 파일 머리말 주석에 「입력」의 요구사항 문단을 **그대로** 붙여 넣는다. 줄이거나 고쳐 쓰지 않으며 선택지 목록·placeholder·기본값·Label 문구를 하나도 빠뜨리지 않는다. 그 아래에 정하지 않아 비워 둔 자리를 적는다. 단독 `/review-design`은 요청을 받지 않으므로 이 주석이 근거다.
-- `apps/sandbox/src/screens.ts`의 `sandboxScreens`에 한 줄을 더한다. `prompt`는 요청의 한 줄 요약, `createdAt`은 오늘 날짜다. 요청에 `원본:`이 있으면 그 경로를 `source`에 그대로 적고, 없으면 `source`를 두지 않는다.
+- `${user_config.screens_dir}/../screens.ts`의 `sandboxScreens`에 한 줄을 더한다. **이 등록이 빠지면 화면이 목록에 뜨지 않는다.** 7단계의 「변경 파일」에 이 파일이 없으면 등록을 빠뜨린 것이다. `prompt`는 요청의 한 줄 요약, `createdAt`은 오늘 날짜다. 요청에 `원본:`이 있으면 그 경로를 `source`에 그대로 적고, 없으면 `source`를 두지 않는다.
 
 **색과 경계**
 
@@ -112,11 +119,11 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 - 데스크톱 화면은 뷰포트를 그대로 쓴다. `min-h-dvh`는 최상위 레이아웃 상자 한 곳에만 둔다.
 - 모바일 앱 화면은 Studio의 `MobileWebView`와 같은 모양으로 세운다. 바깥 상자 `min-h-dvh bg-oe-background-secondary` 안에 `mx-auto flex min-h-dvh w-full max-w-[390px] flex-col bg-oe-background-primary border-oe-border-secondary sm:border-x`를 둔다. 기기 모형이 아니므로 둥근 모서리와 그림자를 두르지 않고 높이를 고정하지 않는다.
 - 글자와 덩이의 가로 가운데 정렬(`text-center`, 세로 방향 flex의 `items-center`, 가로 방향 flex의 `justify-center`)은 요청이 가운데라고 말한 요소에만 쓴다. 요청이 한 요소에만 준 정렬(예: 「Footer는 가운데 정렬」)을 다른 요소로 옮기지 않는다. 정렬을 말하지 않은 제목·문단·폼 요소·링크는 왼쪽 정렬로 둔다. 「폼을 남은 높이의 가운데에 세운다」는 상자의 위치이지 상자 안 글자의 정렬이 아니다. 한 줄에 놓인 요소끼리 세로 가운데를 맞추는 가로 방향 flex의 `items-center`는 이 규칙의 대상이 아니다.
-- `docs/system/`이 크기를 정한 자리(App Header의 Title 등)는 그 문서를 따른다. 그 밖에 요청이 말하지 않아 스스로 정한 값(화면 제목의 `text-*`·`font-*`, 폼 요소 사이 `gap-*`, 덩이 사이 `mt-*`)은 코드에 쓰되 「판단이 필요한 것」에 「제목 `text-2xl font-semibold`, 폼 `gap-3` — 요청에 없어 정함」처럼 한 줄로 적는다.
+- `${user_config.docs_root}`이 크기를 정한 자리(App Header의 Title 등)는 그 문서를 따른다. 그 밖에 요청이 말하지 않아 스스로 정한 값(화면 제목의 `text-*`·`font-*`, 폼 요소 사이 `gap-*`, 덩이 사이 `mt-*`)은 코드에 쓰되 「판단이 필요한 것」에 「제목 `text-2xl font-semibold`, 폼 `gap-3` — 요청에 없어 정함」처럼 한 줄로 적는다.
 
 ### 4. 테스트를 쓴다 — ⑦
 
-`apps/sandbox/src/app/<key>/page.test.tsx`. 첫 줄은 `import "@/test-setup"`, 실행기는 `node:test`, 렌더는 `@testing-library/react`, JSX를 쓰므로 `import React from "react"`를 둔다. 테스트 이름과 `assert` 실패 메시지는 한국어로 쓴다. 이름에 한글이 없으면 `screen-rules` 테스트가 실패한다. 검사할 것은 넷이다.
+`${user_config.screens_dir}/<key>/page.test.tsx`. 첫 줄은 그 자리의 JSDOM 설정을 부르는 import(이 저장소는 `import "@/test-setup"`), 실행기는 `node:test`, 렌더는 `@testing-library/react`, JSX를 쓰므로 `import React from "react"`를 둔다. 테스트 이름과 `assert` 실패 메시지는 한국어로 쓴다. 이름에 한글이 없으면 5단계의 화면 규칙 검사가 실패한다. 검사할 것은 넷이다.
 
 1. 화면 제목이 `heading`으로 잡힌다.
 2. 매핑표의 상호작용 요소마다 접근 가능한 이름으로 찾아진다. Control만이 아니라 native `<button>`·`<a>`로 만든 요소도 모두 포함한다. role은 요구사항의 낱말에서 정한다. 입력은 `getByLabelText(이름)`, 「버튼」은 `getByRole("button", { name })`, 「링크」는 `getByRole("link", { name })`이다.
@@ -126,20 +133,23 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 ### 5. 검사한다
 
 ```bash
-pnpm --filter @ooee/sandbox build
-pnpm --filter @ooee/sandbox test
-pnpm check
+${user_config.check_command}
+node ${CLAUDE_PLUGIN_ROOT}/lib/check-screens.mjs --screens ${user_config.screens_dir} --docs ${user_config.docs_root} --only <key>
 ```
 
-셋 다 통과할 때까지 「하지 않는 것」의 세 파일을 고친다. `pnpm check`는 `apps/sandbox`를 잡지 않지만 저장소 전체가 깨지지 않았는지 확인하는 자리다.
+`check_command`는 세미콜론으로 이어 붙인 여러 명령일 수 있다. 하나씩 나눠 돌리고 각각의 종료 코드를 따로 본다.
 
-`pnpm --filter @ooee/sandbox test`에는 `src/screen-rules.test.tsx`가 들어 있다. 이 테스트가 모든 화면의 `page.tsx`를 `/review-design` 검사 항목 가운데 기계로 가를 수 있는 것(1·2·3의 버튼·5·12·13·14와 머리말)으로 읽어, 새 화면에 위반이 있으면 `L<행> [<항목>] <내용>`으로 실패한다. 그 줄이 가리키는 자리를 `page.tsx`에서 고친다. 이 테스트가 통과해도 6단계 검수는 그대로 한다.
+화면 규칙 검사가 승인 요청에 막히면 그 자리에서 멈추고 「막힌 명령」에 적는다. 경로 표기를 절대에서 상대로 바꿔 다시 돌리는 것도 「막힌 명령 다시 시도」다. 이 명령을 늘 쓰려면 설치한 저장소가 `permissions.allow`에 한 줄을 두어야 하며, 그 줄은 Plugin의 `README.md`에 있다.
+
+모두 통과할 때까지 「하지 않는 것」의 세 파일을 고친다. `check_command` 는 화면 자리 밖까지 함께 보는 자리다.
+
+`check-screens.mjs`는 `/review-design` 검사 항목 가운데 기계로 가를 수 있는 것(1·2·3의 버튼·5·12·13·14와 머리말, 테스트 이름)을 새 화면에서 본다. 위반이 있으면 `L<행> [<항목>] <내용>`으로 적고 0이 아닌 코드로 끝난다. 그 줄이 가리키는 자리를 `page.tsx`에서 고친다. 이 검사가 통과해도 6단계 검수는 그대로 한다. `--only`를 빼면 모든 화면을 본다.
 
 **검사가 실패하면.** 세 파일을 고쳐도 통과하지 않거나 오류의 파일 경로가 세 파일 밖이면(예: `apps/studio/.next/dev/types/validator.ts`, 다른 화면의 `page.test.tsx`), 원인이 자기 변경과 무관해 보여도 그 파일을 고치지 않고 캐시도 지우지 않는다. 6단계는 그대로 하고, 7단계의 보고 첫 제목을 「## 검사 실패」로 바꿔 낸다. 원인은 추정이라고 밝힌다.
 
 ### 6. 검수한다 — ③
 
-`.claude/skills/review-design/SKILL.md`의 「읽는다」와 「검사 항목」을 새로 만든 `page.tsx`에 그대로 적용해 위반 목록을 낸다. 위반이 0건이 될 때까지 고치고 다시 검수한다.
+`${CLAUDE_PLUGIN_ROOT}/skills/review-design/SKILL.md`의 「읽는다」와 「검사 항목」을 새로 만든 `page.tsx`에 그대로 적용해 위반 목록을 낸다. 위반이 0건이 될 때까지 고치고 다시 검수한다.
 
 `/review-design`은 요청 문장을 보지 않는다. 검수와 별도로 요청 문장을 한 문장씩 코드와 대조해, 요청에 없는데 코드가 정한 것(정렬·크기·간격)과 요청에 있는데 코드에 없는 것을 「판단이 필요한 것」에 적는다.
 
@@ -159,9 +169,9 @@ commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5�
 제목: feat(sandbox): <화면 이름> 화면 추가
 
 ## 무엇을 변경했나요?
-- apps/sandbox/src/app/<key>/page.tsx — <한 줄>
-- apps/sandbox/src/app/<key>/page.test.tsx — <한 줄>
-- apps/sandbox/src/screens.ts — 등록
+- <screens_dir>/<key>/page.tsx — <한 줄>
+- <screens_dir>/<key>/page.test.tsx — <한 줄>
+- <screens_dir>/../screens.ts — 등록
 
 ## 매핑표
 <2단계의 표>
@@ -182,9 +192,8 @@ commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5�
 <git status --porcelain --untracked-files=all 출력 원문>
 
 ## 확인 사항
-- [ ] pnpm --filter @ooee/sandbox build
-- [ ] pnpm --filter @ooee/sandbox test
-- [ ] pnpm check
+- [ ] <check_command 의 명령들>
+- [ ] check-screens (화면 규칙)
 - [ ] 세 파일 밖을 고치지 않았다
 - [ ] 확정되지 않은 결정을 Stable 자산으로 승격하지 않았다
 - [ ] 비밀번호, API key, 개인 경로를 포함하지 않았다

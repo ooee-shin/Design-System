@@ -81,7 +81,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 5 | `feature/storybook-ci` | `.github/workflows/storybook.yml`, 호스팅 | pull request마다 `build-storybook` 검사, `dev`·`main`에 주소가 생긴다 |
 | 6 | `feature/figma-mcp` | `.mcp.json` Figma 항목, [figma-component-map.md](figma-component-map.md), 관련 문서 갱신 | 저장소 루트에서 연 세션이 `.mcp.json`의 figma 서버를 싣고, `get_metadata`가 `Iw2MXs9sfqtJFze7F9vGf5`의 「고객의 소리」 프레임을 돌려주며, 그 레이어 이름이 매핑표의 항목으로 풀린다(풀리지 않는 이름은 표의 「되짚지 않는 것」에 있다) |
 | 7 | `feature/skill-design-page` | ②: `.claude/skills/design-page/SKILL.md`, `scripts/figma/`의 `prepare.mjs`·`audit.js`와 보강한 변환 도구, 결과 절. ④는 순서 6 뒤에 같은 명령에 더한다. ④의 산출물은 `scripts/figma/`의 재조회·차이 판정 도구와 그 픽스처 테스트, `SKILL.md`의 「되읽기」 절, ②가 남기는 기준선(프레임을 그린 커밋과 파일 key)이며 근거는 [figma-component-map.md](figma-component-map.md)다. 규칙의 출발점은 [figma-page-agent.md](figma-page-agent.md) | ②: Sonnet 수준의 모델이 `/design-page`를 돌려 audit의 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 보고까지 간다. ④: 사람이 Figma에서 고친 것 셋을 다시 읽어 그 셋만 화면 코드에 반영하고, 되짚을 수 없는 것은 「사람이 정할 것」으로 낸다 |
-| 8 | `feature/agent-kit` | Plugin 디렉터리 | 다른 저장소에서 설치해 `/generate-code`가 돈다 |
+| 8 | `feature/agent-kit` | `plugins/ooee-harness/`(plugin.json, skills/, lib/screen-rules, README의 권한 조각, .mcp.json), 저장소 루트 `.claude-plugin/marketplace.json`, 루트 `package.json` 검사 연결, `.claude/skills/` 제거 | `docs/system/`·`packages/`·`apps/studio`만 담은 사본 저장소에서 Plugin을 설치해 `/ooee-harness:generate-code`가 「pull request 준비 완료」까지 간다. Plugin Skill은 이름 앞에 Plugin 이름이 붙으므로 명령 이름이 바뀐다 |
 
 ## 이 문서가 제안하는 기본값
 
@@ -105,7 +105,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | --- | --- | --- | --- |
 | R1 | Figma remote MCP의 `generate_figma_design`·`use_figma`가 유진식 계정과 seat에서 되는가. 결과가 라이브러리에 묶이는가. 대상 폴더는 [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더다 | 반나절 | 어느 서버에 어느 도구가 있는지, seat와 플랜 조건, 결과 frame의 상태가 적힌다 |
 | R2 | Storybook과 `@storybook/addon-mcp`가 이 스택(Tailwind v4, `private: true` 소스 export, Node 22.22.1)에서 도는가. `features.componentsManifest`가 `docs` toolset을 켜는가. Studio 없이 Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 보이는가 | 하루 | `pnpm build-storybook` 성공, `docs-list` 응답, Brand Button 배경·Checked Checkbox·Active Chip·Focus ring이 보이는 스크린샷 |
-| R3 | 이관 뒤 `AGENTS.md`·Skill·`.mcp.json`이 어디에 남는가 | 반나절 | 「이관 시 남기는 것」이 채워진다 |
+| R3 | 이관 뒤 `AGENTS.md`·Skill·`.mcp.json`이 어디에 남는가 | 반나절 | 「이관 시 남기는 것」이 채워진다. `2026-09-16` 완료 |
 | R4 | 비공개 무료 플랜에서 Storybook을 어디에 올리는가 | 반나절 | 호스팅 하나가 정해지고 secret 이름이 정해진다 |
 
 ## 통합 검증 항목 채우기
@@ -145,10 +145,12 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | Storybook 호스팅: Chromatic, Cloudflare Pages, 저장소 공개 또는 GitHub 플랜 변경. 외부 서비스 사용 여부는 블루키에 묻는다 | 유진식 | `2026-09-19` |
 | ~~Figma의 역할: 디자인 원본 또는 검토용 캔버스~~ → **검토용 캔버스로 정했다**(`2026-09-16` A/B 검증. 「스파이크 결과」와 [roadmap.md](roadmap.md)) | 유진식 | 정해짐 |
 | roadmap.md 4·5단계의 「1차 범위: 제외」와 루트 `README.md`의 1차 범위 문구를 검증용 실험 구현으로 고칠지. 팀이 정한 프로젝트 범위라 유진식 혼자 고치지 않는다 | 신주희·유진식 | `2026-09-23` |
-| 이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치: `packages/` 안의 Plugin 디렉터리 또는 별도 저장소 | 유진식 | `2026-09-25` |
+| ~~이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치~~ → **`plugins/ooee-harness/` Claude Code Plugin으로 정했다**(`2026-09-16` 스파이크 R3. 「이관 시 남기는 것」). 별도 저장소는 열지 않되 나중에 뽑아낼 수 있게 둔다 | 유진식 | 정해짐 |
+| `AGENTS.md` 「코드 소유 경계」의 import 경계(`@ooee/ui`에서만 가져온다)를 `docs/system/quality.md`로 승격할지. 하네스가 이관 뒤에도 그 규칙을 읽어야 해서 원본의 자리가 필요하다. `data-slot` 승격과 같은 성격이라 함께 정한다 | 신주희 | `2026-09-23` |
+| 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 유진식 | `2026-09-25` |
 | `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 신주희 | `2026-09-23` |
 | `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 신주희 | `2026-09-23` |
-| 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8만 막는다 | 유진식 | 미정 |
+| 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8에서는 Plugin의 배포 source 타입(상대 경로 또는 git 저장소)만 막는다 | 유진식 | 미정 |
 
 ## 일정
 
@@ -184,7 +186,33 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 ## 이관 시 남기는 것
 
-스파이크 R3의 결과로 채운다. 지금 정해진 것은 `docs/system/`이 자산을 어떻게 만들고 어떤 도구로 검수했는지를 적지 않는다는 것(`docs/system/README.md`의 「이 문서의 독자」)과, `AGENTS.md`·`.claude/`·`docs/process/`·`apps/sandbox`·`scripts/figma/`가 이관 시 제거된다는 것뿐이다. `AGENTS.md`와 `.claude/`가 이 규칙대로 사라지면 블루키는 UI 키트만 받게 되므로, Plugin 디렉터리로 분리하거나 제거 규칙을 고치는 둘 중 하나를 `2026-09-25`까지 정한다.
+스파이크 R3(`2026-09-16`)의 결과다. **하네스는 제거하지 않고 `plugins/ooee-harness/`(Claude Code Plugin)로 분리해 전달 자산과 함께 넘긴다.** `AGENTS.md`·`.claude/`·`docs/process/`·`apps/sandbox`·`scripts/figma/`는 지금 규칙대로 전달본에서 사라지고, 그 안에서 명령이 실제로 쓰는 것만 Plugin으로 옮긴다. 옮기는 것은 절차(Skill)와 기계 판정(`screen-rules`)이고, 남겨 두는 것은 이 저장소의 작업 신호·branch 운영·v0가 만든 화면 기록이다.
+
+**「제거」는 전달본에서만 일어난다.** 이 저장소는 이관 뒤에도 컴포넌트를 이어서 만드는 자리이므로, 전달은 여기서 파일을 지우는 일이 아니라 전달 범위만 담은 사본을 만드는 일이다.
+
+| 지금 자리 | 이관 시 | 가는 자리 |
+| --- | --- | --- |
+| `docs/system/`, `packages/`, `apps/studio` | 전달 | 그대로 |
+| `plugins/ooee-harness/` | 전달 | 그대로. 설치 단위다 |
+| `.claude/skills/generate-code`·`review-design` | 옮긴다 | `plugins/ooee-harness/skills/`. 화면을 쓸 자리와 검사 명령을 `apps/sandbox`로 박아 두지 않고 Plugin 설정값(`userConfig`)으로 뺀다 |
+| `.claude/settings.json` | 옮기지 못한다 | Plugin은 권한 규칙을 싣지 못한다. 받는 쪽 `.claude/settings.json`에 붙여 넣을 `permissions` 조각을 `plugins/ooee-harness/README.md`가 갖는다 |
+| `apps/sandbox/src/screen-rules.ts`와 그 테스트 | 옮긴다 | `plugins/ooee-harness/lib/`. 화면이 아니라 `/review-design` 검사 항목의 기계 판정이다. `docs/system/README.md` 경로와 저장소 루트를 상대 경로로 박지 않고 인수로 받게 고친다 |
+| `apps/sandbox`의 나머지 | 제거 | 화면을 쓸 자리는 설치한 저장소가 갖고, Plugin의 설정값이 그 자리를 가리킨다 |
+| `AGENTS.md`의 import 경계(「코드 소유 경계」) | 승격하거나 옮긴다 | `@ooee/ui`에서만 가져온다는 규칙은 작업 운영이 아니라 시스템 규칙이므로 `docs/system/quality.md`로 승격할지 신주희와 정한다. 승격하지 않으면 원본을 `plugins/ooee-harness/rules/`로 옮기고 `AGENTS.md`가 그 파일을 가리킨다 |
+| `AGENTS.md`의 나머지 | 제거 | 작업 신호, branch 운영, 화면 확정 검수 |
+| `.mcp.json` | 옮긴다 | `plugins/ooee-harness/.mcp.json`. URL 한 줄뿐이라 secret이 없고 저장소 경로에도 기대지 않는다 |
+| `scripts/figma/`, `/design-page`, [figma-component-map.md](figma-component-map.md) | 나중에 옮긴다 | 순서 8에 넣지 않는다. `packages/tokens` 상대 import, `scripts/visual` 실행 위치, `node_modules/.pnpm/*` 탐색, 3001 포트 개발 서버에 동시에 기대므로 `data-slot` 승격 결정 뒤로 미룬다 |
+| `scripts/visual/` | 전달 | 제거 목록에 없고 저장소 경로에 기대지 않는다. 루트 `package.json`의 `visual` script와 함께 남는다 |
+| `docs/process/` | 제거 | 위에 적은 것 말고는 전부 |
+
+**받는 쪽이 하는 일은 넷이다.**
+
+1. `/plugin marketplace add <저장소 또는 사본 경로>` 뒤 `/plugin install ooee-harness@ooee`. 비공개 저장소는 기기에 이미 있는 git 자격 증명을 쓴다.
+2. 설치하면 명령 이름 앞에 Plugin 이름이 붙는다. `/ooee-harness:generate-code`·`/ooee-harness:review-design`이다.
+3. `plugins/ooee-harness/README.md`의 `permissions` 조각을 자기 `.claude/settings.json`에 붙여 넣는다. Plugin이 권한을 대신 걸어 주지 않는다.
+4. 설정값 셋을 채운다. 화면을 쓸 디렉터리, `docs/system/`의 자리, 검사 명령이다. 지금 `SKILL.md`에 `apps/sandbox`와 `pnpm --filter @ooee/sandbox …`로 박혀 있는 자리다.
+
+**하네스는 `docs/system/` 없이 성립하지 않는다.** ①의 디자인 시스템 검색과 `/review-design`의 검사 항목이 모두 그 파일들을 원본으로 읽는다. 그래서 Plugin을 설치하는 저장소에는 전달 자산이 함께 있거나 「아직 정하지 않은 것」의 조회 endpoint가 있어야 한다.
 
 ## 스파이크 결과
 
@@ -323,3 +351,20 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **왜.** 옮긴 결과에서 모든 요소가 Frame이었다. DOM의 감싸개를 그대로 옮겼기 때문이다. 유진식이 「가장 바깥만 Frame으로 두고 오토 레이아웃을 쓰라」고 정했다. Figma에서 오토 레이아웃은 Frame에만 붙으므로, 「배치하는 곳만 Frame」으로 옮겨 적었다.
 - **규칙.** 화면 루트와 자식을 배치하는 상자, 칠·테두리·모서리를 가진 상자, `data-slot`이 붙은 컴포넌트 노드는 Frame이다. 글자 하나만 감싼 상자는 없애고 글자가 그 자리를 차지하며(가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다), 아이콘 하나만 감싼 상자와 그대로 통과시키는 상자도 없앤다. 자식 없이 칠·테두리만 있는 잎은 Rectangle이다.
 - **효과.** 「고객의 소리」 목록 프레임의 Frame이 124개에서 69개로 줄었다. `data-slot` 이름은 그대로 남아 되짚기의 근거가 유지된다. 접은 수는 manifest의 `folded`에 남고 보고에도 적는다.
+
+### 2026-09-16 스파이크 R3: 이관 뒤 하네스의 자리
+
+- **답.** 하네스는 제거하지 않고 `plugins/ooee-harness/`(Claude Code Plugin)로 분리해 전달 자산과 함께 넘긴다. 자세한 것은 「이관 시 남기는 것」에 적었고, 「아직 정하지 않은 것」의 위치 행을 이 결과로 닫았다.
+- **왜 이 저장소 안의 Plugin인가.** 셋을 견줬다. ① 이 저장소 안 Plugin 디렉터리, ② 별도 저장소, ③ 제거 규칙만 고치기. ③은 순서 8의 완료 기준(「설치해서 돈다」)을 채우지 못한다. 파일 복사는 설치가 아니고, `SKILL.md`에 `apps/sandbox`와 `pnpm --filter @ooee/sandbox …`가 문자열로 박혀 있어 남의 저장소에서 성립하지 않는다. ②는 하네스가 전달 자산에 강하게 묶여 있는 지금 상태와 맞지 않는다. `/review-design`의 검사 항목과 `/generate-code`가 읽는 문서의 대부분이 `docs/system/`이고, `SKILL.md`가 `button.tsx`의 Focus 문자열과 `index.ts`의 export 목록을 참조한다. 같은 저장소에 두면 그 결합이 `pnpm check`와 sandbox 테스트로 계속 검사된다. ①에서 ②로는 디렉터리 하나를 뽑아내면 되므로 되돌리기도 싸다.
+- **Plugin으로 확인한 것.** `skills/`·`.mcp.json`·`settings.json`은 Plugin 루트에 두고 `.claude-plugin/plugin.json`이 이름을 정한다. Skill 이름 앞에는 Plugin 이름이 붙어 `/ooee-harness:generate-code`가 된다. `${CLAUDE_PLUGIN_ROOT}`와 `${user_config.…}`는 Skill 본문에서도 치환되므로 화면 자리와 검사 명령을 설정값으로 뺄 수 있다. marketplace는 같은 저장소에 두고 `source`를 상대 경로로 적을 수 있으며, 개발 중에는 `claude --plugin-dir ./plugins/ooee-harness`와 `/reload-plugins`로 바로 시험한다. 비공개 저장소 설치는 기기의 git 자격 증명을 그대로 쓴다.
+- **Plugin이 못 하는 것.** 권한 규칙을 싣지 못한다. Plugin 루트의 `settings.json`은 `agent`와 `subagentStatusLine` 두 키만 받는다. 그래서 공용 권한은 설치하는 저장소의 `.claude/settings.json`이 계속 소유하고, 붙여 넣을 조각을 Plugin의 README가 갖는다.
+- **순서 8에 `/design-page`는 넣지 않는다.** `scripts/figma/`는 `packages/tokens` 상대 import, `scripts/visual` 실행 위치, `node_modules/.pnpm/*` 탐색, 3001 포트 개발 서버에 동시에 기댄다. `/generate-code`·`/review-design` 둘로 완료 기준을 채우고, Figma 쪽은 `data-slot` 승격 결정 뒤에 옮긴다.
+- **함께 정해야 하는 것 둘을 「아직 정하지 않은 것」에 더했다.** import 경계 문장을 `docs/system/quality.md`로 승격할지(신주희), 전달본 사본을 만드는 절차(유진식)다.
+
+### 2026-09-16 순서 8: 하네스를 Plugin 으로 묶었다
+
+- **만든 것.** `plugins/ooee-harness/`(Claude Code Plugin)와 저장소 루트 `.claude-plugin/marketplace.json`. Plugin 은 `skills/generate-code`·`skills/review-design`, 규칙 판정기 `lib/screen-rules.mjs`, 화면을 훑는 `lib/check-screens.mjs`, 그 시험, 설치 문서 `README.md`를 갖는다. 이 저장소의 `.claude/skills/`에는 `/design-page`만 남았다.
+- **경로를 설정값으로 뺐다.** `screens_dir`·`docs_root`·`check_command` 셋이다. `SKILL.md` 본문에서 `${user_config.…}`로 쓰고, 설정이 비어 있으면 요청에 적힌 값이나 저장소 구조에서 찾아 쓰고 보고에 적는다. 화면 규칙 판정기는 `typescript` 를 설치한 저장소에서 찾아 쓰므로 Plugin 자체에는 의존성이 없다.
+- **완료 기준을 채웠다.** `docs/system/`·`packages/`·화면 앱만 담은 사본 저장소를 만들어 Plugin 을 띄우고 `/ooee-harness:generate-code`로 STO 지원요청 화면을 만들었다. build·test·화면 규칙 검사가 모두 통과했고 「pull request 준비 완료」까지 갔다. 사본에는 `AGENTS.md`도 `docs/process/`도 `.claude/`도 없다.
+- **사본 시험에서 드러난 것 둘.** ① 화면 앱의 빌드 산출물이 `.gitignore` 에 없으면 보고의 「세 파일만 바뀌었다」 확인이 언제나 실패한다. Plugin README 의 요구 조건에 적었다. ② 화면 규칙 검사 명령이 승인 요청에 막히자 세션이 절대 경로를 상대 경로로 바꿔 다시 돌렸다. 경로 표기를 바꾸는 것도 「막힌 명령 다시 시도」라고 `SKILL.md`에 적고, 늘 쓰려면 저장소가 `permissions.allow` 에 한 줄을 두도록 README 에 넣었다.
+- **남은 것.** `/design-page`와 `scripts/figma/`는 저장소 구조에 기대므로 옮기지 않았다(R3 의 결정). marketplace 설치(`/plugin marketplace add`)는 대화형 명령이라 사본 시험에서는 `--plugin-dir`로 확인했다.
