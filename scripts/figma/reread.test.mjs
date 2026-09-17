@@ -148,4 +148,14 @@ test("인스턴스는 주 컴포넌트 이름으로 견주고 안쪽은 보지 �
     swapped.map((c) => [c.kind, c.from, c.to, c.auto]),
     [["컴포넌트", "Button/fill·brand·regular", "Button/outline·brand·regular", false]],
   );
+
+  // 화면 사양은 인스턴스의 칠·모서리를 싣지 않는다(컴포넌트가 가진 값이다). 없다고 「색이 사라졌다」로 세지 않는다.
+  const painted = diffFrame(spec, {
+    name: "f",
+    nodes: [
+      { p: "voc:s0", n: "main", t: "f", w: 100, h: 40 },
+      { p: "voc:s0.0", n: "button", t: "i", w: 80, h: 36, r: 8, bg: { v: "oe-brand-background-bold-primary" }, st: "Button/fill·brand·regular" },
+    ],
+  });
+  assert.deepEqual(painted, []);
 });

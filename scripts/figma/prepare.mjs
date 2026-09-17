@@ -26,7 +26,7 @@ if (!key || !screenName) {
 }
 const base = opt("base", "http://localhost:3001");
 const width = Number(opt("width", "1440"));
-// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 인스턴스를 만드는 단계가 매우 느리다(아래 주석).
+// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 까닭은 아래 prep() 의 주석에 있다.
 const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
 // 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
@@ -134,7 +134,8 @@ const unknownIcons = [];
 function prep(node, nodePath, icons, primitives) {
   node.path = nodePath;
   // 인스턴스는 --instances 를 줄 때만 쓴다. 느려서가 아니라(2026-09-17 측정: 하나에 0.2초),
-  // 카탈로그를 Figma 에 먼저 올려 둔 파일에서만 맞기 때문이다. 없으면 build 결과의 instanceMiss 에 나온다.
+  // 카탈로그를 Figma 에 먼저 올려 둔 파일에서만 맞기 때문이다. 그 이름의 컴포넌트가 없으면
+  // 안쪽을 싣지 않은 탓에 대신 그릴 것이 없으므로 builder 가 error 로 멈춘다.
   if (!useInstances) delete node.inst;
   const where = `${nodePath} ${node.n || node.s || ""}`.slice(0, 60);
   if (node.bg) node.bg = resolve(node.bg, `bg ${where}`) || undefined;

@@ -147,32 +147,31 @@ function textsOf(spec, acc = []) {
 
 async function build(spec, parent, parentBox) {
   let node;
+  // 인스턴스로 놓는 자리는 안쪽이 조각에 실려 오지 않는다. 그래서 컴포넌트를 못 찾으면 그릴 것이 없다.
+  // 프레임으로 대신 그리면 이름도 색도 좌표도 없는 글자가 엉뚱한 자리에 놓이므로, 그리지 않고 멈춘다.
   if (spec.inst) {
     const component = await componentNamed(spec.inst);
     const wanted = textsOf(spec);
-    if (component) {
-      const instance = component.createInstance();
-      parent.appendChild(instance);
-      const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
-      if (slots.length === wanted.length) {
-        for (const [i, text] of slots.entries()) {
-          await figma.loadFontAsync(text.fontName);
-          text.characters = wanted[i].s;
-        }
-        instance.name = spec.n;
-        instance.resize(Math.max(1, spec.w), Math.max(1, spec.h));
-        // 인스턴스 안쪽은 카탈로그의 경로를 물고 온다. 지우지 않으면 되읽기가 화면의 자리로 착각한다.
-        for (const inner of instance.findAll(() => true)) inner.setSharedPluginData(TAG, "p", "");
-        report.instances = (report.instances || 0) + 1;
-        if (spec.path) instance.setSharedPluginData(TAG, "p", spec.path);
-        place(instance, spec, parentBox, parent);
-        return instance;
-      }
+    if (!component) throw new Error(`컴포넌트를 찾지 못했다: ${spec.inst}. 카탈로그를 이 파일에 먼저 올린다`);
+    const instance = component.createInstance();
+    parent.appendChild(instance);
+    const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
+    if (slots.length !== wanted.length) {
       instance.remove();
-      report.instanceMiss = [...new Set([...(report.instanceMiss || []), `${spec.inst} 글자 ${wanted.length}개≠${slots.length}개`])];
-    } else {
-      report.instanceMiss = [...new Set([...(report.instanceMiss || []), `${spec.inst} 없음`])];
+      throw new Error(`컴포넌트의 글자 수가 다르다: ${spec.inst} 화면 ${wanted.length}개 ≠ 컴포넌트 ${slots.length}개. 카탈로그를 다시 올린다`);
     }
+    for (const [i, text] of slots.entries()) {
+      await figma.loadFontAsync(text.fontName);
+      text.characters = wanted[i].s;
+    }
+    instance.name = spec.n;
+    instance.resize(Math.max(1, spec.w), Math.max(1, spec.h));
+    // 인스턴스 안쪽은 카탈로그의 경로를 물고 온다. 지우지 않으면 되읽기가 화면의 자리로 착각한다.
+    for (const inner of instance.findAll(() => true)) inner.setSharedPluginData(TAG, "p", "");
+    report.instances = (report.instances || 0) + 1;
+    if (spec.path) instance.setSharedPluginData(TAG, "p", spec.path);
+    place(instance, spec, parentBox, parent);
+    return instance;
   }
   if (spec.t === "x") {
     node = figma.createText();
@@ -265,6 +264,7 @@ async function build(spec, parent, parentBox) {
   return node;
 }
 
+try {
 for (CHUNK of RUN) {
   let parent;
   if (CHUNK.rootFrame) {
@@ -287,6 +287,10 @@ for (CHUNK of RUN) {
     }
   }
   if (CHUNK.lastForParent && parent.type === "FRAME") settle(parent);
+}
+} catch (e) {
+  // 여기까지 그린 것은 남는다. 무엇이 왜 멈췄는지 돌려주고 사람이 고친 뒤 이 단계부터 다시 돌린다.
+  return { error: (e && e.message) || String(e), report };
 }
 for (const key of ["unmappedColors", "unmappedText", "weightFallback", "defaultTextColor", "opacityOnToken"]) report[key] = [...new Set(report[key])].slice(0, 20);
 return report;

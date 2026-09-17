@@ -37,9 +37,18 @@ export function stripComments(src) {
 }
 
 /**
+ * `builder.js` 가 인스턴스를 놓을 때 실제로 읽는 자리. 이 밖의 값은 조각에 실어도 쓰이지 않는다.
+ * builder 를 고치면 이 목록도 함께 고쳐야 한다. step-payload.test.mjs 가 둘을 묶어 둔다.
+ */
+export const INSTANCE_FIELDS = ["t", "n", "x", "y", "w", "h", "path", "inst", "portal"];
+
+/**
  * 인스턴스로 놓을 자리는 안쪽을 싣지 않는다. 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은
  * 글자뿐이다(`builder.js` 의 `textsOf` 가 이 글자를 슬롯에 넣는다). 되읽기도 인스턴스 안쪽은 화면의
  * 자리로 견주지 않으므로(`reread.mjs` 의 `flatten`) 사양에서 빼도 잃는 것이 없다.
+ *
+ * 노드 자신의 칠·테두리·모서리·오토 레이아웃도 뗀다. 그것은 컴포넌트가 가진 값이고 builder 의 인스턴스
+ * 경로는 읽지 않는다. 컴포넌트를 찾지 못하면 builder 가 그리지 않고 멈추므로 대신 그릴 것도 없다.
  *
  * 글자의 **차례**는 그대로 둔다. builder 는 인스턴스 안 글자 노드를 찾은 차례대로 바꾸므로,
  * 차례가 틀어지면 값이 엉뚱한 자리에 들어간다.
@@ -49,8 +58,8 @@ export function foldInstances(node) {
     const texts = [];
     const walk = (n) => { if (n.t === "x") texts.push({ t: "x", s: n.s }); (n.k || []).forEach(walk); };
     (node.k || []).forEach(walk);
+    for (const field of Object.keys(node)) if (!INSTANCE_FIELDS.includes(field)) delete node[field];
     if (texts.length) node.k = texts;
-    else delete node.k;
     return node;
   }
   (node.k || []).forEach(foldInstances);
