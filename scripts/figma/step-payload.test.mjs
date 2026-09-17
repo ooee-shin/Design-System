@@ -48,6 +48,22 @@ test("builder.js 에는 블록 주석과 여러 줄 템플릿 문자열이 없�
   assert.deepEqual(odd, [], "여러 줄 템플릿 문자열이 생겼다. stripComments 를 다시 봐야 한다");
 });
 
+test("builder.js 에 // 를 품은 정규식 리터럴이 없다", () => {
+  // stripLineComment 는 따옴표만 따라가고 정규식 리터럴은 모른다. `/^https?:\/\//` 같은 것이 생기면
+  // 그 줄이 가운데서 잘린다. 아래 파싱 시험이 결국 잡아 주지만, 여기서 까닭까지 알려 주는 편이 낫다.
+  const bad = builder
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("//"))
+    .filter((line) => [...line.matchAll(/\/(?![/*])(?:\\.|\[(?:\\.|[^\]])*\]|[^/\n\\])+\//g)].some((m) => m[0].includes("//")));
+  assert.deepEqual(bad, [], "// 를 품은 정규식 리터럴이 생겼다. stripComments 를 다시 봐야 한다");
+});
+
+test("주석을 뗀 builder.js 는 원본과 공백만 다르다", () => {
+  // 주석 말고 다른 것을 지우면 여기서 갈린다. 파싱 시험만으로는 「문법은 맞지만 뜻이 달라진」 것을 못 잡는다.
+  const bare = (source) => source.split("\n").map(stripLineComment).join("\n").replace(/\s+/g, "");
+  assert.equal(bare(stripComments(builder)), bare(builder));
+});
+
 test("주석을 뺀 builder.js 가 그대로 async 함수 본문으로 파싱된다", () => {
   const stripped = stripComments(builder);
   assert.doesNotThrow(() => new AsyncFunction(stripped));

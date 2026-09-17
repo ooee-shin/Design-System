@@ -69,6 +69,13 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
 
+**이 실행은 지금 42단계 702,691자다(2026-09-17, 컴포넌트 139개).** 화면 하나가 5~6단계인 것과 견주면 크다. 단계마다 `builder.js` 가 통째로 들어가므로 그 글자의 74%(521,586자)는 39번 되풀이되는 같은 코드이고, 카탈로그 노드 자체는 18만 자뿐이다. 옮겨 적는 데 걸리는 시간이 곧 이 글자 수라, 컴포넌트를 더할수록 단계가 선형으로 는다.
+
+줄이려면 반복분을 건드려야 한다. 두 갈래가 있고 아직 하지 않았다.
+
+- 카탈로그를 컴포넌트 종류별로 쪼개 한 번에 한 종류만 옮긴다(`--only Button` 같은 옵션).
+- `builder.js` 를 첫 단계에서 한 번만 보내고 이후 단계는 조각만 싣는다. Figma plugin 은 호출마다 새 함수 본문이라 지금 구조로는 안 되고, 코드를 문서에 저장해 두고 되읽는 식이 필요하다.
+
 변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
