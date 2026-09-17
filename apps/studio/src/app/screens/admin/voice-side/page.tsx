@@ -169,21 +169,24 @@ function StorePicker({
         세로선 위로 올라오려고 쓰는 값이 화면 전체의 순서에 끼어들면, 위에 붙어 있는 머리 줄을
         덮는다. */}
     <div className="isolate grid grid-cols-[minmax(4.5rem,0.7fr)_minmax(0,1.3fr)] overflow-hidden rounded-oe-control border border-oe-border-secondary">
-      {/* 왼쪽은 지역이다. 두 칸을 가르는 세로선은 이 칸이 갖고, 고른 지역만 그 선 위로 올라와
-          오른쪽 칸과 이어져 보인다. 선을 지우고 고른 줄만 흰 바닥으로 두면 두 칸의 경계가
-          사라져서 어디까지가 지역인지 읽히지 않는다. */}
-      <div className={`relative flex max-h-60 flex-col overflow-y-auto bg-oe-background-secondary${keyword ? " opacity-50" : ""} [scrollbar-width:none] after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary p-1 [&::-webkit-scrollbar]:hidden`}>
+      {/* 왼쪽은 지역이다. 두 칸을 가르는 세로선은 이 칸이 갖는다. */}
+      <div className={`relative flex max-h-60 flex-col overflow-y-auto bg-oe-background-secondary${keyword ? " opacity-50" : ""} [scrollbar-width:none] after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary [&::-webkit-scrollbar]:hidden`}>
         {REGIONS.map((region) => (
           <button
             key={region}
             type="button"
             onClick={() => setActiveRegion(region)}
-            // 줄마다 모서리를 두고 칸 안쪽으로 살짝 들인다. 각진 채로 두면 포커스 링이 칸
-            // 경계에 사각으로 붙고, 고른 줄의 흰 바닥도 벽에 닿아 보인다.
-            className={`flex min-h-9 shrink-0 items-center gap-1 rounded-md pr-1.5 pl-2.5 text-left text-oe-label outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${
+            // 줄이 칸을 가로로 꽉 채운다. 안쪽으로 들이면 고른 줄의 면이 칸 안에 뜬 조각처럼
+            // 보이고, 채우면 그 줄이 곧 그 칸의 한 단이 된다. 포커스 링은 안쪽에 그려 칸
+            // 경계를 넘지 않게 한다.
+            className={`flex min-h-9 shrink-0 items-center gap-1 pr-2 pl-3 text-left text-oe-label outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-inset ${
               activeRegion === region
-                ? "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary"
-                : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"
+                ? // 고른 줄은 오른쪽 칸과 같은 흰 바닥이 되고 두 칸을 가르는 세로선 위로 올라와
+                  // 그 선을 덮는다. 고른 지역이 오른쪽에 펼쳐진 점포와 이어져 보이는 것이 두 칸
+                  // 으로 나눈 이유다. 브랜드 색은 쓰지 않는다. 여기서 고르는 것은 조건이 아니라
+                  // 오른쪽에 무엇을 띄울지이고, 브랜드 색은 걸린 조건을 말하는 자리에 남겨 둔다.
+                  "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary"
+                : "text-oe-foreground-secondary hover:bg-oe-interaction-hover-subtle"
             }`}
           >
             <span className="min-w-0 flex-1 truncate">{region}</span>
