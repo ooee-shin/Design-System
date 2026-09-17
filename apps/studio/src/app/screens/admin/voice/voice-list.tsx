@@ -68,8 +68,10 @@ export function VoiceList({
         {leading}
         {/* 조건을 건 결과가 몇 건인지 말한다. 표 아래의 「1–10」 은 그중 지금 어디를 보고
             있는지를 말하므로 둘이 겹치지 않는다. */}
-        <span className="text-base font-semibold text-oe-foreground-primary tabular-nums">
-          전체 {rows.length}건
+        {/* 조건을 걸 때마다 바뀌는 것은 숫자 하나뿐이다. 그 숫자만 브랜드 색으로 두면 눈이
+            「전체」와 「건」을 다시 읽지 않고 바뀐 값에 바로 닿는다. */}
+        <span className="text-base font-semibold text-oe-foreground-primary">
+          전체 <span className="text-oe-brand-foreground-primary tabular-nums">{rows.length}</span>건
         </span>
         {/* 치고 누르는 것은 오른쪽에 모은다. 표 아래 줄도 왼쪽이 상태, 오른쪽이 조작이라
             위아래가 같은 규칙으로 읽힌다. */}
