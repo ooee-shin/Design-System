@@ -21,6 +21,13 @@ export const CONTROL_HEIGHTS = {
 
 export type ControlSize = keyof typeof CONTROL_HEIGHTS;
 
+/**
+ * 컨트롤 줄에 끼지 않고 글자 옆에 붙는 요소의 높이다. 제목 옆 개수 표시나 표 안의 태그처럼
+ * 다른 요소에 딸려 서는 자리에 쓰며, 본문 글자의 줄 높이와 같아 줄을 두껍게 만들지 않는다.
+ * 기준은 docs/system/interaction.md의 「Compact」다.
+ */
+export const COMPACT_HEIGHT = 20;
+
 export const ICON_SIZES = {
   xsmall: 12,
   small: 16,
