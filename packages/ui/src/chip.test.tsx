@@ -128,9 +128,9 @@ test("the type rejects forcing the icon only variant from outside", () => {
   assert.ok(forcedIconOnly)
 })
 
-// Label 이 있으면 그 글자가 접근 가능한 이름이다. `ariaLabel` 을 함께 받아도 덮어쓰면
-// 화면에 보이는 글자와 읽히는 이름이 갈린다. Icon only 에서만 `aria-label` 을 붙인다.
-test("a labelled chip is never renamed by ariaLabel", () => {
+// 보이는 글자와 읽히는 이름이 갈리면 화면을 보며 말하는 사람과 듣는 사람이 같은 것을
+// 가리키지 못한다. Label 을 담지 않은 `ariaLabel` 은 이름으로 쓰지 않는다.
+test("a labelled chip is never renamed by an ariaLabel that drops the label", () => {
   for (const props of [
     { children: "Label", ariaLabel: "다른 이름" },
     { children: "Label", ariaLabel: "다른 이름", onClick: () => undefined },
@@ -141,6 +141,26 @@ test("a labelled chip is never renamed by ariaLabel", () => {
     const chip = view.container.querySelector("[data-slot=chip]")
 
     assert.equal(chip?.getAttribute("aria-label"), null, `${JSON.stringify(props)} 에서 Label 이 덮어써졌다`)
+  }
+})
+
+// 「2」처럼 짧은 Label 은 그 자체로 무엇을 하는 자리인지 말하지 못한다. 보이는 글자를 담은
+// 이름은 그 Label 을 보태는 것이므로 받는다. 기준은 chip.md 의 「Label 을 담은 이름만 보태기」다.
+test("a labelled chip takes an ariaLabel that contains its label", () => {
+  for (const props of [
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기" },
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기", onClick: () => undefined },
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기", onRemove: () => undefined, removeLabel: "삭제" },
+  ] as const) {
+    cleanup()
+    const view = render(<Chip {...props} />)
+    const chip = view.container.querySelector("[data-slot=chip]")
+
+    assert.equal(
+      chip?.getAttribute("aria-label"),
+      "처리상태 조건 2개 지우기",
+      `${JSON.stringify(props)} 에서 Label 을 담은 이름이 붙지 않았다`,
+    )
   }
 })
 

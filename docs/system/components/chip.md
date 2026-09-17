@@ -7,7 +7,7 @@
 ## 역할과 경계
 
 - Chip은 값 하나를 짧은 Label로 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 삭제할 수 있다.
-- 항상 하나가 켜져 있고 끌 수 없는 위치 표시는 Chip이 아니라 Tab이 담당한다. Chip은 아무것도 켜지지 않은 상태가 기본이다.
+- **화면의 내용을 갈아 끼우는 위치 표시는 Chip이 아니라 Tab이 담당한다.** Chip은 같은 내용을 좁히거나 값을 고르는 자리다. 가르는 기준은 켜진 것이 몇 개인지가 아니라 누른 뒤 무엇이 달라지는지다. Chip에도 하나만 고를 수 있고 해제할 수 없는 자리가 있다. 목록을 거르는 기간처럼 조건이 서로 배타적이고 거르지 않는 상태를 두지 않는 경우가 그것이며, 그때도 바뀌는 것은 화면이 아니라 그 화면이 담는 범위다.
 - 설명이나 시각 정보를 비교하며 고르는 카드형 선택지는 Select Box가 담당한다.
 - 다른 요소에 덧붙어 상태나 개수를 작게 표시하는 것은 [badge.md](badge.md)가 담당한다. Chip은 [interaction.md](../interaction.md)의 「공통 Control Height」를 따르므로 컨트롤과 나란히 놓이는 크기이며, Badge는 자기 크기 체계로 덧붙는다. 동작이 없는 정보 표시가 Chip에 남는 이유도 크기와 놓이는 자리가 컨트롤 쪽이기 때문이다.
 - Label, Helper text와 Error message는 별도 Field가 소유하며 그 구조와 API는 [field.md](field.md)에 있다.
@@ -28,7 +28,8 @@ Extended anatomy는 선택 요소를 표시한다.
 
 ## Properties
 
-- `controlSize`: `xsmall | small | regular | large | xlarge`, 기본값 `regular`. 실제 높이는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다. 다섯 단계인 이유는 Input·Select·Combobox가 제공하는 넷에 Suggestion용 XSmall 28px을 더했기 때문이다. Selection이 폼 요소와 같은 페이지에서, 때로는 같은 Field 안에서 쓰이므로 폼 요소의 단계를 모두 가져야 나란히 놓았을 때 높이를 맞출 수 있다. 공통 scale의 XXSmall 24px과 XXLarge 56px은 폼 요소도 갖지 않으므로 제공하지 않는다
+- `controlSize`: `compact | xsmall | small | regular | large | xlarge`, 기본값 `regular`. `compact`를 뺀 나머지의 높이는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다. 그 다섯 단계는 Input·Select·Combobox가 제공하는 넷에 Suggestion용 XSmall 28px을 더한 것이다. Selection이 폼 요소와 같은 페이지에서, 때로는 같은 Field 안에서 쓰이므로 폼 요소의 단계를 모두 가져야 나란히 놓았을 때 높이를 맞출 수 있다. 공통 scale의 XXSmall 24px과 XXLarge 56px은 폼 요소도 갖지 않으므로 제공하지 않는다
+- `compact`는 컨트롤 높이 scale을 따르지 않는 20px이며 [interaction.md](../interaction.md)의 「Compact」가 소유한다. 컨트롤 줄에 끼지 않고 글자 옆에 붙는 자리에만 쓴다. 필터 패널에서 축 이름 옆에 조건이 몇 개 걸렸는지 알리며 그 축만 지우는 Chip이 이 크기를 쓰는 자리다. 이때 Label에 담기는 것은 값이 아니라 개수다
 - `shape`: `circle | rounded`, 기본값 `circle`. [vocabulary.md](../vocabulary.md)의 공통 모양 어휘를 사용하며 `rounded`는 [interaction.md](../interaction.md)의 「공통 Control Radius」를 따른다
 - `active`: `boolean`, 기본값 `false`
 - `children`: Label 문자열. 없으면 Icon only이며 높이와 같은 정사각 폭을 사용한다
@@ -37,7 +38,7 @@ Extended anatomy는 선택 요소를 표시한다.
 - `leadingTone`, `trailingTone`: `secondary | tertiary`, 기본값 `secondary`
 - `onClick`: Container 전체를 누르는 동작
 - `onRemove`, `removeLabel`, `removeTooltip`: Chip 자체를 삭제하는 Remove button
-- `ariaLabel`: Icon only에서 필수
+- `ariaLabel`: Icon only에서 필수이며, Label이 있는 Chip에서는 그 Label을 담은 이름만 받는다. 규칙은 아래 Guidelines의 「Label을 담은 이름만 보태기」에 있다
 
 Style variant는 제공하지 않는다. 한 가지 스타일만 두며 Neutral border와 기본 surface를 사용한다.
 
@@ -61,6 +62,7 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 - Chip은 내부 콘텐츠를 감싸는 너비를 사용한다. 담을 폭보다 넓어지면 Label만 말줄임해 한 줄을 유지하고 Leading element, Prefix, Trailing element와 Remove button은 줄이지 않는다. 아이콘이 찌그러지거나 Remove button을 누를 수 없게 되면 값을 지울 방법이 사라지기 때문이다. Chip을 여러 줄로 늘리지 않는다.
 - `circle`이 기본이며 `rounded`는 Selection에서만 사용한다. Selection이 폼 요소와 나란히 놓이는 유일한 쓰임이므로 그 자리에서만 모서리를 맞출 이유가 있다.
+- **Label을 담은 이름만 보탠다.** Label이 있으면 그 글자가 접근 가능한 이름이다. 「2」처럼 짧은 Label은 그 자체로 무엇을 하는 자리인지 말하지 못하므로 `ariaLabel`로 이름을 보탤 수 있지만, 그 이름은 **화면에 보이는 Label을 그대로 포함해야 한다.** 「2」를 「조건 지우기」로 바꿔 부르면 화면을 보며 말하는 사람과 듣는 사람이 같은 것을 가리키지 못한다. Label을 담지 않은 이름은 붙지 않으며 개발 중에 경고한다.
 - Icon only는 누르면 바로 끝나는 동작에만 쓴다. 별도 화면이 열리거나 다음 선택을 요구하는 자리에는 두지 않는다. 아이콘은 열리기 전에 무엇을 고르는 자리인지 대신 말해 주지 못한다.
 - Icon only에 Remove button을 함께 두지 않는다. 지울 값이 화면에 없으면 무엇을 지우는지 알 수 없다.
 
@@ -71,7 +73,7 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 | 쓰임 | 모양 | 누르는 동작 | 개별 제거 | Active |
 | --- | --- | --- | --- | --- |
 | Filter | `circle` | 조건을 켜고 끄거나 선택 화면을 연다 | 두지 않는다. 초기화가 담당한다 | 사용한다 |
-| Selection | `rounded` | 값을 고르고 해제한다 | 두지 않는다 | 사용한다 |
+| Selection | `rounded` | 값을 고른다. 여러 개를 고르는 자리는 다시 눌러 해제하고, 하나만 고르는 자리는 해제하지 않는다 | 두지 않는다 | 사용한다 |
 | Suggestion | `circle` | 누르면 값이 채워진다 | 두지 않는다 | 사용하지 않는다 |
 | Input | `circle` | 두지 않는다 | Remove button을 사용한다 | 사용하지 않는다 |
 | 정보 표시 | `circle` | 두지 않는다 | 두지 않는다 | 사용하지 않는다 |
@@ -93,7 +95,9 @@ Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 
 - 각 Chip은 Label 너비만큼만 차지하고 줄이 넘치면 줄바꿈한다. 이 배치를 Select Box가 만들지 않는 이유도 같은 기준이며 [select-box.md](select-box.md)의 「역할과 경계」에 있다.
 - 다섯 쓰임 가운데 `rounded`를 쓰는 것은 Selection뿐이다. Input, Select, Number Input과 같은 페이지에서 값을 고르는 자리이며 Field에서 다루기도 하므로, 나란히 놓였을 때 모서리가 갈리지 않아야 한다. 값은 [interaction.md](../interaction.md)의 「공통 Control Radius」가 소유한다.
-- 선택과 해제를 전체 Click으로 받는다. `onClick` 하나로 켜고 끄며 Remove button은 두지 않는다. 아무것도 켜지지 않은 상태가 기본이라는 점에서, 항상 하나가 켜져 있고 끌 수 없는 Tab과 갈린다.
+- 선택과 해제를 전체 Click으로 받는다. `onClick` 하나로 켜고 끄며 Remove button은 두지 않는다.
+- **여러 개를 고르는 자리와 하나만 고르는 자리가 함께 있다.** 여러 개를 고르는 자리는 아무것도 켜지지 않은 상태가 기본이며, 고른 값을 다시 눌러 해제한다. **하나만 고르는 자리는 처음부터 하나가 켜져 있고 해제할 수 없다.** 조건이 서로 배타적이고 고르지 않은 상태에 뜻이 없을 때가 그렇다. 목록을 거르는 기간이 여기에 해당하며, 기간을 고르지 않는다는 것이 곧 전체를 불러온다는 뜻이 되어 버리는 자리에서는 그 상태를 두지 않는다.
+- 어느 쪽이든 누른 뒤 바뀌는 것은 화면이 아니라 그 화면이 담는 내용이다. 화면 자체가 갈리면 Tab이다.
 - 설명이나 시각 정보를 견주어 고르는 자리는 Select Box가 담당한다. 키워드만으로 판단할 수 있을 때 Chip을 사용한다.
 
 ### Chip을 Suggestion으로 사용하기

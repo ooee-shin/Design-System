@@ -32,6 +32,7 @@
   --oe-border-primary: var(--color-neutral-300);
   --oe-border-bold-primary: var(--color-neutral-950);
   --oe-border-secondary: var(--color-neutral-200);
+  --oe-border-tertiary: var(--color-neutral-150);
   --oe-border-disabled: var(--color-neutral-100);
   --oe-border-visual: rgb(0 0 0 / 10%);
   --oe-interaction-hover-subtle: rgb(0 0 0 / 3%);
@@ -88,6 +89,7 @@
   --oe-border-primary: var(--color-neutral-700);
   --oe-border-bold-primary: var(--color-neutral-50);
   --oe-border-secondary: var(--color-neutral-800);
+  --oe-border-tertiary: var(--color-neutral-850);
   --oe-border-disabled: var(--color-neutral-900);
   --oe-border-visual: rgb(0 0 0 / 10%);
   --oe-interaction-hover-subtle: rgb(255 255 255 / 5%);
@@ -124,6 +126,12 @@
 }
 
 @theme inline {
+  /* Tailwind 팔레트에 없는 사이 단계다. 경계의 가장 옅은 값이 100 이면 배경과 구별되지 않고
+     200 이면 상자를 두르는 선과 같은 무게가 되어, 그 사이가 필요했다. 값을 직접 적지 않고 두
+     단계를 섞어, 팔레트가 바뀌어도 그 사이를 따라가게 한다. */
+  --color-neutral-150: color-mix(in oklab, var(--color-neutral-100), var(--color-neutral-200));
+  --color-neutral-850: color-mix(in oklab, var(--color-neutral-800), var(--color-neutral-900));
+
   /* 모서리 반지름. 값의 단일 원본은 index.ts 의 RADII 이며 index.test.ts 가 대조한다.
      oe-control 은 값을 입력받거나 고르는 컨트롤이 공유하는 값이다. */
   --radius-oe-control: 0.5rem;
@@ -141,6 +149,7 @@
   --spacing-oe-control-large: 2.5rem;
   --spacing-oe-control-xlarge: 3rem;
   --spacing-oe-control-xxlarge: 3.5rem;
+  --spacing-oe-compact: 1.25rem;
   --spacing-oe-padding-default: 1rem;
   --spacing-oe-padding-wide: 2.5rem;
   --spacing-oe-icon-xsmall: 0.75rem;
@@ -206,6 +215,7 @@
   --color-oe-border-primary: var(--oe-border-primary);
   --color-oe-border-bold-primary: var(--oe-border-bold-primary);
   --color-oe-border-secondary: var(--oe-border-secondary);
+  --color-oe-border-tertiary: var(--oe-border-tertiary);
   --color-oe-border-disabled: var(--oe-border-disabled);
   --color-oe-border-visual: var(--oe-border-visual);
   --color-oe-focus-ring: var(--oe-focus-ring);

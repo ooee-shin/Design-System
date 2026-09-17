@@ -9,6 +9,7 @@ import {
   createBrandSemanticMapping,
   CORE_SEMANTIC_TOKENS,
   createCoreSemanticCssVariables,
+  COMPACT_HEIGHT,
   CONTROL_HEIGHTS,
   ICON_SIZES,
   PADDINGS,
@@ -25,6 +26,19 @@ test("control heights expose the shared form and button size scale", () => {
     xlarge: 48,
     xxlarge: 56,
   });
+});
+
+test("the compact height stands outside the control scale and matches its css variable", () => {
+  assert.equal(COMPACT_HEIGHT, 20);
+  assert.ok(
+    !Object.values(CONTROL_HEIGHTS).includes(COMPACT_HEIGHT as never),
+    "COMPACT_HEIGHT 는 컨트롤 높이 scale 의 값과 겹치지 않는다",
+  );
+
+  const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
+  const found = css.match(/--spacing-oe-compact:\s*([0-9.]+)rem/);
+  assert.ok(found, "--spacing-oe-compact 가 styles.css 에 없다");
+  assert.equal(Number(found[1]) * 16, COMPACT_HEIGHT, "--spacing-oe-compact 의 값이 COMPACT_HEIGHT 와 다르다");
 });
 
 test("every control height matches the css variable that exposes it", () => {

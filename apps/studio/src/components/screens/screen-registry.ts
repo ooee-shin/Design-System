@@ -24,6 +24,11 @@ export type ScreenWorkItem = {
   scope?: string;
   /** 아직 만들지 않은 화면은 갖지 않는다. 없으면 링크가 아니라 `예정`으로 표시한다. */
   href?: string;
+  /**
+   * 열리기는 하지만 아직 만들고 있는 화면인지. 열어 본 사람이 덜 만들어진 자리를 결정된 것으로
+   * 읽지 않게 목록에 `진행중`을 붙이고, 「몇 개 만들었습니다」의 개수에서도 뺀다.
+   */
+  inProgress?: boolean;
 };
 
 export const screenRoots: ScreenRoot[] = [
@@ -35,6 +40,8 @@ export const screenRoots: ScreenRoot[] = [
       { key: "layout", name: "레이아웃·테마설정", scope: "Admin Layout(Header, Side Navigation, Page Header)", href: "/screens/admin/layout" },
       { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
+      { key: "voice", name: "점주의 소리", scope: "목록·상세, 지원요청으로 전환", href: "/screens/admin/voice", inProgress: true },
+      { key: "support-request", name: "지원요청", scope: "목록·상세, 점주의소리로 전환, 채팅" },
     ],
   },
   {
@@ -47,6 +54,9 @@ export const screenRoots: ScreenRoot[] = [
       { key: "layout-v3", name: "App Layout V3·Floating", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v3" },
       { key: "test", name: "테스트", href: "/screens/sto/test" },
       { key: "login", name: "로그인", href: "/screens/sto/login" },
+      { key: "voice", name: "점주의 소리", scope: "목록·상세, 전환된 건 표시" },
+      { key: "support-request", name: "지원요청", scope: "목록·상세 탭(요청 내용·채팅)" },
+      { key: "write", name: "통합 작성 폼", scope: "종류 선택·카테고리·제목·내용·첨부, 불일치 안내와 확인 시트, 접수 완료" },
     ],
   },
   {

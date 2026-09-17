@@ -7,13 +7,16 @@ import { cn } from "./utils"
 
 type ChipTone = "secondary" | "tertiary"
 type ChipShape = "rounded" | "circle"
-type ChipSize = "xsmall" | "small" | "regular" | "large" | "xlarge"
+type ChipSize = "compact" | "xsmall" | "small" | "regular" | "large" | "xlarge"
 
 const chipVariants = cva(
   "inline-flex max-w-full shrink-0 items-center border border-oe-border-secondary bg-oe-background-primary text-oe-foreground-secondary transition-[background-color,border-color,color] duration-[60ms]",
   {
     variants: {
       controlSize: {
+        // 컨트롤 줄에 끼지 않고 글자 옆에 붙는 크기다. 뜻과 쓰는 자리는 interaction.md 의
+        // 「Compact」가 갖는다. 나머지 단계와 달리 컨트롤 높이 scale 을 따르지 않는다.
+        compact: "h-oe-compact gap-0.5 px-1.5 text-oe-label font-normal",
         xsmall: "h-oe-control-xsmall gap-1 px-2 text-oe-label font-normal",
         small: "h-oe-control-small gap-1 px-2.5 text-sm font-medium",
         regular: "h-oe-control-regular gap-1.5 px-3 text-sm font-medium",
@@ -34,6 +37,7 @@ const chipVariants = cva(
 )
 
 const iconOnlyWidth: Record<ChipSize, string> = {
+  compact: "w-oe-compact",
   xsmall: "w-oe-control-xsmall",
   small: "w-oe-control-small",
   regular: "w-oe-control-regular",
@@ -45,6 +49,7 @@ const iconOnlyWidth: Record<ChipSize, string> = {
 // 끝나고 반대 변이 글자로 끝나면 글자 쪽이 답답해 보인다. 그때 글자가 닿는 변에만 여백을
 // 더한다. 아이콘 쪽을 줄이지 않으므로 어느 변도 기준보다 좁아지지 않는다.
 const textSidePadding: Record<ChipSize, { left: string; right: string }> = {
+  compact: { left: "pl-2", right: "pr-2" },
   xsmall: { left: "pl-2.5", right: "pr-2.5" },
   small: { left: "pl-3", right: "pr-3" },
   regular: { left: "pl-4", right: "pr-4" },
@@ -60,6 +65,7 @@ const toneClassName: Record<ChipTone, { default: string; active: string }> = {
 }
 
 const iconSize: Record<ChipSize, string> = {
+  compact: "[&_svg]:size-oe-icon-xsmall",
   xsmall: "[&_svg]:size-oe-icon-xsmall",
   small: "[&_svg]:size-oe-icon-small",
   regular: "[&_svg]:size-oe-icon-small",
@@ -118,6 +124,16 @@ function Chip({
   if (process.env.NODE_ENV !== "production" && iconOnly && !ariaLabel) {
     console.warn("Label 이 없는 Chip 에는 ariaLabel 이 필요합니다. 아이콘만 남으면 읽을 이름이 없습니다.")
   }
+
+  // Label 이 있는 Chip 도 이름을 보탤 수 있다. 「2」처럼 짧은 Label 은 그 자체로 무엇을 하는
+  // 자리인지 말하지 못하기 때문이다. 다만 **보이는 글자를 포함하는 이름만** 받는다. 보이는
+  // 글자와 읽히는 이름이 갈리면 화면을 보며 말하는 사람과 듣는 사람이 같은 것을 가리키지
+  // 못한다. 포함하지 않는 이름은 붙이지 않고 개발 중에 알린다.
+  const namesTheLabel = iconOnly || !children || !ariaLabel || ariaLabel.includes(children)
+  if (process.env.NODE_ENV !== "production" && !namesTheLabel) {
+    console.warn(`Chip 의 ariaLabel 은 화면에 보이는 Label 을 포함해야 합니다. Label "${children}" 이 "${ariaLabel}" 에 없어 이름을 붙이지 않았습니다.`)
+  }
+  const accessibleName = namesTheLabel ? ariaLabel : undefined
   const size = controlSize ?? "regular"
   const leftEndsWithIcon = Boolean(leadingElement)
   const rightEndsWithIcon = Boolean(trailingElement) || Boolean(onRemove)
@@ -142,7 +158,7 @@ function Chip({
 
   if (onRemove) {
     return (
-      <span data-slot="chip" data-active={active ? "" : undefined} aria-label={iconOnly ? ariaLabel : undefined} className={shared}>
+      <span data-slot="chip" data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
         {content}
         <Tooltip.Root>
           <Tooltip.Trigger
@@ -150,7 +166,7 @@ function Chip({
             delay={150}
             aria-label={removeLabel}
             onClick={onRemove}
-            className={cn("grid shrink-0 cursor-pointer place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring", size === "small" ? "size-4" : "size-5")}
+            className={cn("grid shrink-0 cursor-pointer place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring", size === "small" || size === "compact" ? "size-4" : "size-5")}
           >
             <RiCloseLine aria-hidden="true" />
           </Tooltip.Trigger>
@@ -173,7 +189,7 @@ function Chip({
         data-slot="chip"
         data-active={active ? "" : undefined}
         aria-pressed={active}
-        aria-label={iconOnly ? ariaLabel : undefined}
+        aria-label={accessibleName}
         onClick={onClick}
         className={cn(
           shared,
@@ -189,7 +205,7 @@ function Chip({
   }
 
   return (
-    <span data-slot="chip" data-active={active ? "" : undefined} aria-label={iconOnly ? ariaLabel : undefined} className={shared}>
+    <span data-slot="chip" data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
       {content}
     </span>
   )
