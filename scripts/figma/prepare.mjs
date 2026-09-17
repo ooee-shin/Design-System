@@ -12,7 +12,7 @@ import { existsSync, globSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildDriver, foldInstances, fnv, loaderCode, stripComments } from "./step-payload.mjs";
+import { buildDriver, foldInstances, fnv, loaderSteps, stripComments } from "./step-payload.mjs";
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback; };
@@ -37,9 +37,12 @@ const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
 const duplicate = states.map((s) => s.label).find((label, i, labels) => labels.indexOf(label) !== i);
 if (duplicate !== undefined) throw new Error(`--state 이름이 겹친다: ${duplicate}. 프레임 이름이 같아 뒤 상태를 그릴 때 앞 프레임이 지워진다`);
 
-const STEP_LIMIT = 19000; // use_figma 한도는 50,000자지만, 모델이 20,000자쯤을 옮기다 줄바꿈을 하나 더해 문법이 깨진 적이 있다
+// use_figma 한도는 50,000자지만 옮겨 적는 것은 모델이라, 한 단계가 클수록 한 글자가 어긋날 자리도 는다.
+// 21,000자가 깨진 적이 있고, builder 를 문서로 뺀 뒤 데이터만으로 19,000자가 된 단계가 또 깨졌다.
+// 그 단계 파일 자체는 해시가 맞았으니(로컬 확인) 옮겨 적다 틀린 것이다. 그래서 여유를 더 둔다.
+const STEP_LIMIT = 12000;
 const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
-const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. 주석을 뺀 builder.js(약 13,400자)가 단계마다 함께 들어가므로 작게 둔다
+const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. 조각 여러 개를 한 단계에 담으므로 STEP_LIMIT 보다 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
@@ -293,20 +296,24 @@ const steps = [];
 const writeStep = (name, code, description) => { const file = path.join(work, "steps", name); writeFileSync(file, code); steps.push({ file, description, chars: code.length, lines: code.split("\n").length }); };
 const round = (x) => ({ r: Math.round(x.r * 10000) / 10000, g: Math.round(x.g * 10000) / 10000, b: Math.round(x.b * 10000) / 10000, a: x.a });
 const tokenRows = Object.entries(tokens.tokens).map(([name, v]) => [name, round(v.light), round(v.dark), `${v.light.source} / ${v.dark.source}`]);
+let stepNo = 0;
+const num = () => String(++stepNo).padStart(2, "0");
 writeStep(
-  "01-setup-variables.js",
+  `${num()}-setup-variables.js`,
   readFileSync(path.join(here, "setup-variables.js"), "utf8")
     .replace("const TOKENS = __TOKENS__;", () => `const TOKENS = [\n${tokenRows.map((row) => JSON.stringify(row)).join(",\n")}\n];`)
     .replace("const SIZES = __SIZES__;", () => `const SIZES = ${JSON.stringify(tokens.sizes)};`)
     .replace("const EXPECT = __EXPECT__;", () => `const EXPECT = ${fnv(JSON.stringify([tokenRows, tokens.sizes]))};`),
   "oe 토큰을 Figma 변수로 맞춘다",
 );
-writeStep("02-setup-text-styles.js", readFileSync(path.join(here, "setup-text-styles.js"), "utf8"), "oe 텍스트 스타일을 맞춘다");
+writeStep(`${num()}-setup-text-styles.js`, readFileSync(path.join(here, "setup-text-styles.js"), "utf8"), "oe 텍스트 스타일을 맞춘다");
 // builder 는 여기서 한 번만 보내 문서에 둔다. 이후 build 단계는 조각만 싣고 이것을 꺼내 쓴다.
-writeStep("03-load-builder.js", loaderCode(builder), "builder 를 문서에 둔다. 이후 build 단계가 이것을 꺼내 쓴다");
-runs.forEach((chunks, i) => writeStep(`${String(i + 4).padStart(2, "0")}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
+// 한 단계에 다 들어가지 않으면 나눠 보내 이어 붙인다. 마지막 조각에서 전체 해시를 확인한다.
+const loaders = loaderSteps(builder, STEP_LIMIT - 1400);
+loaders.forEach((code, i) => writeStep(`${num()}-load-builder.js`, code, `builder 를 문서에 둔다 (${i + 1}/${loaders.length}). 이후 build 단계가 이것을 꺼내 쓴다`));
+runs.forEach((chunks, i) => writeStep(`${num()}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
 writeStep(
-  `${String(runs.length + 4).padStart(2, "0")}-audit.js`,
+  `${num()}-audit.js`,
   readFileSync(path.join(here, "audit.js"), "utf8")
     .replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(screenName)};`)
     .replace("const FRAMES = __FRAMES__;", () => `const FRAMES = ${JSON.stringify(frames.map((f) => f.name))};`),
