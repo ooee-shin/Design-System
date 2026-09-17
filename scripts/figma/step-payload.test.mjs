@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { foldInstances, INSTANCE_FIELDS, stripComments, stripLineComment } from "./step-payload.mjs";
+import { buildDriver, fnv, foldInstances, INSTANCE_FIELDS, loaderCode, stripComments, stripLineComment } from "./step-payload.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const builder = readFileSync(path.join(here, "builder.js"), "utf8");
@@ -70,11 +70,38 @@ test("주석을 뺀 builder.js 가 그대로 async 함수 본문으로 파싱된
   assert.ok(stripped.length < builder.length);
 });
 
-test("prepare.mjs 가 찾아 바꾸는 자리는 주석을 빼도 남는다", () => {
+test("builder 가 ARGS 로 값을 받는 자리는 주석을 빼도 남는다", () => {
   const stripped = stripComments(builder);
-  for (const anchor of ["const SCREEN = __SCREEN__;", "const EXPECT = __EXPECT__;", "const RUN = __RUN__;"]) {
-    assert.ok(stripped.includes(anchor), `${anchor} 가 사라졌다. 치환이 조용히 실패한다`);
-  }
+  assert.ok(stripped.includes("const { SCREEN, EXPECT, RUN } = ARGS;"), "ARGS 를 푸는 줄이 사라졌다. build 단계가 값을 넘길 자리가 없어진다");
+});
+
+test("loader 단계는 builder 를 줄 배열로 싣고 해시로 지킨다", () => {
+  const code = loaderCode("const a = 1;\nconst b = 2;");
+  assert.ok(code.includes('"const a = 1;"'), "코드를 줄 배열로 싣는다. 한 줄짜리 긴 문자열은 옮겨 적다 접히면 깨진다");
+  assert.ok(code.includes(`const EXPECT = ${fnv("const a = 1;\nconst b = 2;")};`));
+  assert.ok(code.includes("setSharedPluginData"), "문서에 저장해야 다음 단계가 꺼내 쓴다");
+  assert.doesNotThrow(() => new AsyncFunction(code));
+});
+
+test("build 단계는 조각만 싣고 문서의 builder 를 꺼내 쓴다", () => {
+  const runBody = '[{"frameName":"f","nodes":[]}]';
+  const code = buildDriver({ screenName: "관리자 로그인", expect: 111, builderHash: 222, runBody });
+  assert.ok(!code.includes("figma.createFrame"), "builder 본문이 단계에 실리면 안 된다");
+  assert.ok(code.includes("getSharedPluginData"), "문서에서 꺼내 쓴다");
+  assert.ok(code.includes("const BUILDER = 222;"), "이번 단계가 기대하는 builder 인지 해시로 가른다");
+  assert.ok(code.includes("const EXPECT = 111;"), "조각 내용도 해시로 지킨다");
+  assert.ok(code.length < 1500, `driver 는 작아야 한다. 지금 ${code.length}자`);
+  assert.doesNotThrow(() => new AsyncFunction(code));
+});
+
+test("loader 가 실은 코드를 그대로 되돌려 준다", () => {
+  // 옮겨 적기만 맞으면 문서에 들어가는 것이 원본과 같아야 한다. 줄 배열로 나눴다 합치는 자리를 확인한다.
+  const source = stripComments(builder);
+  const code = loaderCode(source);
+  const lines = code.slice(code.indexOf("const CODE = [") + "const CODE = [".length, code.indexOf('].join("\\n");'));
+  const joined = JSON.parse(`[${lines}]`).join("\n");
+  assert.equal(joined, source);
+  assert.equal(fnv(joined), fnv(source));
 });
 
 test("인스턴스 자리는 안쪽을 글자만 남기고 접는다", () => {

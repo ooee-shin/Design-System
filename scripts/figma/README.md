@@ -13,7 +13,8 @@ Figma 쪽 호출은 Figma remote MCP의 `use_figma`로 한다. `prepare.mjs`가 
 | `dom-extract.js` | 브라우저에 뜬 화면을 트리로 읽는다. 색마다 class에서 찾은 후보와 계산된 색을 함께 남긴다 |
 | `setup-variables.js` | `oe color`(Light·Dark)·`oe size` 변수를 맞춘다. 있는 변수는 값만 고쳐 이미 그린 프레임의 연결을 유지한다 |
 | `setup-text-styles.js` | `oe/text-*/<weight>` 텍스트 스타일을 맞춘다. 글꼴 대체가 이 파일 한 곳에 있다 |
-| `builder.js` | 조각으로 auto-layout 프레임을 만든다. primitive 변수는 `oe primitive` 컬렉션에 필요할 때 만들고 값을 맞춘다 |
+| `builder.js` | 조각으로 auto-layout 프레임을 만든다. primitive 변수는 `oe primitive` 컬렉션에 필요할 때 만들고 값을 맞춘다. **단계마다 실리지 않고 「builder 를 문서에 둔다」 단계로 한 번만 간다** |
+| `step-payload.mjs` | 단계에 싣는 글자를 줄이는 규칙. 주석 떼기, 인스턴스 접기, loader·build 단계 틀 |
 | `audit.js` | 읽기만 한다. 빠진 프레임, 변수에 묶이지 않은 칠, 스타일 없는 글자, 투명도를 더한 칠을 센다 |
 | `reread.js` | 되읽기(④)에서 프레임을 줄(`rows`)로 읽는다. 파일을 바꾸지 않는다. `use_figma` 응답이 20,000자에서 잘려 자리를 아끼려고 객체 대신 줄로 돌려준다 |
 | `reread.mjs` | `step`은 위 단계 파일을 만들고(`--parts`로 나눌 수 있다), `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
@@ -35,15 +36,34 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - 돌릴 때마다 `.figma-work/<key>/`를 지우고 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
 - **두 개를 한꺼번에 돌리지 않는다.** 화면을 읽을 때 띄우는 Chrome 이 디버깅 포트 9222 를 쓰므로 서로 막혀 멈춘다. 굳이 나란히 돌려야 하면 `CDP_PORT=9301` 처럼 실행마다 다른 포트를 준다.
 
-`manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
+`manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. 세 번째 단계가 **「builder 를 문서에 둔다」**이고, 뒤따르는 build 단계는 조각만 실은 채 문서에 둔 그것을 꺼내 쓴다. 그래서 build 단계를 다시 돌릴 때도 그 앞 단계는 건너뛰지 않는다 — 문서에 builder 가 없거나 다르면 build 단계가 `error` 로 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
 
 ## 어떻게 틀리지 않게 하는가
 
 - **색 이름.** `dom-extract.js`는 요소의 class에서 `oe-*` 토큰과 primitive 단계를 후보로 모은다. `data-[checked]:`처럼 상태가 붙은 class도 후보이고, 정적인 화면에 걸리지 않는 `hover:`·`focus:`·`active:`·`dark:` 변형은 뺀다. `prepare.mjs`가 후보의 Light 값과 브라우저가 실제로 칠한 색을 대조해 고른다. 맞는 후보가 없으면 manifest의 `unresolvedColors`에 남긴다. `/design-page`는 그 경우 멈추고 옮기지 않는다.
 - **팝업.** Select·Combobox 목록처럼 Portal로 `<body>` 끝에 붙은 요소도 루트 위에 absolute로 겹쳐 옮긴다.
-- **옮겨 적기.** 모델이 단계 파일을 `use_figma`에 옮기다 숫자 하나를 바꿔도 문법은 그대로다. 단계마다 조각 내용의 해시를 Figma 쪽에서 다시 재서 다르면 아무것도 그리지 않고 `error`를 낸다.
+- **옮겨 적기.** 모델이 단계 파일을 `use_figma`에 옮기다 숫자 하나를 바꿔도 문법은 그대로다. 단계마다 조각 내용의 해시를 Figma 쪽에서 다시 재서 다르면 아무것도 그리지 않고 `error`를 낸다. 문서에 둔 builder 도 같은 해시로 지킨다.
 - **다른 화면.** 조각 경로는 `<key>:s<상태 순서>`로 시작하고 부모는 같은 이름의 루트 프레임 안에서만 찾는다. 변수는 `oe color`·`oe primitive`·`oe size` 컬렉션 안에서만 찾아 다른 라이브러리의 같은 이름 변수에 묶지 않는다.
 - **위치.** auto-layout 부모 안에서 DOM과 2px 넘게 어긋난 자식만 absolute로 빼고, 한 자식을 빼면 형제를 다시 잰다.
+
+## builder 는 한 번만 보낸다
+
+걸리는 시간은 Figma 호출이 아니라 **모델이 옮겨 적는 글자 수**로 정해진다. 예전에는 단계마다 `builder.js`(주석을 뺀 13,400자)가 통째로 실려서, 한 단계의 8할이 매번 같은 코드였다.
+
+지금은 「builder 를 문서에 둔다」 단계가 그것을 **공유 plugin data**(`ooee.build`/`builder`)에 한 번 저장하고, 뒤따르는 build 단계는 조각만 실은 채 그것을 꺼내 `AsyncFunction` 으로 만들어 부른다. build 단계의 코드는 700자 남짓이다.
+
+| | 전 | 후 |
+| --- | --- | --- |
+| 관리자 로그인 | 6단계 67,456자 | **5단계 43,181자** |
+| 카탈로그(139개) | 42단계 702,691자 | **15단계 216,490자** |
+
+무엇에 기대는지 2026-09-17 에 `use_figma` 로 직접 확인했다.
+
+- 호출 사이에 `globalThis` 는 **살아남지 않는다**. 그래서 함수를 전역에 두는 길은 막혀 있다.
+- 공유 plugin data 는 문서에 남아 **다음 호출에서 그대로 읽힌다**. 6,082자를 넣고 다음 호출에서 해시까지 같게 되읽었다.
+- plugin 환경에 `eval` 과 `new Function` 이 있다. 되읽은 코드를 `AsyncFunction` 으로 만들어 실제로 돌렸다.
+
+두 겹으로 지킨다. loader 는 실어 보낸 코드의 해시를 저장 전에 다시 재고, build 단계는 문서에서 꺼낸 코드의 해시가 자기가 기대하는 값과 같은지 본다. 다르면 그리지 않고 `error` 를 낸다. 그래서 **build 단계만 따로 다시 돌리는 것은 안 된다** — 문서에 builder 가 없거나 낡았으면 멈춘다.
 
 ## Figma 에서 무엇이 Frame 이 되나
 
@@ -69,12 +89,7 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
 
-**이 실행은 지금 42단계 702,691자다(2026-09-17, 컴포넌트 139개).** 화면 하나가 5~6단계인 것과 견주면 크다. 단계마다 `builder.js` 가 통째로 들어가므로 그 글자의 74%(521,586자)는 39번 되풀이되는 같은 코드이고, 카탈로그 노드 자체는 18만 자뿐이다. 옮겨 적는 데 걸리는 시간이 곧 이 글자 수라, 컴포넌트를 더할수록 단계가 선형으로 는다.
-
-줄이려면 반복분을 건드려야 한다. 두 갈래가 있고 아직 하지 않았다.
-
-- 카탈로그를 컴포넌트 종류별로 쪼개 한 번에 한 종류만 옮긴다(`--only Button` 같은 옵션).
-- `builder.js` 를 첫 단계에서 한 번만 보내고 이후 단계는 조각만 싣는다. Figma plugin 은 호출마다 새 함수 본문이라 지금 구조로는 안 되고, 코드를 문서에 저장해 두고 되읽는 식이 필요하다.
+**이 실행은 지금 15단계 216,490자다(2026-09-17, 컴포넌트 139개).** builder 를 한 번만 보내기 전에는 42단계 702,691자였다. 그때는 글자의 74%가 39번 되풀이되는 같은 코드였다.
 
 변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
 

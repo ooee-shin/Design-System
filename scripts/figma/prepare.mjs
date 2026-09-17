@@ -12,7 +12,7 @@ import { existsSync, globSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { foldInstances, stripComments } from "./step-payload.mjs";
+import { buildDriver, foldInstances, fnv, loaderCode, stripComments } from "./step-payload.mjs";
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback; };
@@ -45,7 +45,6 @@ const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
 mkdirSync(path.join(work, "steps"), { recursive: true });
 const run = (cmd, argv) => execFileSync(cmd, argv, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-const fnv = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return h >>> 0; };
 
 // 1. 토큰 값
 run(process.execPath, ["--import", "tsx", path.join(here, "token-export.ts"), path.join(work, "oe-tokens.json")]);
@@ -234,13 +233,11 @@ const chunkText = (c) => {
 // 한 글자도 틀리지 않게 다시 쳐서 use_figma 에 넘긴다. 짧을수록 단계가 줄고 옮겨 적다 틀릴 자리도 준다.
 // 저장소의 builder.js 는 그대로 두므로 읽을 때는 주석이 있는 원본을 본다. 규칙은 step-payload.mjs 에 있다.
 const builder = stripComments(readFileSync(path.join(here, "builder.js"), "utf8"));
+const builderHash = fnv(builder);
 const buildCode = (chunks) => {
   const body = `[\n${chunks.map(chunkText).join(",\n")}\n]`;
   const expect = fnv(JSON.stringify(JSON.parse(body)));
-  return builder
-    .replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(screenName)};`)
-    .replace("const EXPECT = __EXPECT__;", () => `const EXPECT = ${expect};`)
-    .replace("const RUN = __RUN__;", () => `const RUN = ${body};`);
+  return buildDriver({ screenName, expect, builderHash, runBody: body });
 };
 const fits = (chunks) => { const code = buildCode(chunks); return code.length <= STEP_LIMIT && code.split("\n").length <= LINE_LIMIT; };
 const size = (v) => JSON.stringify(v).length;
@@ -305,9 +302,11 @@ writeStep(
   "oe 토큰을 Figma 변수로 맞춘다",
 );
 writeStep("02-setup-text-styles.js", readFileSync(path.join(here, "setup-text-styles.js"), "utf8"), "oe 텍스트 스타일을 맞춘다");
-runs.forEach((chunks, i) => writeStep(`${String(i + 3).padStart(2, "0")}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
+// builder 는 여기서 한 번만 보내 문서에 둔다. 이후 build 단계는 조각만 싣고 이것을 꺼내 쓴다.
+writeStep("03-load-builder.js", loaderCode(builder), "builder 를 문서에 둔다. 이후 build 단계가 이것을 꺼내 쓴다");
+runs.forEach((chunks, i) => writeStep(`${String(i + 4).padStart(2, "0")}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
 writeStep(
-  `${String(runs.length + 3).padStart(2, "0")}-audit.js`,
+  `${String(runs.length + 4).padStart(2, "0")}-audit.js`,
   readFileSync(path.join(here, "audit.js"), "utf8")
     .replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(screenName)};`)
     .replace("const FRAMES = __FRAMES__;", () => `const FRAMES = ${JSON.stringify(frames.map((f) => f.name))};`),

@@ -66,6 +66,63 @@ export function foldInstances(node) {
   return node;
 }
 
+/** 문서에 builder 를 둘 때 쓰는 공유 plugin data 자리. reread 와 같은 namespace 를 쓴다. */
+export const TAG = "ooee.build";
+export const BUILDER_KEY = "builder";
+
+/** 옮겨 적다 한 글자만 틀려도 잡아내는 해시. builder.js·단계 파일이 모두 같은 것을 쓴다. */
+export function fnv(s) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+  return h >>> 0;
+}
+
+/**
+ * builder 를 문서에 한 번 두는 단계. 이후 build 단계는 이것을 꺼내 쓴다.
+ *
+ * `use_figma` 호출 사이에 `globalThis` 는 살아남지 않는다(2026-09-17 확인). 반면 공유 plugin data 는
+ * 문서에 남고 `new AsyncFunction` 도 쓸 수 있어서, 코드를 문서에 두고 단계마다 꺼내 쓰는 길이 열린다.
+ *
+ * 코드는 한 줄짜리 긴 문자열 대신 줄 배열로 싣는다. 모델이 옮겨 적을 때 긴 줄이 접히면 문법이 깨지기 때문이다.
+ */
+export function loaderCode(builderSource) {
+  const lines = builderSource.split("\n").map((line) => JSON.stringify(line)).join(",\n");
+  return `const TAG = ${JSON.stringify(TAG)};
+const KEY = ${JSON.stringify(BUILDER_KEY)};
+const EXPECT = ${fnv(builderSource)};
+const CODE = [
+${lines}
+].join("\\n");
+const fnv = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return h >>> 0; };
+if (fnv(CODE) !== EXPECT) return { error: "옮기는 중 builder 가 바뀌었다. 이 단계 파일을 처음부터 다시 읽어 그대로 넘긴다" };
+figma.root.setSharedPluginData(TAG, KEY, CODE);
+const back = figma.root.getSharedPluginData(TAG, KEY);
+if (back !== CODE) return { error: "문서에 저장한 builder 가 넣은 것과 다르다" };
+return { stored: CODE.length, hash: EXPECT };
+`;
+}
+
+/**
+ * 조각만 싣는 build 단계. 문서에 둔 builder 를 꺼내 `ARGS` 를 넘겨 부른다.
+ * builder 가 없거나 이번 단계가 기대하는 것과 다르면 그리지 않고 멈춘다.
+ */
+export function buildDriver({ screenName, expect, builderHash, runBody }) {
+  return `const TAG = ${JSON.stringify(TAG)};
+const KEY = ${JSON.stringify(BUILDER_KEY)};
+const SCREEN = ${JSON.stringify(screenName)};
+const EXPECT = ${expect};
+const BUILDER = ${builderHash};
+const RUN = ${runBody};
+const fnv = (s) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193); return h >>> 0; };
+if (fnv(JSON.stringify(RUN)) !== EXPECT) return { error: "옮기는 중 조각 내용이 바뀌었다. 단계 파일을 처음부터 다시 읽어 그대로 넘긴다" };
+const CODE = figma.root.getSharedPluginData(TAG, KEY);
+if (!CODE) return { error: "문서에 builder 가 없다. 「builder 를 문서에 둔다」 단계를 먼저 돌린다" };
+if (fnv(CODE) !== BUILDER) return { error: "문서의 builder 가 이번 단계와 다르다. 「builder 를 문서에 둔다」 단계를 다시 돌린다" };
+const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+return await new AsyncFunction("ARGS", CODE)({ SCREEN, EXPECT, RUN });
+`;
+}
+
 /** builder.js 가 인스턴스 글자 슬롯에 넣을 문구를 세는 것과 같은 차례로 모은다. 시험이 둘을 견준다. */
 export function textsOf(spec, acc = []) {
   if (spec.t === "x") acc.push(spec);
