@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { RiArrowRightSLine, type RemixiconComponentType } from "@remixicon/react"
+import { RiArrowDownSLine, type RemixiconComponentType } from "@remixicon/react"
 
 import { SearchForm } from "@/components/candidates/search-form"
 import {
@@ -141,7 +141,10 @@ export function AppSidebar({
                         <SidebarMenuButton className={`h-9 gap-2 pr-3 pl-4 font-medium ${MENU_ROW_CLASS}`} isActive={item.isActive} render={<CollapsibleTrigger />}>
                           {showRowIcons ? <item.icon className="size-oe-icon-small shrink-0" aria-hidden="true" /> : null}
                           {item.title}
-                          <RiArrowRightSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-90" />
+                          {/* 접히고 펴지는 자리는 모두 아래를 보는 화살표로 시작해 열리면
+                              위로 돈다. 화살표가 가리키는 것은 하위 항목이 있는 방향이 아니라
+                              눌렀을 때 내용이 펼쳐질 방향이다. */}
+                          <RiArrowDownSLine className="ml-auto shrink-0 transition-transform group-data-open/collapsible:rotate-180" />
                         </SidebarMenuButton>
 
                         {/* 3depth 는 2depth 와 크기도 색도 같고 두께만 다르다. 1depth 가 12px 로

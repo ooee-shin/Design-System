@@ -145,8 +145,12 @@ export function AdminLayout({
 
           좌측 메뉴의 글자색은 사이드바의 가장 바깥 요소가 정하므로, 스타일 변수를 그보다 위에
           얹어야 안쪽까지 따라온다. 고른 줄의 색도 스타일이 바꿀 수 있도록 변수로 둔다. */}
+      {/* 화면 높이를 잠근다. 바깥 상자가 `min-h-svh` 로만 서 있으면 본문이 길어질 때 상자가
+          함께 늘어나 페이지 전체가 스크롤되고, 그러면 좌측 메뉴와 헤더가 위로 밀려 올라간다.
+          높이를 뷰포트에 고정해야 그 둘이 제자리를 지키고 본문 안에서 스크롤할 자리를 화면이
+          직접 정할 수 있다. */}
       <SidebarProvider
-        className="min-w-[1024px]"
+        className="h-svh min-w-[1024px] overflow-hidden"
         style={
           {
             "--nav-active-background": "var(--oe-brand-background-secondary)",
