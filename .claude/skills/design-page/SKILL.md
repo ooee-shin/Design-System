@@ -73,7 +73,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 1. `Read`로 그 파일을 **처음부터 끝까지** 읽는다.
 2. `mcp__figma__use_figma`를 `fileKey`, `description`에 manifest의 `description`, `code`에 읽은 내용을 **그대로** 넣어 부른다. Read가 붙이는 줄 번호는 넣지 않는다.
 3. 결과에 `error`가 있으면 멈추고 그 단계 이름과 결과 전문을 보고한다. 「조각 내용이 바뀌었다」 오류만은 같은 단계를 1번부터 한 번 더 한다. 두 번째도 같으면 멈춘다.
-4. build 단계의 결과에서 `unmappedColors`·`unmappedText`·`weightFallback`·`defaultTextColor`·`opacityOnToken`·`replacedFrames`를 모아 둔다. 멈추지는 않는다.
+4. build 단계의 결과에서 `unmappedColors`·`unmappedText`·`weightFallback`·`defaultTextColor`·`opacityOnToken`·`replacedFrames`·`instanceMiss`를 모아 둔다. 멈추지는 않는다.
 
 ### 6. 검사한다
 
@@ -84,6 +84,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 모든 프레임에서 `textsWithoutStyle`이 비어 있다(모든 글자가 텍스트 스타일이다).
 - 모든 프레임에서 `rootWithoutFill`이 `false`다(루트 프레임에 바탕 칠이 있다). 칠이 없는 루트는 `unboundPaints`에 잡히지 않는다.
 - 5단계에서 모은 `unmappedColors`·`unmappedText`·`defaultTextColor`가 비어 있다.
+- `--instances`로 돌렸다면 5단계에서 모은 `instanceMiss`가 비어 있다. 인스턴스로 놓을 자리는 안쪽을 단계에 싣지 않으므로, 컴포넌트를 찾지 못하면 그 자리가 빈 상자로 그려진다. 비어 있지 않으면 「검사 실패」로 보고하고, 카탈로그(`/design-page 카탈로그`)를 그 파일에 먼저 올린 뒤 다시 돌린다.
 
 하나라도 어기면 「완료」라고 쓰지 않고 「검사 실패」로 보고한다. `opacityOnToken`은 완료를 막지 않는다. 코드가 `border-[var(--brand-500)]/30`처럼 색에 투명도를 붙여 쓴 자리를 그대로 옮긴 것이지만 `figma-page-agent.md` 규칙 5(토큰에 임의 투명도 금지)와 부딪치므로 「확인이 필요한 것」에 적는다.
 
@@ -96,7 +97,7 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 - 글꼴 대체로 생긴 글자 폭 차이와 그 때문에 끝 글자가 조금 잘리는 자리
 - 그림자(`shadow-*`): 옮기지 않는다. oe 토큰에 그림자 색이 없다
 - 레이어 이름: `data-slot`, 없으면 role, 없으면 태그 이름이라 `div`·`td`·`span`이 많다
-- 컴포넌트는 인스턴스가 아니라 프레임이다(Code Connect 없음)
+- 컴포넌트는 기본적으로 인스턴스가 아니라 프레임이다(Code Connect 없음). `--instances`로 돌린 자리만 카탈로그 컴포넌트의 인스턴스다
 
 ### 8. 보고한다
 
