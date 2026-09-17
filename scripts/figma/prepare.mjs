@@ -21,7 +21,7 @@ const all = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] 
 const key = opt("key");
 const screenName = opt("name");
 if (!key || !screenName) {
-  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version]');
+  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--only <컴포넌트>]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version]');
   process.exit(1);
 }
 const base = opt("base", "http://localhost:3001");
@@ -29,8 +29,14 @@ const width = Number(opt("width", "1440"));
 // 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 까닭은 아래 prep() 의 주석에 있다.
 const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
-// 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
-const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
+// 카탈로그를 컴포넌트 한 종류씩 옮길 때 쓴다. 그 종류가 없는 구역을 지우고 읽어 프레임이 작아진다.
+// 큰 오토 레이아웃 프레임에 노드를 붙이는 값은 이미 있는 자식 수에 비례해 커지므로(2026-09-17 측정:
+// 자식 100개 473ms · 500개 4,651ms), 139개를 한 프레임에 넣으면 뒤 단계가 몇 분씩 걸린다.
+const only = all("only");
+const onlyState = (name) => `${name}=[...document.querySelectorAll("section")].forEach((s) => { if (!s.querySelector('[data-component="${name}"]')) s.remove(); })`;
+
+// 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 도 --only 도 없으면 「기본」 하나만 옮긴다.
+const states = (only.length ? only.map(onlyState) : all("state").length ? all("state") : ["기본"]).map((s) => {
   const i = s.indexOf("=");
   return i < 0 ? { label: s, script: "" } : { label: s.slice(0, i), script: s.slice(i + 1) };
 });
