@@ -12,6 +12,8 @@ import { existsSync, globSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { foldInstances, stripComments } from "./step-payload.mjs";
+
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : fallback; };
 const all = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] : []));
@@ -227,33 +229,9 @@ const chunkText = (c) => {
   const { nodes, icons, primitives, ...meta } = c;
   return `${JSON.stringify(meta).slice(0, -1)},"primitives":${JSON.stringify(primitives)},\n"icons":{${Object.entries(icons).map(([n, s]) => `\n${JSON.stringify(n)}:${JSON.stringify(s)}`).join(",")}},\n"nodes":[\n${nodes.map(format).join(",\n")}\n]}`;
 };
-/**
- * 인스턴스로 놓을 자리는 안쪽을 싣지 않는다. 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은
- * 글자뿐이다(`builder.js` 의 `textsOf` 가 이 글자를 슬롯에 넣는다). 되읽기도 인스턴스 안쪽은 화면의
- * 자리로 견주지 않으므로(`reread.mjs` 의 `flatten`) 사양에서 빼도 잃는 것이 없다.
- * 단계마다 옮겨 적는 글자 수가 곧 걸리는 시간이라, 이 접기가 인스턴스를 쓰는 값어치다.
- */
-function foldInstances(node) {
-  if (node.inst) {
-    const texts = [];
-    const walk = (n) => { if (n.t === "x") texts.push({ t: "x", s: n.s }); (n.k || []).forEach(walk); };
-    (node.k || []).forEach(walk);
-    if (texts.length) node.k = texts;
-    else delete node.k;
-    return;
-  }
-  (node.k || []).forEach(foldInstances);
-}
-
 // 단계 파일에 실을 builder 는 주석과 빈 줄을 뺀다. 한 단계의 8할이 builder 이고, 모델이 그것을
 // 한 글자도 틀리지 않게 다시 쳐서 use_figma 에 넘긴다. 짧을수록 단계가 줄고 옮겨 적다 틀릴 자리도 준다.
-// 저장소의 builder.js 는 그대로 두므로 읽을 때는 주석이 있는 원본을 본다.
-const stripComments = (src) =>
-  src
-    .split("\n")
-    .filter((line) => line.trim() && !line.trim().startsWith("//"))
-    .map((line) => line.replace(/ \/\/ .*$/, "")) // 줄 끝 주석. 문자열 안에는 ` // ` 꼴이 없다
-    .join("\n");
+// 저장소의 builder.js 는 그대로 두므로 읽을 때는 주석이 있는 원본을 본다. 규칙은 step-payload.mjs 에 있다.
 const builder = stripComments(readFileSync(path.join(here, "builder.js"), "utf8"));
 const buildCode = (chunks) => {
   const body = `[\n${chunks.map(chunkText).join(",\n")}\n]`;
