@@ -36,7 +36,11 @@ description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/u
 git status --porcelain --untracked-files=all ${user_config.screens_dir}
 ```
 
+**이 명령의 첫 도구 호출이 이것이어야 한다.** 파일을 하나라도 만든 뒤에 돌린 결과는 쓰지 않는다. 늦게 돌리면 자기가 만든 파일이 출력에 섞여 남의 변경으로 보인다.
+
 출력이 한 줄이라도 있으면 파일을 만들지 않고 멈춘다. 다른 세션이나 사람이 같은 working tree에서 화면 자리를 고치는 중이거나, 앞선 화면이 아직 commit되지 않은 상태다. 이 상태에서 시작하면 5단계 검사가 남의 변경으로 실패하고 7단계의 「세 파일」 확인이 성립하지 않는다. 보고 첫 제목을 「## 시작하지 않음」으로 하고 출력 전문을 붙인다.
+
+**「시작하지 않음」은 파일을 하나도 만들지 않았을 때만 쓴다.** 출력의 경로가 이번에 만들 화면의 것뿐이면 그것은 자기 산출물이므로 멈출 이유가 아니다. 0단계를 늦게 돌린 것이니 절차를 끝까지 마치고, 늦게 돌렸다는 사실을 7단계의 「판단이 필요한 것」에 적는다.
 
 ### 1. 읽는다 — ① 디자인 시스템 검색
 
@@ -79,7 +83,7 @@ Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번
 - 상태(`useState`)를 쓰면 첫 줄에 `"use client"`를 둔다. `@ooee/ui`의 Control은 소비자 쪽 `"use client"`를 전제한다.
 - import는 `react`(hook), `@ooee/ui`(컴포넌트), `@remixicon/react`(아이콘, Line variant 우선), `@/lib/utils`(`cn`)만 쓴다. `next/link`·`next/navigation`은 쓰지 않는다.
 - 파일 머리말 주석에 「입력」의 요구사항 문단을 **그대로** 붙여 넣는다. 줄이거나 고쳐 쓰지 않으며 선택지 목록·placeholder·기본값·Label 문구를 하나도 빠뜨리지 않는다. 그 아래에 정하지 않아 비워 둔 자리를 적는다. 단독 `/review-design`은 요청을 받지 않으므로 이 주석이 근거다.
-- `${user_config.screens_dir}/../screens.ts`의 `sandboxScreens`에 한 줄을 더한다. `prompt`는 요청의 한 줄 요약, `createdAt`은 오늘 날짜다. 요청에 `원본:`이 있으면 그 경로를 `source`에 그대로 적고, 없으면 `source`를 두지 않는다.
+- `${user_config.screens_dir}/../screens.ts`의 `sandboxScreens`에 한 줄을 더한다. **이 등록이 빠지면 화면이 목록에 뜨지 않는다.** 7단계의 「변경 파일」에 이 파일이 없으면 등록을 빠뜨린 것이다. `prompt`는 요청의 한 줄 요약, `createdAt`은 오늘 날짜다. 요청에 `원본:`이 있으면 그 경로를 `source`에 그대로 적고, 없으면 `source`를 두지 않는다.
 
 **색과 경계**
 
