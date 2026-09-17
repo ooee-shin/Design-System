@@ -87,9 +87,12 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 `apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
 
 ```bash
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
+# 한 종류씩 옮긴다. 프레임이 「컴포넌트 / Button」처럼 나뉘고 한 번에 할 일이 작아진다.
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only Button --only Chip --height 900
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
+
+**한 번에 다 옮기지 않는다.** 큰 오토 레이아웃 프레임에 노드를 붙이는 값은 **이미 있는 자식 수에 비례해** 커진다(2026-09-17 측정: 자식 100개 473ms · 300개 2,019ms · 500개 4,651ms). 139개를 한 프레임에 넣으면 뒤 단계가 몇 분씩 걸리고, 실제로 한 단계가 1,026초 무응답으로 MCP 타임아웃을 냈다. `--only` 로 종류를 나누면 프레임마다 자식이 수십 개라 이 값이 붙지 않는다.
 
 **이 실행은 지금 23단계 223,095자다(2026-09-17, 컴포넌트 139개).** builder 를 한 번만 보내기 전에는 42단계 702,691자였고, 그때는 글자의 74%가 39번 되풀이되는 같은 코드였다.
 
