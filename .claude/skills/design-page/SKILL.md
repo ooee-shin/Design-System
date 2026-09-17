@@ -72,7 +72,9 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 
 1. `Read`로 그 파일을 **처음부터 끝까지** 읽는다.
 2. `mcp__figma__use_figma`를 `fileKey`, `description`에 manifest의 `description`, `code`에 읽은 내용을 **그대로** 넣어 부른다. Read가 붙이는 줄 번호는 넣지 않는다.
-3. 결과에 `error`가 있으면 멈추고 그 단계 이름과 결과 전문을 보고한다. 「조각 내용이 바뀌었다」 오류만은 같은 단계를 1번부터 한 번 더 한다. 두 번째도 같으면 멈춘다.
+3. 결과에 `error`가 있으면 멈추고 그 단계 이름과 결과 전문을 보고한다. 「조각 내용이 바뀌었다」·「옮기는 중 builder 가 바뀌었다」 오류만은 같은 단계를 1번부터 한 번 더 한다. 두 번째도 같으면 멈춘다.
+
+**단계를 건너뛰지 않는다.** 「builder 를 문서에 둔다」 단계가 뒤따르는 build 단계가 쓸 코드를 문서에 넣는다. 그것을 빼고 build 단계만 돌리면 「문서에 builder 가 없다」로 멈춘다.
 4. build 단계의 결과에서 `unmappedColors`·`unmappedText`·`weightFallback`·`defaultTextColor`·`opacityOnToken`·`replacedFrames`를 모아 둔다. 멈추지는 않는다.
 
 ### 6. 검사한다
