@@ -68,7 +68,9 @@ const BADGE_VARIANTS = ["fill", "tonal", "outlined"] as const;
 const BADGE_TONES = ["brand", "neutral", "warning", "danger", "success", "info"] as const;
 const INPUT_VARIANTS = ["outline", "filled"] as const;
 const INPUT_SIZES = ["small", "regular", "large", "xlarge"] as const;
-const SWITCH_SIZES = ["small", "medium", "large"] as const; // Switch만 크기 이름이 다르다
+// 크기 축은 컴포넌트마다 이름이 다르다. Switch 는 controlSize 가 small·medium·large 이고,
+// Badge 는 아예 prop 이름이 size 이며 값이 small·medium 둘뿐이다. Textarea·Radio 에는 크기 축이 없다.
+const SWITCH_SIZES = ["small", "medium", "large"] as const;
 const SELECT_OPTIONS = [
   { value: "a", label: "첫째" },
   { value: "b", label: "둘째" },
@@ -106,8 +108,9 @@ export default function CatalogPage() {
         items={BADGE_VARIANTS.flatMap((variant) =>
           BADGE_TONES.map((tone) => ({
             props: `${variant}·${tone}·medium`,
+            // Badge 의 기본 size 는 small 이다. 이름에 medium 이라 적으면 실제로도 medium 을 넘겨야 한다.
             node: (
-              <Badge variant={variant} tone={tone}>
+              <Badge variant={variant} tone={tone} size="medium">
                 배지
               </Badge>
             ),
@@ -159,14 +162,17 @@ export default function CatalogPage() {
           { props: "rounded·on", node: <Checkbox defaultChecked aria-label="켜기" /> },
           { props: "rounded·indeterminate", node: <Checkbox indeterminate aria-label="일부" /> },
           { props: "rounded·disabled", node: <Checkbox disabled aria-label="비활성" /> },
+          { props: "ghost·off", node: <Checkbox shape="ghost" aria-label="테두리 없이 끄기" /> },
+          { props: "ghost·on", node: <Checkbox shape="ghost" defaultChecked aria-label="테두리 없이 켜기" /> },
         ]}
       />
 
       <Group
         component="Chip"
         items={[
-          ...CONTROL_SIZES.map((controlSize) => ({ props: `rounded·${controlSize}`, node: <Chip controlSize={controlSize}>칩</Chip> })),
-          { props: "rounded·regular·active", node: <Chip active>칩</Chip> },
+          // Chip 의 기본 shape 는 circle 이다. rounded 를 그리려면 실제로 넘겨야 한다.
+          ...CONTROL_SIZES.map((controlSize) => ({ props: `rounded·${controlSize}`, node: <Chip shape="rounded" controlSize={controlSize}>칩</Chip> })),
+          { props: "rounded·regular·active", node: <Chip shape="rounded" active>칩</Chip> },
           { props: "circle·regular", node: <Chip shape="circle">칩</Chip> },
         ]}
       />
@@ -255,7 +261,8 @@ export default function CatalogPage() {
             node: <ToggleButton controlSize={controlSize} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label={`즐겨찾기 ${controlSize}`} />,
           })),
           { props: "ghost·brand·regular·pressed", node: <ToggleButton defaultPressed icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 켬" /> },
-          { props: "ghost·custom·regular", node: <ToggleButton tone="custom" color="like" icon={<RiHeart3Line aria-hidden />} activeIcon={<RiHeart3Fill aria-hidden />} aria-label="좋아요" /> },
+          { props: "ghost·custom·like·regular", node: <ToggleButton tone="custom" color="like" icon={<RiHeart3Line aria-hidden />} activeIcon={<RiHeart3Fill aria-hidden />} aria-label="좋아요" /> },
+          { props: "ghost·custom·favorite·regular", node: <ToggleButton tone="custom" color="favorite" icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} defaultPressed aria-label="즐겨찾기 색" /> },
           { props: "tonal·brand·regular", node: <ToggleButton variant="tonal" icon={<RiStarLine aria-hidden />} aria-label="즐겨찾기 담기" /> },
           { props: "ghost·brand·regular·수", node: <ToggleButton count={12} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 수" /> },
         ]}
@@ -346,6 +353,22 @@ export default function CatalogPage() {
                     { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
                     { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
                     { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden />, badge: { count: 2 } },
+                  ]}
+                />
+              </div>
+            ),
+          },
+          {
+            props: "floating·라벨없음",
+            node: (
+              <div className="w-[390px]">
+                <BottomNavigation
+                  value="home"
+                  variant="floating"
+                  items={[
+                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
+                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
+                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden /> },
                   ]}
                 />
               </div>
