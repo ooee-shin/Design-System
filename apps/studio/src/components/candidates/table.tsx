@@ -81,7 +81,9 @@ function TableHeaderCell({
   align = "center",
   width,
   ...props
-}: React.ComponentProps<"th"> & {
+  // `align` 은 th 와 td 가 원래 갖고 있는 HTML 속성이라 그대로 두면 두 타입이 겹쳐서 값이
+  // `center` 하나로 좁혀진다. 원래 것을 덜어내고 이 표가 쓰는 뜻으로 다시 정한다.
+}: Omit<React.ComponentProps<"th">, "align"> & {
   align?: "start" | "center"
   /** 이 열의 폭. 주지 않은 열이 남는 폭을 나눠 갖는다. */
   width?: number
@@ -106,7 +108,7 @@ function TableCell({
   className,
   align = "center",
   ...props
-}: React.ComponentProps<"td"> & { align?: "start" | "center" }) {
+}: Omit<React.ComponentProps<"td">, "align"> & { align?: "start" | "center" }) {
   return (
     <td
       data-slot="table-cell"
