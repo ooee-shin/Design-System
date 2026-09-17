@@ -335,24 +335,36 @@ export default function Page() {
                   생기고 사라질 때 아래 조건들이 밀려 올라가거나 내려가지 않는다. */}
               <div className="sticky top-0 z-10 bg-oe-background-primary px-5 pt-4">
               <div className="flex h-9 items-center justify-between">
-                <h2 className="text-sm font-semibold text-oe-foreground-primary">필터</h2>
-                {/* 되돌릴 것이 있을 때만 선다. 아무것도 고르지 않은 화면에 초기화가 서 있으면
+                <h2 className="text-base font-semibold text-oe-foreground-primary">필터</h2>
+                {/* 조회는 이 줄에 둔다. 스크롤해도 남는 자리라 조건을 고치는 내내 눈에 들어오고,
+                    고친 것이 있을 때만 눌려서 아직 묻지 않은 것이 있다는 것도 함께 말한다.
+                    바닥에 두면 축을 고르는 동안에는 시야 밖이다.
+
+                    초기화는 되돌릴 것이 있을 때만 선다. 아무것도 고르지 않은 화면에 서 있으면
                     무엇을 되돌리는 것인지 읽는 사람이 먼저 헤아려야 한다. */}
-                {isFiltered(draft) ? (
+                <span className="-mr-1 flex items-center gap-1">
+                  {isFiltered(draft) ? (
+                    <Button
+                      variant="ghost"
+                      tone="neutral"
+                      controlSize="xsmall"
+                      leadingIcon={<RiResetLeftLine />}
+                      onClick={() => {
+                        setDraft(EMPTY_FILTER);
+                        setFilter(EMPTY_FILTER);
+                      }}
+                    >
+                      초기화
+                    </Button>
+                  ) : null}
                   <Button
-                    variant="ghost"
-                    tone="neutral"
-                    controlSize="xsmall"
-                    leadingIcon={<RiResetLeftLine />}
-                    className="-mr-2"
-                    onClick={() => {
-                      setDraft(EMPTY_FILTER);
-                      setFilter(EMPTY_FILTER);
-                    }}
+                    controlSize="small"
+                    disabled={!dirty}
+                    onClick={() => setFilter(draft)}
                   >
-                    초기화
+                    조회
                   </Button>
-                ) : null}
+                </span>
               </div>
               </div>
 
@@ -452,21 +464,6 @@ export default function Page() {
               </FilterSection>
               </ScrollArea>
 
-              {/* 조회는 패널 맨 아래에 붙어 있다. 조건을 고르다 보면 목록이 길어져 위로 올라간
-                  머리 줄까지 돌아가야 하는데, 다 고른 뒤 누르는 것이므로 마지막에 닿는 자리에
-                  둔다.
-
-                  고친 것이 없으면 누를 이유가 없으므로 그때만 눌린다. */}
-              <div className="shrink-0 border-t border-oe-border-secondary bg-oe-background-primary px-5 py-3">
-                <Button
-                  layout="fill"
-                  disabled={!dirty}
-                  leadingIcon={<RiSearchLine />}
-                  onClick={() => setFilter(draft)}
-                >
-                  조회
-                </Button>
-              </div>
             </div>
           </aside>
 
