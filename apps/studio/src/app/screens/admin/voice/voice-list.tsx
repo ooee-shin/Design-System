@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * 점주의 소리 목록의 결과 영역이다. 건수 줄과 표, 그 아래 안내를 갖는다.
+ * 점주의 소리 목록의 결과 영역이다. 표와 그 위아래 줄을 갖는다.
  *
  * 필터를 어디에 세울지 두 안을 보고 있으므로, 안이 달라도 같아야 하는 이쪽을 한 곳에 두었다.
  * 「전환된 건 표시」만 여기에 있는데, 목록에 무엇까지 담을지 정하는 조작이라 빠진 건수를 말하는
@@ -24,7 +24,7 @@ import {
   TableRow,
 } from "@/components/candidates/table";
 
-import { LIST_NOTES, SOURCE, STATUS, VOICES, matches, type Filter } from "./voice-data";
+import { SOURCE, STATUS, VOICES, matches, type Filter } from "./voice-data";
 
 const PAGE_SIZES = [10, 25, 50, 100].map((size) => ({ value: String(size), label: String(size) }));
 
@@ -69,7 +69,7 @@ export function VoiceList({
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-oe-border-secondary bg-oe-background-primary">
+      <div className="overflow-hidden rounded-oe-control border border-oe-border-secondary bg-oe-background-primary">
         <Table>
           <TableHead>
             <TableRow>
@@ -188,13 +188,6 @@ export function VoiceList({
         </div>
       </div>
 
-      {/* 답변을 등록하면 전환이 잠긴다는 것을 여기서 미리 말해 두어야, 상세에서 버튼이 눌리지
-          않는 것을 고장으로 읽지 않는다. */}
-      <ul className="flex list-disc flex-col gap-1 pl-4 text-xs leading-5 text-oe-foreground-tertiary">
-        {LIST_NOTES.map((note) => (
-          <li key={note}>{note}</li>
-        ))}
-      </ul>
     </div>
   );
 }

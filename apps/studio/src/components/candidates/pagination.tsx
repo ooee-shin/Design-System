@@ -21,8 +21,11 @@ import { cn } from "@/lib/utils"
  * 서야 하는데, 이는 Button 이 갖는 규칙과 다르다.
  */
 
+// 넷이 한 덩어리로 선다. 테두리를 버튼마다 두르면 비활성인 것도 테두리는 그대로 남아, 누를 수
+// 없는 쪽이 오히려 또렷해진다. 한 겹으로 두르고 사이를 선으로 나누면 그 안에서 아이콘 색만
+// 흐려져 무엇이 눌리는지 갈린다.
 const STEP =
-  "grid size-8 shrink-0 place-items-center rounded-oe-control text-oe-foreground-secondary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:ring-2 focus-visible:ring-oe-focus-ring disabled:pointer-events-none disabled:text-oe-foreground-disabled"
+  "grid size-8 shrink-0 place-items-center border-l border-oe-border-secondary text-oe-foreground-secondary outline-none transition-colors first:border-l-0 hover:bg-oe-interaction-hover hover:text-oe-foreground-primary focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-inset disabled:pointer-events-none disabled:text-oe-foreground-disabled"
 
 function Pagination({
   page,
@@ -40,7 +43,7 @@ function Pagination({
   const last = page === lastPage
 
   return (
-    <nav aria-label="페이지 이동" data-slot="pagination" className={cn("flex items-center gap-0.5", className)}>
+    <nav aria-label="페이지 이동" data-slot="pagination" className={cn("flex items-center overflow-hidden rounded-oe-control border border-oe-border-secondary", className)}>
       {/* 갈 곳이 없어도 버튼은 남는다. 사라지면 남은 버튼들이 자리를 옮겨서, 같은 곳을 연달아
           누르려던 손이 매번 목표를 다시 찾아야 한다. */}
       <button type="button" className={STEP} aria-label="첫 페이지" disabled={first} onClick={() => goTo(1)}>
