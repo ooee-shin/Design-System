@@ -100,6 +100,10 @@ export default function CatalogPage() {
             ),
           })),
           { props: "fill·brand·regular·disabled", node: <Button disabled>버튼</Button> },
+          // 위 두 묶음은 축마다 하나씩만 훑는다. 화면이 실제로 쓰는 조합은 그 밖에도 있어서 따로 적는다.
+          // 무엇이 빠졌는지는 page.test.tsx 의 「화면이 쓰는 인스턴스 이름이 카탈로그에 모두 있다」가 알려 준다.
+          { props: "ghost·neutral·small", node: <Button variant="ghost" tone="neutral" controlSize="small">버튼</Button> },
+          { props: "tonal·brand·small", node: <Button variant="tonal" controlSize="small">버튼</Button> },
         ]}
       />
 
