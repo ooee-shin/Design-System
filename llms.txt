@@ -1,0 +1,100 @@
+# ooee-ui — LLM이 읽는 색인
+
+`ooee-ui`는 블루키의 디자인 시스템이다. 이 파일은 **무엇을 어디서 읽으면 되는지**만 적는다. 내용은 아래 문서가 그대로 갖는다.
+
+원본은 언제나 저장소의 파일이다. 이 색인이 가리키는 경로가 없으면 이 파일이 낡은 것이므로, 고치고 지나간다.
+
+## 먼저 읽을 것
+
+| 무엇 | 어디 | 왜 |
+| --- | --- | --- |
+| 지켜야 하는 경계와 규칙 | [AGENTS.md](AGENTS.md) | 코드 소유 경계, 변경 원칙, 권한. **화면이나 컴포넌트를 건드리기 전에 읽는다** |
+| 컴포넌트 목록과 고르는 법 | [docs/system/README.md](docs/system/README.md) | 「Component」 표가 정본이다. `확정`이 아닌 것은 `packages/ui`가 export해도 쓰지 않는다 |
+| 코드에서 쓸 수 있는 이름 | [packages/ui/src/index.ts](packages/ui/src/index.ts) | 여기서 export하지 않는 이름은 import하지 않는다 |
+
+## 디자인 시스템 (`docs/system/` — 전달 자산)
+
+| 섹션 | 진입점 | 설명 |
+| --- | --- | --- |
+| 구조 용어 | [vocabulary.md](docs/system/vocabulary.md) | Control·Indicator·Field·Container 구조 용어와 모양 어휘. **모든 컴포넌트 문서가 이 어휘로 쓰여 있다** |
+| 토큰 | [tokens.md](docs/system/tokens.md) | `oe` 토큰 문법과 Neutral·status·Overlay 체계 |
+| 색 | [foundations/color.md](docs/system/foundations/color.md) | 색상 생성 규칙과 Light/Dark semantic mapping |
+| 아이콘 | [foundations/icon.md](docs/system/foundations/icon.md) | 공급원(Remix)과 크기 토큰 |
+| 상호작용 | [interaction.md](docs/system/interaction.md) | Focus, Disabled, Read-only와 Layout 기본값. 공통 Control Height가 여기 있다 |
+| 품질 기준 | [quality.md](docs/system/quality.md) | 자산이 충족해야 하는 상태·접근성·반응형 기준 |
+| Studio | [studio.md](docs/system/studio.md) | 컴포넌트를 화면에서 찾아보는 표준 채널의 구성 기준 |
+
+컴포넌트마다 문서가 하나씩 있다 — [docs/system/components/](docs/system/components/). 각 문서는 「역할과 경계」, 「Guidelines」, 「현재 정의하지 않은 항목」을 갖고, **Property 이름과 값은 문서에 적힌 코드 문자열 그대로 쓴다.**
+
+확정 19종: `app-header` `badge` `bottom-navigation` `button` `checkbox` `chip` `combobox` `field` `input` `input-button` `message-bubble` `notification-badge` `number-input` `radio` `select` `select-box` `switch` `textarea` `toggle-button`
+
+초안(쓰지 않는다): `admin-header` `message-attachment` `message-composer` `page-header` `side-navigation` `tabs`
+
+## 코드
+
+| 무엇 | 어디 |
+| --- | --- |
+| 컴포넌트 구현 | `packages/ui/src/` — `@base-ui/react` + cva + tailwind-merge. `data-slot`으로 자기 이름을 남긴다 |
+| 토큰 | `packages/tokens/src/` — `index.ts`가 정의, `styles.css`가 CSS 변수 |
+| Studio (컴포넌트 문서·Playground) | `apps/studio` — 3000 포트 |
+| Sandbox (화면 작업과 Figma 카탈로그) | `apps/sandbox` — 3001 포트 |
+
+### Playground — 이 저장소의 Storybook 자리
+
+**컴포넌트를 실제로 보려면 Studio의 Playground를 연다.** `http://localhost:3000/components/<key>` 이고, `<key>`는 위 확정 목록의 이름이다(예: `/components/button`, `/components/toggle-button`).
+
+Storybook이 주는 것과 같은 것을 여기서 얻는다.
+
+| Storybook에서 찾던 것 | 여기서 |
+| --- | --- |
+| Controls 패널 (prop을 바꿔 본다) | Playground의 옵션 토글. **이 컴포넌트에 어떤 변형이 있는지의 정본이다** |
+| Stories (변형별 예시) | 같은 페이지의 State·Style 절 |
+| Docs 탭 (prop 표와 설명) | `docs/system/components/<key>.md` — Property 이름과 값이 코드 문자열 그대로 있다 |
+| 코드 스니펫 | 컴포넌트 문서의 예시와 `packages/ui/src/<key>.tsx` |
+
+`docs-list`·`docs-show` 같은 MCP 도구를 찾지 마라. 없다. 파일을 직접 읽는 것이 원본이고, 화면이 필요하면 위 URL을 `curl`로 받아 읽는다.
+
+**Playground의 옵션과 Figma 카탈로그의 축은 같아야 한다.** 한쪽에만 있으면 그 변형은 디자이너가 Figma에서 쓸 수 없거나, 반대로 Figma에 쓰이지 않는 변형이 서 있는 것이다. 어긋난 것을 찾으면 고치지 말고 보고한다 — 어느 쪽이 맞는지는 사람이 정한다.
+
+**새 컴포넌트가 필요하면 shadcn/ui에서 출발해** 이 저장소의 스택으로 정규화한다(`@base-ui/react`, cva + tailwind-merge, `oe` 시맨틱 토큰, `data-slot`). 맨바닥에서 만들지 않는다.
+
+## 하네스 (AI가 쓰는 명령)
+
+| 명령 | 하는 일 | 정의 |
+| --- | --- | --- |
+| `/ooee-harness:generate-code` | 요구사항에서 화면 코드를 만든다 | [SKILL.md](plugins/ooee-harness/skills/generate-code/SKILL.md) |
+| `/ooee-harness:review-design` | 만든 화면을 검사 항목으로 검수한다 | [SKILL.md](plugins/ooee-harness/skills/review-design/SKILL.md) |
+| `/design-page` | 화면을 Figma로 옮기고(②), 사람이 고친 Figma를 코드로 되읽는다(④) | [SKILL.md](.claude/skills/design-page/SKILL.md) |
+
+기계로 가를 수 있는 검사는 `plugins/ooee-harness/lib/check-screens.mjs`가 돈다. 판정 규칙의 원본은 `screen-rules.mjs`다.
+
+## Figma
+
+| 무엇 | 어디 |
+| --- | --- |
+| 옮기는 도구 전체 | [scripts/figma/README.md](scripts/figma/README.md) |
+| 컴포넌트 카탈로그 (Figma 라이브러리의 원본) | `apps/sandbox/src/app/catalog/page.tsx` |
+| Figma에서 코드로 되짚는 표 | [docs/process/figma-component-map.md](docs/process/figma-component-map.md) |
+
+**카탈로그가 Figma 라이브러리의 정본이다.** 변형을 더하려면 카탈로그에 항목을 더하고 다시 올린다 — Figma 쪽을 손으로 고치지 않는다. 축의 값은 모두 곱해져 Variant가 되므로 곱집합에 빈칸이 있으면 테스트가 실패한다.
+
+Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Storybook이 하던 일은 이미 Studio의 Playground가 한다** — 위 「Playground」 절을 본다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md)의 「2026-09-18 순서 3·5를 하지 않기로 했다」에 있다.
+
+## 일하는 방식 (`docs/process/` — 전달본에는 가지 않는다)
+
+| 무엇 | 어디 |
+| --- | --- |
+| AI 개발 환경 전체 설계와 결정 기록 | [ai-environment.md](docs/process/ai-environment.md) |
+| 브랜치와 릴리스 | [git-workflow.md](docs/process/git-workflow.md) |
+| 지금 무엇을 하고 있고 무엇이 남았나 | [working-context.md](docs/process/working-context.md) |
+| 검사 명령 | [tooling.md](docs/process/tooling.md) |
+
+## 확인 명령
+
+```bash
+pnpm check   # lint + typecheck + test + build. 다섯 workspace 전부를 본다
+pnpm dev     # Studio (3000)
+pnpm --filter @ooee/sandbox dev   # Sandbox (3001)
+```
+
+커밋 메시지와 pull request 본문은 **한국어로 쓴다.** `main`에 직접 push하지 않는다 — `feature/*` → `dev` → `main`이다.

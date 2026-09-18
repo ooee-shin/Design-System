@@ -297,7 +297,7 @@
 ## 확정된 이관 전제
 
 - 이 저장소의 목적은 개인 자산화가 아니라 블루키 제품에서 사용할 UI 시스템의 1차 컴포넌트 완성이다. 통합 방식(블루키 코드 직접 삽입 vs 별도 패키지 연동)은 개발 검토 후 결정하며 1차 작업에 영향을 주지 않는다.
-- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이며 Storybook의 기반이 된다. 최종적으로 컴포넌트를 찾아보는 표준 채널은 Storybook이 맡는다.
+- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이고, **컴포넌트를 찾아보는 표준 채널이다.** Storybook은 두지 않기로 했다(`2026-09-18`, [ai-environment.md](ai-environment.md)). AI 가 읽는 색인은 저장소 루트의 `llms.txt` 다.
 - `docs/process/`와 `AGENTS.md`는 전달 시 제거한다. 그래서 `docs/system/`의 문서는 이 둘을 참조하지 않는다.
 - 디자인 토큰은 변환 없이 그대로 사용하며 기존 개발 네이밍·스택과의 정합성은 1차 범위에서 고려하지 않는다.
 
@@ -349,7 +349,7 @@
 8. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 9. **Button의 Ghost.** 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다. 그 밖의 미정 항목은 [button.md](../system/components/button.md)의 「현재 정의하지 않은 항목」이 갖는다.
 10. **Chip `xsmall` 의 글자 색이 빠진다.** `chip.tsx:13` 의 `text-oe-foreground-secondary` 가 실제 DOM 에 남지 않아 상속 색(neutral-950)으로 그려진다. `xsmall` 만 그렇고 나머지 크기는 neutral-700 으로 맞다. 까닭은 `cn()`(tailwind-merge)이 `xsmall` 이 더하는 `text-oe-label`(글자 크기 토큰)을 색 클래스와 같은 무리로 보고 앞의 색을 지우기 때문이다. 같은 문제를 `switch.tsx:32` 가 이미 `text-[length:var(--text-oe-label)] leading-[var(--text-oe-label--line-height)]` 로 피하고 있으므로 같은 방식을 쓰면 된다. 브라우저에서 잰 값은 `xsmall` `lab(2.75 0 0)` · `small`·`regular` `lab(27.0 0 0)` 이고, 클래스는 각각 `text-oe-label` 하나와 `text-oe-foreground-secondary text-sm` 다. 화면을 Figma 로 옮기다 「색 후보 없음」으로 걸려 찾았다(`2026-09-17`, 유진식).
-11. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
+11. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Studio 의 메뉴 구조와 함께 정하면 두 번 바꾸지 않는다.
 
 `Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열네 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
@@ -376,7 +376,7 @@ pnpm visual --path /components/badge \
 
 개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-담당은 신주희가 Component·Variant, Token·UI 개선과 Story 작성이고, 유진식이 Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill·Plugin이다.
+담당은 신주희가 Component·Variant 와 Token·UI 개선이고, 유진식이 Figma MCP, Agent Rules, `AGENTS.md`, Skill·Plugin, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
 
 **통합 검증 항목 다섯 중 셋은 아직 대상이 없다.** Storybook, Storybook MCP와 `.mcp.json`의 Figma MCP 설정이 없다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 유진식의 작업이 들어오는 순서대로 채운다.
 
