@@ -167,12 +167,40 @@ function prep(node, nodePath, icons, primitives) {
  * `data-slot` 이 붙은 노드(컴포넌트를 가리키는 이름)와 루트, 칠·테두리·모서리를 가진 상자는 접지 않는다.
  */
 const folded = { text: 0, icon: 0, pass: 0, rect: 0 };
-function fold(node, isRoot = false) {
-  if (node.k) node.k = node.k.map((kid) => fold(kid));
+/**
+ * 카탈로그 항목의 감싸개를 컴포넌트 밖으로 밀어낸다. `Group` 이 씌운 div 는 항목을 늘어놓으려고 둔 것이지
+ * Figma 컴포넌트의 몸이 될 이유가 없다. 자식이 하나뿐이고 제 칠·테두리가 없으면 표시를 자식에게 넘긴다.
+ * 그러면 남은 감싸개는 평범한 통과 상자가 되어 fold 가 걷어낸다.
+ */
+function hoistComponents(node) {
+  if (node.component) {
+    let cur = node;
+    while ((cur.k || []).length === 1 && !cur.bg && !cur.bd && !cur.r && cur.k[0].t === "f") {
+      cur.k[0].component = cur.component;
+      delete cur.component;
+      cur = cur.k[0];
+    }
+  }
+  for (const kid of node.k || []) hoistComponents(kid);
+}
+
+/**
+ * `inComponent` 는 카탈로그 컴포넌트 **안쪽**이라는 뜻이다. 거기서는 `data-slot` 상자도 접는다.
+ * 화면에서는 레이어 이름이 되짚기의 다리라 접지 않지만, 카탈로그는 Component Set 이름과 Variant 속성이
+ * 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다(2026-09-18 유진식).
+ */
+function fold(node, isRoot = false, inComponent = false) {
+  const inside = inComponent || Boolean(node.component);
+  if (node.k) node.k = node.k.map((kid) => fold(kid, false, inside));
   if (node.t === "x" || node.t === "svg") return node;
   const kids = node.k || [];
-  if (!kids.length && (node.bg || node.bd) && !node.slot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
-  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !node.component && !isRoot;
+  const keepSlot = node.slot && !inComponent;
+  if (!kids.length && (node.bg || node.bd) && !keepSlot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
+  // 글자·아이콘 하나만 감싼 상자는 `overflow: hidden`(말줄임)이 붙어 있어도 접는다. Figma 에서 글자는
+  // 제 크기를 갖고 잘림은 부모 auto layout 이 다루므로, clip 만으로 상자를 남길 까닭이 없다.
+  const onlyTextOrIcon = kids.length === 1 && (kids[0].t === "x" || kids[0].t === "svg");
+  const keepClip = node.clip && !onlyTextOrIcon;
+  const plain = !node.bg && !node.bd && !node.r && !keepClip && !keepSlot && !node.component && !isRoot;
   if (!plain || kids.length !== 1) return node;
   const kid = kids[0];
   const near = (a, b) => Math.abs(a - b) <= 1;
@@ -260,6 +288,7 @@ const builtAt = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" 
 trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
+  hoistComponents(tree);
   tree = fold(tree, true);
   inferLayout(tree);
   foldInstances(tree);
