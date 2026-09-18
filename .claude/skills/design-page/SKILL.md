@@ -54,7 +54,7 @@ node scripts/figma/prepare.mjs --key <key> --name "<screens.ts의 name>" [--stat
 ```
 
 - `--state`를 하나라도 줄 때는 첫 `--state`에 기본 화면 이름(예: `목록`)만 JS 없이 둔다.
-- 화면 코드가 `max-w-[390px]` 모바일 뷰로 서 있으면(`.claude/skills/generate-code/SKILL.md` 「화면 폭」) `--width 390 --height 844`를 준다. 그 밖에는 기본값 1440×900이다.
+- 화면 코드가 `max-w-[390px]` 모바일 뷰로 서 있으면(`plugins/ooee-harness/skills/generate-code/SKILL.md` 「화면 폭」) `--width 390 --height 844`를 준다. 그 밖에는 기본값 1440×900이다.
 - 명령이 0이 아닌 코드로 끝나면 멈추고, 돌린 명령과 오류 전문을 보고한다. `scripts/figma/`나 상태 JS를 고쳐 다시 돌리지 않고 단계 파일을 손으로 만들지 않는다.
 - 출력의 `unresolvedColors`·`unknownIcons`가 0이 아니면 멈추고 manifest의 `unresolvedColors`·`unknownIcons` 목록을 보고한다. 이름을 찾지 못한 색은 Figma에서 변수에 묶을 수 없다.
 - `.figma-work/<key>/manifest.json`을 읽는다.
@@ -89,7 +89,14 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 `--instances`로 돌렸을 때 build 단계가 「컴포넌트를 찾지 못했다」 또는 「컴포넌트의 글자 수가 다르다」 `error`를 돌려주면, 그 파일에 카탈로그가 없거나 낡은 것이다. 3번의 「멈추고 보고한다」를 그대로 따르되, 사람에게 아래를 먼저 하도록 보고에 적는다. 카탈로그는 `screens.ts`의 화면이 아니므로 이 명령으로 부르지 않고 도구를 직접 돌린다.
 
 ```bash
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
+# 종류마다 `--only` 를 준다. 주지 않으면 모든 변형이 한 프레임에 들어가는데, 큰 auto-layout
+# 프레임에 붙이는 시간은 자식 수의 제곱으로 늘어 한 단계가 MCP 타임아웃을 낸다.
+# 까닭과 잰 값은 scripts/figma/README.md 의 「한 번에 다 옮기지 않는다」에 있다.
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
+  --only Button --only Badge --only Input --only Select --only Checkbox --only Chip \
+  --only Field --only Switch --only Radio --only Textarea --only InputButton \
+  --only NumberInput --only Combobox --only ToggleButton --only NotificationBadge \
+  --only SelectBox --only AppHeader --only BottomNavigation
 # manifest 의 steps 를 use_figma 에 fileKey 와 함께 순서대로 넘긴다
 ```
 
@@ -184,7 +191,7 @@ node scripts/figma/reread.mjs diff --key <key> --state <상태 순서> --figma .
 
 `auto`가 `true`인 것만 `apps/sandbox/src/app/<key>/page.tsx`에 반영한다. 고치는 파일은 `/generate-code`와 같은 세 파일(`page.tsx`, 같은 디렉터리의 `page.test.tsx`, `apps/sandbox/src/screens.ts`)뿐이다.
 
-- **색**: `hint`가 가리키는 class를 그 자리에서 바꾼다. 같은 class가 여러 곳에 있으면 변화가 난 경로(`p`)의 요소만 고친다. 토큰 이름을 코드에 적는 방식은 `.claude/skills/generate-code/SKILL.md`의 「색과 경계」를 따른다.
+- **색**: `hint`가 가리키는 class를 그 자리에서 바꾼다. 같은 class가 여러 곳에 있으면 변화가 난 경로(`p`)의 요소만 고친다. 토큰 이름을 코드에 적는 방식은 `plugins/ooee-harness/skills/generate-code/SKILL.md`의 「색과 경계」를 따른다.
 - **글자**: 문구를 그대로 옮긴다. 머리말 주석의 요청 문단은 고치지 않고, 요청과 달라진 문구는 보고의 「사람이 정할 것」에도 적는다.
 - **글자 크기**: `text-*` class를 바꾼다.
 - **아이콘**: `@remixicon/react`의 다른 이름으로 바꾸고 import도 함께 고친다.
@@ -198,7 +205,7 @@ pnpm --filter @ooee/sandbox build
 pnpm --filter @ooee/sandbox test
 ```
 
-둘 다 통과할 때까지 세 파일을 고친다. 그다음 `.claude/skills/review-design/SKILL.md`의 「검사 항목」을 고친 `page.tsx`에 적용해 위반이 0건인지 본다. 위반이 생겼으면 그 자리를 되돌리고 「사람이 정할 것」에 적는다.
+둘 다 통과할 때까지 세 파일을 고친다. 그다음 `plugins/ooee-harness/skills/review-design/SKILL.md`의 「검사 항목」을 고친 `page.tsx`에 적용해 위반이 0건인지 본다. 위반이 생겼으면 그 자리를 되돌리고 「사람이 정할 것」에 적는다.
 
 ### R6. 보고한다
 

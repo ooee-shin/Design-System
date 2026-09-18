@@ -19,6 +19,10 @@ Figma 쪽 호출은 Figma remote MCP의 `use_figma`로 한다. `prepare.mjs`가 
 | `reread.js` | 되읽기(④)에서 프레임을 줄(`rows`)로 읽는다. 파일을 바꾸지 않는다. `use_figma` 응답이 20,000자에서 잘려 자리를 아끼려고 객체 대신 줄로 돌려준다 |
 | `reread.mjs` | `step`은 위 단계 파일을 만들고(`--parts`로 나눌 수 있다), `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
 | `reread.test.mjs` | 차이 판정 시험. `pnpm test`에 들어 있어 Figma 없이 돈다 |
+| `combine-variants.js` | build 가 만든 컴포넌트를 `ooee.build`/`set` 값으로 묶어 **Component Set** 을 만든다. build 뒤 audit 앞에 선다 |
+| `export-keys.js` | 라이브러리 파일의 Component Set 과 변형 키를 뽑는다. 아직 어느 단계도 부르지 않는다 |
+| `step-payload.test.mjs` | 주석 떼기·인스턴스 접기·조각 나누기 시험. Figma 없이 돈다 |
+| `token-export.test.mjs` | 토큰 뽑기 시험. `color-mix` 중간 단계가 빠지지 않는지 본다 |
 
 ## 사람이 직접 돌릴 때
 
@@ -89,7 +93,7 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 
 ## 컴포넌트 카탈로그
 
-`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
+`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 카탈로그의 `data-variant-props` 그대로인 `variant=fill, tone=brand, controlSize=regular, state=기본` 꼴이다. 자산 패널에서 컴포넌트별로 묶는 것은 이름이 아니라 `combine-variants.js` 가 만드는 **Component Set** 이고, 세트 이름은 그때 붙는다.
 
 ```bash
 # 한 종류씩 옮긴다. 프레임이 「컴포넌트 / Button」처럼 나뉘고 한 번에 할 일이 작아진다.
@@ -101,7 +105,13 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only Button
 
 **이 실행은 지금 23단계 223,095자다(2026-09-17, 컴포넌트 139개).** builder 를 한 번만 보내기 전에는 42단계 702,691자였고, 그때는 글자의 74%가 39번 되풀이되는 같은 코드였다.
 
-변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
+변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 종류는 열여덟이다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
+
+**개수는 여기에 적지 않는다.** 카탈로그가 정본이고 항목이 늘 때마다 바뀐다. 문서에 베껴 두면 반드시 어긋난다(실제로 135·139 두 값이 서로 다른 채 남아 있었고 둘 다 실제와 달랐다). 지금 개수는 이렇게 센다:
+
+```bash
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only <종류>   # 준비 결과의 프레임·단계 수
+```
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
 
@@ -116,13 +126,13 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only Button
 
 ## 컴포넌트 인스턴스 (실험)
 
-`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/fill·brand·xlarge` 같은 이름을 만든다. 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
+`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/variant=fill, tone=brand, controlSize=xlarge, state=기본` 같은 이름을 만든다(첫 `/` 앞이 세트 이름, 뒤가 그 안의 Variant 다). 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
 
 **인스턴스로 놓을 자리는 안쪽을 단계에 싣지 않는다.** 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은 글자뿐이고, 노드 자신의 칠·테두리·모서리·오토 레이아웃도 컴포넌트가 가진 값이라 뗀다. 그만큼 옮겨 적을 글자가 준다(관리자 로그인: 6단계 67,456자 → 5단계 50,095자).
 
 **그래서 그 이름의 컴포넌트가 없으면 그리지 않고 멈춘다.** 안쪽을 싣지 않았으니 대신 그릴 것이 없다. build 단계가 `error` 로 「컴포넌트를 찾지 못했다: `<이름>`」 또는 「컴포넌트의 글자 수가 다르다」를 돌려준다. 카탈로그를 그 파일에 먼저 올리고 그 단계부터 다시 돌린다. 그때까지 그린 것은 남는다.
 
-**기본은 꺼 둔다.** 느려서가 아니라, 카탈로그를 이미 올려 둔 파일에서만 맞기 때문이다. 예전에 적어 둔 「인스턴스 둘에 23분」은 틀린 기록이었다. 2026-09-17 에 `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 훑기 17ms(그때 카탈로그는 77개였다. 지금은 135개이고 이 비용만 개수에 비례한다), `createInstance` 131ms, 글자 바꾸기 11ms 로 **인스턴스 하나에 0.2초**다. 그 23분은 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다(그 실행은 11단계 157,897자).
+**기본은 꺼 둔다.** 느려서가 아니라, 카탈로그를 이미 올려 둔 파일에서만 맞기 때문이다. 예전에 적어 둔 「인스턴스 둘에 23분」은 틀린 기록이었다. 2026-09-17 에 `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 훑기 17ms(그때 카탈로그는 77개였다. 이 비용만 개수에 비례한다), `createInstance` 131ms, 글자 바꾸기 11ms 로 **인스턴스 하나에 0.2초**다. 그 23분은 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다(그 실행은 11단계 157,897자).
 
 **전제 하나.** 글자를 슬롯에 넣을 때 `instance.findAllWithCriteria({types:["TEXT"]})` 가 돌려주는 차례가 화면 사양을 전위 순회한 차례와 같다고 본다. 카탈로그와 화면이 같은 React 컴포넌트에서 나오므로 지금은 맞지만, 코드로 확인할 수 있는 것이 아니다. 인스턴스 안 글자가 뒤바뀌어 보이면 이 전제를 먼저 의심한다.
 
