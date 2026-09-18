@@ -38,6 +38,10 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 
 `manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. 세 번째 단계가 **「builder 를 문서에 둔다」**이고, 뒤따르는 build 단계는 조각만 실은 채 문서에 둔 그것을 꺼내 쓴다. 그래서 build 단계를 다시 돌릴 때도 그 앞 단계는 건너뛰지 않는다 — 문서에 builder 가 없거나 다르면 build 단계가 `error` 로 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
 
+**단계를 건너뛰거나 앞뒤를 바꾸지 않는다.** 뒤 단계의 조각은 앞 단계가 만든 노드를 부모로 찾는다. 한 단계를 건너뛰고 다음 것을 돌리면 「부모를 찾지 못했다」로 멈춘다. 나눠서 돌릴 때도 순서는 그대로여야 한다.
+
+**「옮기는 중 조각 내용이 바뀌었다」는 대개 다시 보내면 풀린다.** 모델이 옮겨 적다 한 글자를 틀린 것이고, 단계 파일 자체는 멀쩡하다. 같은 단계를 **세 번까지** 다시 보내고, 세 번째도 같으면 그때 파일을 의심한다. 파일이 맞는지는 Figma 없이 확인할 수 있다 — 단계의 `RUN` 을 그대로 평가해 `fnv(JSON.stringify(RUN))` 가 그 파일의 `EXPECT` 와 같은지 보면 된다.
+
 ## 어떻게 틀리지 않게 하는가
 
 - **색 이름.** `dom-extract.js`는 요소의 class에서 `oe-*` 토큰과 primitive 단계를 후보로 모은다. `data-[checked]:`처럼 상태가 붙은 class도 후보이고, 정적인 화면에 걸리지 않는 `hover:`·`focus:`·`active:`·`dark:` 변형은 뺀다. `prepare.mjs`가 후보의 Light 값과 브라우저가 실제로 칠한 색을 대조해 고른다. 맞는 후보가 없으면 manifest의 `unresolvedColors`에 남긴다. `/design-page`는 그 경우 멈추고 옮기지 않는다.
