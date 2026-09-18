@@ -66,7 +66,7 @@ const STEP_RULE = {
   fill: (color: (step: number) => string) => [`bg-${color(600)}`, "text-white", `hover:bg-${color(700)}`, `active:bg-${color(800)}`],
   tonal: (color: (step: number) => string) => [`bg-${color(100)}`, `text-${color(800)}`, `hover:bg-${color(200)}`, `active:bg-${color(300)}`, `dark:bg-${color(800)}`, `dark:text-${color(200)}`, `dark:hover:bg-${color(700)}`, `dark:active:bg-${color(600)}`],
   outline: (color: (step: number) => string) => [`border-${color(500)}/30`, `text-${color(800)}`, `hover:bg-${color(100)}`, `active:bg-${color(200)}`, `dark:text-${color(300)}`, `dark:hover:bg-${color(800)}`, `dark:active:bg-${color(700)}`],
-  ghost: (color: (step: number) => string) => [`text-${color(800)}`, `hover:bg-${color(100)}`, `active:bg-${color(200)}`, `dark:text-${color(300)}`, `dark:hover:bg-${color(800)}`, `dark:active:bg-${color(700)}`],
+  ghost: (color: (step: number) => string) => [`text-${color(700)}`, `hover:bg-${color(100)}`, `active:bg-${color(200)}`, `dark:text-${color(400)}`, `dark:hover:bg-${color(800)}`, `dark:active:bg-${color(700)}`],
 } as const
 
 const variants = ["fill", "tonal", "outline", "ghost"] as const satisfies readonly ButtonVariant[]
@@ -99,18 +99,26 @@ test("every tone and variant follows the shared step rule", () => {
   }
 })
 
-// Outline 은 경계를 그리고 Ghost 는 그리지 않는다. 그 밖의 색은 둘이 같으므로 한 자리에서 두
-// variant 를 바꿔 달아도 글자 색과 Hover 가 달라지지 않는다.
-test("outline draws a border and ghost does not, while their other colours match", () => {
+// Outline 은 경계를 그리고 Ghost 는 그리지 않는다. Hover 와 Pressed 는 둘이 같은 사다리를 밟지만
+// 글자는 Ghost 만 한 칸 옅다. 배경도 경계도 없어 글자 하나로 무게가 정해지는 Style 이기 때문이다.
+test("outline draws a border and ghost does not, and only ghost lightens its label", () => {
   const outline = renderButton(<Button variant="outline">Label</Button>)
   const ghost = renderButton(<Button variant="ghost">Label</Button>)
 
   assertHas(outline, ["bg-transparent"], "outline")
   assertHas(ghost, ["border-transparent", "bg-transparent"], "ghost")
 
-  const shared = STEP_RULE.ghost(brandColor)
-  assertHas(outline, shared, "outline")
-  assertHas(ghost, shared, "ghost")
+  const background = [
+    `hover:bg-${brandColor(100)}`,
+    `active:bg-${brandColor(200)}`,
+    `dark:hover:bg-${brandColor(800)}`,
+    `dark:active:bg-${brandColor(700)}`,
+  ]
+  assertHas(outline, background, "outline")
+  assertHas(ghost, background, "ghost")
+
+  assertHas(outline, [`text-${brandColor(800)}`, `dark:text-${brandColor(300)}`], "outline")
+  assertHas(ghost, [`text-${brandColor(700)}`, `dark:text-${brandColor(400)}`], "ghost")
 })
 
 // fill 과 tonal 은 배경을 스스로 채우므로 경계를 두지 않는다. 경계를 두면 같은 자리에서 variant 를

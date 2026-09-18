@@ -27,6 +27,11 @@
    바꾸면 여기도 함께 고친다. custom tone 의 엑셀 색은 조립하지 않고 `button.tsx` 에 그대로 적으므로
    Tailwind 가 그 파일에서 찾는다. */
 @source inline("bg-{neutral,red}-200");
+/* ghost 의 글자만 한 칸 옅은 Light 700, Dark 400 을 쓴다. */
+@source inline("text-{neutral,red}-700");
+@source inline("dark:text-{neutral,red}-400");
+@source inline("text-[var(--brand-700)]");
+@source inline("dark:text-[var(--brand-400)]");
 @source inline("dark:bg-{neutral,red}-800");
 @source inline("hover:bg-{neutral,red}-{100,200,700}");
 @source inline("active:bg-{neutral,red}-{200,300,800}");
@@ -47,7 +52,7 @@
 @source inline("dark:active:bg-[var(--brand-700)]");
 
 /* ToggleButton 은 Button 과 같은 사다리를 쓰지만 Ghost 켜짐의 글자에 600 단계를 더 쓴다. 배경을
-   두지 않는 Style 이라 글자와 아이콘만으로 켜짐을 말해야 하고, Button 의 Label 이 쓰는 800 은
+   두지 않는 Style 이라 글자와 아이콘만으로 켜짐을 말해야 하고, Button 의 Ghost Label 이 쓰는 700 은
    유채색이 거의 남지 않아 브랜드 색으로 켜졌다는 것이 읽히지 않기 때문이다. tone 은 brand 와
    custom 둘뿐이고, custom color 의 노랑과 빨강은 조립하지 않고 `toggle-button.tsx` 에 그대로
    적으므로 Tailwind 가 그 파일에서 찾는다. */

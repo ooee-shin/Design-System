@@ -11,19 +11,29 @@
  * 있게 한다. 셋 다 조건을 한 줄로 늘어놓는 안에서는 자리가 없어 못 하던 것이다.
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
-import { RiArrowDownSLine, RiCalendarLine, RiCloseLine, RiResetLeftLine, RiSearchLine, RiSideBarLine } from "@remixicon/react";
+import {
+  RiArrowDownSLine,
+  RiCalendarLine,
+  RiCloseLine,
+  RiResetLeftLine,
+  RiSearchLine,
+  RiEqualizer2Line,
+} from "@remixicon/react";
 
 import { Button, CheckboxField, Chip, Input, InputButton } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
+import { OpenInNewIcon } from "@/components/candidates/material-symbols";
 import { Collapsible, CollapsibleContent } from "@/components/candidates/collapsible";
 import { PageHeader } from "@/components/candidates/page-header";
 import { ScrollArea } from "@/components/candidates/scroll-area";
 
 import {
+  ANSWERED_OPTIONS,
   CATEGORY_OPTIONS,
+  ROLE_TITLE,
   CUSTOM,
   EMPTY_FILTER,
   PAGE_DESCRIPTION,
@@ -39,6 +49,7 @@ import {
   countsFor,
   isFiltered,
   toggleValue,
+  viewerOf,
   type Filter,
   type FilterAxis,
 } from "./voice-data";
@@ -53,16 +64,26 @@ function FilterSection({
   count = 0,
   onClear,
   defaultOpen = false,
+  open: openProp,
+  onOpenChange,
   children,
 }: {
   label: string;
   count?: number;
   onClear?: () => void;
   defaultOpen?: boolean;
+  /** 화면이 여닫는 상태를 직접 들고 있을 때 넘긴다. 주지 않으면 이 축이 스스로 기억한다. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-  const toggle = () => setOpen((previous) => !previous);
+  const [ownOpen, setOwnOpen] = useState(defaultOpen);
+  const open = openProp ?? ownOpen;
+  const setOpen = (next: boolean) => {
+    setOwnOpen(next);
+    onOpenChange?.(next);
+  };
+  const toggle = () => setOpen(!open);
   const arrow = (
     <RiArrowDownSLine
       className={`size-oe-icon-small shrink-0 text-oe-foreground-tertiary transition-transform ${open ? "rotate-180" : ""}`}
@@ -229,6 +250,14 @@ function StorePicker({
   );
 }
 
+/**
+ * 조건 패널이 목록 옆의 한 칸으로 서기에 좁은 폭이다.
+ *
+ * 값의 근거는 화면을 잰 것이다. 좌측 내비 240px, 목록 영역 좌우 여백 48px, 표 1044px, 패널 264px
+ * 을 더하면 1596px 이라 1600px 부터 둘이 함께 들어간다.
+ */
+const NARROW = "(max-width: 1599px)";
+
 export default function Page() {
   // 고르는 동안에는 `draft` 에만 쌓이고, 조회를 눌러야 `filter` 로 넘어가 목록이 다시 선다.
   // 한 번 고를 때마다 서버에 묻지 않고 다 고른 뒤 한 번에 묻는다.
@@ -238,17 +267,68 @@ export default function Page() {
   const [filter, setFilter] = useState<Filter>(EMPTY_FILTER);
   const [draft, setDraft] = useState<Filter>(EMPTY_FILTER);
   const dirty = JSON.stringify(draft) !== JSON.stringify(filter);
-  const [panelOpen, setPanelOpen] = useState(true);
+  // 사용자가 직접 여닫거나 폭이 경계를 넘을 때 정해지는 값이다. 아직 그런 일이 없으면 `null` 이며,
+  // 그때는 지금 폭이 정한다. 넓은 폭으로 들어오면 열린 채, 좁은 폭으로 들어오면 닫힌 채 시작한다.
+  // 처음 값을 상태에 박아 두면 좁은 폭으로 들어왔을 때 열린 채로 그려진 뒤에 닫히게 된다.
+  const [panelChoice, setPanelChoice] = useState<boolean | null>(null);
+  // 표가 온전히 보이지 않는 폭이 되면 조건 패널을 닫고, 다시 보이는 폭이 되면 연다. 경계는
+  // 1600px 이며 화면을 재서 나온 값이다. 좌측 내비 240px, 목록 영역 좌우 여백 48px, 표 1044px,
+  // 조건 패널 264px 을 더하면 1596px 이라 1600px 부터 둘이 함께 들어간다. 그보다 좁으면 패널이
+  // 차지한 만큼 표의 오른쪽 열이 잘리므로, 조건보다 목록을 먼저 보이게 둔다.
+  //
+  // 패널을 닫으면 1332px 까지는 표가 온전히 들어온다. 그보다 더 좁아지면 표가 자기 안에서 가로로
+  // 스크롤하며, 그 구간은 관리자가 `lg` 까지 대응한다는 기존 규칙이 담당한다.
+  //
+  // 폭이 실제로 바뀔 때만 움직인다. 처음 열릴 때의 상태는 건드리지 않으므로, 좁은 폭에서 직접
+  // 열어 둔 것은 그 안에서 그대로 남는다.
+  useEffect(() => {
+    const query = window.matchMedia(NARROW);
+    const follow = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setPanelChoice(false);
+        return;
+      }
+      // 넓어질 때는 닫힌 모습을 한 번 그린 뒤에 연다. 그 순간 패널이 얹힌 모습에서 한 칸
+      // 차지하는 모습으로 갈리는데, 폭을 여는 것까지 같은 프레임에 함께 일어나면 브라우저가
+      // 출발점을 잡지 못해 늘어나는 과정 없이 그대로 나타난다.
+      //
+      // 프레임을 두 번 기다리는 이유는 첫 번째 콜백이 아직 그리기 전에 돌기 때문이다. 그 자리에서
+      // 열면 닫힌 폭과 열린 폭이 한 번의 그리기에 함께 들어가 여전히 출발점이 없다.
+      requestAnimationFrame(() => requestAnimationFrame(() => setPanelChoice(true)));
+    };
+    query.addEventListener("change", follow);
+    return () => query.removeEventListener("change", follow);
+  }, []);
+
+  // 지금 좁은 폭인지. 좁으면 패널이 목록 옆의 한 칸이 아니라 목록 위에 얹힌다. 효과 안에서 상태를
+  // 고치지 않고 매체 질의를 그대로 읽으므로, 처음 그릴 때부터 실제 폭과 어긋나지 않는다.
+  const narrow = useSyncExternalStore(
+    useCallback((onChange: () => void) => {
+      const query = window.matchMedia(NARROW);
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    }, []),
+    () => window.matchMedia(NARROW).matches,
+    () => false,
+  );
+
+  const panelOpen = panelChoice ?? !narrow;
+
+  // 답변 여부 축만 화면이 여닫는 상태를 들고 있다. 요약의 지연을 누르면 그 축에 미답변이 걸리는데,
+  // 접힌 채로 개수만 바뀌면 무엇이 걸렸는지 펼쳐 봐야 안다.
+  const [answeredOpen, setAnsweredOpen] = useState(false);
   // 담당자는 다섯이 넘어가면 눈으로 훑기 어려워진다. 고른 조건이 아니라 목록을 찾는 도구이므로
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
   const edit = (patch: Partial<Filter>) => setDraft((previous) => ({ ...previous, ...patch }));
-  // 목록 머리의 검색창은 왼쪽 패널 밖에 있어 「조회」 버튼을 거치지 않는다. `edit` 만 부르면
-  // `draft` 에만 쌓이는데 그 칸은 `filter` 를 읽으므로 친 글자가 화면에 나타나지 않는다.
-  // 그래서 둘을 함께 옮겨 바로 걸리게 한다. 둘이 같이 움직이므로 `dirty` 도 어긋나지 않는다.
-  const editAndApply = (patch: Partial<Filter>) => {
+  // 목록 위 줄의 조작은 조회를 거치지 않고 곧바로 적용한다. 왼쪽 패널이 목록에 무엇을 담을지
+  // 정하는 자리라면, 검색과 전환 건 보기는 이미 담긴 목록 안에서 무엇을 볼지 정하는 자리다.
+  // 쳐 넣은 글자가 화면에 남으려면 고른 값과 적용된 값을 함께 고쳐야 한다.
+  const applyNow = (patch: Partial<Filter>) => {
     setDraft((previous) => ({ ...previous, ...patch }));
     setFilter((previous) => ({ ...previous, ...patch }));
+    // 지연을 켜면 그 조건이 걸린 축을 함께 펼친다. 걸린 것을 눈으로 확인할 수 있어야 한다.
+    if (patch.overdueOnly) setAnsweredOpen(true);
   };
 
   /** 한 축의 값 목록이다. 값마다 몇 건이 걸리는지 오른쪽 끝에 붙는다. */
@@ -283,7 +363,14 @@ export default function Page() {
             // 이름만으로 누구인지 갈리지 않을 때가 있어 팀을 옆에 붙인다.
             rightDescription={option.description}
             checked={draft[axis].includes(option.value)}
-            onCheckedChange={() => edit({ [axis]: toggleValue(draft[axis], option.value) })}
+            // 답변 여부를 직접 고르면 요약의 지연 조건은 푼다. 지연이 그 축을 미답변으로 맞추고
+            // 있었는데 여기서 값을 바꾸면 둘이 서로 다른 것을 말하게 된다.
+            onCheckedChange={() =>
+              edit({
+                [axis]: toggleValue(draft[axis], option.value),
+                ...(axis === "answered" ? { overdueOnly: false } : {}),
+              })
+            }
             trailingElement={
               <span className="text-xs tabular-nums text-oe-foreground-tertiary">{counts[option.value] ?? 0}</span>
             }
@@ -294,30 +381,82 @@ export default function Page() {
   };
 
   return (
-    <AdminLayout>
+    // 헤더에 서는 사람과 목록·통계가 세는 범위가 같은 사람을 가리켜야 하므로 화면이 넘긴다.
+    //
+    // 권한은 헤더의 사람을 눌러 SV 와 관리자 사이를 오간다. 권한마다 목록과 통계의 범위가 갈리는
+    // 것을 확인하려고 둔 길이며, 화면 안에 고르는 자리를 따로 만들지 않는다. 제품에서는 로그인한
+    // 사람의 권한이 정하는 값이라 화면에 그 조작이 있어서는 안 된다.
+    <AdminLayout
+      user={{ ...viewerOf(filter.role), role: ROLE_TITLE[filter.role] }}
+      onUserClick={() => applyNow({ role: filter.role === "admin" ? "sv" : "admin" })}
+    >
       <div className="flex min-h-0 flex-1 flex-col">
         <PageHeader
           path={PAGE_PATH}
           title="점주의 소리"
           description={PAGE_DESCRIPTION}
           actions={
-            // 조건 패널을 여닫는 길이다. 목록 위가 아니라 화면 머리에 두어, 표 위 줄은 결과를
-            // 다루는 것들만 남긴다.
-            <Button
-              variant="outline"
-              tone="neutral"
-              leadingIcon={<RiSideBarLine />}
-              aria-expanded={panelOpen}
-              onClick={() => setPanelOpen((previous) => !previous)}
-            >
-              필터
-            </Button>
+            // 이 목록을 다루는 조작이 아니라 이 화면이 쓰는 설정을 여는 길이다. 그래서 목록 위
+            // 줄이 아니라 화면 머리에 서고, 새 창에서 열린다는 것을 뒤따르는 아이콘이 말한다.
+            // 그 아이콘만 Material Symbols 의 `open_in_new` 를 쓴다. Remix 의 `RiExternalLinkLine`
+            // 은 화살표의 선이 상자의 변과 어긋나 같은 크기에서 지저분하게 보인다.
+            // 앞에 아이콘을 두지 않는 이유는 둘이 나란히 서기 때문이다. 앞뒤로 다 붙으면 글자가
+            // 아이콘 사이에 끼고, 두 버튼의 앞 아이콘이 서로 다른 뜻을 가진 표시로 읽힌다.
+            // 버튼을 감싸지 않고 그대로 넘긴다. 나란히 선 버튼 사이 간격은 `PageHeader` 의 이
+            // 자리가 6px 로 갖고 있고, 그것이 버튼 묶음의 규칙이다.
+            <>
+              <Button variant="outline" tone="neutral" controlSize="small" trailingIcon={<OpenInNewIcon />}>
+                카테고리설정
+              </Button>
+              <Button variant="outline" tone="neutral" controlSize="small" trailingIcon={<OpenInNewIcon />}>
+                자동답변설정
+              </Button>
+            </>
           }
         />
 
-        <div className="flex min-h-0 flex-1">
+        {/* 좁은 폭에서 패널이 이 자리 위에 얹히므로 기준을 여기서 잡고, 닫힌 동안 오른쪽으로
+            비켜 있는 패널이 화면 밖으로 삐져나오지 않게 잘라 둔다. */}
+        <div className="relative flex min-h-0 flex-1 overflow-hidden">
+          {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
+              읽히지 않는다. */}
+          <div className="oe-scrollbar-bare flex min-w-0 flex-1 items-start overflow-auto px-6 pt-4 pb-16">
+            <VoiceList
+              filter={filter}
+              onFilterChange={applyNow}
+              afterCount={
+                // 조건 패널을 여닫는 길이다. 건수 바로 뒤에 두어, 그 숫자가 어떤 조건으로 나온
+                // 것인지 되짚는 자리와 붙여 놓는다.
+                //
+                // 글자 없이 아이콘만 둔다. 관리자 웹은 같은 사람이 매일 쓰는 도구라 자리와 모양을
+                // 익히며 쓰고, 이 화면에서 여닫을 것은 조건 패널 하나뿐이다.
+                //
+                // 모양은 슬라이더다. 깔때기는 걸러 낸 결과를 뜻하는 관용인데 이 패널은 값을 고르고
+                // 조절하는 자리이고, 16px 에서 깔때기는 대가 얇아 형태가 흐려진다. 슬라이더는 선
+                // 둘과 점 둘이라 그 크기에서도 또렷하다. 대신 접근 가능한
+                // 이름에는 누르면 무엇이 되는지를 그대로 담고, `aria-expanded` 로 지금 열려 있는지
+                // 함께 알린다.
+                <Button
+                  variant="ghost"
+                  tone="neutral"
+                  controlSize="small"
+                  leadingIcon={<RiEqualizer2Line />}
+                  aria-expanded={panelOpen}
+                  aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
+                  onClick={() => setPanelChoice(!panelOpen)}
+                />
+              }
+            />
+          </div>
+
           {/* 조건은 본문 위에 얹힌 상자가 아니라 본문 옆의 한 칸이다. 그래서 페이지 헤더가
-              아래에 선을 긋듯이 이 자리도 오른쪽에 선을 긋고, 그 선까지가 조건의 영역이다.
+              아래에 선을 긋듯이 이 자리도 왼쪽에 선을 긋고, 그 선부터가 조건의 영역이다.
+
+              왼쪽이 아니라 오른쪽에 두었다. 왼쪽에는 이미 화면을 옮기는 내비게이션이 세로로 서
+              있어서, 그 옆에 조건 패널이 또 붙으면 성격이 다른 기둥 둘이 하나의 넓은 사이드바로
+              읽힌다. 오른쪽에 두면 본문이 내비게이션 바로 옆에서 시작해 이 화면의 내용이 주인
+              자리를 갖고, 결과를 먼저 보고 조건으로 좁히는 차례와도 맞는다. 패널이 쓰는 폭은
+              어느 쪽에 있든 같으므로 목록에 주는 폭은 달라지지 않는다.
               상자를 두르지 않는 이유는 그 안에서 축을 다시 선으로 나누기 때문이다. 선이 두
               겹이 되면 무엇이 묶여 있는지 오히려 읽히지 않는다.
 
@@ -325,15 +464,57 @@ export default function Page() {
               지면 이 자리만 스크롤되고 목록은 제자리를 지킨다. */}
           {/* 접을 때 사라지는 것이 아니라 폭이 줄어든다. 갑자기 없어지면 옆의 목록이 한 번에
               넓어져서 어디를 보고 있었는지 놓친다. 안쪽 내용은 폭을 고정해 두어, 줄어드는 동안
-              글자가 찌그러지지 않고 왼쪽으로 밀려 나간다. 닫힌 동안에는 `inert` 로 포커스가
+              글자가 찌그러지지 않고 오른쪽으로 밀려 나간다. 닫힌 동안에는 `inert` 로 포커스가
               들어가지 않게 막는다. */}
+          {/* 패널의 왼쪽 선이다. 가리키면 드러나고 누르면 여닫는다. 좌측 내비게이션의 레일과 같은
+              방식이며, 그쪽이 오른쪽 선을 쓰는 것처럼 이쪽은 왼쪽 선을 쓴다.
+
+              같은 일을 하는 버튼이 목록 위 줄에 이미 있으므로 이름도 그 버튼과 같은 말을 쓰고
+              `tabIndex` 를 빼서 초점 차례에서는 한 번만 만난다. 닫혀 있으면 화면 오른쪽 끝에
+              붙어 있어 그 자리를 눌러 다시 열 수 있다. */}
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
+            title={panelOpen ? "필터 닫기" : "필터 열기"}
+            onClick={() => setPanelChoice(!panelOpen)}
+            className={`absolute inset-y-0 z-30 hidden w-4 transition-[right,transform] duration-200 ease-out after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-oe-border-primary motion-reduce:transition-none sm:block ${
+              panelOpen ? "right-[16.5rem] translate-x-1/2 cursor-e-resize" : "right-0 translate-x-0 cursor-w-resize"
+            }`}
+          />
+
           <aside
             inert={!panelOpen}
-            className={`shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none ${
-              panelOpen ? "w-[18.25rem] border-r border-oe-border-secondary opacity-100" : "w-0 opacity-0"
-            }`}
+            // 넓은 폭에서는 목록 옆의 한 칸이라 폭이 줄고 늘며 목록 폭을 함께 바꾼다. 좁은 폭에서는
+            // 목록 위에 얹혀 오른쪽에서 밀려 들어오고, 목록은 제 폭을 그대로 지킨다. 그 폭에서
+            // 패널이 한 칸을 차지하면 표의 오른쪽 열이 잘리기 때문이다.
+            //
+            // 흐려짐은 한 칸으로 설 때만 쓴다. 그 모습은 폭이 잘리며 드러나므로 흐려짐이 함께
+            // 걷히면 잘린 자리가 덜 도드라진다. 얹힌 모습에서 반투명한 면을 쓰면 뒤의 목록이
+            // 비쳐서 떠 있는 면이 유령처럼 보이고, 미끄러져 들어오는 것만으로 없던 것이 온다는
+            // 것은 이미 읽힌다.
+            //
+            // 옮기는 것은 `translate` 로 적는다. `transform` 만 적으면 Tailwind 가 만드는 개별
+            // 속성이 전이 목록에 들지 않아 자리만 그대로 튄다.
+            //
+            // 얹힌 모습에서는 왼쪽 선을 두지 않고 그림자만 쓴다. 선은 자기 바깥의 배경과 대비로
+            // 보이는데 그 바깥이 흰 바닥·회색 카드·표 머리줄로 자리마다 달라서, 한 줄인 선이
+            // 중간에 끊긴 것처럼 읽힌다. 한 칸으로 설 때의 선은 같은 층에 나란히 놓인 것을 가르는
+            // 것이므로 그대로 남긴다.
+            className={
+              narrow
+                ? `absolute inset-y-0 right-0 z-20 w-[16.5rem] bg-oe-background-primary shadow-lg transition-[translate] duration-200 ease-out motion-reduce:transition-none ${
+                    panelOpen ? "translate-x-0" : "translate-x-full"
+                  }`
+                : `relative shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none ${
+                    panelOpen ? "w-[16.5rem] border-l border-oe-border-secondary opacity-100" : "w-0 opacity-0"
+                  }`
+            }
           >
-            <div className="flex h-full w-[18.25rem] flex-col">
+            {/* 안쪽 내용은 패널의 오른쪽 끝에 붙여 둔다. 폭이 늘고 줄며 여닫히는 동안 왼쪽이
+                잘리므로, 내용이 오른쪽에서 드러나고 사라진다. 왼쪽에 붙여 두면 반대로 오른쪽이
+                잘려서 조회 버튼과 여백이 먼저 사라지고, 열릴 때는 없던 것이 뒤늦게 생겨난다. */}
+            <div className="absolute inset-y-0 right-0 flex w-[16.5rem] flex-col">
               {/* 스크롤 막대를 콘텐츠 위에 겹쳐 그린다. 막대가 자리를 차지하면 축을 가르는
                   선이 그 앞에서 멈추고 오른쪽 여백만 넓어지며, 필요할 때만 생기게 두면 축을
                   펼치고 접을 때마다 안쪽 폭이 흔들린다. */}
@@ -352,17 +533,20 @@ export default function Page() {
 
                     초기화는 되돌릴 것이 있을 때만 선다. 아무것도 고르지 않은 화면에 서 있으면
                     무엇을 되돌리는 것인지 읽는 사람이 먼저 헤아려야 한다. */}
-                <span className="-mr-1 flex items-center gap-1">
+                {/* 나란히 선 버튼 사이는 6px 이다. 버튼 묶음의 규칙이며 화면 안에서 같은 값을
+                    쓴다. */}
+                <span className="-mr-1 flex items-center gap-1.5">
                   {isFiltered(draft) ? (
                     <Button
                       variant="ghost"
                       tone="neutral"
                       controlSize="xsmall"
                       leadingIcon={<RiResetLeftLine />}
-                      onClick={() => {
-                        setDraft(EMPTY_FILTER);
-                        setFilter(EMPTY_FILTER);
-                      }}
+                      // 고른 것을 비우기만 하고 목록은 건드리지 않는다. 값을 고르는 것과 같은
+                      // 층의 조작이므로, 이것도 조회를 눌러야 목록에 반영된다. 여기서 목록까지
+                      // 함께 되돌리면 조건을 걸 때는 조회를 거치는데 풀 때는 거치지 않게 된다.
+                      // 권한은 고른 조건이 아니라 볼 수 있는 범위라 초기화에서 살려 둔다.
+                      onClick={() => setDraft({ ...EMPTY_FILTER, role: draft.role })}
                     >
                       초기화
                     </Button>
@@ -385,8 +569,8 @@ export default function Page() {
                 <div className="flex w-fit flex-col">
                   {/* 넷뿐이라 접지 않고 한 줄에 펼쳐 둔다. 기간은 목록을 읽는 내내 바탕이 되는
                       조건이라 지금 어느 폭으로 보고 있는지가 늘 보여야 하고, 줄이 넘어가면
-                      어디까지가 기간인지 한눈에 들어오지 않는다. 넷을 더한 폭이 236px 이라
-                      240px 안에 선다. */}
+                      어디까지가 기간인지 한눈에 들어오지 않는다. 넷을 더한 폭이 221px 이고,
+                      이 줄이 패널 폭의 최소값을 정한다. */}
                   <div className="flex gap-1">
                     {PERIOD_OPTIONS.map((option) => (
                       <Chip
@@ -436,6 +620,18 @@ export default function Page() {
                 {valueList("category", CATEGORY_OPTIONS)}
               </FilterSection>
 
+              {/* 처리상태 다음이 아니라 카테고리 다음이다. 앞의 둘이 이 건이 무엇이고 어디까지
+                  왔는지를 고르는 축이고, 답변 여부는 그중 답이 나갔는지만 다시 가르는 축이다. */}
+              <FilterSection
+                label="답변 여부"
+                count={draft.answered.length}
+                onClear={() => edit({ answered: [] })}
+                open={answeredOpen}
+                onOpenChange={setAnsweredOpen}
+              >
+                {valueList("answered", ANSWERED_OPTIONS)}
+              </FilterSection>
+
               <FilterSection label="점포" count={draft.store.length} onClear={() => edit({ store: [] })}>
                 <StorePicker
                   chosen={draft.store}
@@ -476,12 +672,6 @@ export default function Page() {
 
             </div>
           </aside>
-
-          {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
-              읽히지 않는다. */}
-          <div className="flex min-w-0 flex-1 items-start overflow-auto px-6 pt-6 pb-16">
-            <VoiceList filter={filter} onFilterChange={editAndApply} />
-          </div>
         </div>
       </div>
     </AdminLayout>

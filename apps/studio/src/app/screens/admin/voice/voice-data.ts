@@ -13,14 +13,24 @@ const TODAY = "2026-09-17";
 // 처리상태는 기존 셋을 그대로 쓴다. 이번 작업이 상태값을 건드리지 않기 때문이다. 전환은 상태가
 // 아니라 표시이므로 이 표에 넣지 않고 따로 붙인다.
 export const STATUS = {
-  recv: { label: "접수", tone: "neutral" },
+  // 접수는 담당자가 아직 손대지 않은 건, 곧 지금 처리해야 할 업무다. 회색으로 두면 나머지 두
+  // 상태만 색을 갖게 되어, 가장 먼저 찾아야 하는 건이 목록에서 가장 물러나 보인다.
+  recv: { label: "접수", tone: "warning" },
   prog: { label: "처리중", tone: "info" },
   done: { label: "처리완료", tone: "success" },
+  // 지원요청으로 옮겨진 건이 처리상태 자리에 갖는 값이다. 접수로 남겨 두면 여기서 처리할 일처럼
+  // 읽히는데, 이 건의 답변과 처리는 이제 지원요청에서 한다.
+  moved: { label: "지원요청 전환", tone: "neutral" },
 } as const;
+
+/** 실제 처리 흐름을 뜻하는 상태다. 전환은 이 셋 가운데 하나를 대신해 표시될 뿐 흐름에 끼지 않는다. */
+const WORK_STATUS = ["recv", "prog", "done"] as const;
 
 export const SOURCE = {
   direct: "직접 등록",
-  request_transfer: "지원요청 전환",
+  // 「지원요청 전환」이라고만 적으면 지원요청으로 옮겨 나간 건을 뜻하는 처리상태와 같은 말이
+  // 되어 방향이 갈리지 않는다. 유입 경로는 들어온 쪽이므로 어디에서 왔는지를 밝혀 적는다.
+  request_transfer: "지원요청에서 전환",
 } as const;
 
 export const REGIONS = ["서울", "경기", "인천", "부산", "대구", "광주"];
@@ -82,7 +92,61 @@ export function membersOf(team: string) {
   return SUPERVISORS.filter((person) => person.team === team).map((person) => person.name);
 }
 
-export type VoiceStatus = keyof typeof STATUS;
+/**
+ * 이 화면을 보고 있는 사람이다. 예시에서 1팀의 김도현으로 둔다.
+ *
+ * 헤더에 서는 이름과 요약이 세는 범위가 같은 사람을 가리켜야 하므로 한 곳에서 정한다.
+ */
+export const VIEWER = { name: "김도현", id: "kimdohyun", team: "1팀" };
+
+/**
+ * 권한이 목록과 요약의 범위를 정한다.
+ *
+ * SV 는 자기가 담당한 점포가 올린 건, 팀장은 자기 팀원들이 담당한 건의 합, 관리자는 전부다.
+ * 조건이 아니라 그 사람이 볼 수 있는 범위이므로 초기화로 풀리지 않는다.
+ */
+export const ROLES = [
+  { value: "sv", label: "SV" },
+  { value: "leader", label: "팀장" },
+  { value: "admin", label: "관리자" },
+] as const;
+
+export type Role = (typeof ROLES)[number]["value"];
+
+export function inScope(voice: Voice, role: Role) {
+  if (role === "admin") return true;
+  if (role === "leader") return membersOf(VIEWER.team).includes(voice.sv);
+  return voice.sv === VIEWER.name;
+}
+
+/**
+ * 들어온 건수를 부르는 이름이다. 권한이 정한 범위가 그 이름이 된다.
+ *
+ * 관리자는 전부를 세므로 들어온 양 그대로 「유입」이다. SV 와 팀장은 자기 담당이나 팀원의 건만
+ * 세므로 그 숫자가 곧 맡은 일의 양이고, 「나의 업무」가 무엇을 센 값인지 정확히 말한다. 카드에
+ * 따로 제목을 두지 않고 이 라벨이 범위를 말한다.
+ */
+export function inflowLabel(role: Role) {
+  return role === "admin" ? "유입" : "나의 업무";
+}
+
+/** 헤더의 권한 표시다. 관리자만 기존 화면이 쓰던 영문 표기를 그대로 쓴다. */
+export const ROLE_TITLE: Record<Role, string> = { sv: "SV", leader: "팀장", admin: "Admin" };
+
+/** 본사 관리자 계정이다. 다른 관리자 화면들이 쓰던 예시 계정을 그대로 쓴다. */
+const ADMIN_VIEWER = { name: "김블루", id: "KimblueId" };
+
+/**
+ * 권한에 따라 로그인한 사람도 바뀐다.
+ *
+ * SV 와 팀장은 담당 SV 인 김도현이고 관리자는 본사 계정이다. 권한만 바꾸고 이름을 그대로 두면
+ * 담당 SV 가 전체를 보는 모습이 되어, 그 숫자가 누구의 범위인지 헤더가 거짓을 말한다.
+ */
+export function viewerOf(role: Role) {
+  return role === "admin" ? ADMIN_VIEWER : { name: VIEWER.name, id: VIEWER.id };
+}
+
+export type VoiceStatus = (typeof WORK_STATUS)[number];
 export type VoiceSource = keyof typeof SOURCE;
 
 export type Voice = {
@@ -105,7 +169,7 @@ export const VOICES: Voice[] = [
   { no: 326, store: "마천동점", sv: "박지우", category: "메뉴 관련", title: "신메뉴 시식 일정을 지역별로 나눠 주세요", attached: false, status: "recv", source: "direct", createdAt: "2026-09-16 09:08", answeredAt: null },
   { no: 325, store: "아현점", sv: "한지훈", category: "물류 관련", title: "발주 마감 시간을 한 시간 늦춰 주세요", attached: false, status: "done", source: "direct", createdAt: "2026-09-15 19:00", answeredAt: "2026-09-24 10:55" },
   { no: 324, store: "명동점", sv: "최은영", category: "운영 관련", title: "본사 방문 일정을 미리 공지해 주세요", attached: false, status: "recv", source: "direct", createdAt: "2026-09-14 13:01", answeredAt: null },
-  { no: 323, store: "가재울점", sv: "오세진", category: "물류 관련", title: "식용유에 거품이 심하게 올라옵니다", attached: true, status: "recv", source: "direct", createdAt: "2026-09-14 18:28", answeredAt: null },
+  { no: 323, store: "가재울점", sv: "오세진", category: "물류 관련", title: "식용유에 거품이 심하게 올라옵니다", attached: true, status: "recv", source: "direct", createdAt: "2026-09-14 18:28", answeredAt: null, movedTo: 2371 },
   { no: 322, store: "동의대역점", sv: "이서준", category: "사장님 앱 관련", title: "앱에서 바로 문의할 수 있게 해 주세요", attached: false, status: "recv", source: "direct", createdAt: "2026-09-12 17:26", answeredAt: null },
   { no: 321, store: "부천원종점", sv: "김도현", category: "사장님 앱 관련", title: "직원 계정 권한을 나눠 주세요", attached: false, status: "recv", source: "direct", createdAt: "2026-09-11 19:38", answeredAt: null },
   { no: 320, store: "인천검단신도시점", sv: "윤가람", category: "사장님 앱 관련", title: "정산 내역을 엑셀로 내려받게 해 주세요", attached: false, status: "recv", source: "direct", createdAt: "2026-09-05 20:05", answeredAt: null },
@@ -226,15 +290,74 @@ export const PERIOD_OPTIONS = [
   { value: "1m", label: "1개월" },
   { value: "3m", label: "3개월" },
   { value: "6m", label: "6개월" },
-  { value: CUSTOM, label: "직접 선택" },
+  { value: CUSTOM, label: "선택" },
 ];
 const PERIOD_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
 
-export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
+// 처리상태 축은 실제 상태 셋만 고른다. 전환된 건을 목록에 담을지는 조건이 아니라 담기는 범위를
+// 정하는 조작이라 목록 위 줄의 「지원요청 전환 건 보기」가 갖는다.
+export const STATUS_OPTIONS = WORK_STATUS.map((value) => ({ value, label: STATUS[value].label }));
+
+/** 답변이 나갔는지. */
+function answeredKeyOf(voice: Voice) {
+  return voice.answeredAt ? "yes" : "no";
+}
+
+/** 목록의 처리상태 자리에 설 값의 이름이다. 전환된 건은 그 자리를 전환이 대신한다. */
+function statusKeyOf(voice: Voice) {
+  return voice.movedTo ? "moved" : voice.status;
+}
+
+/** 목록의 처리상태 자리에 설 값이다. */
+export function statusOf(voice: Voice) {
+  return STATUS[statusKeyOf(voice)];
+}
+
+/**
+ * 표 위 요약이 상태별로 쪼개는 차례다. 전환을 맨 뒤에 두어 실제 처리 흐름 셋과 갈린다.
+ *
+ * 점 색은 표의 badge 와 같은 tone 을 쓴다. 숫자에는 색을 입히지 않고 점만 색을 갖는 까닭은,
+ * 색이 숫자에 붙으면 화면이 어느 값이 문제인지를 먼저 말하게 되기 때문이다. 아직 몇 건부터
+ * 문제인지 정한 기준이 없다.
+ */
+export const SUMMARY_STATUS = [...WORK_STATUS, "moved"] as const;
+
+/**
+ * 요약의 점과 막대가 함께 쓰는 색이다. 둘이 같은 색이어야 막대의 조각과 그 옆의 이름이 서로를
+ * 가리킨다.
+ *
+ * 유채색 셋은 500 단계를 쓴다. 표의 badge 는 옅은 바탕과 진한 글자로 색조를 보여 주는데, 점은
+ * 면이 6px 뿐이라 같은 옅은 바탕을 쓰면 흰 바닥에서 사라지고 글자 단계인 800 을 쓰면 badge 보다
+ * 진해 보인다. 그 사이 단계가 색조를 그대로 유지한 채 가장 밝게 읽힌다.
+ *
+ * 전환의 회색만 400 단계다. 300 단계는 흰 바닥과 대비가 1.44:1 로 막대에서 조각이 있는지조차
+ * 보이지 않는다. 400 으로 올리면 옆 조각들과의 색 거리도 색각 이상에서 안전한 범위에 든다.
+ *
+ * **현재 토큰에 이 단계의 배경색 이름이 없어 경계용·컨트롤용 토큰을 빌려 쓴다.** 이름과 쓰임이
+ * 어긋나므로, 상태색에 중간 단계 배경 토큰을 둘지는 `open-questions.md` 의 token candidate 에서
+ * 판단한다.
+ */
+export const STATUS_COLOR: Record<(typeof SUMMARY_STATUS)[number], string> = {
+  recv: "bg-oe-warning-border-primary",
+  prog: "bg-oe-info-border-primary",
+  done: "bg-oe-success-border-primary",
+  moved: "bg-oe-background-control-off",
+};
 export const CATEGORY_OPTIONS = CATEGORIES.map((name) => ({ value: name, label: name }));
 export const STORE_OPTIONS = STORES.map(({ name, region }) => ({ value: name, label: name, description: region }));
 export const SUPERVISOR_OPTIONS = SUPERVISORS.map(({ name, team }) => ({ value: name, label: name, description: team }));
 export const SOURCE_OPTIONS = Object.entries(SOURCE).map(([value, label]) => ({ value, label }));
+
+/**
+ * 답변이 나갔는지로 거른다.
+ *
+ * 처리상태와 값이 겹쳐 보이지만 하는 일이 다르다. 미답변은 접수와 처리중을 한 번에 집는 조건이라,
+ * 답변이 안 나간 건을 찾을 때 두 상태를 따로 고르지 않아도 된다.
+ */
+export const ANSWERED_OPTIONS = [
+  { value: "yes", label: "답변 완료" },
+  { value: "no", label: "미답변" },
+];
 
 /**
  * 값을 고르는 네 축은 여러 개를 함께 고를 수 있다. 「접수와 처리중을 함께 본다」처럼 담당자가
@@ -246,20 +369,25 @@ export const EMPTY_FILTER = {
   period: "1m",
   from: "",
   to: "",
-  // 점포명과 제목을 한 칸에서 함께 찾는다. 나누면 찾는 낱말이 어느 쪽에 있는지 먼저 정해야
-  // 하는데, 대개 모른다.
+  // 목록 안에서 한 건을 제목으로 집어내는 칸이다.
   keyword: "",
   status: [] as string[],
   category: [] as string[],
   store: [] as string[],
   sv: [] as string[],
   source: [] as string[],
+  answered: [] as string[],
   showMoved: false,
+  // 표 위 요약의 「지연」을 눌러 켜는 조건이다. 축으로 두지 않은 까닭은 고를 값이 없고 켜고 끄는
+  // 것뿐이며, 그 숫자를 본 자리에서 바로 그 건들만 보는 것이 이 조건을 쓰는 유일한 길이기 때문이다.
+  overdueOnly: false,
+  // 권한은 고른 조건이 아니라 그 사람이 볼 수 있는 범위다. 초기화가 조건을 비울 때도 남는다.
+  role: "admin" as Role,
 };
 
 export type Filter = typeof EMPTY_FILTER;
 /** 값을 여러 개 고를 수 있는 축의 이름이다. */
-export type FilterAxis = "status" | "category" | "store" | "sv" | "source";
+export type FilterAxis = "status" | "category" | "answered" | "store" | "sv" | "source";
 
 /** 오늘에서 `months` 달 앞선 날짜를 `YYYY-MM-DD` 로 돌려준다. */
 function monthsAgo(months: number) {
@@ -284,22 +412,160 @@ function inPeriod(voice: Voice, filter: Filter) {
   return registeredOn >= monthsAgo(PERIOD_MONTHS[filter.period]);
 }
 
-export function matches(voice: Voice, filter: Filter) {
-  if (!filter.showMoved && voice.movedTo) return false;
+/**
+ * 등록일로부터 며칠 지났는지를 말로 돌려준다.
+ *
+ * 목록에서 날짜만 보면 며칠 지난 건인지 세어 봐야 한다. 미답변 건을 훑을 때 필요한 것은 그 셈의
+ * 결과이므로 화면이 대신 센다. 오늘과 어제는 숫자보다 그 말이 빠르게 읽힌다.
+ */
+export function elapsedDays(createdAt: string) {
+  return Math.round((Date.parse(`${TODAY}T00:00:00`) - Date.parse(`${createdAt.slice(0, 10)}T00:00:00`)) / 86_400_000);
+}
 
+export function elapsedLabel(createdAt: string) {
+  const days = elapsedDays(createdAt);
+  if (days <= 0) return "오늘";
+  if (days === 1) return "어제";
+  return `${days}일 전`;
+}
+
+/**
+ * 손대지 않은 채 오래 둔 건인지.
+ *
+ * 접수는 아직 아무도 손대지 않은 상태라 날이 갈수록 방치된 시간이 그대로 쌓인다. 처리중은 이미
+ * 손을 댄 건이라 같은 날수가 같은 뜻이 아니어서 세지 않는다.
+ */
+export const OVERDUE_DAYS = 5;
+
+/** 답변이 기한 안에 나갔는지. 답변이 없으면 아직 판정할 것이 없어 `null` 이다. */
+function answeredInTime(voice: Voice) {
+  if (!voice.answeredAt) return null;
+  const days =
+    (Date.parse(`${voice.answeredAt.slice(0, 10)}T00:00:00`) - Date.parse(`${voice.createdAt.slice(0, 10)}T00:00:00`)) /
+    86_400_000;
+  return days <= OVERDUE_DAYS;
+}
+
+/**
+ * 기한 안에 답변이 나간 비율이다.
+ *
+ * 판정이 끝난 건만 센다. 답변이 있으면 그 답변이 기한 안이었는지로 갈리고, 답변이 없는 건은 기한을
+ * 넘겼을 때만 못 지킨 것으로 센다. 어제 들어와 아직 기한이 남은 건은 어느 쪽도 아니므로 빼며,
+ * 그래서 방금 들어온 건이 값을 깎지 않는다.
+ *
+ * 그냥 답변률은 이 값과 다르다. 답변한 건을 전체로 나누면 아직 답변할 시간이 남은 건까지 분모에
+ * 들어가 늘 낮게 나오고, 기간을 넓히면 오래된 건이 이미 답변을 마쳤다는 이유로 값이 올라간다.
+ * 최근이 나아진 것이 아닌데 화면은 그렇게 말한다.
+ */
+export function inTimeRate(rows: Voice[]) {
+  let judged = 0;
+  let kept = 0;
+  for (const voice of rows) {
+    if (voice.movedTo) continue;
+    const inTime = answeredInTime(voice);
+    if (inTime === null) {
+      if (elapsedDays(voice.createdAt) <= OVERDUE_DAYS) continue;
+      judged += 1;
+      continue;
+    }
+    judged += 1;
+    if (inTime) kept += 1;
+  }
+  return judged === 0 ? null : (kept / judged) * 100;
+}
+
+export function isOverdue(voice: Voice) {
+  return !voice.movedTo && voice.status === "recv" && elapsedDays(voice.createdAt) >= OVERDUE_DAYS;
+}
+
+/** 며칠 앞이나 뒤의 날짜를 `YYYY-MM-DD` 로 돌려준다. */
+function shiftDays(day: string, days: number) {
+  const date = new Date(`${day}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+/** 지금 걸린 기간의 시작과 끝이다. 직접 선택에서 한쪽이 비어 있으면 견줄 구간을 만들 수 없다. */
+function periodRange(filter: Filter) {
+  if (filter.period === CUSTOM) return filter.from && filter.to ? [filter.from, filter.to] : null;
+  return [monthsAgo(PERIOD_MONTHS[filter.period]), TODAY];
+}
+
+/**
+ * 지금 기간의 바로 앞, 같은 길이의 구간이다.
+ *
+ * 「지난달」이 아니라 같은 길이의 직전 구간인 까닭은 기간을 6개월로 넓혀 보는 동안에도 견주는
+ * 단위가 함께 넓어져야 하기 때문이다. 한 달을 보다가 6개월을 보는데 견줄 값만 한 달이면 늘었는지
+ * 줄었는지가 뒤바뀐다.
+ */
+function previousRange(filter: Filter) {
+  const range = periodRange(filter);
+  if (!range) return null;
+  const [start, end] = range;
+  const days = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000);
+  const previousEnd = shiftDays(start, -1);
+  return [shiftDays(previousEnd, -days), previousEnd];
+}
+
+/** 기간을 뺀 나머지 조건에 맞는지. 견줄 구간을 셀 때 기간만 바꿔 끼우려고 따로 두었다. */
+function matchesExceptPeriod(voice: Voice, filter: Filter) {
+  if (!inScope(voice, filter.role)) return false;
+  // 제목만 찾는다. 점포는 왼쪽 패널에 전용 축이 있으므로 검색이 두 곳을 함께 뒤지면 같은 일을
+  // 두 자리에서 하게 되고, 검색 칸이 무엇을 찾는 칸인지 말하기도 어려워진다.
   const keyword = filter.keyword.trim();
-  if (keyword && !voice.store.includes(keyword) && !voice.title.includes(keyword)) return false;
+  if (keyword && !voice.title.includes(keyword)) return false;
 
-  if (!chosen(filter.status, voice.status)) return false;
+  // 화면이 「지원요청 전환」이라고 말하는 건은 접수 조건으로 걸리지 않는다. 데이터의 상태값은
+  // 접수로 남아 있지만, 목록에서 접수를 골랐을 때 전환된 건이 섞여 나오면 화면에 적힌 처리상태와
+  // 걸어 둔 조건이 서로 다른 것을 말하게 된다.
+  if (!chosen(filter.status, statusKeyOf(voice))) return false;
   if (!chosen(filter.category, voice.category)) return false;
+  if (!chosen(filter.answered, answeredKeyOf(voice))) return false;
   if (!chosen(filter.store, voice.store)) return false;
   if (!chosen(filter.sv, voice.sv)) return false;
-  if (!chosen(filter.source, voice.source)) return false;
+  return chosen(filter.source, voice.source);
+}
+
+/**
+ * 그 기간에 들어온 건수와, 바로 앞 같은 길이의 구간에 들어온 건수다.
+ *
+ * 유입은 등록된 건 전부를 세므로 지원요청으로 전환된 건도 든다. 전환은 들어온 뒤에 일어난 일이고,
+ * 늘었는지 줄었는지를 볼 때 빼면 실제로 들어온 양을 말하지 않게 된다. 그래서 이 값은 표 위 요약의
+ * 상태 넷을 더한 값과 같다.
+ */
+/**
+ * 견준 구간을 부르는 이름이다.
+ *
+ * 「직전」으로만 두면 무엇의 직전인지가 화면에 없다. 기간이 한 달일 때 그 앞 한 달은 전월이고,
+ * 석 달을 보고 있으면 그 앞 석 달이므로 이름도 함께 바뀌어야 한다.
+ */
+export function previousPeriodName(filter: Filter) {
+  if (filter.period === CUSTOM) return "직전 같은 기간";
+  return filter.period === "1m" ? "전월" : `전 ${PERIOD_MONTHS[filter.period]}개월`;
+}
+
+export function inflow(filter: Filter) {
+  const within = (voice: Voice, [start, end]: string[]) => {
+    const day = voice.createdAt.slice(0, 10);
+    return day >= start && day <= end;
+  };
+  const range = periodRange(filter);
+  const previous = previousRange(filter);
+  const count = (span: string[] | null) =>
+    span === null ? null : VOICES.filter((voice) => matchesExceptPeriod(voice, filter) && within(voice, span)).length;
+  return { now: count(range), before: count(previous) };
+}
+
+export function matches(voice: Voice, filter: Filter) {
+  if (!filter.showMoved && voice.movedTo) return false;
+  if (filter.overdueOnly && !isOverdue(voice)) return false;
+  if (!matchesExceptPeriod(voice, filter)) return false;
   return inPeriod(voice, filter);
 }
 
 const AXIS_VALUE: Record<FilterAxis, (voice: Voice) => string> = {
-  status: (voice) => voice.status,
+  status: (voice) => statusKeyOf(voice),
+  answered: (voice) => answeredKeyOf(voice),
   category: (voice) => voice.category,
   store: (voice) => voice.store,
   sv: (voice) => voice.sv,
@@ -325,10 +591,11 @@ export function countsFor(axis: FilterAxis, filter: Filter) {
 /** 되돌릴 것이 있는지. 목록에 무엇까지 담을지 정하는 전환 표시는 여기서 세지 않는다. */
 export function isFiltered(filter: Filter) {
   if (filter.period !== EMPTY_FILTER.period || filter.from || filter.to) return true;
-  if (filter.keyword) return true;
+  if (filter.keyword || filter.overdueOnly) return true;
   return (
     filter.status.length +
       filter.category.length +
+      filter.answered.length +
       filter.store.length +
       filter.sv.length +
       filter.source.length >
