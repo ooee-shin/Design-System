@@ -137,6 +137,10 @@ const FIELD_STATES = ["비어 있음", "값 있음", "disabled"] as const;
 const FIELD_KINDS = ["기본", "required", "helper", "error"] as const;
 const NUMBER_CONTROLS = ["trailing", "split", "없음"] as const;
 const TOGGLE_VARIANTS = ["ghost", "tonal"] as const;
+// 크기는 Button 과 같은 다섯 단계를 받지만 카탈로그에는 가운데 셋만 둔다. 다섯을 다 곱하면
+// 이 컴포넌트 하나가 Button 과 같은 120 개가 되는데, 도구 모음에서 쓰는 크기는 이 셋이다.
+// 화면이 xsmall·xlarge 를 쓰기 시작하면 여기에 더한다 — page.test.tsx 가 빠진 이름을 잡아 준다.
+const TOGGLE_SIZES = ["small", "regular", "large"] as const;
 // brand 는 그대로 쓰고 like·favorite 는 `tone="custom"` 의 색 이름이다.
 const TOGGLE_TONES = ["brand", "like", "favorite"] as const;
 const PRESS_STATES = ["기본", "pressed"] as const;
@@ -297,7 +301,7 @@ export default function CatalogPage() {
         component="ToggleButton"
         // 전에는 `state` 에 눌림과 「수 있음」이 함께 있었다. 수를 보이는 것은 상태가 아니라 따로 켜고
         // 끄는 것이라, 한 축에 섞어 두면 「눌렸고 수도 보이는」 조합을 Figma 에서 만들 수 없다. 축을 갈랐다.
-        items={cross({ variant: TOGGLE_VARIANTS, tone: TOGGLE_TONES, controlSize: CONTROL_SIZES, state: PRESS_STATES, count: COUNT_STATES }, ({ variant, tone, controlSize, state, count }) => {
+        items={cross({ variant: TOGGLE_VARIANTS, tone: TOGGLE_TONES, controlSize: TOGGLE_SIZES, state: PRESS_STATES, count: COUNT_STATES }, ({ variant, tone, controlSize, state, count }) => {
           const icon = tone === "like" ? <RiHeart3Line aria-hidden /> : <RiStarLine aria-hidden />;
           const activeIcon = tone === "like" ? <RiHeart3Fill aria-hidden /> : <RiStarFill aria-hidden />;
           // tonal 은 배경이 켜짐을 말하므로 타입이 `activeIcon` 을 막는다. 넘기는 짝을 갈라 맞춘다.
