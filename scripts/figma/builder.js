@@ -45,7 +45,10 @@ function primitiveVar(name, value) {
   if (!v) { v = figma.variables.createVariable(name, prim, "COLOR"); v.scopes = ["ALL_FILLS", "STROKE_COLOR"]; primVar.set(name, v); }
   if (!syncedPrimitives.has(name)) {
     v.setValueForMode(prim.modes[0].modeId, { r: value.r, g: value.g, b: value.b, a: value.a ?? 1 });
-    v.description = PRIMITIVE_NOTE + (name.startsWith("brand-") ? " 기본 brand seed 와 HCT tone 단계 매핑은 Provisional 이다(docs/process/open-questions.md)." : "");
+    v.description =
+      name.startsWith("hex-")
+        ? "아직 토큰이 아닌 색이다. 코드(toggle-button.tsx 의 custom tone 등)에 날 hex 로 적혀 있어 이름 없이 값만 옮겨 왔다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다."
+        : PRIMITIVE_NOTE + (name.startsWith("brand-") ? " 기본 brand seed 와 HCT tone 단계 매핑은 Provisional 이다(docs/process/open-questions.md)." : "");
     syncedPrimitives.add(name);
   }
   return v;

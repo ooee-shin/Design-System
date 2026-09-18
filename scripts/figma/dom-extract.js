@@ -25,6 +25,11 @@
     const pal = rest.match(/^(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(\d{2,3})(?:\/(\d+))?$/);
     if (pal) return { primitive: pal[1] + "-" + pal[2], alpha: pal[3] };
     if (rest === "white" || rest === "black") return { primitive: rest };
+    // 토큰도 팔레트 단계도 아닌 날 hex 다(ToggleButton 의 custom tone 이 이렇게 적혀 있다).
+    // 이름을 지어 주면 없는 의미를 만들어 내므로 hex 그대로를 primitive 이름으로 쓴다.
+    // Figma 에서 `hex-…` 이라는 이름으로 보이는 것 자체가 「아직 토큰이 아니다」라는 표시다.
+    const hex = rest.match(/^\[#([0-9a-fA-F]{6})\]$/);
+    if (hex) return { primitive: "hex-" + hex[1].toLowerCase() };
     return null;
   }
   function candidates(el, prop, { placeholder = false } = {}) {
