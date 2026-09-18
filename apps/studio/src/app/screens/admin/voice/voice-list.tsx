@@ -24,19 +24,19 @@ import {
   TableRow,
 } from "@/components/candidates/table";
 
-import { STATUS, STATUS_COLOR, SUMMARY_STATUS, OVERDUE_DAYS, VOICES, elapsedLabel, inflow, isOverdue, inflowLabel, matches, previousPeriodName, statusOf, teamOf, type Filter } from "./voice-data";
+import { STATUS, STATUS_COLOR, SUMMARY_STATUS, OVERDUE_DAYS, VOICES, elapsedLabel, inflow, isOverdue, inTimeRate, inflowLabel, matches, previousPeriodName, statusOf, teamOf, type Filter } from "./voice-data";
 
 const PAGE_SIZES = [10, 25, 50, 100].map((size) => ({ value: String(size), label: String(size) }));
 
 export function VoiceList({
   filter,
   onFilterChange,
-  afterSearch,
+  afterCount,
 }: {
   filter: Filter;
   onFilterChange: (patch: Partial<Filter>) => void;
-  /** 검색 칸과 엑셀 다운로드 사이에 설 것. 조건 패널을 여닫는 버튼처럼 그 안을 쓰는 화면만 갖는 조작이다. */
-  afterSearch?: React.ReactNode;
+  /** 건수 바로 뒤에 설 것. 조건 패널을 여닫는 버튼처럼 그 안을 쓰는 화면만 갖는 조작이다. */
+  afterCount?: React.ReactNode;
 }) {
   // 정렬은 조건이 아니라 걸러 낸 목록을 보는 방식이라 조회를 거치지 않고 곧바로 반영된다.
   // 기본은 등록일 최신순이다. 목록을 열었을 때 먼저 봐야 하는 것은 방금 들어온 건이다.
@@ -61,13 +61,12 @@ export function VoiceList({
   // 상태 셋은 전환된 건을 빼고 센다. 그 셋의 합이 목록의 전체 건수와 같아야 읽는 사람이 숫자를
   // 다시 세어 보지 않는다.
   const answerable = rows.filter((voice) => !voice.movedTo);
-  // 답변률은 소수점 한 자리까지 적는다. 분모가 수십 건이라 정수로 끊으면 한 건이 답변될 때마다
-  // 값이 몇 퍼센트씩 뛰어, 어제와 오늘을 견줄 수 없다.
   // 접수 상태로 기한을 넘긴 건이다. 표에서는 그 줄의 경과가 빨갛게 서지만 보고 있는 페이지의
   // 줄만 보이므로, 지금 조건에 몇 건이 밀려 있는지는 여기서 말한다.
   const overdueCount = rows.filter(isOverdue).length;
-  const answered = answerable.filter((voice) => voice.answeredAt).length;
-  const answerRate = answerable.length === 0 ? null : (answered / answerable.length) * 100;
+  // 소수점 한 자리까지 적는다. 분모가 수십 건이라 정수로 끊으면 한 건이 판정될 때마다 값이 몇
+  // 퍼센트씩 뛰어, 어제와 오늘을 견줄 수 없다.
+  const answerRate = inTimeRate(rows);
   // 전환 건수는 목록에 담았는지와 무관하게 그 조건에 해당하는 전부를 센다. 담지 않은 동안 0으로
   // 말하면, 빠져 있는 건이 몇 건인지 알 길이 없어 「전환 건 포함」을 켜 볼 이유도 알 수 없다.
   const movedInScope = VOICES.filter((voice) => matches(voice, { ...filter, showMoved: true }) && voice.movedTo).length;
@@ -224,14 +223,16 @@ export function VoiceList({
                   그렇고, 그때는 이 표시가 서지 않는다. */}
           </div>
 
-          {/* 답변률은 답변이 등록된 건을 전환 제외 전체로 나눈 값이다. 전환된 건의 답변은 지원요청에서
-              하므로 분모에서 빠진다.
-
-              이 값은 기간을 넓히면 올라간다. 오래된 건은 이미 답변을 마쳤기 때문이며, 최근이 더
-              나쁘다는 뜻이 아니다. 「접수 후 며칠 안에 답변」 같은 약속이 정해지면 그 기한을 기준으로
-              다시 세운다. */}
+          {/* 기한 안에 답변이 나간 비율이다. 판정이 끝난 건만 세므로 아직 기한이 남은 미답변 건은
+              값을 깎지 않는다. 기준일은 지연과 같은 값이라 둘이 같은 약속을 말한다. 전환된 건은
+              답변을 지원요청에서 하므로 세지 않는다. */}
           <div className="flex min-w-18 flex-col gap-0.5">
-            <span className="text-xs text-oe-foreground-tertiary">답변률</span>
+            <span
+              className="text-xs text-oe-foreground-tertiary"
+              title={`접수 후 ${OVERDUE_DAYS}일 안에 답변한 비율. 기한이 남은 미답변 건은 세지 않습니다.`}
+            >
+              기한 내 답변률
+            </span>
             <span className="text-xl font-semibold text-oe-foreground-primary">
               {answerRate === null ? "-" : answerRate.toFixed(1)}
               <span className="ml-0.5 text-sm font-medium">%</span>
@@ -315,15 +316,14 @@ export function VoiceList({
               값이라, 숫자가 자기 글자 폭만큼 차지해도 어긋나 보일 자리가 없다. */}
           전체 <span className="text-oe-brand-foreground-primary">{rows.length}</span>건
         </span>
-        {/* 전환된 건을 함께 담은 동안에만 그 가운데 몇 건이 그것인지 밝힌다. 담지 않은 것이 이
-            목록의 기본이라 그때는 말할 것이 없고, 켜서 건수가 늘었을 때 왜 늘었는지가 필요하다. */}
-        {filter.showMoved && movedInScope > 0 ? (
-          <span className="ml-1 text-xs text-oe-foreground-tertiary">
-            {/* 줄의 기본 간격 4px 에 4px 을 더해 8px 로 떼어 둔다. 앞의 건수와 이어 읽히는
-                문장이지만 붙여 두면 「건」과 「지원요청」이 한 낱말처럼 읽힌다. */}
-            지원요청 전환 {movedInScope}건 포함
-          </span>
-        ) : null}
+        {/* 조건 패널을 여닫는 조작이 건수 바로 뒤에 선다. 그 숫자가 어떤 조건으로 나온 것인지
+            되짚는 길이라 인과가 붙어 읽히고, 앞에 선 것이 건수 하나뿐이라 자리도 자릿수만큼만
+            움직인다. 오른쪽 끝에 두면 자리는 고정되지만 결과를 다루는 묶음 뒤에 화면의 틀을
+            다루는 것이 붙어 성격이 섞인다.
+
+            전환된 건이 몇 건 섞였는지는 적지 않는다. 담았다는 사실은 체크박스의 켜짐이 이미
+            말하고, 건수 옆의 글이 조건에 따라 생기고 사라지면 그 자리가 흔들린다. */}
+        {afterCount}
         {/* 치고 누르는 것은 오른쪽에 모은다. 표 아래 줄도 왼쪽이 상태, 오른쪽이 조작이라
             위아래가 같은 규칙으로 읽힌다. */}
         <span className="flex flex-1 items-center justify-end gap-1.5">
@@ -333,9 +333,8 @@ export function VoiceList({
               왼쪽 패널의 조건들과 달리 조회를 거치지 않는다. 무엇을 조건으로 고를지가 아니라
               걸러 낸 목록에 전환된 건까지 담을지 정하는 조작이라 층이 다르다. */}
           {/* 「보기」가 아니라 「포함」인 것은 전환된 건만 골라 보는 조작이 아니라 목록에 함께
-              담는 조작이기 때문이다. 옆의 「지원요청 전환 N건 포함」과 같은 말을 써서 둘이 한
-              쌍으로 읽힌다. 「지원요청」을 떼어도 뜻이 남는 것은 처리상태 열에 「지원요청 전환」이
-              서 있어 이 목록에서 전환 건이 무엇인지 화면이 이미 말해 주기 때문이다. */}
+              담는 조작이기 때문이다. 「지원요청」을 떼어도 뜻이 남는 것은 처리상태 열에 「지원요청
+              전환」이 서 있어 이 목록에서 전환 건이 무엇인지 화면이 이미 말해 주기 때문이다. */}
           <CheckboxField
             label="전환 건 포함"
             checked={filter.showMoved}
@@ -356,8 +355,6 @@ export function VoiceList({
             onChange={(event) => onFilterChange({ keyword: event.target.value })}
             onClear={() => onFilterChange({ keyword: "" })}
           />
-          {/* 조건 패널을 여닫는 조작이 검색과 엑셀 사이에 선다. 왼쪽은 결과를 말하는 글만 남는다. */}
-          {afterSearch}
           <Button variant="fill" tone="custom" color="excel" controlSize="small" leadingIcon={<RiDownloadLine />}>
             엑셀 다운로드
           </Button>
