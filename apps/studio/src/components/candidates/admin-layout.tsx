@@ -3,7 +3,7 @@
 import * as React from "react"
 import type { ReactNode } from "react"
 
-import { AdminHeader, SidebarToggle } from "@/components/candidates/admin-header"
+import { AdminHeader, SidebarToggle, type AdminHeaderUser } from "@/components/candidates/admin-header"
 import { ADMIN_MENU } from "@/components/candidates/admin-menu"
 import { AppSidebar, type FavoriteItem } from "@/components/candidates/app-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/candidates/sidebar"
@@ -125,6 +125,8 @@ export function AdminLayout({
   menuStyle = SIDEBAR_STYLES[0].name,
   showRowIcons = false,
   favorites = [],
+  user = SIGNED_IN,
+  onUserClick,
   children,
 }: {
   /** 좌측 메뉴 스타일의 이름. `SIDEBAR_STYLES` 중 하나다. */
@@ -133,6 +135,15 @@ export function AdminLayout({
   showRowIcons?: boolean
   /** 즐겨찾기에 담은 화면들. */
   favorites?: FavoriteItem[]
+  /**
+   * 로그인한 사람이다. 화면이 넘기지 않으면 예시 계정으로 둔다.
+   *
+   * 권한에 따라 목록과 통계의 범위가 갈리는 화면은 헤더에 선 사람과 그 범위가 같은 사람을
+   * 가리켜야 하므로, 그 화면이 직접 넘긴다.
+   */
+  user?: AdminHeaderUser
+  /** 로그인한 사람을 누를 때 할 일. 권한을 갈아 끼워 보는 화면이 넘긴다. */
+  onUserClick?: () => void
   children: ReactNode
 }) {
   const style = SIDEBAR_STYLES.find((item) => item.name === menuStyle) ?? SIDEBAR_STYLES[0]
@@ -170,11 +181,16 @@ export function AdminLayout({
             만들어지는 것처럼 보인다. */}
         <SidebarToggle />
         <AppSidebar groups={ADMIN_MENU} showRowIcons={showRowIcons} favorites={favorites} />
-        <SidebarInset className="min-h-0">
+        {/* 본문 열은 가로로도 줄어들 수 있어야 한다. `min-w-0` 이 없으면 표처럼 폭이 넓은 내용이
+            이 열을 자기 폭만큼 밀어내고, 바깥 상자가 `overflow-hidden` 이라 넘친 만큼이 스크롤도
+            되지 않고 그대로 잘린다. 줄어들 수 있게 두면 넘치는 것은 그 내용이 자기 안에서
+            스크롤한다. */}
+        <SidebarInset className="min-h-0 min-w-0">
           <AdminHeader
             logo={MAIN_LOGO}
             systemName={SYSTEM_NAME}
-            user={SIGNED_IN}
+            user={user}
+            onUserClick={onUserClick}
             unreadCount={UNREAD_NOTIFICATIONS}
           />
           {children}

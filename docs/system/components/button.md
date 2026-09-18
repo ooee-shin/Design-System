@@ -65,13 +65,13 @@ brand는 seed에서 생성한 `--brand-{단계}`, neutral은 `neutral`, danger�
 | Fill | 600 | white | 투명 |
 | Tonal | Light 100 / Dark 800 | Light 800 / Dark 200 | 투명 |
 | Outline | 없음 | Light 800 / Dark 300 | 500의 30% 알파 |
-| Ghost | 없음 | Light 800 / Dark 300 | 투명 |
+| Ghost | 없음 | Light 700 / Dark 400 | 투명 |
 
 Fill과 Tonal의 경계를 투명으로 두는 이유는 같은 자리에서 Style을 바꿀 때 버튼 폭이 1px씩 달라지지 않게 하려는 것이다.
 
 기본 seed에서 Brand Fill의 글자 대비는 4.46으로 WCAG 2.x의 4.5에 조금 못 미친다. 그래도 600을 유지한다. 이 단계를 정한 근거와 APCA 수치는 [badge.md](badge.md)의 「색」이 소유하며, Button이 그것을 물려받아 두 컴포넌트가 한 화면에서 같은 색을 낸다. 700으로 내리면 대비는 확보되지만 Badge와 갈라지고, brand는 seed에서 생성되므로 이 값도 seed를 바꾸면 함께 움직인다.
 
-Hover와 Pressed는 어느 Style에서나 배경을 한 단계씩 진하게 밟는다. Light는 100에서 200, 300으로 내려가고 Dark는 800에서 700, 600으로 올라가 방향이 서로 반대다. Fill은 600에서 700, 800으로 내려간다. Outline과 Ghost는 정지 상태에 배경이 없으므로 같은 사다리를 한 칸 늦게 밟아 Hover에서 100, Pressed에서 200을 쓴다. Outline과 Ghost는 경계 말고는 색이 같으므로 한 자리에서 둘을 바꿔 달아도 글자 색과 Hover가 달라지지 않는다.
+Hover와 Pressed는 어느 Style에서나 배경을 한 단계씩 진하게 밟는다. Light는 100에서 200, 300으로 내려가고 Dark는 800에서 700, 600으로 올라가 방향이 서로 반대다. Fill은 600에서 700, 800으로 내려간다. Outline과 Ghost는 정지 상태에 배경이 없으므로 같은 사다리를 한 칸 늦게 밟아 Hover에서 100, Pressed에서 200을 쓴다. 글자는 Ghost만 한 칸 옅은 Light 700, Dark 400을 쓴다. 배경도 경계도 없어 글자 하나로 무게가 정해지는 Style이라, 다른 셋과 같은 단계를 쓰면 물러나 있어야 할 조작이 본문 글자와 같은 무게로 읽힌다.
 
 `custom` tone의 엑셀 색은 이 단계 규칙에 들어오지 않는다. Tailwind 팔레트도 seed에서 생성한 값도 아니고 Microsoft가 정한 고정 색이기 때문이다. 그래서 Fill의 600단계만 그 실제 값 `#217346`이며 나머지 단계는 같은 색조에서 밝기만 옮겨 위 규칙에 태울 수 있게 만든 값이다. Fill은 Light와 Dark에서 값을 뒤집지 않는다. 테마에 따라 색이 달라지면 엑셀로 읽히지 않기 때문이며, 뒤집히는 것은 배경이 옅은 나머지 셋의 색조뿐이다. 이 값들은 공용 semantic token으로 올리지 않았다.
 
@@ -87,6 +87,13 @@ Disabled는 배경을 `oe-background-disabled`로, 글자를 `oe-foreground-disa
 세 상태에 짝을 하나씩 더 단다. Hover와 Pressed는 그 회색을 다시 덮지 않도록, `dark:`는 Tailwind가 그 변형을 `disabled:`보다 뒤에 배치하기 때문이다. `dark:bg-`나 `dark:text-`가 하나라도 있으면 Dark에서 Disabled 색이 tone 색으로 되돌아간다.
 
 ## Guidelines
+
+### 나란히 둘 때 간격은 6px
+
+버튼을 둘 이상 나란히 둘 때 사이 간격은 6px이다. 크기와 Style에 관계없이 같은 값을 쓰며, 도구 모음이든 페이지 헤더든 폼 아래의 확인·취소든 이 값이 버튼 묶음의 규칙이다.
+
+한 값으로 고정하는 이유는 묶음마다 다른 간격을 쓰면 같은 화면에서 버튼 사이가 제각각으로 보이기 때문이다. `xsmall`처럼 아주 작은 크기와 `xlarge`처럼 큰 크기는 정렬해 보고 크기별로 다른 값을 정할 수 있으나, 그때까지는 일괄 6px이다.
+
 
 Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
 

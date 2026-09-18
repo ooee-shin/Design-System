@@ -23,7 +23,9 @@ import { RiSideBarLine } from "@remixicon/react"
 // 상태를 걷어내고, 어느 폭에서나 지금까지의 동작 하나만 남겼다.
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+// 받은 코드의 16rem 에서 240px 로 줄였다. 메뉴 이름 가운데 가장 긴 「업무관리 사용자별」도
+// 이 폭에서 91px 을 남기므로 글자가 잘리지 않고, 줄인 만큼이 본문 폭으로 간다.
+const SIDEBAR_WIDTH = "15rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
