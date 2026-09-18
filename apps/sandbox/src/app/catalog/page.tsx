@@ -72,7 +72,22 @@ function cross<A extends Record<string, readonly string[]>>(axes: A, node: (prop
  */
 type Impossible = { props: Record<string, string>; why: string };
 
-function Group({ component, items, impossible = [] }: { component: string; items: Item[]; impossible?: Impossible[] }) {
+function Group({
+  component,
+  items,
+  impossible = [],
+  surface,
+}: {
+  component: string;
+  items: Item[];
+  impossible?: Impossible[];
+  /**
+   * 항목을 올려 둘 바탕이다. 컴포넌트가 **바탕과 같은 색을 스스로 그리는** 자리에만 준다.
+   * NotificationBadge 의 테두리 링이 `oe-background-primary` 인데 이 화면의 바탕도 같아서,
+   * 그냥 두면 링이 있는데 없는 것으로 캡처된다. Studio 플레이그라운드도 같은 이유로 회색 위에 올린다.
+   */
+  surface?: "secondary";
+}) {
   // 한 Component Set 안의 Variant 는 **모두 같은 축**을 가져야 한다. 하나라도 다르면 Figma 가 묶지 못한다.
   // 이 화면은 미리 그려지므로 여기서 멈추면 빌드가 실패해 바로 드러난다.
   const axes = Object.keys(items[0].props).join(",");
@@ -100,7 +115,7 @@ function Group({ component, items, impossible = [] }: { component: string; items
   return (
     <section className="flex flex-col gap-3" data-component-set={component} data-impossible={JSON.stringify(impossible.map((skip) => variantName(skip.props)))}>
       <h2 className="text-oe-label font-medium text-oe-foreground-secondary">{component}</h2>
-      <div className="flex flex-wrap items-start gap-4">
+      <div className={`flex flex-wrap items-start gap-4${surface === "secondary" ? " rounded-xl bg-oe-background-secondary p-4" : ""}`}>
         {items.map((item) => (
           <div key={variantName(item.props)} className="flex flex-col gap-1" data-component={component} data-variant-props={variantName(item.props)}>
             {item.node}
@@ -198,7 +213,7 @@ export default function CatalogPage() {
       <Group
         component="Select"
         items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES }, ({ variant, controlSize }) => (
-          <Select variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
+          <Select variant={variant} controlSize={controlSize} ariaLabel={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
         ))}
       />
 
@@ -322,6 +337,7 @@ export default function CatalogPage() {
 
       <Group
         component="NotificationBadge"
+        surface="secondary"
         items={cross({ shape: NOTIFICATION_SHAPES, tone: NOTIFICATION_TONES, overflow: OVERFLOW_STATES }, ({ shape, tone, overflow }) =>
           shape === "dot" ? <NotificationBadge /> : <NotificationBadge count={overflow === "넘침" ? 120 : 5} tone={tone} />,
         ).filter((item) => item.props.shape !== "dot" || (item.props.tone === "accent" && item.props.overflow === "아님"))}
