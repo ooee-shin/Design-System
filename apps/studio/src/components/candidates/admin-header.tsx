@@ -15,6 +15,7 @@ import {
 import { Badge, Button, NotificationBadge } from "@ooee/ui"
 
 import { useSidebar } from "@/components/candidates/sidebar"
+import { cn } from "@/lib/utils"
 import {
   Tooltip,
   TooltipContent,
@@ -56,6 +57,7 @@ export function AdminHeader({
   systemName,
   user,
   unreadCount,
+  onUserClick,
 }: {
   logo: AdminHeaderLogo
   /** 로고의 대체 텍스트로 쓰는 시스템 이름. */
@@ -63,6 +65,8 @@ export function AdminHeader({
   user: AdminHeaderUser
   /** 읽지 않은 알림 개수. 없으면 배지가 붙지 않는다. */
   unreadCount?: number
+  /** 로그인한 사람을 누를 때 할 일. 주지 않으면 누를 수 없는 글자로 남는다. */
+  onUserClick?: () => void
 }) {
   const { state } = useSidebar()
 
@@ -101,13 +105,35 @@ export function AdminHeader({
         {/* 이름이 먼저 읽히고 아이디와 권한이 그것을 보충한다. 세 Utility 와는 선으로 가르지
             않고 여백만으로 갈라 둔다. 헤더 전체를 세로로 자르는 선은 나누는 힘이 너무 세서,
             성격이 다를 뿐 같은 오른쪽 묶음인 둘을 서로 다른 영역처럼 보이게 했다. */}
-        <span className="ml-3 flex items-center gap-2 text-sm">
+        {/* 누르는 길을 받으면 이 묶음이 버튼이 된다. 제품에서는 로그인한 사람을 누를 일이 없고,
+            권한에 따라 화면이 갈리는 자리에서 그 권한을 갈아 끼워 보려고 화면이 넘긴다. */}
+        <span
+          {...(onUserClick
+            ? {
+                role: "button" as const,
+                tabIndex: 0,
+                onClick: onUserClick,
+                onKeyDown: (event: React.KeyboardEvent) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault()
+                    onUserClick()
+                  }
+                },
+                "aria-label": `${user.name} ${user.role}. 눌러서 권한을 바꿉니다.`,
+              }
+            : {})}
+          className={cn(
+            "ml-3 flex items-center gap-2 rounded-oe-control text-sm",
+            onUserClick &&
+              "-mx-1 cursor-pointer px-1 py-0.5 outline-none hover:bg-oe-interaction-hover-subtle focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+          )}
+        >
           <span className="font-medium text-oe-foreground-primary">{user.name}</span>
           <span className="text-xs text-oe-foreground-tertiary">{user.id}</span>
           {/* 글자와 가운데를 맞추면 배지가 위로 올라 보이고, 2px 을 내리면 이번에는 내려가
               보인다. 그 사이인 1px 로 둔다. 여백 대신 옮기는 이유는, 가운데 정렬이 여백만큼
               다시 끌어올려 절반만 내려가기 때문이다. */}
-          <Badge tone="neutral" variant="outlined" className="translate-y-px">
+          <Badge tone="neutral" variant="tonal" className="translate-y-px">
             {user.role}
           </Badge>
         </span>

@@ -20,6 +20,7 @@ const HELP = `
   --viewport <WxH>     기본 1440x900
   --theme <dark|light> 테마를 전환한 뒤 측정한다.
   --click <텍스트>      그 텍스트를 가진 button을 누른다. 여러 번 쓰면 순서대로 누른다.
+  --hover <셀렉터>      그 요소 가운데로 포인터를 옮긴다. 포인터를 얹어야 나타나는 것을 잴 때 쓴다.
   --sweep <a,b,c>      Control 축 하나. 여러 번 쓰면 모든 조합을 크롬 한 번으로 훑는다.
                        예: --sweep Fill,Tonal,Outlined --sweep Brand,Neutral → 6개 조합
   --json               훑은 결과를 표 대신 JSON 전문으로 낸다.
@@ -68,6 +69,14 @@ const MEASURE = (selector) => `(() => {
       text: el.textContent.trim().slice(0, 60),
     };
   });
+})()`;
+
+/** 요소 가운데의 뷰포트 좌표다. 포인터를 옮길 자리를 페이지에서 받아 온다. */
+const HOVER_POINT = (selector) => `(() => {
+  const el = document.querySelector(${JSON.stringify(selector)});
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
 })()`;
 
 const CLICK = (text) => `(() => {
@@ -142,6 +151,16 @@ try {
       await settle();
     }
     return log;
+  };
+
+  // `el.dispatchEvent` 로 만든 이벤트는 `:hover` 를 켜지 않는다. 브라우저가 실제 포인터로
+  // 받아들이게 CDP 의 입력 채널로 보낸다.
+  const hoverOver = async (selector) => {
+    const point = await session.eval(HOVER_POINT(selector));
+    if (!point) return { selector, found: false };
+    await session.send("Input.dispatchMouseEvent", { type: "mouseMoved", buttons: 0, ...point });
+    await settle();
+    return { selector, found: true, ...point };
   };
 
   const measureAll = async () => {
@@ -222,6 +241,7 @@ try {
   } else {
     if (opts.click.length) report.clicked = await clickAll(opts.click);
     if (opts.theme || opts.click.length) await settle();
+    if (opts.hover) report.hovered = await hoverOver(opts.hover);
     if (opts.measure.length) report.measured = await measureAll();
     if (opts.eval) report.evaluated = await session.eval(opts.eval);
     if (opts.shot) report.screenshot = await capture(opts.shot);

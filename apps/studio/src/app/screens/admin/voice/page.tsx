@@ -13,17 +13,28 @@
 
 import { useState } from "react";
 
-import { RiArrowDownSLine, RiCalendarLine, RiCloseLine, RiResetLeftLine, RiSearchLine, RiSideBarLine } from "@remixicon/react";
+import {
+  RiArrowDownSLine,
+  RiCalendarLine,
+  RiCloseLine,
+  RiResetLeftLine,
+  RiSearchLine,
+  RiSideBarLine,
+} from "@remixicon/react";
 
 import { Button, CheckboxField, Chip, Input, InputButton } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
+import { OpenInNewIcon } from "@/components/candidates/material-symbols";
 import { Collapsible, CollapsibleContent } from "@/components/candidates/collapsible";
 import { PageHeader } from "@/components/candidates/page-header";
 import { ScrollArea } from "@/components/candidates/scroll-area";
 
 import {
+  ANSWERED_OPTIONS,
   CATEGORY_OPTIONS,
+  ROLE_TITLE,
+  VIEWER,
   CUSTOM,
   EMPTY_FILTER,
   PAGE_DESCRIPTION,
@@ -243,6 +254,13 @@ export default function Page() {
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
   const edit = (patch: Partial<Filter>) => setDraft((previous) => ({ ...previous, ...patch }));
+  // 목록 위 줄의 조작은 조회를 거치지 않고 곧바로 적용한다. 왼쪽 패널이 목록에 무엇을 담을지
+  // 정하는 자리라면, 검색과 전환 건 보기는 이미 담긴 목록 안에서 무엇을 볼지 정하는 자리다.
+  // 쳐 넣은 글자가 화면에 남으려면 고른 값과 적용된 값을 함께 고쳐야 한다.
+  const applyNow = (patch: Partial<Filter>) => {
+    setDraft((previous) => ({ ...previous, ...patch }));
+    setFilter((previous) => ({ ...previous, ...patch }));
+  };
 
   /** 한 축의 값 목록이다. 값마다 몇 건이 걸리는지 오른쪽 끝에 붙는다. */
   const valueList = (
@@ -276,7 +294,14 @@ export default function Page() {
             // 이름만으로 누구인지 갈리지 않을 때가 있어 팀을 옆에 붙인다.
             rightDescription={option.description}
             checked={draft[axis].includes(option.value)}
-            onCheckedChange={() => edit({ [axis]: toggleValue(draft[axis], option.value) })}
+            // 답변 여부를 직접 고르면 요약의 지연 조건은 푼다. 지연이 그 축을 미답변으로 맞추고
+            // 있었는데 여기서 값을 바꾸면 둘이 서로 다른 것을 말하게 된다.
+            onCheckedChange={() =>
+              edit({
+                [axis]: toggleValue(draft[axis], option.value),
+                ...(axis === "answered" ? { overdueOnly: false } : {}),
+              })
+            }
             trailingElement={
               <span className="text-xs tabular-nums text-oe-foreground-tertiary">{counts[option.value] ?? 0}</span>
             }
@@ -287,30 +312,77 @@ export default function Page() {
   };
 
   return (
-    <AdminLayout>
+    // 헤더에 서는 사람과 목록·통계가 세는 범위가 같은 사람을 가리켜야 하므로 화면이 넘긴다.
+    //
+    // 권한은 헤더의 사람을 눌러 SV 와 관리자 사이를 오간다. 권한마다 목록과 통계의 범위가 갈리는
+    // 것을 확인하려고 둔 길이며, 화면 안에 고르는 자리를 따로 만들지 않는다. 제품에서는 로그인한
+    // 사람의 권한이 정하는 값이라 화면에 그 조작이 있어서는 안 된다.
+    <AdminLayout
+      user={{ name: VIEWER.name, id: VIEWER.id, role: ROLE_TITLE[filter.role] }}
+      onUserClick={() => applyNow({ role: filter.role === "admin" ? "sv" : "admin" })}
+    >
       <div className="flex min-h-0 flex-1 flex-col">
         <PageHeader
           path={PAGE_PATH}
           title="점주의 소리"
           description={PAGE_DESCRIPTION}
           actions={
-            // 조건 패널을 여닫는 길이다. 목록 위가 아니라 화면 머리에 두어, 표 위 줄은 결과를
-            // 다루는 것들만 남긴다.
-            <Button
-              variant="outline"
-              tone="neutral"
-              leadingIcon={<RiSideBarLine />}
-              aria-expanded={panelOpen}
-              onClick={() => setPanelOpen((previous) => !previous)}
-            >
-              필터
-            </Button>
+            // 이 목록을 다루는 조작이 아니라 이 화면이 쓰는 설정을 여는 길이다. 그래서 목록 위
+            // 줄이 아니라 화면 머리에 서고, 새 창에서 열린다는 것을 뒤따르는 아이콘이 말한다.
+            // 그 아이콘만 Material Symbols 의 `open_in_new` 를 쓴다. Remix 의 `RiExternalLinkLine`
+            // 은 화살표의 선이 상자의 변과 어긋나 같은 크기에서 지저분하게 보인다.
+            // 앞에 아이콘을 두지 않는 이유는 둘이 나란히 서기 때문이다. 앞뒤로 다 붙으면 글자가
+            // 아이콘 사이에 끼고, 두 버튼의 앞 아이콘이 서로 다른 뜻을 가진 표시로 읽힌다.
+            // 버튼을 감싸지 않고 그대로 넘긴다. 나란히 선 버튼 사이 간격은 `PageHeader` 의 이
+            // 자리가 6px 로 갖고 있고, 그것이 버튼 묶음의 규칙이다.
+            <>
+              <Button variant="outline" tone="neutral" controlSize="small" trailingIcon={<OpenInNewIcon />}>
+                카테고리설정
+              </Button>
+              <Button variant="outline" tone="neutral" controlSize="small" trailingIcon={<OpenInNewIcon />}>
+                자동답변설정
+              </Button>
+            </>
           }
         />
 
         <div className="flex min-h-0 flex-1">
+          {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
+              읽히지 않는다. */}
+          <div className="oe-scrollbar-bare flex min-w-0 flex-1 items-start overflow-auto px-6 pt-4 pb-16">
+            <VoiceList
+              filter={filter}
+              onFilterChange={applyNow}
+              afterSearch={
+                // 조건 패널을 여닫는 길이다. 검색과 엑셀 사이에 두어 오른쪽 조작 묶음 안에 든다.
+                // 두 조작 사이에서 경계를 가진 outline 이라 배경 없는 검색 칸과 채워진 엑셀 버튼
+                // 가운데에서 어느 쪽에도 묻히지 않는다.
+                //
+                // 글자 없이 아이콘만 둔다. 관리자 웹은 같은 사람이 매일 쓰는 도구라 자리와 모양을
+                // 익히며 쓰고, 이 화면에서 여닫을 것은 조건 패널 하나뿐이다. 대신 접근 가능한
+                // 이름에는 누르면 무엇이 되는지를 그대로 담고, `aria-expanded` 로 지금 열려 있는지
+                // 함께 알린다.
+                <Button
+                  variant="outline"
+                  tone="neutral"
+                  controlSize="small"
+                  leadingIcon={<RiSideBarLine />}
+                  aria-expanded={panelOpen}
+                  aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
+                  onClick={() => setPanelOpen((previous) => !previous)}
+                />
+              }
+            />
+          </div>
+
           {/* 조건은 본문 위에 얹힌 상자가 아니라 본문 옆의 한 칸이다. 그래서 페이지 헤더가
-              아래에 선을 긋듯이 이 자리도 오른쪽에 선을 긋고, 그 선까지가 조건의 영역이다.
+              아래에 선을 긋듯이 이 자리도 왼쪽에 선을 긋고, 그 선부터가 조건의 영역이다.
+
+              왼쪽이 아니라 오른쪽에 두었다. 왼쪽에는 이미 화면을 옮기는 내비게이션이 세로로 서
+              있어서, 그 옆에 조건 패널이 또 붙으면 성격이 다른 기둥 둘이 하나의 넓은 사이드바로
+              읽힌다. 오른쪽에 두면 본문이 내비게이션 바로 옆에서 시작해 이 화면의 내용이 주인
+              자리를 갖고, 결과를 먼저 보고 조건으로 좁히는 차례와도 맞는다. 패널이 쓰는 폭은
+              어느 쪽에 있든 같으므로 목록에 주는 폭은 달라지지 않는다.
               상자를 두르지 않는 이유는 그 안에서 축을 다시 선으로 나누기 때문이다. 선이 두
               겹이 되면 무엇이 묶여 있는지 오히려 읽히지 않는다.
 
@@ -318,15 +390,15 @@ export default function Page() {
               지면 이 자리만 스크롤되고 목록은 제자리를 지킨다. */}
           {/* 접을 때 사라지는 것이 아니라 폭이 줄어든다. 갑자기 없어지면 옆의 목록이 한 번에
               넓어져서 어디를 보고 있었는지 놓친다. 안쪽 내용은 폭을 고정해 두어, 줄어드는 동안
-              글자가 찌그러지지 않고 왼쪽으로 밀려 나간다. 닫힌 동안에는 `inert` 로 포커스가
+              글자가 찌그러지지 않고 오른쪽으로 밀려 나간다. 닫힌 동안에는 `inert` 로 포커스가
               들어가지 않게 막는다. */}
           <aside
             inert={!panelOpen}
             className={`shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none ${
-              panelOpen ? "w-[18.25rem] border-r border-oe-border-secondary opacity-100" : "w-0 opacity-0"
+              panelOpen ? "w-[16.5rem] border-l border-oe-border-secondary opacity-100" : "w-0 opacity-0"
             }`}
           >
-            <div className="flex h-full w-[18.25rem] flex-col">
+            <div className="flex h-full w-[16.5rem] flex-col">
               {/* 스크롤 막대를 콘텐츠 위에 겹쳐 그린다. 막대가 자리를 차지하면 축을 가르는
                   선이 그 앞에서 멈추고 오른쪽 여백만 넓어지며, 필요할 때만 생기게 두면 축을
                   펼치고 접을 때마다 안쪽 폭이 흔들린다. */}
@@ -345,17 +417,20 @@ export default function Page() {
 
                     초기화는 되돌릴 것이 있을 때만 선다. 아무것도 고르지 않은 화면에 서 있으면
                     무엇을 되돌리는 것인지 읽는 사람이 먼저 헤아려야 한다. */}
-                <span className="-mr-1 flex items-center gap-1">
+                {/* 나란히 선 버튼 사이는 6px 이다. 버튼 묶음의 규칙이며 화면 안에서 같은 값을
+                    쓴다. */}
+                <span className="-mr-1 flex items-center gap-1.5">
                   {isFiltered(draft) ? (
                     <Button
                       variant="ghost"
                       tone="neutral"
                       controlSize="xsmall"
                       leadingIcon={<RiResetLeftLine />}
-                      onClick={() => {
-                        setDraft(EMPTY_FILTER);
-                        setFilter(EMPTY_FILTER);
-                      }}
+                      // 고른 것을 비우기만 하고 목록은 건드리지 않는다. 값을 고르는 것과 같은
+                      // 층의 조작이므로, 이것도 조회를 눌러야 목록에 반영된다. 여기서 목록까지
+                      // 함께 되돌리면 조건을 걸 때는 조회를 거치는데 풀 때는 거치지 않게 된다.
+                      // 권한은 고른 조건이 아니라 볼 수 있는 범위라 초기화에서 살려 둔다.
+                      onClick={() => setDraft({ ...EMPTY_FILTER, role: draft.role })}
                     >
                       초기화
                     </Button>
@@ -378,8 +453,8 @@ export default function Page() {
                 <div className="flex w-fit flex-col">
                   {/* 넷뿐이라 접지 않고 한 줄에 펼쳐 둔다. 기간은 목록을 읽는 내내 바탕이 되는
                       조건이라 지금 어느 폭으로 보고 있는지가 늘 보여야 하고, 줄이 넘어가면
-                      어디까지가 기간인지 한눈에 들어오지 않는다. 넷을 더한 폭이 236px 이라
-                      240px 안에 선다. */}
+                      어디까지가 기간인지 한눈에 들어오지 않는다. 넷을 더한 폭이 221px 이고,
+                      이 줄이 패널 폭의 최소값을 정한다. */}
                   <div className="flex gap-1">
                     {PERIOD_OPTIONS.map((option) => (
                       <Chip
@@ -429,6 +504,12 @@ export default function Page() {
                 {valueList("category", CATEGORY_OPTIONS)}
               </FilterSection>
 
+              {/* 처리상태 다음이 아니라 카테고리 다음이다. 앞의 둘이 이 건이 무엇이고 어디까지
+                  왔는지를 고르는 축이고, 답변 여부는 그중 답이 나갔는지만 다시 가르는 축이다. */}
+              <FilterSection label="답변 여부" count={draft.answered.length} onClear={() => edit({ answered: [] })}>
+                {valueList("answered", ANSWERED_OPTIONS)}
+              </FilterSection>
+
               <FilterSection label="점포" count={draft.store.length} onClear={() => edit({ store: [] })}>
                 <StorePicker
                   chosen={draft.store}
@@ -469,12 +550,6 @@ export default function Page() {
 
             </div>
           </aside>
-
-          {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
-              읽히지 않는다. */}
-          <div className="flex min-w-0 flex-1 items-start overflow-auto px-6 pt-6 pb-16">
-            <VoiceList filter={filter} onFilterChange={edit} />
-          </div>
         </div>
       </div>
     </AdminLayout>
