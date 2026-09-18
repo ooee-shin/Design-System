@@ -133,6 +133,19 @@ export function inflowLabel(role: Role) {
 /** 헤더의 권한 표시다. 관리자만 기존 화면이 쓰던 영문 표기를 그대로 쓴다. */
 export const ROLE_TITLE: Record<Role, string> = { sv: "SV", leader: "팀장", admin: "Admin" };
 
+/** 본사 관리자 계정이다. 다른 관리자 화면들이 쓰던 예시 계정을 그대로 쓴다. */
+const ADMIN_VIEWER = { name: "김블루", id: "KimblueId" };
+
+/**
+ * 권한에 따라 로그인한 사람도 바뀐다.
+ *
+ * SV 와 팀장은 담당 SV 인 김도현이고 관리자는 본사 계정이다. 권한만 바꾸고 이름을 그대로 두면
+ * 담당 SV 가 전체를 보는 모습이 되어, 그 숫자가 누구의 범위인지 헤더가 거짓을 말한다.
+ */
+export function viewerOf(role: Role) {
+  return role === "admin" ? ADMIN_VIEWER : { name: VIEWER.name, id: VIEWER.id };
+}
+
 export type VoiceStatus = (typeof WORK_STATUS)[number];
 export type VoiceSource = keyof typeof SOURCE;
 
@@ -423,6 +436,43 @@ export function elapsedLabel(createdAt: string) {
  * 손을 댄 건이라 같은 날수가 같은 뜻이 아니어서 세지 않는다.
  */
 export const OVERDUE_DAYS = 5;
+
+/** 답변이 기한 안에 나갔는지. 답변이 없으면 아직 판정할 것이 없어 `null` 이다. */
+function answeredInTime(voice: Voice) {
+  if (!voice.answeredAt) return null;
+  const days =
+    (Date.parse(`${voice.answeredAt.slice(0, 10)}T00:00:00`) - Date.parse(`${voice.createdAt.slice(0, 10)}T00:00:00`)) /
+    86_400_000;
+  return days <= OVERDUE_DAYS;
+}
+
+/**
+ * 기한 안에 답변이 나간 비율이다.
+ *
+ * 판정이 끝난 건만 센다. 답변이 있으면 그 답변이 기한 안이었는지로 갈리고, 답변이 없는 건은 기한을
+ * 넘겼을 때만 못 지킨 것으로 센다. 어제 들어와 아직 기한이 남은 건은 어느 쪽도 아니므로 빼며,
+ * 그래서 방금 들어온 건이 값을 깎지 않는다.
+ *
+ * 그냥 답변률은 이 값과 다르다. 답변한 건을 전체로 나누면 아직 답변할 시간이 남은 건까지 분모에
+ * 들어가 늘 낮게 나오고, 기간을 넓히면 오래된 건이 이미 답변을 마쳤다는 이유로 값이 올라간다.
+ * 최근이 나아진 것이 아닌데 화면은 그렇게 말한다.
+ */
+export function inTimeRate(rows: Voice[]) {
+  let judged = 0;
+  let kept = 0;
+  for (const voice of rows) {
+    if (voice.movedTo) continue;
+    const inTime = answeredInTime(voice);
+    if (inTime === null) {
+      if (elapsedDays(voice.createdAt) <= OVERDUE_DAYS) continue;
+      judged += 1;
+      continue;
+    }
+    judged += 1;
+    if (inTime) kept += 1;
+  }
+  return judged === 0 ? null : (kept / judged) * 100;
+}
 
 export function isOverdue(voice: Voice) {
   return !voice.movedTo && voice.status === "recv" && elapsedDays(voice.createdAt) >= OVERDUE_DAYS;

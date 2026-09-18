@@ -21,6 +21,7 @@ const HELP = `
   --theme <dark|light> 테마를 전환한 뒤 측정한다.
   --click <텍스트>      그 텍스트를 가진 button을 누른다. 여러 번 쓰면 순서대로 누른다.
   --hover <셀렉터>      그 요소 가운데로 포인터를 옮긴다. 포인터를 얹어야 나타나는 것을 잴 때 쓴다.
+  --resize <WxH>       화면을 띄운 뒤에 폭을 바꾼다. 폭이 바뀔 때만 일어나는 것을 잴 때 쓴다.
   --sweep <a,b,c>      Control 축 하나. 여러 번 쓰면 모든 조합을 크롬 한 번으로 훑는다.
                        예: --sweep Fill,Tonal,Outlined --sweep Brand,Neutral → 6개 조합
   --json               훑은 결과를 표 대신 JSON 전문으로 낸다.
@@ -163,6 +164,15 @@ try {
     return { selector, found: true, ...point };
   };
 
+  // 처음부터 좁게 띄우는 것과 띄운 뒤에 좁히는 것은 다르다. 뒤쪽에서만 `resize` 와 매체 질의의
+  // 변화가 일어나므로, 그때만 움직이는 것을 재려면 이 길로 폭을 바꾼다.
+  const resizeTo = async (size) => {
+    const [width, height] = size.split("x").map(Number);
+    await session.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
+    await settle();
+    return { width, height };
+  };
+
   const measureAll = async () => {
     const out = {};
     for (const selector of opts.measure) out[selector] = await session.eval(MEASURE(selector));
@@ -241,6 +251,7 @@ try {
   } else {
     if (opts.click.length) report.clicked = await clickAll(opts.click);
     if (opts.theme || opts.click.length) await settle();
+    if (opts.resize) report.resized = await resizeTo(opts.resize);
     if (opts.hover) report.hovered = await hoverOver(opts.hover);
     if (opts.measure.length) report.measured = await measureAll();
     if (opts.eval) report.evaluated = await session.eval(opts.eval);
