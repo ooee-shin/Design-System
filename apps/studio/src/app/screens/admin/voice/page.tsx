@@ -243,6 +243,13 @@ export default function Page() {
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
   const edit = (patch: Partial<Filter>) => setDraft((previous) => ({ ...previous, ...patch }));
+  // 목록 머리의 검색창은 왼쪽 패널 밖에 있어 「조회」 버튼을 거치지 않는다. `edit` 만 부르면
+  // `draft` 에만 쌓이는데 그 칸은 `filter` 를 읽으므로 친 글자가 화면에 나타나지 않는다.
+  // 그래서 둘을 함께 옮겨 바로 걸리게 한다. 둘이 같이 움직이므로 `dirty` 도 어긋나지 않는다.
+  const editAndApply = (patch: Partial<Filter>) => {
+    setDraft((previous) => ({ ...previous, ...patch }));
+    setFilter((previous) => ({ ...previous, ...patch }));
+  };
 
   /** 한 축의 값 목록이다. 값마다 몇 건이 걸리는지 오른쪽 끝에 붙는다. */
   const valueList = (
@@ -473,7 +480,7 @@ export default function Page() {
           {/* 아래를 넉넉히 비운다. 목록이 화면 밑변에 닿으면 더 볼 것이 남았는지 아닌지
               읽히지 않는다. */}
           <div className="flex min-w-0 flex-1 items-start overflow-auto px-6 pt-6 pb-16">
-            <VoiceList filter={filter} onFilterChange={edit} />
+            <VoiceList filter={filter} onFilterChange={editAndApply} />
           </div>
         </div>
       </div>
