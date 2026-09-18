@@ -25,6 +25,11 @@
     const pal = rest.match(/^(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(\d{2,3})(?:\/(\d+))?$/);
     if (pal) return { primitive: pal[1] + "-" + pal[2], alpha: pal[3] };
     if (rest === "white" || rest === "black") return { primitive: rest };
+    // 토큰도 팔레트 단계도 아닌 날 hex 다(ToggleButton 의 custom tone 이 이렇게 적혀 있다).
+    // 이름을 지어 주면 없는 의미를 만들어 내므로 hex 그대로를 primitive 이름으로 쓴다.
+    // Figma 에서 `hex-…` 이라는 이름으로 보이는 것 자체가 「아직 토큰이 아니다」라는 표시다.
+    const hex = rest.match(/^\[#([0-9a-fA-F]{6})\]$/);
+    if (hex) return { primitive: "hex-" + hex[1].toLowerCase() };
     return null;
   }
   function candidates(el, prop, { placeholder = false } = {}) {
@@ -162,8 +167,11 @@
     const attr = (name) => el.getAttribute(name);
     // 이름은 `<Component Set>/<축=값, 축=값>` 꼴이다. 첫 `/` 앞이 Assets 에 서는 세트 이름이고
     // 뒤가 그 안의 Variant 다. 카탈로그 화면의 data-variant-props 와 글자까지 같아야 한다.
+    // Base UI 는 상태를 **빈 문자열**로 찍는다(`data-disabled=""`, `data-checked=""`). 값을 `"true"` 와
+    // 견주면 언제나 거짓이므로 있고 없음만 본다. 일부 선택도 값이 아니라 `data-indeterminate` 라는
+    // 별도 속성이다. 확인한 실제 출력은 docs/process/working-context.md 에 적어 두었다.
     if (slot === "button" && attr("data-variant")) {
-      const state = el.hasAttribute("disabled") || attr("data-disabled") === "true" ? "disabled" : "기본";
+      const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled" : "기본";
       node.inst = `Button/variant=${attr("data-variant")}, tone=${attr("data-tone") || "brand"}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
     }
     if (slot === "input-container" && attr("data-variant")) {
@@ -171,10 +179,15 @@
       const state = input && input.disabled ? "disabled" : input && input.value ? "값 있음" : "비어 있음";
       node.inst = `Input/variant=${attr("data-variant")}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
     }
-    if (slot === "checkbox") {
-      const checked = attr("data-checked");
-      const state = attr("data-disabled") === "true" ? "disabled" : checked === "true" ? "on" : checked === "indeterminate" ? "indeterminate" : "off";
-      node.inst = `Checkbox/shape=${attr("data-shape") || "rounded"}, state=${state}`;
+    if (slot === "checkbox" && el.hasAttribute("data-shape")) {
+      const state = el.hasAttribute("data-disabled")
+        ? "disabled"
+        : el.hasAttribute("data-indeterminate")
+          ? "indeterminate"
+          : el.hasAttribute("data-checked")
+            ? "on"
+            : "off";
+      node.inst = `Checkbox/shape=${attr("data-shape")}, state=${state}`;
     }
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";
