@@ -373,7 +373,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 - **틀린 기록을 고쳤다.** 「인스턴스 둘을 놓는 데 23분」이라 적어 두고 다음 수로 `getNodeByIdAsync` 를 꼽았었다. `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 77개 훑기 17ms, `createInstance` 131ms, 글자 바꾸기 11ms — **인스턴스 하나에 0.2초**다. 그 23분은 그 실행이 11단계 157,897자였던 것이고, 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다.
 - **그래서 줄인 것은 단계 payload 다.** ① 단계에 실을 builder 에서 주석과 빈 줄을 뺀다(저장소 원본은 그대로). ② 인스턴스로 놓을 노드는 안쪽을 싣지 않고 글자만 남긴다. 되읽기도 인스턴스 안쪽은 화면의 자리로 견주지 않으므로 사양에서 빼도 잃는 것이 없다. 관리자 로그인 기준 **7단계 87,168자 → 5단계 51,413자**다.
-- **대신 생긴 위험을 막았다.** 인스턴스 자리의 안쪽을 싣지 않으므로 그 이름의 컴포넌트가 Figma 에 없으면 빈 상자가 그려진다. `/design-page` 가 `instanceMiss` 를 모아 비어 있지 않으면 「검사 실패」로 본다.
+- **대신 생긴 위험을 막았다.** 인스턴스 자리의 안쪽을 싣지 않으므로 그 이름의 컴포넌트가 Figma 에 없으면 빈 상자가 그려진다. 처음에는 `/design-page` 가 `instanceMiss` 를 모아 「검사 실패」로 보게 하려 했으나, 뒤에 더 단단한 쪽으로 바꿨다 — `builder.js` 가 컴포넌트를 못 찾으면 아무것도 그리지 않고 `error` 로 멈춘다. 그래서 `instanceMiss` 라는 검사는 지금 없다.
 - **카탈로그를 18종 135개로 넓혔다.** Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation. 넓히다 Button 의 `fill·brand·regular` 가 두 번 만들어지던 것을 찾아 고치고, 변형 이름이 겹치면 빌드가 실패하도록 막았다.
 - **배운 것.** 이 도구에서 값비싼 자원은 Figma 호출이 아니라 **모델이 옮겨 적는 글자**다. 다음에 ②가 느리면 먼저 `manifest.json` 의 단계 수와 글자 수를 본다.
 
