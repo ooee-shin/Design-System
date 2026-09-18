@@ -65,6 +65,15 @@ function paintFor(ref, where) {
   if (ref.alpha) report.opacityOnToken.push(`${where} ${variable.name}/${ref.alpha}`);
   return figma.variables.setBoundVariableForPaint({ type: "SOLID", color: { r: 0, g: 0, b: 0 }, opacity }, "color", variable);
 }
+// Figma 는 **변수에 묶인 paint 를 노드에 얹는 순간 투명도를 1 로 되돌린다.** 얹기 전 paint 가
+// `opacity: 0.3` 이어도 `node.strokes` 에 넣고 다시 읽으면 1 이다. 얹은 뒤 한 번 더 써야 남는다.
+// 그래서 칠은 언제나 이 함수로 넣는다. `border-…/30` 같은 알파가 이 한 줄에 걸려 있다.
+function setPaints(node, field, paints) {
+  node[field] = paints;
+  const wanted = paints.map((p) => (p && typeof p.opacity === "number" ? p.opacity : 1));
+  if (wanted.every((o) => o === 1)) return;
+  node[field] = node[field].map((p, i) => ({ ...p, opacity: wanted[i] }));
+}
 function bindSize(node, sz, where) {
   if (!sz) return;
   const bind = (field, name) => { const v = sizeVar.get(name); if (v) node.setBoundVariable(field, v); else report.unmappedColors.push(`${where} size ${name}`); };
@@ -150,7 +159,13 @@ async function componentNamed(name) {
     const catalog = figma.root.children.find((p) => p.name === "컴포넌트");
     if (catalog) {
       await catalog.loadAsync();
-      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) if (!componentIndex.has(c.name)) componentIndex.set(c.name, c);
+      // 변형으로 묶고 나면 컴포넌트 이름은 `variant=fill, tone=brand` 처럼 **축만** 남고 세트 이름은
+      // 부모 COMPONENT_SET 이 갖는다. 화면이 찾는 이름은 `Button/variant=fill, …` 꼴이므로 둘을 이어
+      // 색인한다. 아직 안 묶인 컴포넌트는 combine 전에 남겨 둔 `set` 플러그인 값을 쓴다.
+      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) {
+        const set = c.parent && c.parent.type === "COMPONENT_SET" ? c.parent.name : c.getSharedPluginData(TAG, "set");
+        for (const key of set ? [`${set}/${c.name}`, c.name] : [c.name]) if (!componentIndex.has(key)) componentIndex.set(key, c);
+      }
     }
   }
   return componentIndex.get(name) || null;
@@ -202,7 +217,7 @@ async function build(spec, parent, parentBox) {
     node.name = spec.n;
     if (!spec.c) report.defaultTextColor.push(where);
     const p = paintFor(spec.c || { token: "oe-foreground-primary" }, `text:${where}`);
-    if (p) node.fills = [p];
+    if (p) setPaints(node, "fills", [p]);
     node.textAlignHorizontal = spec.al === "center" ? "CENTER" : spec.al === "right" || spec.al === "end" ? "RIGHT" : "LEFT";
     // 폭을 먼저 정하고 높이 자동 맞춤을 켠다. resize 가 textAutoResize 를 되돌리지 않게 하려는 순서다.
     if (!spec.lh || spec.h <= spec.lh * 1.5) node.textAutoResize = "WIDTH_AND_HEIGHT";
@@ -211,11 +226,11 @@ async function build(spec, parent, parentBox) {
     // 자식 없이 칠·테두리만 있는 상자다. 배치할 것이 없으므로 Frame 이 아니라 Rectangle 로 둔다.
     node = figma.createRectangle();
     node.name = spec.n;
-    node.fills = spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : [];
+    setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
       const p = paintFor(spec.bd.c, `border:${spec.n}`);
       if (p) {
-        node.strokes = [p];
+        setPaints(node, "strokes", [p]);
         node.strokeAlign = "INSIDE";
         if (spec.bd.ds) node.dashPattern = [4, 4];
         node.strokeWeight = spec.bd.w[0];
@@ -230,16 +245,16 @@ async function build(spec, parent, parentBox) {
     node.resize(spec.w, spec.h);
     node.fills = [];
     const p = paintFor(spec.c, `icon:${node.name}`);
-    if (p) for (const v of node.findAll((n) => "fills" in n && n.type !== "FRAME")) v.fills = [p];
+    if (p) for (const v of node.findAll((n) => "fills" in n && n.type !== "FRAME")) setPaints(v, "fills", [p]);
     bindSize(node, spec.sz, `icon:${node.name}`);
   } else {
     node = figma.createFrame();
     node.name = spec.n;
-    node.fills = spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : [];
+    setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
       const p = paintFor(spec.bd.c, `border:${spec.n}`);
       if (p) {
-        node.strokes = [p];
+        setPaints(node, "strokes", [p]);
         node.strokeAlign = "INSIDE";
         if (spec.bd.ds) node.dashPattern = [4, 4];
         const [top, right, bottom, left] = spec.bd.w;

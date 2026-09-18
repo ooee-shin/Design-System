@@ -51,7 +51,28 @@ const variantName = (props: Record<string, string>) =>
     .map(([axis, value]) => `${axis}=${value}`)
     .join(", ");
 
-function Group({ component, items }: { component: string; items: Item[] }) {
+/**
+ * 축의 값을 **모두 곱해** 항목을 만든다.
+ *
+ * Figma 의 Component Set 은 Variant 이름에서 축과 값을 모아 드롭다운을 만든다. 그래서 값이 하나라도
+ * 나타나면 그 값은 모든 축과 곱해져 고를 수 있게 되는데, 그 조합의 Variant 가 없으면 골랐을 때
+ * 아무것도 나오지 않는다. 훑기(축마다 하나씩)로 만들면 이 빈칸이 대부분을 차지한다.
+ * 실제로 Button 은 훑기로 19개만 올라가 120개 가운데 101개가 빈칸이었다.
+ */
+function cross<A extends Record<string, readonly string[]>>(axes: A, node: (props: { [K in keyof A]: A[K][number] }) => React.ReactNode): Item[] {
+  let rows: Record<string, string>[] = [{}];
+  for (const axis of Object.keys(axes)) rows = rows.flatMap((row) => axes[axis].map((value) => ({ ...row, [axis]: value })));
+  return rows.map((props) => ({ props, node: node(props as { [K in keyof A]: A[K][number] }) }));
+}
+
+/**
+ * 곱집합에서 **빼는** 조합이다. 컴포넌트가 타입으로 막아 만들 수 없는 짝에만 쓴다
+ * (예: NotificationBadge 의 점 형태는 `tone` 을 받지 않는다). 「아직 안 만들었다」에는 쓰지 않는다.
+ * 여기 적은 조합이 실제로는 만들어져 있으면 테스트가 「이 예외는 이제 필요 없다」고 알려 준다.
+ */
+type Impossible = { props: Record<string, string>; why: string };
+
+function Group({ component, items, impossible = [] }: { component: string; items: Item[]; impossible?: Impossible[] }) {
   // 한 Component Set 안의 Variant 는 **모두 같은 축**을 가져야 한다. 하나라도 다르면 Figma 가 묶지 못한다.
   // 이 화면은 미리 그려지므로 여기서 멈추면 빌드가 실패해 바로 드러난다.
   const axes = Object.keys(items[0].props).join(",");
@@ -71,8 +92,13 @@ function Group({ component, items }: { component: string; items: Item[] }) {
     seen.add(name);
   }
 
+  for (const skip of impossible) {
+    const mine = Object.keys(skip.props).join(",");
+    if (mine !== axes) throw new Error(`${component} 의 예외가 축과 맞지 않는다: 「${axes}」 와 「${mine}」`);
+  }
+
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-3" data-component-set={component} data-impossible={JSON.stringify(impossible.map((skip) => variantName(skip.props)))}>
       <h2 className="text-oe-label font-medium text-oe-foreground-secondary">{component}</h2>
       <div className="flex flex-wrap items-start gap-4">
         {items.map((item) => (
@@ -85,6 +111,8 @@ function Group({ component, items }: { component: string; items: Item[] }) {
   );
 }
 
+// 정지 상태와 비활성 둘만 둔다. hover·pressed 는 정적인 화면 캡처에 걸리지 않아 Figma 로 옮길 수 없다.
+const STATES = ["기본", "disabled"] as const;
 const BUTTON_VARIANTS = ["fill", "tonal", "outline", "ghost"] as const;
 const BUTTON_TONES = ["brand", "neutral", "danger"] as const;
 const CONTROL_SIZES = ["xsmall", "small", "regular", "large", "xlarge"] as const;
@@ -95,6 +123,34 @@ const INPUT_SIZES = ["small", "regular", "large", "xlarge"] as const;
 // 크기 축은 컴포넌트마다 이름이 다르다. Switch 는 controlSize 가 small·medium·large 이고,
 // Badge 는 아예 prop 이름이 size 이며 값이 small·medium 둘뿐이다. Textarea·Radio 에는 크기 축이 없다.
 const SWITCH_SIZES = ["small", "medium", "large"] as const;
+const BADGE_SIZES = ["small", "medium"] as const;
+// Chip 은 다른 컨트롤보다 한 단계 작은 compact 를 더 갖는다.
+const CHIP_SIZES = ["compact", "xsmall", "small", "regular", "large", "xlarge"] as const;
+const CHIP_SHAPES = ["rounded", "circle"] as const;
+const CHIP_STATES = ["기본", "active"] as const;
+const CHECKBOX_SHAPES = ["square", "rounded", "ghost"] as const;
+const CHECK_STATES = ["off", "on", "indeterminate", "disabled"] as const;
+// Switch·Radio 처럼 일부 선택이 없는 컨트롤이 쓴다.
+const TOGGLE_STATES = ["off", "on", "disabled"] as const;
+// 값을 받는 컨트롤의 상태다. 비었는지 찼는지가 테두리·글자색을 가른다.
+const FIELD_STATES = ["비어 있음", "값 있음", "disabled"] as const;
+const FIELD_KINDS = ["기본", "required", "helper", "error"] as const;
+const NUMBER_CONTROLS = ["trailing", "split", "없음"] as const;
+const TOGGLE_VARIANTS = ["ghost", "tonal"] as const;
+// brand 는 그대로 쓰고 like·favorite 는 `tone="custom"` 의 색 이름이다.
+const TOGGLE_TONES = ["brand", "like", "favorite"] as const;
+const PRESS_STATES = ["기본", "pressed"] as const;
+const COUNT_STATES = ["없음", "있음"] as const;
+const NOTIFICATION_SHAPES = ["dot", "count"] as const;
+const NOTIFICATION_TONES = ["accent", "neutral"] as const;
+const OVERFLOW_STATES = ["아님", "넘침"] as const;
+const SELECTION_MODES = ["single", "multiple"] as const;
+const SELECT_BOX_TRAILING = ["radio", "checkbox", "none"] as const;
+const TITLE_ALIGNS = ["center", "start"] as const;
+// 양옆에 무엇이 서는지다. 화면이 왼쪽만 쓰는 경우가 있어 셋으로 둔다.
+const HEADER_SIDES = ["없음", "왼쪽", "양옆"] as const;
+const NAV_VARIANTS = ["bar", "floating"] as const;
+const LABEL_STATES = ["없음", "있음"] as const;
 const SELECT_OPTIONS = [
   { value: "a", label: "첫째" },
   { value: "b", label: "둘째" },
@@ -105,301 +161,237 @@ export default function CatalogPage() {
     <main className="flex min-h-dvh flex-col gap-10 bg-oe-background-primary p-10">
       <Group
         component="Button"
-        items={[
-          ...BUTTON_VARIANTS.flatMap((variant) =>
-            BUTTON_TONES.map((tone) => ({
-              props: { variant, tone, controlSize: "regular", state: "기본" },
-              node: (
-                <Button variant={variant} tone={tone}>
-                  버튼
-                </Button>
-              ),
-            })),
-          ),
-          // regular 은 위 변형 묶음에 이미 있다. 여기서 또 만들면 이름이 같은 Variant 가 둘이 된다.
-          ...CONTROL_SIZES.filter((controlSize) => controlSize !== "regular").map((controlSize) => ({
-            props: { variant: "fill", tone: "brand", controlSize, state: "기본" },
-            node: (
-              <Button controlSize={controlSize}>버튼</Button>
-            ),
-          })),
-          { props: { variant: "fill", tone: "brand", controlSize: "regular", state: "disabled" }, node: <Button disabled>버튼</Button> },
-          // 위 두 묶음은 축마다 하나씩만 훑는다. 화면이 실제로 쓰는 조합은 그 밖에도 있어서 따로 적는다.
-          // 무엇이 빠졌는지는 page.test.tsx 의 「화면이 쓰는 인스턴스 이름이 카탈로그에 모두 있다」가 알려 준다.
-          { props: { variant: "ghost", tone: "neutral", controlSize: "small", state: "기본" }, node: <Button variant="ghost" tone="neutral" controlSize="small">버튼</Button> },
-          { props: { variant: "tonal", tone: "brand", controlSize: "small", state: "기본" }, node: <Button variant="tonal" controlSize="small">버튼</Button> },
-        ]}
+        items={cross({ variant: BUTTON_VARIANTS, tone: BUTTON_TONES, controlSize: CONTROL_SIZES, state: STATES }, ({ variant, tone, controlSize, state }) => (
+          <Button variant={variant} tone={tone} controlSize={controlSize} disabled={state === "disabled"}>
+            버튼
+          </Button>
+        ))}
       />
 
       <Group
         component="Badge"
-        items={BADGE_VARIANTS.flatMap((variant) =>
-          BADGE_TONES.map((tone) => ({
-            props: { variant, tone, size: "medium" },
-            // Badge 의 기본 size 는 small 이다. 이름에 medium 이라 적으면 실제로도 medium 을 넘겨야 한다.
-            node: (
-              <Badge variant={variant} tone={tone} size="medium">
-                배지
-              </Badge>
-            ),
-          })),
-        ).concat(BADGE_TONES.map((tone) => ({ props: { variant: "tonal", tone, size: "small" }, node: <Badge variant="tonal" tone={tone} size="small">배지</Badge> })))}
+        items={cross({ variant: BADGE_VARIANTS, tone: BADGE_TONES, size: BADGE_SIZES }, ({ variant, tone, size }) => (
+          <Badge variant={variant} tone={tone} size={size}>
+            배지
+          </Badge>
+        ))}
       />
 
       <Group
         component="Input"
-        items={[
-          ...INPUT_VARIANTS.flatMap((variant) =>
-            INPUT_SIZES.map((controlSize) => ({
-              props: { variant, controlSize, state: "비어 있음" },
-              node: <Input variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="입력" />,
-            })),
-          ),
-          { props: { variant: "outline", controlSize: "regular", state: "값 있음" }, node: <Input aria-label="값" defaultValue="입력한 값" /> },
-          { props: { variant: "outline", controlSize: "regular", state: "disabled" }, node: <Input aria-label="비활성" placeholder="입력" disabled /> },
-        ]}
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <Input
+            variant={variant}
+            controlSize={controlSize}
+            aria-label={`${variant} ${controlSize} ${state}`}
+            placeholder="입력"
+            defaultValue={state === "값 있음" ? "입력한 값" : undefined}
+            disabled={state === "disabled"}
+          />
+        ))}
       />
 
       <Group
         component="Select"
-        items={INPUT_VARIANTS.flatMap((variant) =>
-          INPUT_SIZES.map((controlSize) => ({
-            props: { variant, controlSize },
-            node: (
-              <Select
-                variant={variant}
-                controlSize={controlSize}
-                aria-label={`${variant} ${controlSize}`}
-                placeholder="선택"
-                options={SELECT_OPTIONS}
-              />
-            ),
-          })),
-        )}
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES }, ({ variant, controlSize }) => (
+          <Select variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
+        ))}
       />
 
       <Group
         component="Checkbox"
-        items={[
-          { props: { shape: "square", state: "off" }, node: <Checkbox shape="square" aria-label="끄기" /> },
-          { props: { shape: "square", state: "on" }, node: <Checkbox shape="square" defaultChecked aria-label="켜기" /> },
-          { props: { shape: "rounded", state: "off" }, node: <Checkbox aria-label="끄기" /> },
-          { props: { shape: "rounded", state: "on" }, node: <Checkbox defaultChecked aria-label="켜기" /> },
-          { props: { shape: "rounded", state: "indeterminate" }, node: <Checkbox indeterminate aria-label="일부" /> },
-          { props: { shape: "rounded", state: "disabled" }, node: <Checkbox disabled aria-label="비활성" /> },
-          { props: { shape: "ghost", state: "off" }, node: <Checkbox shape="ghost" aria-label="테두리 없이 끄기" /> },
-          { props: { shape: "ghost", state: "on" }, node: <Checkbox shape="ghost" defaultChecked aria-label="테두리 없이 켜기" /> },
-        ]}
+        items={cross({ shape: CHECKBOX_SHAPES, state: CHECK_STATES }, ({ shape, state }) => (
+          <Checkbox
+            shape={shape}
+            aria-label={`${shape} ${state}`}
+            defaultChecked={state === "on"}
+            indeterminate={state === "indeterminate"}
+            disabled={state === "disabled"}
+          />
+        ))}
       />
 
       <Group
         component="Chip"
-        items={[
-          // Chip 의 기본 shape 는 circle 이다. rounded 를 그리려면 실제로 넘겨야 한다.
-          ...CONTROL_SIZES.map((controlSize) => ({ props: { shape: "rounded", controlSize, state: "기본" }, node: <Chip shape="rounded" controlSize={controlSize}>칩</Chip> })),
-          { props: { shape: "rounded", controlSize: "regular", state: "active" }, node: <Chip shape="rounded" active>칩</Chip> },
-          { props: { shape: "circle", controlSize: "regular", state: "기본" }, node: <Chip shape="circle">칩</Chip> },
-        ]}
+        items={cross({ shape: CHIP_SHAPES, controlSize: CHIP_SIZES, state: CHIP_STATES }, ({ shape, controlSize, state }) => (
+          <Chip shape={shape} controlSize={controlSize} active={state === "active"}>
+            칩
+          </Chip>
+        ))}
       />
 
       <Group
         component="Field"
-        items={[
-          { props: { state: "기본" }, node: <Field label="이름"><Input aria-label="이름" placeholder="입력" /></Field> },
-          { props: { state: "required" }, node: <Field label="이름" required><Input aria-label="필수 이름" placeholder="입력" /></Field> },
-          { props: { state: "helper" }, node: <Field label="이름" helperText="도움말"><Input aria-label="도움말 이름" placeholder="입력" /></Field> },
-          { props: { state: "error" }, node: <Field label="이름" errorMessage="오류 문구"><Input aria-label="오류 이름" placeholder="입력" aria-invalid /></Field> },
-        ]}
+        items={cross({ state: FIELD_KINDS }, ({ state }) => (
+          <Field label="이름" required={state === "required"} helperText={state === "helper" ? "도움말" : undefined} errorMessage={state === "error" ? "오류 문구" : undefined}>
+            <Input aria-label={`이름 ${state}`} placeholder="입력" aria-invalid={state === "error" || undefined} />
+          </Field>
+        ))}
       />
 
       <Group
         component="Switch"
-        items={[
-          ...SWITCH_SIZES.map((controlSize) => ({ props: { controlSize, state: "off" }, node: <Switch controlSize={controlSize} aria-label={`${controlSize} 끄기`} /> })),
-          ...SWITCH_SIZES.map((controlSize) => ({ props: { controlSize, state: "on" }, node: <Switch controlSize={controlSize} defaultChecked aria-label={`${controlSize} 켜기`} /> })),
-          { props: { controlSize: "medium", state: "disabled" }, node: <Switch disabled aria-label="비활성" /> },
-        ]}
+        items={cross({ controlSize: SWITCH_SIZES, state: TOGGLE_STATES }, ({ controlSize, state }) => (
+          <Switch controlSize={controlSize} aria-label={`${controlSize} ${state}`} defaultChecked={state === "on"} disabled={state === "disabled"} />
+        ))}
       />
 
       <Group
         component="Radio"
-        items={[
-          { props: { state: "off" }, node: <RadioGroup defaultValue="b"><Radio value="a" aria-label="끄기" /></RadioGroup> },
-          { props: { state: "on" }, node: <RadioGroup defaultValue="a"><Radio value="a" aria-label="켜기" /></RadioGroup> },
-          { props: { state: "disabled" }, node: <RadioGroup defaultValue="b"><Radio value="a" disabled aria-label="비활성" /></RadioGroup> },
-        ]}
+        items={cross({ state: TOGGLE_STATES }, ({ state }) => (
+          <RadioGroup defaultValue={state === "on" ? "a" : "b"}>
+            <Radio value="a" aria-label={state} disabled={state === "disabled"} />
+          </RadioGroup>
+        ))}
       />
 
       <Group
         component="Textarea"
-        items={[
-          ...INPUT_VARIANTS.map((variant) => ({
-            props: { variant, state: "비어 있음" },
-            node: <Textarea variant={variant} aria-label={`${variant} 내용`} placeholder="입력" />,
-          })),
-          { props: { variant: "outline", state: "값 있음" }, node: <Textarea aria-label="값" defaultValue="입력한 내용" /> },
-          { props: { variant: "outline", state: "disabled" }, node: <Textarea aria-label="비활성" placeholder="입력" disabled /> },
-        ]}
+        items={cross({ variant: INPUT_VARIANTS, state: FIELD_STATES }, ({ variant, state }) => (
+          <Textarea
+            variant={variant}
+            aria-label={`${variant} ${state}`}
+            placeholder="입력"
+            defaultValue={state === "값 있음" ? "입력한 내용" : undefined}
+            disabled={state === "disabled"}
+          />
+        ))}
       />
 
       <Group
         component="InputButton"
-        items={[
-          ...INPUT_VARIANTS.flatMap((variant) =>
-            INPUT_SIZES.map((controlSize) => ({
-              props: { variant, controlSize, state: "비어 있음" },
-              node: <InputButton variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="선택" />,
-            })),
-          ),
-          { props: { variant: "outline", controlSize: "regular", state: "값 있음" }, node: <InputButton aria-label="값" value="2026-09-17" /> },
-          { props: { variant: "outline", controlSize: "regular", state: "disabled" }, node: <InputButton aria-label="비활성" placeholder="선택" disabled /> },
-        ]}
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <InputButton
+            variant={variant}
+            controlSize={controlSize}
+            aria-label={`${variant} ${controlSize} ${state}`}
+            placeholder="선택"
+            value={state === "값 있음" ? "2026-09-17" : undefined}
+            disabled={state === "disabled"}
+          />
+        ))}
       />
 
       <Group
         component="NumberInput"
-        items={[
-          ...INPUT_SIZES.map((controlSize) => ({
-            props: { variant: "outline", controlSize, controls: "trailing" },
-            node: <NumberInput controlSize={controlSize} aria-label={`수량 ${controlSize}`} defaultValue={1} />,
-          })),
-          { props: { variant: "outline", controlSize: "regular", controls: "split" }, node: <NumberInput aria-label="나눠 놓기" defaultValue={1} controlsPosition="split" /> },
-          { props: { variant: "outline", controlSize: "regular", controls: "없음" }, node: <NumberInput aria-label="컨트롤 없음" defaultValue={1} hideControls /> },
-        ]}
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, controls: NUMBER_CONTROLS }, ({ variant, controlSize, controls }) => (
+          <NumberInput
+            variant={variant}
+            controlSize={controlSize}
+            aria-label={`수량 ${variant} ${controlSize} ${controls}`}
+            defaultValue={1}
+            controlsPosition={controls === "split" ? "split" : undefined}
+            hideControls={controls === "없음"}
+          />
+        ))}
       />
 
       <Group
         component="Combobox"
-        items={INPUT_VARIANTS.flatMap((variant) =>
-          INPUT_SIZES.map((controlSize) => ({
-            props: { variant, controlSize },
-            node: <Combobox variant={variant} controlSize={controlSize} ariaLabel={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />,
-          })),
-        )}
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES }, ({ variant, controlSize }) => (
+          <Combobox variant={variant} controlSize={controlSize} ariaLabel={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
+        ))}
       />
 
       <Group
         component="ToggleButton"
-        items={[
-          ...CONTROL_SIZES.map((controlSize) => ({
-            props: { variant: "ghost", tone: "brand", controlSize, state: "기본" },
-            node: <ToggleButton controlSize={controlSize} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label={`즐겨찾기 ${controlSize}`} />,
-          })),
-          { props: { variant: "ghost", tone: "brand", controlSize: "regular", state: "pressed" }, node: <ToggleButton defaultPressed icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 켬" /> },
-          { props: { variant: "ghost", tone: "like", controlSize: "regular", state: "기본" }, node: <ToggleButton tone="custom" color="like" icon={<RiHeart3Line aria-hidden />} activeIcon={<RiHeart3Fill aria-hidden />} aria-label="좋아요" /> },
-          { props: { variant: "ghost", tone: "favorite", controlSize: "regular", state: "pressed" }, node: <ToggleButton tone="custom" color="favorite" icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} defaultPressed aria-label="즐겨찾기 색" /> },
-          { props: { variant: "tonal", tone: "brand", controlSize: "regular", state: "기본" }, node: <ToggleButton variant="tonal" icon={<RiStarLine aria-hidden />} aria-label="즐겨찾기 담기" /> },
-          { props: { variant: "ghost", tone: "brand", controlSize: "regular", state: "수 있음" }, node: <ToggleButton count={12} icon={<RiStarLine aria-hidden />} activeIcon={<RiStarFill aria-hidden />} aria-label="즐겨찾기 수" /> },
-        ]}
+        // 전에는 `state` 에 눌림과 「수 있음」이 함께 있었다. 수를 보이는 것은 상태가 아니라 따로 켜고
+        // 끄는 것이라, 한 축에 섞어 두면 「눌렸고 수도 보이는」 조합을 Figma 에서 만들 수 없다. 축을 갈랐다.
+        items={cross({ variant: TOGGLE_VARIANTS, tone: TOGGLE_TONES, controlSize: CONTROL_SIZES, state: PRESS_STATES, count: COUNT_STATES }, ({ variant, tone, controlSize, state, count }) => {
+          const icon = tone === "like" ? <RiHeart3Line aria-hidden /> : <RiStarLine aria-hidden />;
+          const activeIcon = tone === "like" ? <RiHeart3Fill aria-hidden /> : <RiStarFill aria-hidden />;
+          // tonal 은 배경이 켜짐을 말하므로 타입이 `activeIcon` 을 막는다. 넘기는 짝을 갈라 맞춘다.
+          const style = variant === "tonal" ? ({ variant: "tonal", icon } as const) : ({ variant: "ghost", icon, activeIcon } as const);
+          const paint = tone === "brand" ? ({ tone: "brand" } as const) : ({ tone: "custom", color: tone } as const);
+          return (
+            <ToggleButton
+              {...style}
+              {...paint}
+              controlSize={controlSize}
+              count={count === "있음" ? 12 : undefined}
+              defaultPressed={state === "pressed"}
+              aria-label={`${variant} ${tone} ${controlSize} ${state} 수${count}`}
+            />
+          );
+        })}
       />
 
       <Group
         component="NotificationBadge"
-        items={[
-          { props: { shape: "dot", tone: "accent", overflow: "아님" }, node: <NotificationBadge /> },
-          { props: { shape: "count", tone: "accent", overflow: "아님" }, node: <NotificationBadge count={5} /> },
-          { props: { shape: "count", tone: "neutral", overflow: "아님" }, node: <NotificationBadge count={5} tone="neutral" /> },
-          { props: { shape: "count", tone: "accent", overflow: "넘침" }, node: <NotificationBadge count={120} /> },
+        items={cross({ shape: NOTIFICATION_SHAPES, tone: NOTIFICATION_TONES, overflow: OVERFLOW_STATES }, ({ shape, tone, overflow }) =>
+          shape === "dot" ? <NotificationBadge /> : <NotificationBadge count={overflow === "넘침" ? 120 : 5} tone={tone} />,
+        ).filter((item) => item.props.shape !== "dot" || (item.props.tone === "accent" && item.props.overflow === "아님"))}
+        // 점 형태는 수를 보이지 않으므로 타입이 `tone` 과 `max` 를 받지 않는다(notification-badge.tsx 의 갈린 타입).
+        // 곱집합으로 만들 수 없는 것이 아니라 컴포넌트가 만들 수 없는 조합이다.
+        impossible={[
+          { props: { shape: "dot", tone: "neutral", overflow: "아님" }, why: "점 형태는 tone 을 받지 않는다" },
+          { props: { shape: "dot", tone: "accent", overflow: "넘침" }, why: "점 형태는 수를 보이지 않아 넘칠 것이 없다" },
+          { props: { shape: "dot", tone: "neutral", overflow: "넘침" }, why: "점 형태는 tone 도 넘침도 없다" },
         ]}
       />
 
       <Group
         component="SelectBox"
-        items={[
-          {
-            props: { selectionMode: "single", trailingElement: "radio" },
-            node: (
-              <SelectBoxGroup ariaLabel="한 개 고르기" defaultValue="a">
-                <SelectBox value="a" title="첫째" description="설명" />
-              </SelectBoxGroup>
-            ),
-          },
-          {
-            props: { selectionMode: "multiple", trailingElement: "checkbox" },
-            node: (
-              <SelectBoxGroup ariaLabel="여러 개 고르기" selectionMode="multiple" defaultValue={["a"]}>
-                <SelectBox value="a" title="첫째" description="설명" />
-              </SelectBoxGroup>
-            ),
-          },
-          {
-            props: { selectionMode: "single", trailingElement: "none" },
-            node: (
-              <SelectBoxGroup ariaLabel="표시 없음" trailingElement="none">
-                <SelectBox value="a" title="첫째" />
-              </SelectBoxGroup>
-            ),
-          },
+        items={cross({ selectionMode: SELECTION_MODES, trailingElement: SELECT_BOX_TRAILING }, ({ selectionMode, trailingElement }) =>
+          selectionMode === "multiple" ? (
+            <SelectBoxGroup ariaLabel={`여러 개 ${trailingElement}`} selectionMode="multiple" defaultValue={["a"]} trailingElement={trailingElement === "none" ? "none" : undefined}>
+              <SelectBox value="a" title="첫째" description="설명" />
+            </SelectBoxGroup>
+          ) : (
+            <SelectBoxGroup ariaLabel={`한 개 ${trailingElement}`} defaultValue="a" trailingElement={trailingElement === "none" ? "none" : undefined}>
+              <SelectBox value="a" title="첫째" description="설명" />
+            </SelectBoxGroup>
+          ),
+        ).filter(
+          (item) =>
+            item.props.trailingElement === "none" ||
+            (item.props.selectionMode === "single" ? item.props.trailingElement === "radio" : item.props.trailingElement === "checkbox"),
+        )}
+        // 끝 표시는 `none` 이 아니면 selectionMode 가 정한다(select-box.tsx 의 resolvedTrailingElement).
+        // 하나 고르기에 checkbox 를, 여러 개 고르기에 radio 를 세우는 길이 없다.
+        impossible={[
+          { props: { selectionMode: "single", trailingElement: "checkbox" }, why: "하나 고르기의 끝 표시는 radio 로 정해진다" },
+          { props: { selectionMode: "multiple", trailingElement: "radio" }, why: "여러 개 고르기의 끝 표시는 checkbox 로 정해진다" },
         ]}
       />
 
       <Group
         component="AppHeader"
-        items={[
-          { props: { titleAlign: "center", sides: "없음" }, node: <div className="w-[390px]"><AppHeader title="지원요청" sticky={false} /></div> },
-          { props: { titleAlign: "start", sides: "없음" }, node: <div className="w-[390px]"><AppHeader title="지원요청" titleAlign="start" sticky={false} /></div> },
-          {
-            props: { titleAlign: "center", sides: "양옆" },
-            node: (
-              <div className="w-[390px]">
-                <AppHeader title="지원요청" sticky={false} leadingElement={<Button variant="ghost" controlSize="small" aria-label="뒤로"><RiArrowLeftLine aria-hidden /></Button>} trailingElement={<NotificationBadge count={3} />} />
-              </div>
-            ),
-          },
-        ]}
+        items={cross({ titleAlign: TITLE_ALIGNS, sides: HEADER_SIDES }, ({ titleAlign, sides }) => (
+          <div className="w-[390px]">
+            <AppHeader
+              title="지원요청"
+              titleAlign={titleAlign}
+              sticky={false}
+              leadingElement={
+                sides === "없음" ? undefined : (
+                  <Button variant="ghost" controlSize="small" aria-label="뒤로">
+                    <RiArrowLeftLine aria-hidden />
+                  </Button>
+                )
+              }
+              trailingElement={sides === "양옆" ? <NotificationBadge count={3} /> : undefined}
+            />
+          </div>
+        ))}
       />
 
       <Group
         component="BottomNavigation"
-        items={[
-          {
-            props: { variant: "bar", labels: "없음" },
-            node: (
-              <div className="w-[390px]">
-                <BottomNavigation
-                  value="home"
-                  items={[
-                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
-                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
-                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden /> },
-                  ]}
-                />
-              </div>
-            ),
-          },
-          {
-            props: { variant: "bar", labels: "있음" },
-            node: (
-              <div className="w-[390px]">
-                <BottomNavigation
-                  value="home"
-                  showLabels
-                  items={[
-                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
-                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
-                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden />, badge: { count: 2 } },
-                  ]}
-                />
-              </div>
-            ),
-          },
-          {
-            props: { variant: "floating", labels: "없음" },
-            node: (
-              <div className="w-[390px]">
-                <BottomNavigation
-                  value="home"
-                  variant="floating"
-                  items={[
-                    { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
-                    { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
-                    { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden /> },
-                  ]}
-                />
-              </div>
-            ),
-          },
-        ]}
+        items={cross({ variant: NAV_VARIANTS, labels: LABEL_STATES }, ({ variant, labels }) => (
+          <div className="w-[390px]">
+            <BottomNavigation
+              value="home"
+              variant={variant}
+              showLabels={labels === "있음"}
+              items={[
+                { value: "home", label: "홈", icon: <RiHomeFill aria-hidden /> },
+                { value: "search", label: "찾기", icon: <RiSearchLine aria-hidden /> },
+                { value: "me", label: "내 정보", icon: <RiUser3Line aria-hidden />, badge: { count: 2 } },
+              ]}
+            />
+          </div>
+        ))}
       />
     </main>
   );
