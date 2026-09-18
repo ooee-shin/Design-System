@@ -33,7 +33,8 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - `--state`는 `이름=브라우저 JS`이고 여러 번 줄 수 있다. 이름은 첫 `=`까지이며 상태마다 달라야 한다. 하나라도 주면 첫 `--state`에 기본 화면 이름만 둔다. 주지 않으면 「기본」 하나다.
 - 모바일 화면은 `--width 390 --height 844`를 준다. 헤드리스 Chrome 창은 500px보다 좁아지지 않아서 창은 500으로 두고 문서 폭을 줄여 읽는다. 프레임 이름의 기기 표기는 폭 480 이하면 `Mobile`이다.
 - `--version`은 같은 날 같은 화면의 새 파일 이름에 ` · v2`처럼 버전을 붙인다. 이 기기에서 만든 이름은 `.figma-work/files.json`에 쌓여 같은 이름을 자동으로 피한다.
-- 돌릴 때마다 `.figma-work/<key>/`를 지우고 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- 돌릴 때마다 `.figma-work/<key>/`를 **지우고** 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- **올리는 중에 같은 key 로 다시 돌리지 않는다.** 단계 파일이 통째로 사라져 올리던 세션이 원본을 잃는다. 실제로 그렇게 한 번 끊겼다(2026-09-18). 올리는 동안 무언가 고쳐야 하면 다 올린 뒤에 다시 준비한다.
 - **두 개를 한꺼번에 돌리지 않는다.** 화면을 읽을 때 띄우는 Chrome 이 디버깅 포트 9222 를 쓰므로 서로 막혀 멈춘다. 굳이 나란히 돌려야 하면 `CDP_PORT=9301` 처럼 실행마다 다른 포트를 준다.
 
 `manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. 세 번째 단계가 **「builder 를 문서에 둔다」**이고, 뒤따르는 build 단계는 조각만 실은 채 문서에 둔 그것을 꺼내 쓴다. 그래서 build 단계를 다시 돌릴 때도 그 앞 단계는 건너뛰지 않는다 — 문서에 builder 가 없거나 다르면 build 단계가 `error` 로 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
@@ -80,8 +81,8 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 | 화면 루트 | 오토 레이아웃 Frame |
 | 자식을 배치하는 상자(자식 둘 이상, 또는 여백·간격을 주는 상자) | 오토 레이아웃 Frame |
 | 칠·테두리·모서리를 가진 상자 | Frame (자식이 없으면 Rectangle) |
-| `data-slot` 이 붙은 컴포넌트 노드 | Frame. 되짚기의 근거라 접지 않는다 |
-| 글자 하나만 감싼 상자 | 없애고 글자가 그 자리를 차지한다. 가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다 |
+| `data-slot` 이 붙은 컴포넌트 노드 | Frame. 되짚기의 근거라 접지 않는다. **단 카탈로그 컴포넌트 안쪽은 접는다**(아래) |
+| 글자 하나만 감싼 상자 | 없애고 글자가 그 자리를 차지한다. 가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다. `overflow: hidden`(말줄임)이 붙어 있어도 접는다 — Figma 에서 글자는 제 크기를 갖고 잘림은 부모 auto layout 이 다룬다 |
 | 아이콘 하나만 감싼 상자, 자식을 그대로 통과시키는 상자 | 없앤다 |
 
 `manifest.json` 의 `folded` 가 이번에 접은 수를 센다. 「고객의 소리」는 Frame 124개가 69개로 줄었다.
@@ -103,6 +104,13 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only Button
 변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
+
+**컴포넌트 안쪽은 `data-slot` 상자도 접는다.** 화면에서는 레이어 이름이 되짚기의 다리라 남기지만, 카탈로그는 Component Set 이름과 Variant 속성이 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다. `Group` 이 씌운 감싸개도 컴포넌트 표시를 자식에게 넘기고 걷어낸다. 그래서 Figma 의 `Button` 컴포넌트 안에는 글자 하나만 있다(2026-09-18 유진식).
+
+```
+전:  COMPONENT → Frame button → Frame button-label → Text 버튼
+후:  COMPONENT(button) → Text 버튼
+```
 
 `--height` 는 화면 전체가 들어갈 만큼 준다. 항목을 더해 화면이 길어졌으면 그만큼 올린다. 작게 주면 브라우저 스크린샷이 잘려 눈으로 대조할 때 아래쪽을 보지 못한다.
 
