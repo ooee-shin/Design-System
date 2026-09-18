@@ -305,8 +305,11 @@ for (CHUNK of RUN) {
     parent = page;
   } else {
     const root = page.children.find((n) => n.type === "FRAME" && n.name === CHUNK.frameName && n.getSharedPluginData(TAG, "p"));
-    parent = root && (root.getSharedPluginData(TAG, "p") === CHUNK.parentPath ? root : root.findOne((n) => n.type === "FRAME" && n.getSharedPluginData(TAG, "p") === CHUNK.parentPath));
-    if (!parent) return { error: `부모 프레임을 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`, report };
+    // 자식을 담을 수 있는 노드면 무엇이든 부모가 된다. 카탈로그 항목은 createComponentFromNode 로
+    // COMPONENT 가 되므로 FRAME 만 찾으면 그 안쪽을 부모로 하는 뒤 조각이 부모를 잃는다(2026-09-18).
+    const canHoldChildren = (n) => "children" in n;
+    parent = root && (root.getSharedPluginData(TAG, "p") === CHUNK.parentPath ? root : root.findOne((n) => canHoldChildren(n) && n.getSharedPluginData(TAG, "p") === CHUNK.parentPath));
+    if (!parent) return { error: `부모를 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`, report };
   }
   for (const item of CHUNK.nodes) {
     const node = await build(item, parent, CHUNK.parentBox || { x: 0, y: 0 });
