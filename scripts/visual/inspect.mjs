@@ -21,7 +21,7 @@ const HELP = `
   --theme <dark|light> 테마를 전환한 뒤 측정한다.
   --click <텍스트>      그 텍스트를 가진 button을 누른다. 여러 번 쓰면 순서대로 누른다.
   --hover <셀렉터>      그 요소 가운데로 포인터를 옮긴다. 포인터를 얹어야 나타나는 것을 잴 때 쓴다.
-  --resize <WxH>       화면을 띄운 뒤에 폭을 바꾼다. 폭이 바뀔 때만 일어나는 것을 잴 때 쓴다.
+  --resize <WxH>       화면을 띄운 뒤에 폭을 바꾼다. 여러 번 쓰면 순서대로 바꾼다.
   --sweep <a,b,c>      Control 축 하나. 여러 번 쓰면 모든 조합을 크롬 한 번으로 훑는다.
                        예: --sweep Fill,Tonal,Outlined --sweep Brand,Neutral → 6개 조합
   --json               훑은 결과를 표 대신 JSON 전문으로 낸다.
@@ -36,7 +36,7 @@ const HELP = `
 `.trim();
 
 function parseArgs(argv) {
-  const opts = { click: [], measure: [], sweep: [], viewport: "1440x900", wait: 250, pad: 0, scale: 1, out: ".visual" };
+  const opts = { click: [], measure: [], sweep: [], resize: [], viewport: "1440x900", wait: 250, pad: 0, scale: 1, out: ".visual" };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--help" || arg === "-h") return { help: true };
@@ -46,7 +46,7 @@ function parseArgs(argv) {
     const value = argv[i + 1];
     if (value === undefined || value.startsWith("--")) throw new Error(`${arg}에 값이 없습니다.`);
     i += 1;
-    if (key === "click" || key === "measure" || key === "sweep") opts[key].push(value);
+    if (key === "click" || key === "measure" || key === "sweep" || key === "resize") opts[key].push(value);
     else if (key === "wait" || key === "pad" || key === "scale") opts[key] = Number(value);
     else opts[key] = value;
   }
@@ -166,11 +166,18 @@ try {
 
   // 처음부터 좁게 띄우는 것과 띄운 뒤에 좁히는 것은 다르다. 뒤쪽에서만 `resize` 와 매체 질의의
   // 변화가 일어나므로, 그때만 움직이는 것을 재려면 이 길로 폭을 바꾼다.
-  const resizeTo = async (size) => {
-    const [width, height] = size.split("x").map(Number);
-    await session.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
-    await settle();
-    return { width, height };
+  const resizeAll = async (sizes) => {
+    const log = [];
+    for (const [index, size] of sizes.entries()) {
+      const [width, height] = size.split("x").map(Number);
+      await session.send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
+      // 중간 단계는 그 폭에서 일어날 일이 끝나기를 기다린다. 마지막 폭 뒤에는 `--wait` 를 따르므로
+      // 0 으로 두면 바뀐 직후부터 잴 수 있다.
+      if (index < sizes.length - 1) await new Promise((r) => setTimeout(r, 320));
+      else await settle();
+      log.push({ width, height });
+    }
+    return log;
   };
 
   const measureAll = async () => {
@@ -251,7 +258,7 @@ try {
   } else {
     if (opts.click.length) report.clicked = await clickAll(opts.click);
     if (opts.theme || opts.click.length) await settle();
-    if (opts.resize) report.resized = await resizeTo(opts.resize);
+    if (opts.resize.length) report.resized = await resizeAll(opts.resize);
     if (opts.hover) report.hovered = await hoverOver(opts.hover);
     if (opts.measure.length) report.measured = await measureAll();
     if (opts.eval) report.evaluated = await session.eval(opts.eval);

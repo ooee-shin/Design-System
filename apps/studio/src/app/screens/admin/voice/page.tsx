@@ -267,7 +267,10 @@ export default function Page() {
   const [filter, setFilter] = useState<Filter>(EMPTY_FILTER);
   const [draft, setDraft] = useState<Filter>(EMPTY_FILTER);
   const dirty = JSON.stringify(draft) !== JSON.stringify(filter);
-  const [panelOpen, setPanelOpen] = useState(true);
+  // 사용자가 직접 여닫거나 폭이 경계를 넘을 때 정해지는 값이다. 아직 그런 일이 없으면 `null` 이며,
+  // 그때는 지금 폭이 정한다. 넓은 폭으로 들어오면 열린 채, 좁은 폭으로 들어오면 닫힌 채 시작한다.
+  // 처음 값을 상태에 박아 두면 좁은 폭으로 들어왔을 때 열린 채로 그려진 뒤에 닫히게 된다.
+  const [panelChoice, setPanelChoice] = useState<boolean | null>(null);
   // 표가 온전히 보이지 않는 폭이 되면 조건 패널을 닫고, 다시 보이는 폭이 되면 연다. 경계는
   // 1600px 이며 화면을 재서 나온 값이다. 좌측 내비 240px, 목록 영역 좌우 여백 48px, 표 1044px,
   // 조건 패널 264px 을 더하면 1596px 이라 1600px 부터 둘이 함께 들어간다. 그보다 좁으면 패널이
@@ -280,7 +283,19 @@ export default function Page() {
   // 열어 둔 것은 그 안에서 그대로 남는다.
   useEffect(() => {
     const query = window.matchMedia(NARROW);
-    const follow = (event: MediaQueryListEvent) => setPanelOpen(!event.matches);
+    const follow = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setPanelChoice(false);
+        return;
+      }
+      // 넓어질 때는 닫힌 모습을 한 번 그린 뒤에 연다. 그 순간 패널이 얹힌 모습에서 한 칸
+      // 차지하는 모습으로 갈리는데, 폭을 여는 것까지 같은 프레임에 함께 일어나면 브라우저가
+      // 출발점을 잡지 못해 늘어나는 과정 없이 그대로 나타난다.
+      //
+      // 프레임을 두 번 기다리는 이유는 첫 번째 콜백이 아직 그리기 전에 돌기 때문이다. 그 자리에서
+      // 열면 닫힌 폭과 열린 폭이 한 번의 그리기에 함께 들어가 여전히 출발점이 없다.
+      requestAnimationFrame(() => requestAnimationFrame(() => setPanelChoice(true)));
+    };
     query.addEventListener("change", follow);
     return () => query.removeEventListener("change", follow);
   }, []);
@@ -296,6 +311,8 @@ export default function Page() {
     () => window.matchMedia(NARROW).matches,
     () => false,
   );
+
+  const panelOpen = panelChoice ?? !narrow;
 
   // 답변 여부 축만 화면이 여닫는 상태를 들고 있다. 요약의 지연을 누르면 그 축에 미답변이 걸리는데,
   // 접힌 채로 개수만 바뀌면 무엇이 걸렸는지 펼쳐 봐야 안다.
@@ -426,7 +443,7 @@ export default function Page() {
                   leadingIcon={<RiEqualizer2Line />}
                   aria-expanded={panelOpen}
                   aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
-                  onClick={() => setPanelOpen((previous) => !previous)}
+                  onClick={() => setPanelChoice(!panelOpen)}
                 />
               }
             />
@@ -460,7 +477,7 @@ export default function Page() {
             tabIndex={-1}
             aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
             title={panelOpen ? "필터 닫기" : "필터 열기"}
-            onClick={() => setPanelOpen((previous) => !previous)}
+            onClick={() => setPanelChoice(!panelOpen)}
             className={`absolute inset-y-0 z-30 hidden w-4 transition-[right,transform] duration-200 ease-out after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-oe-border-primary motion-reduce:transition-none sm:block ${
               panelOpen ? "right-[16.5rem] translate-x-1/2 cursor-e-resize" : "right-0 translate-x-0 cursor-w-resize"
             }`}
@@ -471,17 +488,33 @@ export default function Page() {
             // 넓은 폭에서는 목록 옆의 한 칸이라 폭이 줄고 늘며 목록 폭을 함께 바꾼다. 좁은 폭에서는
             // 목록 위에 얹혀 오른쪽에서 밀려 들어오고, 목록은 제 폭을 그대로 지킨다. 그 폭에서
             // 패널이 한 칸을 차지하면 표의 오른쪽 열이 잘리기 때문이다.
+            //
+            // 흐려짐은 한 칸으로 설 때만 쓴다. 그 모습은 폭이 잘리며 드러나므로 흐려짐이 함께
+            // 걷히면 잘린 자리가 덜 도드라진다. 얹힌 모습에서 반투명한 면을 쓰면 뒤의 목록이
+            // 비쳐서 떠 있는 면이 유령처럼 보이고, 미끄러져 들어오는 것만으로 없던 것이 온다는
+            // 것은 이미 읽힌다.
+            //
+            // 옮기는 것은 `translate` 로 적는다. `transform` 만 적으면 Tailwind 가 만드는 개별
+            // 속성이 전이 목록에 들지 않아 자리만 그대로 튄다.
+            //
+            // 얹힌 모습에서는 왼쪽 선을 두지 않고 그림자만 쓴다. 선은 자기 바깥의 배경과 대비로
+            // 보이는데 그 바깥이 흰 바닥·회색 카드·표 머리줄로 자리마다 달라서, 한 줄인 선이
+            // 중간에 끊긴 것처럼 읽힌다. 한 칸으로 설 때의 선은 같은 층에 나란히 놓인 것을 가르는
+            // 것이므로 그대로 남긴다.
             className={
               narrow
-                ? `absolute inset-y-0 right-0 z-20 w-[16.5rem] border-l border-oe-border-secondary bg-oe-background-primary shadow-lg transition-transform duration-200 ease-out motion-reduce:transition-none ${
+                ? `absolute inset-y-0 right-0 z-20 w-[16.5rem] bg-oe-background-primary shadow-lg transition-[translate] duration-200 ease-out motion-reduce:transition-none ${
                     panelOpen ? "translate-x-0" : "translate-x-full"
                   }`
-                : `shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none ${
+                : `relative shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-out motion-reduce:transition-none ${
                     panelOpen ? "w-[16.5rem] border-l border-oe-border-secondary opacity-100" : "w-0 opacity-0"
                   }`
             }
           >
-            <div className="flex h-full w-[16.5rem] flex-col">
+            {/* 안쪽 내용은 패널의 오른쪽 끝에 붙여 둔다. 폭이 늘고 줄며 여닫히는 동안 왼쪽이
+                잘리므로, 내용이 오른쪽에서 드러나고 사라진다. 왼쪽에 붙여 두면 반대로 오른쪽이
+                잘려서 조회 버튼과 여백이 먼저 사라지고, 열릴 때는 없던 것이 뒤늦게 생겨난다. */}
+            <div className="absolute inset-y-0 right-0 flex w-[16.5rem] flex-col">
               {/* 스크롤 막대를 콘텐츠 위에 겹쳐 그린다. 막대가 자리를 차지하면 축을 가르는
                   선이 그 앞에서 멈추고 오른쪽 여백만 넓어지며, 필요할 때만 생기게 두면 축을
                   펼치고 접을 때마다 안쪽 폭이 흔들린다. */}
