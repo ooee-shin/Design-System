@@ -7,6 +7,7 @@ import { cn } from "./utils"
 
 type ChipTone = "secondary" | "tertiary"
 type ChipShape = "rounded" | "circle"
+type ChipActiveStyle = "tonal" | "fill"
 type ChipSize = "compact" | "xsmall" | "small" | "regular" | "large" | "xlarge"
 
 const chipVariants = cva(
@@ -57,11 +58,39 @@ const textSidePadding: Record<ChipSize, { left: string; right: string }> = {
   xlarge: { left: "pl-5", right: "pr-5" },
 }
 
+// Active 의 채움은 두 가지다. `tonal` 은 brand 를 옅게 깔고 글자를 brand 로 쓰며, `fill` 은 어두운
+// Neutral surface 를 채우고 글자를 inverse 로 쓴다. 갈라 두는 까닭은 한 화면에 brand 색을 쓰는
+// 요소가 여럿일 때다. 고른 값과 Focus, Brand action 이 모두 같은 색조로 번지면 무엇이 지목된
+// 것인지 색으로 구분되지 않으므로, 그 화면에서는 고른 칩을 Neutral 로 채운다.
+//
+// `fill` 의 surface 는 `oe-background-bold-primary` 다. Button 의 뉴트럴 fill 이 `neutral-600` 인 것과
+// 달리 한참 진한 단계이므로, 고른 칩이 뉴트럴 Button 과 같은 모양으로 보이지 않는다.
+const activeSurfaceClassName: Record<ChipActiveStyle, string> = {
+  tonal: "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-brand-foreground-primary",
+  fill: "border-transparent bg-oe-background-bold-primary text-oe-foreground-inverse",
+}
+
+// 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않으므로, 채움마다 자기 배경을 그대로
+// 붙들어 둔다.
+const activeHoldClassName: Record<ChipActiveStyle, string> = {
+  tonal: "hover:bg-[var(--brand-alpha-05)] active:bg-[var(--brand-alpha-05)]",
+  fill: "hover:bg-oe-background-bold-primary active:bg-oe-background-bold-primary",
+}
+
 // 아이콘은 Label 과 같은 위계(secondary)나 한 단계 옅은 위계(tertiary)를 고를 수 있다.
-// Active 에서도 같은 관계를 brand 계열 안에서 유지한다.
-const toneClassName: Record<ChipTone, { default: string; active: string }> = {
-  secondary: { default: "text-oe-foreground-secondary", active: "text-oe-brand-foreground-primary" },
-  tertiary: { default: "text-oe-foreground-tertiary", active: "text-oe-brand-foreground-secondary" },
+// Active 에서도 같은 관계를 유지하며, 그 관계를 `tonal` 은 brand 계열 안에서 `fill` 은 inverse
+// 계열 안에서 지킨다.
+const toneClassName: Record<ChipTone, { default: string } & Record<ChipActiveStyle, string>> = {
+  secondary: {
+    default: "text-oe-foreground-secondary",
+    tonal: "text-oe-brand-foreground-primary",
+    fill: "text-oe-foreground-inverse",
+  },
+  tertiary: {
+    default: "text-oe-foreground-tertiary",
+    tonal: "text-oe-brand-foreground-secondary",
+    fill: "text-oe-foreground-inverse-secondary",
+  },
 }
 
 const iconSize: Record<ChipSize, string> = {
@@ -82,6 +111,7 @@ type ChipBaseProps = Omit<VariantProps<typeof chipVariants>, "iconOnly"> & {
   trailingElement?: React.ReactNode
   trailingTone?: ChipTone
   active?: boolean
+  activeStyle?: ChipActiveStyle
   className?: string
 }
 
@@ -109,6 +139,7 @@ function Chip({
   controlSize = "regular",
   shape,
   active = false,
+  activeStyle = "tonal",
   ariaLabel,
   className,
   onClick,
@@ -144,15 +175,15 @@ function Chip({
     !iconOnly && oneSideOnly && !rightEndsWithIcon && textSidePadding[size].right,
     iconOnly && iconOnlyWidth[size],
     iconSize[size],
-    active && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-brand-foreground-primary",
+    active && activeSurfaceClassName[activeStyle],
     className,
   )
   const content = (
     <>
-      {leadingElement ? <span data-slot="chip-leading-element" className={cn("flex shrink-0 items-center", active ? toneClassName[leadingTone].active : toneClassName[leadingTone].default)} aria-hidden="true">{leadingElement}</span> : null}
-      {prefix && !iconOnly ? <span data-slot="chip-prefix" className={cn("shrink-0", active ? "text-oe-brand-foreground-secondary" : "text-oe-foreground-tertiary")}>{prefix}</span> : null}
+      {leadingElement ? <span data-slot="chip-leading-element" className={cn("flex shrink-0 items-center", active ? toneClassName[leadingTone][activeStyle] : toneClassName[leadingTone].default)} aria-hidden="true">{leadingElement}</span> : null}
+      {prefix && !iconOnly ? <span data-slot="chip-prefix" className={cn("shrink-0", active ? toneClassName.tertiary[activeStyle] : toneClassName.tertiary.default)}>{prefix}</span> : null}
       {children ? <span data-slot="chip-label" className="min-w-0 truncate">{children}</span> : null}
-      {trailingElement ? <span data-slot="chip-trailing-element" className={cn("flex shrink-0 items-center", active ? toneClassName[trailingTone].active : toneClassName[trailingTone].default)} aria-hidden="true">{trailingElement}</span> : null}
+      {trailingElement ? <span data-slot="chip-trailing-element" className={cn("flex shrink-0 items-center", active ? toneClassName[trailingTone][activeStyle] : toneClassName[trailingTone].default)} aria-hidden="true">{trailingElement}</span> : null}
     </>
   )
 
@@ -166,7 +197,15 @@ function Chip({
             delay={150}
             aria-label={removeLabel}
             onClick={onRemove}
-            className={cn("grid shrink-0 cursor-pointer place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring", size === "small" || size === "compact" ? "size-4" : "size-5")}
+            // 어두운 surface 에서는 Hover 층을 얹지 않고 글자 위계만 올린다. 뉴트럴 Hover 층이
+            // black alpha 라서 그 위에서는 보이지 않고, 밝은 alpha 층은 아직 token 이 없다.
+            className={cn(
+              "grid shrink-0 cursor-pointer place-items-center rounded-md outline-none transition-colors focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+              active && activeStyle === "fill"
+                ? "text-oe-foreground-inverse-secondary hover:text-oe-foreground-inverse"
+                : "text-oe-foreground-tertiary hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover",
+              size === "small" || size === "compact" ? "size-4" : "size-5",
+            )}
           >
             <RiCloseLine aria-hidden="true" />
           </Tooltip.Trigger>
@@ -196,7 +235,7 @@ function Chip({
           "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
           "hover:bg-oe-interaction-hover-subtle active:bg-oe-interaction-hover",
           // 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. Active 가 우선한다.
-          active && "hover:bg-[var(--brand-alpha-05)] active:bg-[var(--brand-alpha-05)]",
+          active && activeHoldClassName[activeStyle],
         )}
       >
         {content}
@@ -212,4 +251,4 @@ function Chip({
 }
 
 export { Chip }
-export type { ChipProps, ChipShape, ChipSize, ChipTone }
+export type { ChipActiveStyle, ChipProps, ChipShape, ChipSize, ChipTone }

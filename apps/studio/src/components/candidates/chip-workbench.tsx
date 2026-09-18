@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { RiArrowDownSLine, RiCloseLine, RiGlobalLine, RiResetRightLine, RiSearchLine } from "@remixicon/react";
 
-import { Chip, Input, type ChipShape, type ChipSize, type ChipTone } from "@ooee/ui";
+import { Chip, Input, type ChipActiveStyle, type ChipShape, type ChipSize, type ChipTone } from "@ooee/ui";
 import { GuidelineGroupTitle, GuidelineTitle } from "@/components/guideline-title";
 import { GuidelineList, GuideVisual, UsageComparison } from "@/components/component-guidelines";
 import { AnatomyBoundaryMarker, AnatomyFrame, AnatomyLegend, AnatomyNumber, AnatomyStructureMap, AnatomySurface, AnatomySwapSlot } from "@/components/component-anatomy";
@@ -93,6 +93,7 @@ export function ChipWorkbench() {
   const [controlSize, setControlSize] = useState<ChipSize>("regular");
   const [shape, setShape] = useState<ChipShape>("circle");
   const [active, setActive] = useState(false);
+  const [activeStyle, setActiveStyle] = useState<ChipActiveStyle>("tonal");
   const [prefix, setPrefix] = useState(false);
   const [label, setLabel] = useState(true);
   const [leadingElement, setLeadingElement] = useState<ChipElement>("icon");
@@ -156,6 +157,7 @@ export function ChipWorkbench() {
                   controlSize={controlSize}
                   shape={shape}
                   active={active}
+                  activeStyle={activeStyle}
                   prefix={prefix ? c.prefix : undefined}
                   leadingElement={resolvedLeading === "icon" ? <RiGlobalLine /> : undefined}
                   leadingTone={leadingTone}
@@ -173,6 +175,7 @@ export function ChipWorkbench() {
                   controlSize={controlSize}
                   shape={shape}
                   active={active}
+                  activeStyle={activeStyle}
                   prefix={prefix ? c.prefix : undefined}
                   leadingElement={resolvedLeading === "icon" ? <RiGlobalLine /> : undefined}
                   leadingTone={leadingTone}
@@ -193,6 +196,11 @@ export function ChipWorkbench() {
                 </ControlSection>
                 <ControlSection title="State">
                   <Toggle label="Active" value={active} onChange={setActive} />
+                  {active ? (
+                    <DependentControlGroup>
+                      <ControlGroup label="Active style">{(["tonal", "fill"] as const).map((item) => <Choice key={item} active={activeStyle === item} onClick={() => setActiveStyle(item)}>{capitalize(item)}</Choice>)}</ControlGroup>
+                    </DependentControlGroup>
+                  ) : null}
                 </ControlSection>
               </div>
               <div className="space-y-4">
