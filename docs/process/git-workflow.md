@@ -24,7 +24,7 @@ main
 | 담당 | 작업 | 예시 branch |
 | --- | --- | --- |
 | 신주희 | Component와 Variant, Token과 UI 개선, Story 작성 | `feature/component-button` |
-| 유진식 | Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill과 Plugin | `feature/figma-mcp-agent` |
+| 유진식 | Figma MCP, Agent Rules, `AGENTS.md`, Skill과 Plugin, `llms.txt` | `feature/figma-mcp-agent` |
 
 같은 파일을 둘이 동시에 고치지 않도록 담당을 나눈 것이다. 상대의 영역을 고쳐야 하면 먼저 알린다.
 
@@ -71,15 +71,14 @@ feat(badge)!: 색을 프리미티브 단계 규칙으로 정리하고 크기·�
 
 ## dev에서 main으로 올릴 때
 
-`dev`에 모인 작업을 통합 검증한 뒤 `main`으로 pull request를 만든다. 검증 항목은 다음 다섯이다.
+`dev`에 모인 작업을 통합 검증한 뒤 `main`으로 pull request를 만든다. 검증 항목은 다음 넷이다.
 
-1. Storybook이 정상으로 뜨는가
-2. 컴포넌트가 서로 충돌하지 않는가
-3. Figma MCP 조회가 정상인가
-4. Storybook MCP 조회가 정상인가
-5. Skill과 Agent가 동작하는가
+1. 컴포넌트가 서로 충돌하지 않는가
+2. Figma MCP 조회가 정상인가
+3. Figma 라이브러리가 카탈로그와 어긋나지 않는가
+4. Skill과 Agent가 동작하는가
 
-**다섯 중 셋은 아직 검증할 대상이 저장소에 없다.** Storybook, Storybook MCP와 `.mcp.json`의 Figma MCP 설정이 없다. 2번은 `pnpm check`가 맡고, 5번의 대상인 Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔다. 5번은 `dev → main` diff에 `.claude/`나 `AGENTS.md`가 있을 때만 유진식이 [ai-environment.md](ai-environment.md)의 「통합 검증 항목 채우기」에 적힌 명령을 돌리고 결과를 pull request 본문에 남긴다. 컴포넌트만 바뀐 pull request는 이 항목을 기다리지 않는다. 대상이 생기는 순서대로 이 목록을 채워 간다.
+Storybook과 Storybook MCP 항목은 걷어냈다 — 그 둘을 두지 않기로 했다(`2026-09-18`, [ai-environment.md](ai-environment.md)). 1번은 `pnpm check`가 맡는다. 3번은 카탈로그(`apps/sandbox/src/app/catalog`)가 바뀐 pull request에서만 보며, 바뀐 뒤 라이브러리를 다시 올리고 Republish 했는지를 본문에 적는다. 4번의 대상인 Skill과 `.claude/settings.json` 공용 권한은 들어왔다. 4번은 `dev → main` diff에 `.claude/`나 `AGENTS.md`가 있을 때만 유진식이 [ai-environment.md](ai-environment.md)의 「통합 검증 항목 채우기」에 적힌 명령을 돌리고 결과를 pull request 본문에 남긴다. 컴포넌트만 바뀐 pull request는 이 항목을 기다리지 않는다. 대상이 생기는 순서대로 이 목록을 채워 간다.
 
 ## 자동 검사가 도는 자리
 

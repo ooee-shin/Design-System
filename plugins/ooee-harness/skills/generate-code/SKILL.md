@@ -53,7 +53,7 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 5. `packages/ui/src/index.ts`. 여기서 export하지 않는 이름은 import하지 않는다.
 6. `${user_config.screens_dir}/../screens.ts`와 `${user_config.screens_dir}/page.tsx`. 등록 형식과 기존 화면의 key를 본다.
 
-Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번 뒤에 같은 컴포넌트를 한 번 더 조회한다. 없으면 건너뛴다. 파일이 원본이고 MCP는 덧붙이는 것이다.
+컴포넌트 문서가 원본이다. 이 저장소에 Storybook·Storybook MCP는 두지 않는다 — Property 목록은 컴포넌트 문서가 코드 문자열 그대로 갖고 있고, 화면으로 보는 자리는 Studio 의 Playground 가 갖는다.
 
 ### 2. 매핑표를 적는다
 

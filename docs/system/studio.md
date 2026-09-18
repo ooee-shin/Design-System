@@ -1,6 +1,6 @@
 # Studio 검수 기준
 
-`apps/studio`는 공용 자산을 화면 맥락에서 구현하고 검수하는 애플리케이션이며 그 자체가 전달 대상 자산이다. 컴포넌트를 찾아보고 확인하는 표준 채널은 최종적으로 Storybook이 맡으며, Studio는 그 기반이 된다. 이 문서는 Studio 화면을 구성하는 기준이므로 Storybook으로 옮길 때도 같은 표기와 순서를 근거로 사용한다.
+`apps/studio`는 공용 자산을 화면 맥락에서 구현하고 검수하는 애플리케이션이며 그 자체가 전달 대상 자산이다. **컴포넌트를 찾아보고 확인하는 표준 채널이 이 Studio다.** Storybook은 두지 않기로 했다(`2026-09-18`, `docs/process/ai-environment.md`). 이 문서는 Studio 화면을 구성하는 기준이다.
 
 구조 용어는 [vocabulary.md](vocabulary.md), Focus 표시 규칙은 [interaction.md](interaction.md)를 따른다.
 
