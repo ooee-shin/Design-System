@@ -318,6 +318,15 @@ writeStep(`${num()}-setup-text-styles.js`, readFileSync(path.join(here, "setup-t
 const loaders = loaderSteps(builder, STEP_LIMIT - 1400);
 loaders.forEach((code, i) => writeStep(`${num()}-load-builder.js`, code, `builder 를 문서에 둔다 (${i + 1}/${loaders.length}). 이후 build 단계가 이것을 꺼내 쓴다`));
 runs.forEach((chunks, i) => writeStep(`${num()}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
+// 카탈로그를 옮길 때만 나온다. 만들어 둔 컴포넌트를 종류별로 Component Set(Variants)으로 묶는다.
+const hasComponents = trees.some(({ tree }) => JSON.stringify(tree).includes('"component"'));
+if (hasComponents) {
+  writeStep(
+    `${num()}-combine-variants.js`,
+    readFileSync(path.join(here, "combine-variants.js"), "utf8").replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(screenName)};`),
+    "컴포넌트를 종류별로 Variants 로 묶는다",
+  );
+}
 writeStep(
   `${num()}-audit.js`,
   readFileSync(path.join(here, "audit.js"), "utf8")

@@ -160,9 +160,22 @@
     // 이름이 맞는 컴포넌트가 Figma 에 있으면 builder 가 프레임 대신 인스턴스를 놓는다.
     const slot = el.getAttribute("data-slot");
     const attr = (name) => el.getAttribute(name);
-    if (slot === "button" && attr("data-variant")) node.inst = `Button/${attr("data-variant")}·${attr("data-tone") || "brand"}·${attr("data-size") || "regular"}`;
-    if (slot === "input-container" && attr("data-variant")) node.inst = `Input/${attr("data-variant")}·${attr("data-size") || "regular"}`;
-    if (slot === "checkbox") node.inst = `Checkbox/rounded·${attr("data-checked") === "true" ? "on" : attr("data-checked") === "indeterminate" ? "indeterminate" : "off"}`;
+    // 이름은 `<Component Set>/<축=값, 축=값>` 꼴이다. 첫 `/` 앞이 Assets 에 서는 세트 이름이고
+    // 뒤가 그 안의 Variant 다. 카탈로그 화면의 data-variant-props 와 글자까지 같아야 한다.
+    if (slot === "button" && attr("data-variant")) {
+      const state = el.hasAttribute("disabled") || attr("data-disabled") === "true" ? "disabled" : "기본";
+      node.inst = `Button/variant=${attr("data-variant")}, tone=${attr("data-tone") || "brand"}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
+    }
+    if (slot === "input-container" && attr("data-variant")) {
+      const input = el.querySelector("input, textarea");
+      const state = input && input.disabled ? "disabled" : input && input.value ? "값 있음" : "비어 있음";
+      node.inst = `Input/variant=${attr("data-variant")}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
+    }
+    if (slot === "checkbox") {
+      const checked = attr("data-checked");
+      const state = attr("data-disabled") === "true" ? "disabled" : checked === "true" ? "on" : checked === "indeterminate" ? "indeterminate" : "off";
+      node.inst = `Checkbox/shape=${attr("data-shape") || "rounded"}, state=${state}`;
+    }
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";
       node.svg = el.outerHTML.replace(/ class="[^"]*"/g, "");
