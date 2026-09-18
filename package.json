@@ -9,11 +9,11 @@
   "scripts": {
     "dev": "pnpm --filter @ooee/studio dev",
     "dev:studio": "pnpm --filter @ooee/studio dev",
-    "build": "pnpm --filter @ooee/studio build",
+    "build": "pnpm --filter @ooee/studio build && pnpm --filter @ooee/sandbox build",
     "lint": "pnpm --filter @ooee/studio lint",
     "typecheck": "pnpm -r typecheck",
     "visual": "node scripts/visual/inspect.mjs",
-    "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts apps/studio/src/lib/*.test.ts scripts/figma/*.test.mjs plugins/ooee-harness/lib/*.test.mjs",
+    "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts apps/studio/src/lib/*.test.ts scripts/figma/*.test.mjs scripts/docs/*.test.mjs plugins/ooee-harness/lib/*.test.mjs",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @ooee/sandbox test && pnpm build"
   },
   "devDependencies": {

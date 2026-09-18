@@ -129,9 +129,7 @@ export function ChipWorkbench() {
     event.currentTarget.scrollLeft = state.startScroll - delta;
   }
 
-  function endDrag(event: React.PointerEvent<HTMLDivElement>) {
-    const state = drag.current;
-    if (!state) return;
+  function endDrag() {
     drag.current = null;
   }
 
