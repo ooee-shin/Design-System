@@ -169,6 +169,7 @@ function SelectBox({
       data-selected={selected ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
       data-readonly={context.readOnly ? "" : undefined}
+      data-trailing-element={context.trailingElement}
       className={cn(
         "relative flex cursor-pointer items-center gap-3 rounded-xl border border-oe-border-secondary bg-transparent px-4 py-3 text-left outline-none transition-[background-color,border-color,box-shadow] duration-150",
         "data-[selected]:border-[var(--brand-alpha-40)] data-[selected]:bg-[var(--brand-alpha-05)] data-[selected]:shadow-[inset_0_0_0_1px_var(--brand-alpha-40)]",

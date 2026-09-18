@@ -182,6 +182,7 @@ function ToggleButton({
       data-slot="toggle-button"
       data-variant={variant}
       data-tone={tone}
+      data-color={color}
       data-size={controlSize}
       className={(state) =>
         cn(toggleButtonVariants({ variant, tone, controlSize, color, pressed: state.pressed, iconOnly }), className)

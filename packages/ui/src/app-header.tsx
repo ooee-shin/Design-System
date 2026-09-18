@@ -176,6 +176,7 @@ function AppHeader({
       ref={ref}
       data-slot="app-header"
       data-title-align={titleAlign}
+      data-sides={leadingElement ? (trailingElement ? "both" : "leading") : trailingElement ? "trailing" : "none"}
       data-stuck={stuck}
       className={cn(
         BASE_CLASS,

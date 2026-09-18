@@ -88,6 +88,7 @@ function Checkbox({ className, indeterminate = false, shape = "rounded", disable
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
+      data-shape={shape}
       indeterminate={shape !== "ghost" ? indeterminate : false}
       disabled={shape !== "ghost" ? disabled : undefined}
       className={cn(

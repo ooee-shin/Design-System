@@ -158,7 +158,7 @@ function Chip({
 
   if (onRemove) {
     return (
-      <span data-slot="chip" data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
+      <span data-slot="chip" data-shape={shape ?? "circle"} data-size={size} data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
         {content}
         <Tooltip.Root>
           <Tooltip.Trigger
@@ -187,6 +187,8 @@ function Chip({
       <button
         type="button"
         data-slot="chip"
+        data-shape={shape ?? "circle"}
+        data-size={size}
         data-active={active ? "" : undefined}
         aria-pressed={active}
         aria-label={accessibleName}
@@ -205,7 +207,7 @@ function Chip({
   }
 
   return (
-    <span data-slot="chip" data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
+    <span data-slot="chip" data-shape={shape ?? "circle"} data-size={size} data-active={active ? "" : undefined} aria-label={accessibleName} className={shared}>
       {content}
     </span>
   )
