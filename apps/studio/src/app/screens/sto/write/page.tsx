@@ -10,7 +10,7 @@ import { AppHeader, Button, Chip, Field, Input, SelectBox, SelectBoxGroup, Texta
 
 import { MobileWebView } from "@/components/screens/screen-chrome";
 
-import { CATEGORIES, CHANNELS, handlingNote, menuLabel, type Channel } from "./write-data";
+import { categoriesOf, CHANNELS, handlingNote, menuLabel, type Channel } from "./write-data";
 
 /**
  * 사장님 앱의 통합 등록 폼이다. 점주의 소리와 지원요청을 한 폼에서 접수한다.
@@ -78,8 +78,9 @@ export default function StoWriteScreenPage() {
               const next = value as Channel;
               if (next === kind) return;
               setKind(next);
-              // 종류를 바꿔도 고른 카테고리는 그대로 둔다. 두 종류가 같은 카테고리 한 벌을 쓰므로
-              // 그 값이 여전히 유효하고, 바꿔 보다가 되돌릴 때 채운 것을 잃지 않는다.
+              // 종류를 바꾸면 고른 카테고리를 비운다. 두 종류가 서로 다른 카테고리 한 벌을 쓰므로
+              // 앞서 고른 값이 새 목록에 없고, 남겨 두면 어느 칩도 눌리지 않은 채로 값만 남는다.
+              setCategory(null);
             }}
           >
             {CHANNELS.map((channel) => (
@@ -121,8 +122,8 @@ export default function StoWriteScreenPage() {
             {/* 바닥 여백은 64px 이다. 등록 버튼이 설 자리를 비워 두는 것이며, 마지막 칸을 채우다가
                 화면 끝에 닿았을 때 아래가 막혀 보이지 않게 한다. */}
             <div className="flex flex-col gap-5 px-oe-padding-default pt-6 pb-16">
-              {/* 카테고리는 열어서 고르지 않고 칩으로 펼쳐 둔다. 목록이 여덟 개로 짧고, 점주가 무엇
-                  중에서 고르는 것인지를 목록을 열어 보지 않고 알아야 어느 것이 자기 건인지 견줄 수
+              {/* 카테고리는 열어서 고르지 않고 칩으로 펼쳐 둔다. 목록이 일곱 개 안팎으로 짧고, 점주가
+                  무엇 중에서 고르는 것인지를 목록을 열어 보지 않고 알아야 어느 것이 자기 건인지 견줄 수
                   있다. 고른 값도 그 자리에 그대로 남아 접힌 Select 처럼 한 칸으로 줄지 않는다.
 
                   고를 수 있는 것은 하나다. 이미 고른 칩을 다시 눌러 비우지는 않는다. 필수 값이라
@@ -133,7 +134,7 @@ export default function StoWriteScreenPage() {
                   파란 기가 세 곳에서 돌아 무엇이 지목된 것인지 색으로 갈리지 않는다. */}
               <Field label="카테고리" group required>
                 <div role="group" className="flex flex-wrap gap-1.5">
-                  {CATEGORIES.map((name) => (
+                  {categoriesOf(kind).map((name) => (
                     <Chip
                       key={name}
                       shape="rounded"
