@@ -22,19 +22,25 @@ import {
   BottomNavigation,
   Button,
   Checkbox,
+  CheckboxField,
   Chip,
   Combobox,
   Field,
   Input,
   InputButton,
+  MessageBubble,
+  MultiCombobox,
+  MultiSelect,
   NotificationBadge,
   NumberInput,
   Radio,
+  RadioField,
   RadioGroup,
   Select,
   SelectBox,
   SelectBoxGroup,
   Switch,
+  SwitchField,
   Textarea,
   ToggleButton,
 } from "@ooee/ui";
@@ -72,7 +78,22 @@ function cross<A extends Record<string, readonly string[]>>(axes: A, node: (prop
  */
 type Impossible = { props: Record<string, string>; why: string };
 
-function Group({ component, items, impossible = [] }: { component: string; items: Item[]; impossible?: Impossible[] }) {
+function Group({
+  component,
+  items,
+  impossible = [],
+  surface,
+}: {
+  component: string;
+  items: Item[];
+  impossible?: Impossible[];
+  /**
+   * 항목을 올려 둘 바탕이다. 컴포넌트가 **바탕과 같은 색을 스스로 그리는** 자리에만 준다.
+   * NotificationBadge 의 테두리 링이 `oe-background-primary` 인데 이 화면의 바탕도 같아서,
+   * 그냥 두면 링이 있는데 없는 것으로 캡처된다. Studio 플레이그라운드도 같은 이유로 회색 위에 올린다.
+   */
+  surface?: "secondary";
+}) {
   // 한 Component Set 안의 Variant 는 **모두 같은 축**을 가져야 한다. 하나라도 다르면 Figma 가 묶지 못한다.
   // 이 화면은 미리 그려지므로 여기서 멈추면 빌드가 실패해 바로 드러난다.
   const axes = Object.keys(items[0].props).join(",");
@@ -100,7 +121,7 @@ function Group({ component, items, impossible = [] }: { component: string; items
   return (
     <section className="flex flex-col gap-3" data-component-set={component} data-impossible={JSON.stringify(impossible.map((skip) => variantName(skip.props)))}>
       <h2 className="text-oe-label font-medium text-oe-foreground-secondary">{component}</h2>
-      <div className="flex flex-wrap items-start gap-4">
+      <div className={`flex flex-wrap items-start gap-4${surface === "secondary" ? " rounded-xl bg-oe-background-secondary p-4" : ""}`}>
         {items.map((item) => (
           <div key={variantName(item.props)} className="flex flex-col gap-1" data-component={component} data-variant-props={variantName(item.props)}>
             {item.node}
@@ -131,9 +152,10 @@ const CHIP_STATES = ["기본", "active"] as const;
 const CHECKBOX_SHAPES = ["square", "rounded", "ghost"] as const;
 const CHECK_STATES = ["off", "on", "indeterminate", "disabled"] as const;
 // Switch·Radio 처럼 일부 선택이 없는 컨트롤이 쓴다.
-const TOGGLE_STATES = ["off", "on", "disabled"] as const;
+// 꺼진 채 비활성과 켜진 채 비활성은 색이 다르다(radio.tsx 의 data-[disabled]:data-[checked]: 전용 색).
+const TOGGLE_STATES = ["off", "on", "disabled-off", "disabled-on"] as const;
 // 값을 받는 컨트롤의 상태다. 비었는지 찼는지가 테두리·글자색을 가른다.
-const FIELD_STATES = ["비어 있음", "값 있음", "disabled"] as const;
+const FIELD_STATES = ["비어 있음", "값 있음", "invalid", "disabled"] as const;
 const FIELD_KINDS = ["기본", "required", "helper", "error"] as const;
 const NUMBER_CONTROLS = ["trailing", "split", "없음"] as const;
 const TOGGLE_VARIANTS = ["ghost", "tonal"] as const;
@@ -147,7 +169,8 @@ const PRESS_STATES = ["기본", "pressed"] as const;
 const COUNT_STATES = ["없음", "있음"] as const;
 const NOTIFICATION_SHAPES = ["dot", "count"] as const;
 const NOTIFICATION_TONES = ["accent", "neutral"] as const;
-const OVERFLOW_STATES = ["아님", "넘침"] as const;
+// 99+ 는 세 글자, 999+ 는 네 글자라 폭이 다르다. 폭을 그 둘로 고정하는 것이 이 컴포넌트 규칙이다.
+const OVERFLOW_STATES = ["아님", "99+", "999+"] as const;
 const SELECTION_MODES = ["single", "multiple"] as const;
 const SELECT_BOX_TRAILING = ["radio", "checkbox", "none"] as const;
 const TITLE_ALIGNS = ["center", "start"] as const;
@@ -155,6 +178,11 @@ const TITLE_ALIGNS = ["center", "start"] as const;
 const HEADER_SIDES = ["없음", "왼쪽", "양옆"] as const;
 const NAV_VARIANTS = ["bar", "floating"] as const;
 const LABEL_STATES = ["없음", "있음"] as const;
+// Field 꼴 컨트롤이 설명을 함께 보일 수 있다. 설명이 붙으면 높이가 달라진다.
+const DESCRIPTIONS = ["없음", "있음"] as const;
+const LABEL_POSITIONS = ["right", "left"] as const;
+const MESSAGE_DIRECTIONS = ["incoming", "outgoing"] as const;
+const MESSAGE_STATES = ["기본", "sending", "sent", "read", "failed", "deleted"] as const;
 const SELECT_OPTIONS = [
   { value: "a", label: "첫째" },
   { value: "b", label: "둘째" },
@@ -191,14 +219,40 @@ export default function CatalogPage() {
             placeholder="입력"
             defaultValue={state === "값 있음" ? "입력한 값" : undefined}
             disabled={state === "disabled"}
+            aria-invalid={state === "invalid" || undefined}
           />
         ))}
       />
 
       <Group
         component="Select"
-        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES }, ({ variant, controlSize }) => (
-          <Select variant={variant} controlSize={controlSize} aria-label={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <Select
+            variant={variant}
+            controlSize={controlSize}
+            ariaLabel={`${variant} ${controlSize} ${state}`}
+            placeholder="선택"
+            options={SELECT_OPTIONS}
+            defaultValue={state === "값 있음" ? "a" : undefined}
+            disabled={state === "disabled"}
+            invalid={state === "invalid"}
+          />
+        ))}
+      />
+
+      <Group
+        component="MultiSelect"
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <MultiSelect
+            variant={variant}
+            controlSize={controlSize}
+            ariaLabel={`여러 개 ${variant} ${controlSize} ${state}`}
+            placeholder="선택"
+            options={SELECT_OPTIONS}
+            defaultValue={state === "값 있음" ? ["a"] : undefined}
+            disabled={state === "disabled"}
+            invalid={state === "invalid"}
+          />
         ))}
       />
 
@@ -208,6 +262,21 @@ export default function CatalogPage() {
           <Checkbox
             shape={shape}
             aria-label={`${shape} ${state}`}
+            defaultChecked={state === "on"}
+            indeterminate={state === "indeterminate"}
+            disabled={state === "disabled"}
+          />
+        ))}
+      />
+
+      {/* 라벨이 붙으면 배치가 달라져 홑 Checkbox 와 별개 세트다. 화면이 실제로 쓰는 쪽은 이쪽이다. */}
+      <Group
+        component="CheckboxField"
+        items={cross({ shape: CHECKBOX_SHAPES, state: CHECK_STATES, description: DESCRIPTIONS }, ({ shape, state, description }) => (
+          <CheckboxField
+            label="항목"
+            bottomDescription={description === "있음" ? "설명이 붙는다" : undefined}
+            shape={shape}
             defaultChecked={state === "on"}
             indeterminate={state === "indeterminate"}
             disabled={state === "disabled"}
@@ -236,15 +305,47 @@ export default function CatalogPage() {
       <Group
         component="Switch"
         items={cross({ controlSize: SWITCH_SIZES, state: TOGGLE_STATES }, ({ controlSize, state }) => (
-          <Switch controlSize={controlSize} aria-label={`${controlSize} ${state}`} defaultChecked={state === "on"} disabled={state === "disabled"} />
+          <Switch
+            controlSize={controlSize}
+            aria-label={`${controlSize} ${state}`}
+            defaultChecked={state === "on" || state === "disabled-on"}
+            disabled={state.startsWith("disabled")}
+          />
+        ))}
+      />
+
+      <Group
+        component="SwitchField"
+        items={cross({ controlSize: SWITCH_SIZES, state: TOGGLE_STATES, labelPosition: LABEL_POSITIONS }, ({ controlSize, state, labelPosition }) => (
+          <SwitchField
+            label="설정"
+            controlSize={controlSize}
+            labelPosition={labelPosition}
+            defaultChecked={state === "on" || state === "disabled-on"}
+            disabled={state.startsWith("disabled")}
+          />
         ))}
       />
 
       <Group
         component="Radio"
         items={cross({ state: TOGGLE_STATES }, ({ state }) => (
-          <RadioGroup defaultValue={state === "on" ? "a" : "b"}>
-            <Radio value="a" aria-label={state} disabled={state === "disabled"} />
+          <RadioGroup defaultValue={state === "on" || state === "disabled-on" ? "a" : "b"}>
+            <Radio value="a" aria-label={state} disabled={state.startsWith("disabled")} />
+          </RadioGroup>
+        ))}
+      />
+
+      <Group
+        component="RadioField"
+        items={cross({ state: TOGGLE_STATES, description: DESCRIPTIONS }, ({ state, description }) => (
+          <RadioGroup defaultValue={state === "on" || state === "disabled-on" ? "a" : "b"}>
+            <RadioField
+              value="a"
+              label="항목"
+              bottomDescription={description === "있음" ? "설명이 붙는다" : undefined}
+              disabled={state.startsWith("disabled")}
+            />
           </RadioGroup>
         ))}
       />
@@ -258,6 +359,7 @@ export default function CatalogPage() {
             placeholder="입력"
             defaultValue={state === "값 있음" ? "입력한 내용" : undefined}
             disabled={state === "disabled"}
+            aria-invalid={state === "invalid" || undefined}
           />
         ))}
       />
@@ -272,6 +374,7 @@ export default function CatalogPage() {
             placeholder="선택"
             value={state === "값 있음" ? "2026-09-17" : undefined}
             disabled={state === "disabled"}
+            aria-invalid={state === "invalid" || undefined}
           />
         ))}
       />
@@ -292,8 +395,54 @@ export default function CatalogPage() {
 
       <Group
         component="Combobox"
-        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES }, ({ variant, controlSize }) => (
-          <Combobox variant={variant} controlSize={controlSize} ariaLabel={`${variant} ${controlSize}`} placeholder="선택" options={SELECT_OPTIONS} />
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <Combobox
+            variant={variant}
+            controlSize={controlSize}
+            ariaLabel={`${variant} ${controlSize} ${state}`}
+            placeholder="선택"
+            options={SELECT_OPTIONS}
+            defaultValue={state === "값 있음" ? "a" : undefined}
+            disabled={state === "disabled"}
+            invalid={state === "invalid"}
+          />
+        ))}
+      />
+
+      <Group
+        component="MultiCombobox"
+        items={cross({ variant: INPUT_VARIANTS, controlSize: INPUT_SIZES, state: FIELD_STATES }, ({ variant, controlSize, state }) => (
+          <MultiCombobox
+            variant={variant}
+            controlSize={controlSize}
+            ariaLabel={`여러 개 ${variant} ${controlSize} ${state}`}
+            placeholder="선택"
+            options={SELECT_OPTIONS}
+            defaultValue={state === "값 있음" ? ["a"] : undefined}
+            disabled={state === "disabled"}
+            invalid={state === "invalid"}
+          />
+        ))}
+      />
+
+      {/* MessageBubble 은 `data-slot` 이 없어 화면에서 되짚지 못한다(figma-component-map.md).
+          카탈로그는 감싸개의 `data-component` 로 표시하므로 Component Set 은 만들어진다. */}
+      <Group
+        component="MessageBubble"
+        items={cross({ direction: MESSAGE_DIRECTIONS, state: MESSAGE_STATES }, ({ direction, state }) => (
+          <div className="w-[360px]">
+            <MessageBubble
+              direction={direction}
+              author="김블루"
+              initials="김"
+              time="오후 3:08"
+              deliveryState={state === "기본" || state === "deleted" ? undefined : state}
+              deleted={state === "deleted"}
+              deletedLabel="삭제된 메시지입니다"
+            >
+              메시지 내용입니다
+            </MessageBubble>
+          </div>
         ))}
       />
 
@@ -322,15 +471,22 @@ export default function CatalogPage() {
 
       <Group
         component="NotificationBadge"
+        surface="secondary"
         items={cross({ shape: NOTIFICATION_SHAPES, tone: NOTIFICATION_TONES, overflow: OVERFLOW_STATES }, ({ shape, tone, overflow }) =>
-          shape === "dot" ? <NotificationBadge /> : <NotificationBadge count={overflow === "넘침" ? 120 : 5} tone={tone} />,
+          shape === "dot" ? (
+            <NotificationBadge />
+          ) : (
+            <NotificationBadge count={overflow === "아님" ? 5 : overflow === "99+" ? 120 : 1200} max={overflow === "999+" ? 999 : undefined} tone={tone} />
+          ),
         ).filter((item) => item.props.shape !== "dot" || (item.props.tone === "accent" && item.props.overflow === "아님"))}
         // 점 형태는 수를 보이지 않으므로 타입이 `tone` 과 `max` 를 받지 않는다(notification-badge.tsx 의 갈린 타입).
         // 곱집합으로 만들 수 없는 것이 아니라 컴포넌트가 만들 수 없는 조합이다.
         impossible={[
           { props: { shape: "dot", tone: "neutral", overflow: "아님" }, why: "점 형태는 tone 을 받지 않는다" },
-          { props: { shape: "dot", tone: "accent", overflow: "넘침" }, why: "점 형태는 수를 보이지 않아 넘칠 것이 없다" },
-          { props: { shape: "dot", tone: "neutral", overflow: "넘침" }, why: "점 형태는 tone 도 넘침도 없다" },
+          { props: { shape: "dot", tone: "accent", overflow: "99+" }, why: "점 형태는 수를 보이지 않아 넘칠 것이 없다" },
+          { props: { shape: "dot", tone: "neutral", overflow: "99+" }, why: "점 형태는 tone 도 넘침도 없다" },
+          { props: { shape: "dot", tone: "accent", overflow: "999+" }, why: "점 형태는 수를 보이지 않아 넘칠 것이 없다" },
+          { props: { shape: "dot", tone: "neutral", overflow: "999+" }, why: "점 형태는 tone 도 넘침도 없다" },
         ]}
       />
 
