@@ -355,7 +355,11 @@
 
 14. **ToggleButton 의 custom tone 색이 토큰이 아니라 날 hex 다.** 즐겨찾기·찜의 색이 `toggle-button.tsx` 의 `CUSTOM_ON_CLASS` 에 `bg-[#fdf5e2]`·`text-[#dfa010]` 처럼 적혀 있다. 그래서 Figma 로 옮길 때 이 칠만 변수에 묶이지 않았다. 지금은 값 그대로를 이름으로 삼은 `hex-fdf5e2` primitive 로 올려 두었고, 변수 설명에도 「아직 토큰이 아니다」라고 적었다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다. (`2026-09-18`)
 
-15. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Studio 의 메뉴 구조와 함께 정하면 두 번 바꾸지 않는다.
+16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠해 Figma 로 못 옮긴다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 19 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
+
+    고치는 길은 둘이다. ① `packages/ui` 가 그 색을 토큰 class 로 칠한다(`--oe-message-*` 로 갈아 끼우는 길을 남기려면 그 자리만 CSS 변수로 두고 기본값은 토큰 class 로). ② `dom-extract.js` 가 `.oe-*` class 의 CSS 규칙을 읽어 `var(--oe-…)` 참조를 후보로 삼는다. ①이 다른 컴포넌트와 같아지는 길이고 ②는 이 컴포넌트 하나를 위해 추출기에 규칙을 더하는 길이다. 어느 쪽인지는 디자인 시스템이 정한다. 같은 자리에 `data-slot` 도 없어(`figma-component-map.md:49`) 되짚기도 안 되므로 함께 보면 좋다.
+
+17. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Studio 의 메뉴 구조와 함께 정하면 두 번 바꾸지 않는다.
 
 `Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열네 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 

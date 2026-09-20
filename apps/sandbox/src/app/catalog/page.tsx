@@ -28,7 +28,6 @@ import {
   Field,
   Input,
   InputButton,
-  MessageBubble,
   MultiCombobox,
   MultiSelect,
   NotificationBadge,
@@ -425,26 +424,11 @@ export default function CatalogPage() {
         ))}
       />
 
-      {/* MessageBubble 은 `data-slot` 이 없어 화면에서 되짚지 못한다(figma-component-map.md).
-          카탈로그는 감싸개의 `data-component` 로 표시하므로 Component Set 은 만들어진다. */}
-      <Group
-        component="MessageBubble"
-        items={cross({ direction: MESSAGE_DIRECTIONS, state: MESSAGE_STATES }, ({ direction, state }) => (
-          <div className="w-[360px]">
-            <MessageBubble
-              direction={direction}
-              author="김블루"
-              initials="김"
-              time="오후 3:08"
-              deliveryState={state === "기본" || state === "deleted" ? undefined : state}
-              deleted={state === "deleted"}
-              deletedLabel="삭제된 메시지입니다"
-            >
-              메시지 내용입니다
-            </MessageBubble>
-          </div>
-        ))}
-      />
+      {/* MessageBubble 은 카탈로그에 올리지 않는다. 이 컴포넌트만 색을 Tailwind 토큰 class 가 아니라
+          손으로 쓴 CSS class(`.oe-message-bubble-outgoing` 등, packages/ui/src/styles.css:61~75)로 칠한다.
+          dom-extract 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고,
+          올리면 칠 25 개가 변수에 묶이지 않은 채로 들어간다. 까닭과 다음 수는
+          docs/process/working-context.md 에 적어 두었다. */}
 
       <Group
         component="ToggleButton"
