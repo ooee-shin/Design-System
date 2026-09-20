@@ -56,7 +56,13 @@ export const screenRoots: ScreenRoot[] = [
       { key: "login", name: "로그인", href: "/screens/sto/login" },
       { key: "voice", name: "점주의 소리", scope: "목록·상세, 전환된 건 표시" },
       { key: "support-request", name: "지원요청", scope: "목록·상세 탭(요청 내용·채팅)" },
-      { key: "write", name: "통합 작성 폼", scope: "종류 선택·카테고리·제목·내용·첨부, 불일치 안내와 확인 시트, 접수 완료" },
+      {
+        key: "write",
+        name: "통합 작성 폼",
+        scope: "종류 선택·카테고리·제목·내용·첨부, 불일치 안내와 확인 시트, 접수 완료",
+        href: "/screens/sto/write",
+        inProgress: true,
+      },
     ],
   },
   {

@@ -4,7 +4,7 @@ export { Badge, BADGE_COLORS, badgeVariants, type BadgeColor, type BadgeProps, t
 export { NotificationBadge, type NotificationBadgeMax, type NotificationBadgeProps, type NotificationBadgeTone } from "./notification-badge";
 export { Button, BUTTON_COLORS, buttonVariants, type ButtonColor, type ButtonLayout, type ButtonProps, type ButtonSize, type ButtonTone, type ButtonVariant } from "./button";
 export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTriggerVariants, type ComboboxOption, type ComboboxProps, type MultiComboboxProps } from "./combobox";
-export { Chip, type ChipProps, type ChipShape, type ChipSize, type ChipTone } from "./chip";
+export { Chip, type ChipActiveStyle, type ChipProps, type ChipShape, type ChipSize, type ChipTone } from "./chip";
 export { Checkbox, CheckboxField, CheckboxIndicator, checkboxIndicatorVariants, checkboxVariants, type CheckboxFieldProps, type CheckboxIndicatorProps, type CheckboxProps } from "./checkbox";
 export { Field, type FieldCharacterCount, type FieldProps } from "./field";
 export { Input, inputContainerVariants, type InputProps } from "./input";

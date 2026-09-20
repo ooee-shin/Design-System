@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start --port 3001",
     "test": "node --import tsx --test \"src/**/*.test.tsx\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@ooee/fonts": "workspace:*",

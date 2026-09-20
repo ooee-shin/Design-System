@@ -170,8 +170,8 @@ function SelectBox({
       data-disabled={isDisabled ? "" : undefined}
       data-readonly={context.readOnly ? "" : undefined}
       className={cn(
-        "relative flex cursor-pointer items-center gap-3 rounded-xl border border-oe-border-secondary bg-transparent px-4 py-3 text-left outline-none transition-[background-color,border-color,box-shadow] duration-150",
-        "data-[selected]:border-[var(--brand-alpha-40)] data-[selected]:bg-[var(--brand-alpha-05)] data-[selected]:shadow-[inset_0_0_0_1px_var(--brand-alpha-40)]",
+        "relative flex cursor-pointer items-center gap-3 rounded-lg border border-oe-border-secondary bg-transparent px-4 pt-3 pb-3.5 text-left outline-none transition-[background-color,border-color,box-shadow] duration-150",
+        "data-[selected]:border-oe-focus-ring data-[selected]:bg-[var(--brand-alpha-05)] data-[selected]:shadow-[inset_0_0_0_1px_var(--oe-focus-ring)]",
         "has-[:focus-visible]:!border-oe-focus-ring has-[:focus-visible]:!shadow-[inset_0_0_0_1px_var(--oe-focus-ring)]",
         "hover:bg-oe-interaction-hover-subtle data-[selected]:hover:bg-[var(--brand-alpha-05)]",
         "active:bg-oe-interaction-hover data-[selected]:active:bg-[var(--brand-alpha-05)]",
@@ -185,8 +185,8 @@ function SelectBox({
       <span className={cn("flex min-w-0 flex-1", context.stackLeadingElement ? "flex-col items-start gap-2" : "items-center gap-3")}>
         {leadingElement ? <span data-slot="select-box-leading-element" className="flex shrink-0 items-center text-oe-foreground-tertiary">{leadingElement}</span> : null}
         <div data-slot="select-box-content" className="min-w-0 flex-1">
-          <span className={cn("block text-sm font-medium leading-5 text-oe-foreground-primary", isDisabled && "text-oe-foreground-disabled")}>{title}</span>
-          {description ? <span className={cn("mt-0.5 block text-xs leading-5 text-oe-foreground-tertiary", isDisabled && "text-oe-foreground-disabled")}>{description}</span> : null}
+          <span className={cn("block text-base font-medium text-oe-foreground-primary", isDisabled && "text-oe-foreground-disabled")}>{title}</span>
+          {description ? <span className={cn("mt-0.5 block text-[length:var(--text-oe-label)] leading-[var(--text-oe-label--line-height)] text-oe-foreground-tertiary", isDisabled && "text-oe-foreground-disabled")}>{description}</span> : null}
         </div>
       </span>
       <span data-slot="select-box-trailing-element" className={cn("relative flex size-5 shrink-0 items-center justify-center", visuallyHiddenControl && "absolute left-3 top-3 size-px")}>
