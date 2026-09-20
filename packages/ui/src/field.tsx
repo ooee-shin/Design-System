@@ -98,11 +98,6 @@ function Field({
 
   const header = (
     <div data-slot="field-header" className="mb-0.5 flex min-w-0 items-center gap-0.5">
-      {required ? (
-        <span aria-hidden="true" data-slot="field-requirement" className={cn("shrink-0 text-sm leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-danger-foreground-secondary")}>
-          *
-        </span>
-      ) : null}
       {group ? (
         <span id={labelId} data-slot="field-label" className={cn("min-w-0 truncate text-sm font-medium leading-5", labelToneClassName)}>
           {label}
@@ -112,6 +107,13 @@ function Field({
           {label}
         </label>
       )}
+      {/* 필수 표시는 Label 뒤에 붙는다. 앞에 두면 줄마다 `*` 가 먼저 서서 칸 이름이 한 칸씩 밀려
+          시작하고, 필수가 아닌 칸과 이름의 시작점이 어긋난다. */}
+      {required ? (
+        <span aria-hidden="true" data-slot="field-requirement" className={cn("shrink-0 text-sm leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-danger-foreground-secondary")}>
+          *
+        </span>
+      ) : null}
       {rightDescription ? (
         <span data-slot="field-right-description" className={cn("ml-1.5 min-w-0 truncate text-xs leading-5", disabled ? "text-oe-foreground-disabled" : "text-oe-foreground-tertiary")}>
           {rightDescription}

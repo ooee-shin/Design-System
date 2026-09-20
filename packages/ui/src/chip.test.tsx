@@ -184,3 +184,54 @@ test("an icon only chip warns when it has no accessible name", () => {
   const chipWarnings = warnings.filter((text) => text.includes("ariaLabel"))
   assert.equal(chipWarnings.length, 1, `경고가 한 번만 나와야 한다: ${JSON.stringify(warnings)}`)
 })
+
+// chip.md 는 Active 의 채움을 둘로 두고, `fill` 이 어두운 Neutral surface 와 inverse 글자를
+// 쓴다고 정한다. brand 색을 쓰는 요소가 여럿인 화면에서 고른 값을 색으로 가르기 위한 축이므로,
+// 기본값이 종전의 `tonal` 로 남아 있는지와 `fill` 이 brand 를 걷어내는지를 함께 검사한다.
+test("the active chip tints itself with brand by default", () => {
+  const view = render(<Chip active>Label</Chip>)
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("bg-[var(--brand-alpha-05)]"))
+  assert.ok(chip?.className.includes("text-oe-brand-foreground-primary"))
+})
+
+test("the filled active chip uses the bold neutral surface instead of brand", () => {
+  const view = render(
+    <Chip active activeStyle="fill">
+      Label
+    </Chip>,
+  )
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(!chip?.className.includes("brand-alpha"))
+})
+
+// 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. 채움마다 자기 배경을 붙들어야
+// 포인터를 얹었을 때 다른 채움의 색이 돌아오지 않는다.
+test("the filled active chip holds its surface on hover and press", () => {
+  const view = render(
+    <Chip active activeStyle="fill" onClick={() => {}}>
+      Label
+    </Chip>,
+  )
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("hover:bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("active:bg-oe-background-bold-primary"))
+})
+
+// 아이콘 위계는 채움 안에서 유지된다. `secondary` 는 Label 과 같은 위계, `tertiary` 는 한 단계
+// 옅은 위계이며, `fill` 에서는 그 관계를 inverse 계열로 지킨다.
+test("the filled active chip keeps the icon hierarchy in the inverse family", () => {
+  const view = render(
+    <Chip active activeStyle="fill" leadingElement={<svg />} trailingElement={<svg />} trailingTone="tertiary">
+      Label
+    </Chip>,
+  )
+
+  assert.ok(view.container.querySelector("[data-slot=chip-leading-element]")?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(view.container.querySelector("[data-slot=chip-trailing-element]")?.className.includes("text-oe-foreground-inverse-secondary"))
+})
