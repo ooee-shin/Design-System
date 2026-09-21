@@ -131,7 +131,7 @@ test("loader 가 실은 코드를 그대로 되돌려 준다", () => {
   assert.equal(fnv(joined), fnv(source));
 });
 
-test("인스턴스 자리는 안쪽을 글자만 남기고 접는다", () => {
+test("인스턴스 자리도 안쪽을 그대로 남긴다", () => {
   const tree = {
     t: "f",
     k: [
@@ -157,9 +157,12 @@ test("인스턴스 자리는 안쪽을 글자만 남기고 접는다", () => {
   };
   foldInstances(tree);
   const folded = tree.k[0];
-  assert.deepEqual(folded.k, [{ t: "x", s: "아이디" }]);
-  // 인스턴스 경로가 읽는 자리만 남는다. 칠·테두리·모서리·오토 레이아웃은 컴포넌트가 가진 값이다.
-  assert.deepEqual(Object.keys(folded).sort(), ["h", "inst", "k", "n", "path", "t", "w", "x", "y"]);
+  // 인스턴스가 되면 안쪽은 쓰이지 않지만, 컴포넌트가 없거나 글자 자리 수가 어긋나 포기하면
+  // builder 가 보통 프레임으로 내려가 이 값들로 그린다. 그래서 버리지 않는다.
+  assert.equal(folded.inst, "Input/outline·regular");
+  assert.equal(folded.bg.token, "oe-background-primary");
+  assert.equal(folded.k[0].n, "input-leading");
+  assert.equal(folded.k[1].n, "칸막이");
 });
 
 test("접은 뒤에도 builder 의 textsOf 가 세는 글자 수와 차례가 같다", () => {
@@ -193,12 +196,13 @@ test("접어서 남기는 자리가 builder 의 인스턴스 경로가 읽는 �
   }
 });
 
-test("글자가 없는 인스턴스도 접는다", () => {
+test("글자가 없는 인스턴스도 안쪽과 칠을 잃지 않는다", () => {
+  // builder 가 인스턴스를 포기하고 프레임으로 내려갈 수 있어야 하므로 그릴 것을 남긴다.
   const node = { t: "f", n: "checkbox", w: 16, h: 16, inst: "Checkbox/rounded·on", bg: { token: "oe-brand-background-bold-primary" }, k: [{ t: "f", n: "checkbox-indicator", k: [{ t: "svg", n: "RiCheckLine" }] }] };
   foldInstances(node);
-  assert.equal("k" in node, false);
-  assert.equal("bg" in node, false);
   assert.equal(node.inst, "Checkbox/rounded·on");
+  assert.equal(node.bg.token, "oe-brand-background-bold-primary");
+  assert.equal(node.k[0].n, "checkbox-indicator");
 });
 
 test("인스턴스가 아닌 자리는 그대로 둔다", () => {
@@ -208,9 +212,10 @@ test("인스턴스가 아닌 자리는 그대로 둔다", () => {
   assert.deepEqual(tree, copy);
 });
 
-test("인스턴스 안의 인스턴스는 따로 접지 않는다", () => {
-  // 바깥이 이미 글자만 남기므로 안쪽 inst 는 payload 에 남지 않는다.
+test("인스턴스 안의 인스턴스도 그대로 남는다", () => {
+  // 바깥이 인스턴스가 되면 안쪽은 쓰이지 않지만, 바깥이 포기하면 안쪽이 다시 기회를 갖는다.
   const node = { t: "f", inst: "Field/기본", k: [{ t: "f", inst: "Input/outline·regular", k: [{ t: "x", s: "값" }] }] };
   foldInstances(node);
-  assert.deepEqual(node.k, [{ t: "x", s: "값" }]);
+  assert.equal(node.k[0].inst, "Input/outline·regular");
+  assert.deepEqual(node.k[0].k, [{ t: "x", s: "값" }]);
 });

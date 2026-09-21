@@ -214,6 +214,10 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 **하네스는 `docs/system/` 없이 성립하지 않는다.** ①의 디자인 시스템 검색과 `/review-design`의 검사 항목이 모두 그 파일들을 원본으로 읽는다. 그래서 Plugin을 설치하는 저장소에는 전달 자산이 함께 있거나 「아직 정하지 않은 것」의 조회 endpoint가 있어야 한다.
 
+## 새 컴포넌트를 만들 때
+
+`@ooee/ui` 에 없는 컴포넌트를 만드는 절차는 [new-component.md](new-component.md) 가 갖는다. 채워야 하는 다섯 자리(구현·export·문서·등록·Playground 와 카탈로그 축)와 shadcn 에서 옮겨 쓰는 방식, Playground 양식이 거기 있다.
+
 ## 스파이크 결과
 
 끝난 날짜 순으로 쌓는다.

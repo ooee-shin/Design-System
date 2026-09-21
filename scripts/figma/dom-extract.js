@@ -42,6 +42,16 @@
       const ref = parseRef(prop, parts.at(-1));
       if (ref) out.push({ ...ref, v: variants.length ? 1 : 0 });
     }
+    // Tailwind 의 `divide-*` 는 **부모에 붙고 자식의 테두리를 칠한다**(`& > * + *`). 그래서 자식의
+    // class 만 보면 후보가 하나도 잡히지 않는다. 표가 칸을 가르는 흔한 방법이라 그냥 두면 표 한 장이
+    // 통째로 변수에 묶이지 않는다(스케줄 화면에서 56 건). 자기 class 에서 못 찾았을 때만 부모를 본다.
+    if (prop === "border" && !out.length && el.parentElement) {
+      for (const c of classList(el.parentElement)) {
+        if (c.includes(":")) continue;
+        const ref = parseRef("border", c.replace(/^divide-/, "border-"));
+        if (ref && !/^divide-[xy]$/.test(c)) out.push({ ...ref, v: 0 });
+      }
+    }
     return out;
   }
   // 글자·아이콘 색은 가까운 조상부터 후보를 모은다.
