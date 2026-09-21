@@ -45,6 +45,14 @@ type SelectProps = VariantProps<typeof selectionTriggerVariants> &
     name?: string
     className?: string
     leadingElement?: React.ReactNode
+    /**
+     * 목록에서 고른 값에 체크를 찍을지.
+     *
+     * `none` 은 Trigger 가 고른 값을 그대로 보여 주고 목록이 짧아 무엇이 켜져 있는지 한눈에
+     * 보이는 자리에 쓴다. 정렬 차례처럼 값이 둘뿐인 목록이 그렇다. 목록이 길거나 값이 서로 비슷해
+     * Trigger 만으로 가려지지 않으면 기본값을 그대로 둔다.
+     */
+    selectedIndicator?: "check" | "none"
   } & SelectItemsProps
 
 type MultiSelectProps = Omit<SelectProps, "value" | "defaultValue" | "onValueChange"> & {
@@ -77,6 +85,7 @@ function Select({
   fixedWidth,
   className,
   leadingElement,
+  selectedIndicator = "check",
 }: SelectProps) {
   const resolvedOptions = options ?? groups?.flatMap((group) => group.options) ?? []
   const paddingX = optionPaddingX[controlSize ?? "regular"]
@@ -117,17 +126,17 @@ function Select({
 
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner align="start" sideOffset={4} alignItemWithTrigger={false} className="z-50">
-          <SelectPrimitive.Popup className="w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
+          <SelectPrimitive.Popup className="w-max min-w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
             <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto p-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
               {groups ? groups.map((group, groupIndex) => (
                 <React.Fragment key={group.label}>
                   {groupIndex > 0 ? <SelectPrimitive.Separator className="my-1.5 h-px bg-oe-border-secondary" /> : null}
                   <SelectPrimitive.Group>
                     <SelectPrimitive.GroupLabel className={cn("py-1.5 text-[11px] font-medium text-oe-foreground-tertiary", paddingX)}>{group.label}</SelectPrimitive.GroupLabel>
-                    {group.options.map((option) => renderOption(option, paddingX))}
+                    {group.options.map((option) => renderOption(option, paddingX, selectedIndicator))}
                   </SelectPrimitive.Group>
                 </React.Fragment>
-              )) : resolvedOptions.map((option) => renderOption(option, paddingX))}
+              )) : resolvedOptions.map((option) => renderOption(option, paddingX, selectedIndicator))}
             </SelectPrimitive.List>
           </SelectPrimitive.Popup>
         </SelectPrimitive.Positioner>
@@ -206,7 +215,7 @@ function MultiSelect({
 
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner align="start" sideOffset={4} alignItemWithTrigger={false} className="z-50">
-          <SelectPrimitive.Popup className="w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
+          <SelectPrimitive.Popup className="w-max min-w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
             <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto p-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
               {groups ? groups.map((group, groupIndex) => (
                 <React.Fragment key={group.label}>
@@ -228,7 +237,7 @@ function MultiSelect({
 /** Trigger 의 좌우 여백에서 List 의 `px-1` 을 뺀 값이다. Trigger 와 Popup 의 Leading 열 시작점을 맞춘다. */
 const optionPaddingX = { small: "px-1.5", regular: "px-2", large: "px-2", xlarge: "px-3" } as const
 
-function renderOption(option: SelectOption, paddingX: string) {
+function renderOption(option: SelectOption, paddingX: string, selectedIndicator: "check" | "none" = "check") {
   return (
     <SelectPrimitive.Item
       key={option.value}
@@ -241,9 +250,11 @@ function renderOption(option: SelectOption, paddingX: string) {
         <span className="block truncate">{option.label}</span>
         {option.description ? <span className="mt-0.5 block text-xs leading-4 text-oe-foreground-tertiary group-data-[disabled]/option:text-oe-foreground-disabled">{option.description}</span> : null}
       </SelectPrimitive.ItemText>
-      <SelectPrimitive.ItemIndicator className="relative flex size-4 shrink-0 items-center justify-center self-start mt-0.5">
-        <RiCheckLine className="size-4 text-oe-brand-foreground-primary" aria-hidden="true" />
-      </SelectPrimitive.ItemIndicator>
+      {selectedIndicator === "none" ? null : (
+        <SelectPrimitive.ItemIndicator className="relative flex size-4 shrink-0 items-center justify-center self-start mt-0.5">
+          <RiCheckLine className="size-4 text-oe-brand-foreground-primary" aria-hidden="true" />
+        </SelectPrimitive.ItemIndicator>
+      )}
     </SelectPrimitive.Item>
   )
 }

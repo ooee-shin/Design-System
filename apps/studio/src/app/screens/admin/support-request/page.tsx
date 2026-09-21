@@ -33,6 +33,7 @@ import {
   PERIOD_OPTIONS,
   REQUESTS,
   SORT_OPTIONS,
+  sortRequests,
   STATUS,
   STATUS_OPTIONS,
   SV_OPTIONS,
@@ -62,8 +63,14 @@ export default function AdminSupportRequestScreenPage() {
   // 머리에 둔다. 「조회」를 기다리지 않고 바로 걸린다.
   const [mineOnly, setMineOnly] = useState(false);
 
-  const shown = REQUESTS.filter(
-    (request) => matches(request, filter) && found(request, keyword) && (!mineOnly || MY_STORES.includes(request.store)),
+  // 차례는 조건과 달리 담긴 것을 다시 세우는 값이라 고르는 즉시 걸린다.
+  const [order, setOrder] = useState("latest");
+
+  const shown = sortRequests(
+    REQUESTS.filter(
+      (request) => matches(request, filter) && found(request, keyword) && (!mineOnly || MY_STORES.includes(request.store)),
+    ),
+    order,
   );
 
   return (
@@ -115,7 +122,8 @@ export default function AdminSupportRequestScreenPage() {
                     그중 내 점포만 볼지가 한 줄에 선다. 셋 다 목록에 무엇이 담겼는지를 말하는 값이라
                     담긴 것 바로 위가 자리다. */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-oe-label shrink-0 text-oe-foreground-secondary">
+                  {/* 건수는 이 줄에서 가장 먼저 읽히는 값이라 옆의 조작들보다 두 단계 크다. */}
+                  <span className="shrink-0 text-base text-oe-foreground-secondary">
                     전체 <span className="font-medium text-oe-foreground-primary tabular-nums">{shown.length}</span>건
                   </span>
                   <div className="flex shrink-0 items-center gap-3">
@@ -124,7 +132,7 @@ export default function AdminSupportRequestScreenPage() {
                         `SwitchField` 의 Small 이 이미 13px 로 갖고 있어 건드리지 않는다. */}
                     <SwitchField
                       controlSize="small"
-                      label={<span className="whitespace-nowrap">내 점포</span>}
+                      label={<span className="whitespace-nowrap">내 담당 점포</span>}
                       labelPosition="left"
                       checked={mineOnly}
                       onCheckedChange={setMineOnly}
@@ -141,8 +149,10 @@ export default function AdminSupportRequestScreenPage() {
                       controlSize="small"
                       className="text-oe-label h-auto gap-1 border-transparent bg-transparent px-0 text-oe-foreground-secondary hover:bg-transparent"
                       options={SORT_OPTIONS}
-                      value="latest"
+                      value={order}
+                      onValueChange={(next) => setOrder(next ?? "latest")}
                       ariaLabel="정렬"
+                      selectedIndicator="none"
                     />
                   </div>
                 </div>
@@ -240,7 +250,7 @@ function FilterBar({
       <FilterAxis label="카테고리">
         <MultiCombobox
           controlSize="small"
-          className="w-44"
+          className="w-[212px]"
           options={CATEGORY_OPTIONS}
           value={draft.category}
           onValueChange={(value) => onDraftChange({ category: value })}
@@ -254,7 +264,7 @@ function FilterBar({
       <FilterAxis label="처리상태">
         <MultiCombobox
           controlSize="small"
-          className="w-36"
+          className="w-[212px]"
           options={STATUS_OPTIONS}
           value={draft.status}
           onValueChange={(value) => onDraftChange({ status: value })}
@@ -272,7 +282,7 @@ function FilterBar({
       <FilterAxis label="점포">
         {/* 점포만 두 단으로 연다. 실제 점포가 천 곳을 넘어 한 목록에 늘어놓을 수 없기 때문이며,
             지역을 먼저 옮겨 다니는 얼개는 점주의 소리 화면이 쓰는 것과 같다. */}
-        <div className="w-44">
+        <div className="w-[212px]">
           <StorePicker value={draft.store} onValueChange={(value) => onDraftChange({ store: value })} />
         </div>
       </FilterAxis>
@@ -280,7 +290,7 @@ function FilterBar({
       <FilterAxis label="담당 SV">
         <MultiCombobox
           controlSize="small"
-          className="w-36"
+          className="w-[212px]"
           options={SV_OPTIONS}
           value={draft.sv}
           onValueChange={(value) => onDraftChange({ sv: value })}

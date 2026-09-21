@@ -170,7 +170,15 @@ export const SV_OPTIONS = [...new Set(REQUESTS.map((request) => request.sv))].ma
  */
 export const MY_STORES = ["마천동점", "명동점", "아현점"];
 
-export const SORT_OPTIONS = [{ value: "latest", label: "최신순" }];
+export const SORT_OPTIONS = [
+  { value: "latest", label: "최신순" },
+  { value: "oldest", label: "오래된순" },
+];
+
+/** 목록의 차례다. 같은 날 들어온 건은 번호가 큰 쪽이 나중이다. */
+export function sortRequests(rows: SupportRequest[], order: string) {
+  return [...rows].sort((a, b) => (order === "oldest" ? a.no - b.no : b.no - a.no));
+}
 
 export type RequestFilter = {
   /** `1m`·`3m`·`6m` 가운데 하나이거나 직접 선택이다. */
