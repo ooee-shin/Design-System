@@ -40,6 +40,7 @@ export type PageHeaderTab = {
 export function PageHeader({
   path,
   title,
+  variant = "surface",
   tabs,
   actions,
   favorite,
@@ -51,6 +52,17 @@ export function PageHeader({
   /** 첫 화면부터 지금 화면까지의 경로. 마지막 항목이 지금 보고 있는 화면이다. */
   path: string[]
   title: string
+  /**
+   * 머리가 자기 면을 갖는지.
+   *
+   * `surface` 는 흰 바탕을 깔고 아래를 선으로 끊는다. 본문이 바로 아래에서 스크롤되는 화면이
+   * 쓰며, 그 선이 스크롤되는 자리와 고정된 자리를 가른다.
+   *
+   * `ghost` 는 바탕과 선을 모두 걷는다. 본문이 통째로 스크롤되지 않고 카드 몇 장으로 나뉘어 있는
+   * 화면이 쓴다. 그런 화면에서는 끊을 자리가 이미 카드의 경계로 있어서, 머리의 선까지 더하면
+   * 가로선이 두 겹으로 겹친다.
+   */
+  variant?: "surface" | "ghost"
   /** 화면 안을 가르는 탭. 없으면 탭 줄이 서지 않는다. */
   tabs?: PageHeaderTab[]
   /** 제목 오른쪽에 서는 동작 버튼. 없으면 제목이 그 자리까지 쓴다. */
@@ -73,7 +85,8 @@ export function PageHeader({
       className={cn(
         // 본문이 스크롤되어도 이 자리는 줄어들지 않는다. 좌우 여백은 본문과 같은 24px 이다.
         // 탭이 있으면 탭의 밑줄이 아래 경계선 자리에 겹쳐야 하므로 아래 여백을 두지 않는다.
-        "shrink-0 border-b border-oe-border-secondary bg-oe-background-primary px-6 pt-4",
+        "shrink-0 px-6 pt-4",
+        variant === "surface" && "border-b border-oe-border-secondary bg-oe-background-primary",
         tabs ? "pb-0" : "pb-5",
         className,
       )}
