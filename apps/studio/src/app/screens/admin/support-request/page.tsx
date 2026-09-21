@@ -101,7 +101,7 @@ export default function AdminSupportRequestScreenPage() {
                   집어내는 대상 바로 위에 두면 그 관계가 자리로 드러난다. */}
               <div className="flex shrink-0 flex-col gap-2.5 border-b border-oe-border-tertiary p-3">
                 <Input
-                  controlSize="small"
+                  controlSize="regular"
                   layout="fill"
                   placeholder="제목 검색"
                   aria-label="제목 검색"
@@ -117,11 +117,12 @@ export default function AdminSupportRequestScreenPage() {
                     전체 <span className="font-medium text-oe-foreground-primary tabular-nums">{shown.length}</span>건
                   </span>
                   <div className="flex shrink-0 items-center gap-3">
-                    {/* 라벨을 줄바꿈하지 않는다. 400px 카드 안에서 셋이 한 줄을 나눠 쓰므로, 두 글자
-                        묶음이 접히면 그 줄만 높이가 늘어난다. */}
+                    {/* 라벨을 줄바꿈하지 않는 것만 화면이 정한다. 400px 카드 안에서 셋이 한 줄을
+                        나눠 쓰므로 두 글자 묶음이 접히면 그 줄만 높이가 늘어난다. 글자 크기는
+                        `SwitchField` 의 Small 이 이미 13px 로 갖고 있어 건드리지 않는다. */}
                     <SwitchField
                       controlSize="small"
-                      label={<span className="text-oe-label whitespace-nowrap">내 점포</span>}
+                      label={<span className="whitespace-nowrap">내 점포</span>}
                       labelPosition="left"
                       checked={mineOnly}
                       onCheckedChange={setMineOnly}
@@ -186,7 +187,7 @@ function FilterBar({
     // 조건 줄만 옅은 회색 면을 갖는다. 화면의 흰 바탕 위에서 이 줄은 값을 읽는 자리가 아니라
     // 목록을 좁히는 조작을 담은 자리이므로, 면을 한 단계 내려 아래의 목록·상세와 갈라 둔다.
     <form
-      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg bg-oe-background-secondary px-5 py-4"
+      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg bg-oe-background-secondary px-5 py-5"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
