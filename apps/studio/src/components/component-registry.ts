@@ -4,6 +4,7 @@ export type ComponentKey =
   | "badge"
   | "bottom-navigation"
   | "button"
+  | "calendar"
   | "checkbox"
   | "chip"
   | "combobox"
@@ -48,6 +49,7 @@ export const componentRegistry: ComponentRegistryItem[] = [
   { key: "badge", title: "Badge", description: "다른 요소에 덧붙어 상태나 개수를 표시합니다. 누르는 동작이 없어 Hover와 Pressed 표시를 갖지 않습니다.", status: "확정", href: "/components/badge", similar: ["chip", "notification-badge"] },
   { key: "bottom-navigation", title: "Bottom Navigation", description: "모바일 화면 맨 아래에서 지금 어느 화면에 있는지 알리고 다른 화면으로 옮기는 한 줄입니다. 항목은 다섯까지입니다.", status: "확정", href: "/components/bottom-navigation" },
   { key: "button", title: "Button", description: "액션을 실행하는 버튼입니다. 폼 요소와 같은 공통 Control Height를 사용하며 Style·Tone·Size와 아이콘 자리를 조합해 씁니다.", status: "확정", href: "/components/button", similar: ["input-button", "chip", "toggle-button"] },
+  { key: "calendar", title: "Calendar", description: "날짜를 고르는 격자입니다. 어디에 얹힐지는 쓰는 쪽이 정하며, 날짜를 입력받는 자리는 Input Button이 맡습니다.", status: "확정", href: "/components/calendar", worksWith: ["field", "input-button"] },
   { key: "checkbox", title: "Checkbox", description: "목록이나 폼에서 항목의 선택 여부를 제어합니다. Control은 16px 단일 크기이며 20px Label 첫 줄 안에서 중앙 정렬됩니다. 선택 상태는 Brand 표현을 사용합니다.", status: "확정", href: "/components/checkbox", similar: ["radio"], worksWith: ["field", "combobox"] },
   { key: "chip", title: "Chip", description: "짧은 Label로 값 하나를 표시하고, 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지웁니다.", status: "확정", href: "/components/chip", similar: ["select-box", "toggle-button"], worksWith: ["combobox"] },
   { key: "combobox", title: "Combobox", description: "Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택합니다.", status: "확정", href: "/components/combobox", worksWith: ["field", "input", "checkbox", "chip"] },

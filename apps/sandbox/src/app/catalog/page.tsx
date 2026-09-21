@@ -21,6 +21,7 @@ import {
   Badge,
   BottomNavigation,
   Button,
+  Calendar,
   Checkbox,
   CheckboxField,
   Chip,
@@ -148,6 +149,8 @@ const BADGE_SIZES = ["small", "medium"] as const;
 const CHIP_SIZES = ["compact", "xsmall", "small", "regular", "large", "xlarge"] as const;
 const CHIP_SHAPES = ["rounded", "circle"] as const;
 const CHIP_STATES = ["기본", "active"] as const;
+// 달력은 고르는 방식으로 갈린다. 범위는 안쪽이 이어진 띠로 서므로 하루 고르기와 모양이 다르다.
+const CALENDAR_MODES = ["single", "range"] as const;
 const CHECKBOX_SHAPES = ["square", "rounded", "ghost"] as const;
 const CHECK_STATES = ["off", "on", "indeterminate", "disabled"] as const;
 // Switch·Radio 처럼 일부 선택이 없는 컨트롤이 쓴다.
@@ -182,6 +185,8 @@ const DESCRIPTIONS = ["없음", "있음"] as const;
 const LABEL_POSITIONS = ["right", "left"] as const;
 const MESSAGE_DIRECTIONS = ["incoming", "outgoing"] as const;
 const MESSAGE_STATES = ["기본", "sending", "sent", "read", "failed", "deleted"] as const;
+// 달력은 오늘에 기대면 캡처마다 달라진다. 고정한 달을 쓴다.
+const CALENDAR_MONTH = new Date(2026, 8, 1);
 const SELECT_OPTIONS = [
   { value: "a", label: "첫째" },
   { value: "b", label: "둘째" },
@@ -255,6 +260,16 @@ export default function CatalogPage() {
         ))}
       />
 
+      <Group
+        component="Calendar"
+        items={cross({ mode: CALENDAR_MODES }, ({ mode }) =>
+          mode === "range" ? (
+            <Calendar mode="range" defaultMonth={CALENDAR_MONTH} selected={{ from: new Date(2026, 8, 14), to: new Date(2026, 8, 18) }} />
+          ) : (
+            <Calendar mode="single" defaultMonth={CALENDAR_MONTH} selected={new Date(2026, 8, 16)} />
+          ),
+        )}
+      />
       <Group
         component="Checkbox"
         items={cross({ shape: CHECKBOX_SHAPES, state: CHECK_STATES }, ({ shape, state }) => (
