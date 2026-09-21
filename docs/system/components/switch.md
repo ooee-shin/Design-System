@@ -45,7 +45,7 @@ SwitchField는 Control과 Label만 결합한다. Description과 Leading/Trailing
 ### State
 
 - Off: 조작 가능한 상태가 Disabled보다 선명하게 보이도록 `oe-background-control-off`를 Track과 inset Border에 함께 사용한다.
-- On: 브랜드와 분리된 기본 Blue 의미의 `oe-info-background-bold-primary` Track과 흰색 Thumb을 사용한다.
+- On: `oe-brand-background-bold-primary` Track과 흰색 Thumb을 사용한다. Radio·Checkbox의 켜진 상태와 같은 값이며, 근거는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」다. 브랜드와 분리된 `oe-info-*`를 쓰던 때에는 두 값이 모두 파래서 차이가 드러나지 않았으나, 브랜드 색을 갈아 끼우면 Switch만 남는다.
 - Focus visible: 기본 inset Border는 유지하고 바깥에 `oe-focus-ring` 2px Outline과 2px offset을 사용한다.
 - Disabled · Off: Border 없이 `oe-background-control-disabled` Track과 더 선명한 `oe-background-disabled-selected` Thumb, disabled text를 사용한다.
 - Disabled · On: Disabled · Off와 같은 Track·Thumb 색상을 사용하고 Thumb 위치만 On으로 이동한다.

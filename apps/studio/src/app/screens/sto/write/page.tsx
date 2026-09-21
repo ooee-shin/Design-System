@@ -10,7 +10,7 @@ import { AppHeader, Button, Chip, Field, Input, SelectBox, SelectBoxGroup, Texta
 
 import { MobileWebView } from "@/components/screens/screen-chrome";
 
-import { CATEGORIES, CHANNELS, handlingNote, menuLabel, type Channel } from "./write-data";
+import { categoriesOf, CHANNELS, handlingNote, menuLabel, type Channel } from "./write-data";
 
 /**
  * 사장님 앱의 통합 등록 폼이다. 점주의 소리와 지원요청을 한 폼에서 접수한다.
@@ -78,8 +78,9 @@ export default function StoWriteScreenPage() {
               const next = value as Channel;
               if (next === kind) return;
               setKind(next);
-              // 종류를 바꿔도 고른 카테고리는 그대로 둔다. 두 종류가 같은 카테고리 한 벌을 쓰므로
-              // 그 값이 여전히 유효하고, 바꿔 보다가 되돌릴 때 채운 것을 잃지 않는다.
+              // 종류를 바꾸면 고른 카테고리를 비운다. 두 종류가 서로 다른 카테고리 한 벌을 쓰므로
+              // 앞서 고른 값이 새 목록에 없고, 남겨 두면 어느 칩도 눌리지 않은 채로 값만 남는다.
+              setCategory(null);
             }}
           >
             {CHANNELS.map((channel) => (
@@ -121,25 +122,28 @@ export default function StoWriteScreenPage() {
             {/* 바닥 여백은 64px 이다. 등록 버튼이 설 자리를 비워 두는 것이며, 마지막 칸을 채우다가
                 화면 끝에 닿았을 때 아래가 막혀 보이지 않게 한다. */}
             <div className="flex flex-col gap-5 px-oe-padding-default pt-6 pb-16">
-              {/* 카테고리는 열어서 고르지 않고 칩으로 펼쳐 둔다. 목록이 여덟 개로 짧고, 점주가 무엇
-                  중에서 고르는 것인지를 목록을 열어 보지 않고 알아야 어느 것이 자기 건인지 견줄 수
+              {/* 구분선 아래에서 어느 게시판에 쓰는 중인지 이름으로 한 번 더 알린다. 위의 안내 줄이
+                  같은 이름을 이미 말하고 있으나, 그 줄은 회색 바탕에 tertiary 로 적은 읽고 지나가는
+                  안내라 눈에 붙들리지 않는다. 사장님이 쓰는 앱이므로 같은 말을 두 번 하더라도 지금
+                  무엇을 쓰는 중인지가 분명한 편이 낫다.
+
+                  위의 물음보다 한 단계 작게 둔다. 화면의 물음은 하나이고 이것은 그 답을 받은 뒤에
+                  서는 구역의 이름이다. */}
+              <h2 className="text-xl font-semibold text-oe-foreground-primary">{menuLabel(kind)}</h2>
+              {/* 카테고리는 열어서 고르지 않고 칩으로 펼쳐 둔다. 목록이 일곱 개 안팎으로 짧고, 점주가
+                  무엇 중에서 고르는 것인지를 목록을 열어 보지 않고 알아야 어느 것이 자기 건인지 견줄 수
                   있다. 고른 값도 그 자리에 그대로 남아 접힌 Select 처럼 한 칸으로 줄지 않는다.
 
                   고를 수 있는 것은 하나다. 이미 고른 칩을 다시 눌러 비우지는 않는다. 필수 값이라
-                  비운 상태는 등록할 수 없는 상태이며, 바꾸려면 다른 칩을 누르면 된다.
-
-                  고른 칩은 `activeStyle="fill"` 로 진한 뉴트럴을 채운다. 위에 Focus 색으로 맞춘 선택
-                  경계가 있고 등록 버튼도 brand 색으로 설 자리이므로, 고른 칩까지 brand 를 옅게 깔면
-                  파란 기가 세 곳에서 돌아 무엇이 지목된 것인지 색으로 갈리지 않는다. */}
+                  비운 상태는 등록할 수 없는 상태이며, 바꾸려면 다른 칩을 누르면 된다. */}
               <Field label="카테고리" group required>
                 <div role="group" className="flex flex-wrap gap-1.5">
-                  {CATEGORIES.map((name) => (
+                  {categoriesOf(kind).map((name) => (
                     <Chip
                       key={name}
                       shape="rounded"
                       controlSize="large"
                       active={category === name}
-                      activeStyle="fill"
                       onClick={() => setCategory(name)}
                     >
                       {name}
@@ -170,18 +174,18 @@ export default function StoWriteScreenPage() {
                 />
               </Field>
 
-              {/* 첨부는 있으면 돕는 값이라 필수가 아니다. 그래서 위의 세 칸과 한 묶음으로 두지 않고
-                  옅은 선으로 한 번 끊는다. 넷을 같은 간격으로 늘어놓으면 알려야 하는 것과 덧붙이는
-                  것이 같은 무게로 읽힌다.
+              {/* 첨부도 위의 세 칸과 같은 간격으로 늘어놓는다. 끊는 선을 두었다가 걷어냈는데, 폼의
+                  칸이 넷뿐이라 선 하나가 구역을 가르는 표시로 읽히고 그 아래 첨부만 따로 떨어진
+                  덩이가 되기 때문이다.
 
-                  라벨과 버튼을 한 줄에 둔다. 첨부는 채워 넣는 값이 아니라 누르는 조작인데, 다른
-                  칸들처럼 라벨 아래에 컨트롤이 서면 입력할 값으로 읽힌다. `Field` 의 Header 오른쪽
-                  끝이 보조 조작을 담는 자리이므로 그 자리를 쓴다.
+                  버튼은 라벨 아래에 둔다. `Field` 의 Header 오른쪽 끝도 보조 조작을 담는 자리이지만,
+                  그 자리에서는 버튼이 라벨과 같은 줄에 서서 작아지고 눌러야 할 것으로 읽히지 않는다.
+                  아래로 내리면 위의 세 칸이 컨트롤을 두는 자리와 같은 자리에 선다.
 
                   버튼을 누르면 기기의 파일 선택이 실제로 열린다. 모양만 있는 버튼으로 두면 눌러도
                   아무 일이 없어서, 이 자리가 무엇을 하는 자리인지 화면에서 확인할 수 없다. 고른
                   파일은 올리지 않고 이름과 크기만 아래에 세운다. */}
-              <div className="mt-1 border-t border-oe-border-secondary pt-5">
+              <div>
                 <input
                   ref={filePicker}
                   type="file"
@@ -208,17 +212,13 @@ export default function StoWriteScreenPage() {
                     event.target.value = "";
                   }}
                 />
-                <Field
-                  label="첨부"
-                  group
-                  trailingElement={
-                    <Button controlSize="small" onClick={() => filePicker.current?.click()}>
-                      파일 첨부하기
-                    </Button>
-                  }
-                >
+                <Field label="첨부" group>
+                  <div className="flex flex-col items-start gap-2">
+                  <Button controlSize="large" onClick={() => filePicker.current?.click()}>
+                    파일 첨부하기
+                  </Button>
                   {files.length === 0 ? null : (
-                    <ul className="flex flex-col gap-1">
+                    <ul className="flex w-full flex-col gap-1">
                       {files.map((file) => (
                         <li
                           key={file.name}
@@ -292,6 +292,7 @@ export default function StoWriteScreenPage() {
                       ))}
                     </ul>
                   )}
+                  </div>
                 </Field>
               </div>
             </div>

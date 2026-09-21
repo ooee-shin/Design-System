@@ -82,7 +82,9 @@ function TableRow({
         // 골라 둔 줄에는 포인터를 얹어도 면을 덧칠하지 않는다. 고른 것을 말하는 색과 지금
         // 가리키고 있다는 색이 같은 자리에서 겹치면 어느 쪽인지 갈리지 않는다.
         interactive && !selected && "hover:bg-oe-interaction-hover-subtle",
-        selected && "bg-oe-brand-background-primary",
+        // 고른 행은 중립 면으로 알린다. 행은 면을 칠해 선택을 알리는 요소이므로 `interaction.md` 의
+        // 「선택 상태」가 정한 대로 brand 를 쓰지 않는다.
+        selected && "bg-oe-background-secondary",
         className,
       )}
       {...props}
