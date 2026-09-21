@@ -58,7 +58,9 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
       <Popover.Portal>
         <Popover.Positioner align="start" sideOffset={4} className="z-50">
           <Popover.Popup className="w-[360px] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
-            <div className="p-2">
+            {/* 검색 칸의 위아래 여백은 좌우보다 좁다. 이 칸은 팝업의 머리라서, 아래 두 단과 사이가
+                벌어지면 팝업 안에 떠 있는 한 줄처럼 보인다. */}
+            <div className="px-2 py-1.5">
               <div className={comboboxSearchContainerVariants()}>
                 <RiSearchLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
                 <input
