@@ -71,7 +71,9 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
               </div>
             </div>
 
-            <div className="grid min-w-0 grid-cols-[minmax(6.5rem,0.8fr)_minmax(0,1.2fr)] border-t border-oe-border-secondary">
+            {/* 검색 아래의 선은 한 단계 옅게 둔다. 팝업 안에서 구역을 나누는 선이라, 팝업 자신의 경계와
+                같은 진하기면 안쪽이 두 장으로 갈려 보인다. */}
+            <div className="grid min-w-0 grid-cols-[minmax(6.5rem,0.8fr)_minmax(0,1.2fr)] border-t border-oe-border-tertiary">
               {/* 왼쪽은 지역이다. 검색 중에는 지역을 가리지 않고 찾으므로 고른 지역을 흐려 두고,
                   그 자리를 눌러 검색을 끝내고 돌아올 수 있게 한다. */}
               <div className="relative h-[264px] bg-oe-background-secondary after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary">
