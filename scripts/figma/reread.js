@@ -47,10 +47,14 @@ for (const frameName of FRAMES) {
   if (!frame) { out.frames.push({ name: frameName, missing: true }); continue; }
   const info = { name: frameName, id: frame.id, build: frame.getSharedPluginData(TAG, "build") || null, w: Math.round(frame.width), h: Math.round(frame.height), part: PART, cols: COLS, rows: [] };
   let index = -1;
+  // 안쪽으로 내려가지 않는 노드다. **이 판정이 두 가지에서 같아야 한다.** 다르면 부분마다 훑는
+  // 노드가 달라져 전역 index 가 갈리고, 그러면 `index % PART.n` 이 더는 나누기가 아니게 되어
+  // 어떤 노드는 어느 부분에도 안 들어가고 어떤 노드는 두 부분에 들어간다.
+  const isLeaf = (node) => /^Ri[A-Z]/.test(node.name) || node.type === "VECTOR" || node.type === "INSTANCE";
   const visit = async (node) => {
     index++;
     const mine = index % PART.n === PART.i;
-    if (!mine) { if (!(/^Ri[A-Z]/.test(node.name) || node.type === "VECTOR")) for (const kid of node.children || []) await visit(kid); return; }
+    if (!mine) { if (!isLeaf(node)) for (const kid of node.children || []) await visit(kid); return; }
     const item = {
       p: node.getSharedPluginData(TAG, "p") || "",
       n: node.type === "TEXT" ? "" : node.name, // 글자 노드의 이름은 문구와 같아 싣지 않는다
@@ -76,10 +80,11 @@ for (const frameName of FRAMES) {
       }
     }
     // 인스턴스는 어느 컴포넌트인지가 곧 되짚기의 답이다. 안쪽으로는 내려가지 않는다.
-    if (node.type === "INSTANCE") item.st = node.mainComponent ? node.mainComponent.name : "";
+    // `node.mainComponent` 는 dynamic-page 문서에서 던진다. 비동기로 읽는다.
+    if (node.type === "INSTANCE") { const main = await node.getMainComponentAsync(); item.st = main ? main.name : ""; }
     // 자리를 아끼려고 줄로 싣는다. COLS 가 칸 이름이고, 빈 칸은 "" 또는 0 이다.
     info.rows.push([item.p, item.n, item.t, item.w, item.h, item.bg ? item.bg.v || item.bg.hex : "", item.c ? item.c.v || item.c.hex : "", item.bd ? item.bd.c.v || item.bd.c.hex : "", item.r || 0, item.s || "", item.fs || 0, item.st || ""]);
-    if (/^Ri[A-Z]/.test(node.name) || node.type === "VECTOR" || node.type === "INSTANCE") return;
+    if (isLeaf(node)) return;
     for (const kid of node.children || []) await visit(kid);
   };
   await visit(frame);
