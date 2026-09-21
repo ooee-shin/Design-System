@@ -34,7 +34,17 @@ type ComboboxProps = VariantProps<typeof comboboxTriggerVariants> & {
   className?: string
 }
 
-type MultiComboboxProps = Omit<ComboboxProps, "value" | "defaultValue" | "onValueChange"> & {
+/** 옵션을 한 단계 묶는 무리다. Label 이 그 무리의 이름으로 목록에 선다. */
+type ComboboxOptionGroup = {
+  label: string
+  options: ComboboxOption[]
+}
+
+type MultiComboboxItemsProps =
+  | { options: ComboboxOption[]; groups?: never }
+  | { options?: never; groups: ComboboxOptionGroup[] }
+
+type MultiComboboxProps = Omit<ComboboxProps, "value" | "defaultValue" | "onValueChange" | "options"> & MultiComboboxItemsProps & {
   value?: string[]
   defaultValue?: string[]
   onValueChange?: (value: string[]) => void
@@ -109,6 +119,7 @@ function Combobox({
 
 function MultiCombobox({
   options,
+  groups,
   value,
   defaultValue,
   onValueChange,
@@ -133,18 +144,20 @@ function MultiCombobox({
   const [uncontrolledValue, setUncontrolledValue] = React.useState<string[]>(defaultValue ?? [])
   const [selectedSearch, setSelectedSearch] = React.useState("")
   const resolvedValue = value ?? uncontrolledValue
-  const selectedOptions = options.filter((option) => resolvedValue.includes(option.value))
+  // 무리로 받았으면 그 안의 옵션을 펼쳐 둔다. 값을 다루는 쪽은 무리를 알 필요가 없다.
+  const resolvedOptions = options ?? groups?.flatMap((group) => group.options) ?? []
+  const selectedOptions = resolvedOptions.filter((option) => resolvedValue.includes(option.value))
   const updateValue = (next: string[]) => {
     if (value === undefined) setUncontrolledValue(next)
     onValueChange?.(next)
   }
-  const enabledValues = options.filter((option) => !option.disabled).map((option) => option.value)
+  const enabledValues = resolvedOptions.filter((option) => !option.disabled).map((option) => option.value)
   const allSelected = enabledValues.length > 0 && enabledValues.every((optionValue) => resolvedValue.includes(optionValue))
   const someSelected = !allSelected && enabledValues.some((optionValue) => resolvedValue.includes(optionValue))
 
   return (
     <ComboboxPrimitive.Root
-      items={options}
+      items={groups ? groups.map((group) => ({ value: group.label, items: group.options })) : options}
       multiple
       value={selectedOptions}
       onValueChange={(selected) => updateValue(selected.map((option) => option.value))}
@@ -174,12 +187,28 @@ function MultiCombobox({
             {(selected: ComboboxOption[]) => selected.length > 0 ? <div data-slot="combobox-selected-items" className="rounded-lg bg-oe-background-secondary p-2"><Input type="search" variant="filled" controlSize="small" value={selectedSearch} onChange={(event) => setSelectedSearch(event.target.value)} aria-label={selectedSearchPlaceholder} placeholder={selectedSearchPlaceholder} leadingElement={<RiSearchLine />} /><div className="mt-2 flex max-h-20 flex-wrap content-start gap-1.5 overflow-y-auto [scrollbar-color:transparent_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">{selected.filter((option) => option.label.toLocaleLowerCase().includes(selectedSearch.trim().toLocaleLowerCase())).map((option) => <Chip key={option.value} controlSize="small" removeLabel={removeSelectedLabel(option.label)} onRemove={() => updateValue(resolvedValue.filter((optionValue) => optionValue !== option.value))}>{option.label}</Chip>)}</div></div> : <></>}
         </ComboboxPrimitive.Value>}
       </div>
-      <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} someSelected={someSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
+      <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple grouped={Boolean(groups)} selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} someSelected={someSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
     </ComboboxPrimitive.Root>
   )
 }
 
-function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, selectAllLabel, totalCount = 0, allSelected = false, someSelected = false, onToggleAll }: { ariaLabel?: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; someSelected?: boolean; onToggleAll?: () => void }) {
+function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, grouped = false, selectAllLabel, totalCount = 0, allSelected = false, someSelected = false, onToggleAll }: { ariaLabel?: string; searchPlaceholder: string; emptyMessage: string; multiple: boolean; grouped?: boolean; selectAllLabel?: string; totalCount?: number; allSelected?: boolean; someSelected?: boolean; onToggleAll?: () => void }) {
+  const renderItem = (option: ComboboxOption) => (
+    <ComboboxPrimitive.Item key={option.value} value={option} disabled={option.disabled} className={cn("group/option relative flex min-h-9 w-full cursor-default items-center gap-2 rounded-md px-2.5 py-2 outline-none data-[disabled]:pointer-events-none data-[disabled]:text-oe-foreground-disabled data-[highlighted]:bg-oe-interaction-hover data-[selected]:data-[highlighted]:!bg-transparent", !multiple && "before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:right-[-0.75rem] before:rounded-md before:content-[''] data-[selected]:before:bg-oe-background-secondary")}>
+      {multiple ? (
+        <CheckboxIndicator className="group-data-[selected]/option:border-oe-brand-background-bold-primary group-data-[selected]/option:bg-oe-brand-background-bold-primary">
+          <ComboboxPrimitive.ItemIndicator className="grid place-items-center"><RiCheckLine className="size-2.5 text-oe-foreground-inverse" /></ComboboxPrimitive.ItemIndicator>
+        </CheckboxIndicator>
+      ) : null}
+      <span className="relative min-w-0 flex-1 truncate">{option.label}</span>
+      {!multiple ? (
+        <ComboboxPrimitive.ItemIndicator className="relative flex size-4 shrink-0 items-center justify-center">
+          <RiCheckLine className="size-4 text-oe-brand-foreground-primary" aria-hidden="true" />
+        </ComboboxPrimitive.ItemIndicator>
+      ) : null}
+    </ComboboxPrimitive.Item>
+  )
+
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner align="start" sideOffset={4} className="z-50 w-[var(--anchor-width)] max-w-[var(--available-width)]">
@@ -200,21 +229,18 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
             ) : null}
             <ComboboxPrimitive.Empty className="px-2.5 py-6 text-center text-xs text-oe-foreground-tertiary empty:hidden">{emptyMessage}</ComboboxPrimitive.Empty>
             <ComboboxPrimitive.List>
-              {(option: ComboboxOption) => (
-                <ComboboxPrimitive.Item key={option.value} value={option} disabled={option.disabled} className={cn("group/option relative flex min-h-9 w-full cursor-default items-center gap-2 rounded-md px-2.5 py-2 outline-none data-[disabled]:pointer-events-none data-[disabled]:text-oe-foreground-disabled data-[highlighted]:bg-oe-interaction-hover data-[selected]:data-[highlighted]:!bg-transparent", !multiple && "before:pointer-events-none before:absolute before:inset-y-0 before:left-0 before:right-[-0.75rem] before:rounded-md before:content-[''] data-[selected]:before:bg-oe-background-secondary")}>
-                  {multiple ? (
-                    <CheckboxIndicator className="group-data-[selected]/option:border-oe-brand-background-bold-primary group-data-[selected]/option:bg-oe-brand-background-bold-primary">
-                      <ComboboxPrimitive.ItemIndicator className="grid place-items-center"><RiCheckLine className="size-2.5 text-oe-foreground-inverse" /></ComboboxPrimitive.ItemIndicator>
-                    </CheckboxIndicator>
-                  ) : null}
-                  <span className="relative min-w-0 flex-1 truncate">{option.label}</span>
-                  {!multiple ? (
-                    <ComboboxPrimitive.ItemIndicator className="relative flex size-4 shrink-0 items-center justify-center">
-                      <RiCheckLine className="size-4 text-oe-brand-foreground-primary" aria-hidden="true" />
-                    </ComboboxPrimitive.ItemIndicator>
-                  ) : null}
-                </ComboboxPrimitive.Item>
-              )}
+              {grouped
+                ? (group: { value: string; items: ComboboxOption[] }) => (
+                    <ComboboxPrimitive.Group key={group.value} items={group.items}>
+                      {/* 무리의 이름은 고르는 값이 아니라 아래 항목들이 무엇에 속하는지 알리는 글이다.
+                          항목보다 작고 옅게 두어 목록을 훑을 때 항목과 섞이지 않게 한다. */}
+                      <ComboboxPrimitive.GroupLabel className="px-2.5 py-1.5 text-[11px] font-medium text-oe-foreground-tertiary">
+                        {group.value}
+                      </ComboboxPrimitive.GroupLabel>
+                      <ComboboxPrimitive.Collection>{(option: ComboboxOption) => renderItem(option)}</ComboboxPrimitive.Collection>
+                    </ComboboxPrimitive.Group>
+                  )
+                : (option: ComboboxOption) => renderItem(option)}
             </ComboboxPrimitive.List>
           </div>
         </ComboboxPrimitive.Popup>
@@ -224,4 +250,4 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
 }
 
 export { Combobox, MultiCombobox, comboboxSearchContainerVariants, comboboxTriggerVariants }
-export type { ComboboxOption, ComboboxProps, MultiComboboxProps }
+export type { ComboboxOption, ComboboxOptionGroup, ComboboxProps, MultiComboboxProps }

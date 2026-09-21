@@ -31,6 +31,8 @@
 - `disabled`: 기본값 `false`
 - `invalid`: 기본값 `false`
 - `options`: 선택지 배열이며 필수다
+- `MultiCombobox.groups`: 선택지를 한 단계 묶어 넘긴다. `options`와 택일이며, 무리마다 Label이 그 항목들 위에 선다. 이름만 길게 늘어놓으면 찾는 사람이 그 이름이 어디에 속하는지부터 떠올려야 하는 목록에 쓴다. 검색과 전체 선택은 무리와 상관없이 전체를 대상으로 한다
+- `MultiCombobox.selectedItems`: `container | none`, 기본값 `container`. `none`은 고른 값을 Trigger 아래에 펼치지 않고 한 줄만 남긴다. 조건 줄처럼 여러 축이 나란히 선 자리에서 한 축만 아래로 자라면 줄의 높이가 흔들리기 때문이며, 고른 값은 Trigger의 요약이 말한다
 - `defaultValue`: uncontrolled 초기값
 - `onValueChange`: 값이 바뀔 때 호출한다
 - `placeholder`: 선택값이 없을 때 Trigger에 표시하는 문자열

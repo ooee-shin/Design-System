@@ -121,7 +121,18 @@ export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) =>
 
 export const STORE_OPTIONS = Object.keys(SV_BY_STORE).map((store) => ({ value: store, label: store }));
 
-export const SV_OPTIONS = [...new Set(Object.values(SV_BY_STORE))].map((sv) => ({ value: sv, label: sv }));
+/**
+ * SV 가 속한 팀이다. 담당 SV 를 고를 때 한 단계 위에서 팀이 먼저 보인다.
+ *
+ * 담당자를 찾는 사람이 이름부터 아는 경우는 드물다. 「수도권 1팀이 맡은 건」처럼 팀으로 먼저
+ * 좁히고 그 안에서 사람을 고르는 것이 실제 순서이므로, 열 명을 한 줄로 늘어놓지 않고 팀으로 묶는다.
+ * 팀 구분은 담당 지역을 따른다.
+ */
+export const SV_GROUPS = [
+  { label: "수도권 1팀", options: ["박지우", "한지훈", "최은영", "오세진"] },
+  { label: "수도권 2팀", options: ["김도현", "윤가람", "서지호"] },
+  { label: "영남·호남팀", options: ["이서준", "임채원", "배수현"] },
+].map((team) => ({ label: team.label, options: team.options.map((sv) => ({ value: sv, label: sv })) }));
 
 /**
  * 로그인한 사람이 맡은 점포다.
