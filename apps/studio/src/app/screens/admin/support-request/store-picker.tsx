@@ -91,7 +91,7 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
                           setActiveRegion(region);
                           setQuery("");
                         }}
-                        className={`text-oe-label flex min-h-9 w-full items-center border-b border-oe-border-secondary pl-[18px] pr-2 text-left ${
+                        className={`flex min-h-9 w-full items-center border-b border-oe-border-secondary pl-[18px] pr-2 text-left ${
                           active
                             ? "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary"
                             : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"
@@ -106,9 +106,6 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
               </div>
 
               <div className="oe-scrollbar-bare h-[264px] overflow-x-hidden overflow-y-auto p-2">
-                <p className="px-2.5 pb-1.5 pt-1 text-[11px] font-medium text-oe-foreground-tertiary">
-                  {keyword ? `「${keyword}」 검색 결과` : activeRegion}
-                </p>
                 {stores.length === 0 ? (
                   <p className="px-2.5 py-6 text-center text-xs text-oe-foreground-tertiary">찾는 점포가 없습니다.</p>
                 ) : (
@@ -120,12 +117,15 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
                       role="checkbox"
                       aria-checked={somePicked ? "mixed" : allPicked}
                       onClick={toggleAll}
-                      className={`text-oe-label flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${
+                      className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${
                         allPicked ? "" : "hover:bg-oe-interaction-hover"
                       }`}
                     >
                       <CheckboxIndicator checked={allPicked} indeterminate={somePicked} />
-                      <span className="font-semibold">전체</span>
+                      {/* 무엇의 전체인지를 이 줄이 직접 말한다. 오른쪽 머리에 지역 이름을 따로
+                          적어 두었다가 걷어냈는데, 왼쪽에서 고른 지역이 이미 흰 면으로 드러나 있어
+                          같은 이름이 두 번 서기 때문이다. */}
+                      <span className="font-semibold">{keyword ? "검색 결과 전체" : `${activeRegion} 전체`}</span>
                     </button>
                     {stores.map((name) => {
                       const selected = value.includes(name);
@@ -135,7 +135,7 @@ export function StorePicker({ value, onValueChange }: { value: string[]; onValue
                           type="button"
                           aria-pressed={selected}
                           onClick={() => toggle(name)}
-                          className={`text-oe-label flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${
+                          className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${
                             selected ? "" : "hover:bg-oe-interaction-hover"
                           }`}
                         >
