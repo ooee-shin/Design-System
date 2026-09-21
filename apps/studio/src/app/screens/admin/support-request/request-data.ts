@@ -53,7 +53,36 @@ export const REQUESTS: SupportRequest[] = [
   { no: 2373, title: "로그인 후 매출현황이 비어 있습니다", category: "앱 오류", store: "명동점", status: "done", createdAt: "2026-09-09", unread: 0 },
   { no: 2372, title: "본사 방문 일정을 다시 잡고 싶습니다", category: "기타", store: "아현점", status: "done", createdAt: "2026-09-08", unread: 0 },
   { no: 2371, title: "포장 용기 뚜껑이 맞지 않습니다", category: "제품 불량", store: "가재울점", status: "done", createdAt: "2026-09-05", unread: 0 },
+  { no: 2358, title: "포스 결제 단말이 자주 멈춥니다", category: "기기·시설", store: "동의대역점", status: "done", createdAt: "2026-08-19", unread: 0 },
+  { no: 2349, title: "여름 성수기 발주 한도를 넘겼습니다", category: "발주·정산", store: "부천원종점", status: "done", createdAt: "2026-07-28", unread: 0 },
+  { no: 2331, title: "배달 리뷰 이벤트 쿠폰이 적용되지 않습니다", category: "배달", store: "수원행궁점", status: "done", createdAt: "2026-06-11", unread: 0 },
+  { no: 2310, title: "냉장고 문 패킹이 떨어졌습니다", category: "기기·시설", store: "광주상무점", status: "done", createdAt: "2026-04-30", unread: 0 },
+  { no: 2294, title: "정산서에 지난달 차감분이 그대로 남아 있습니다", category: "발주·정산", store: "대구월배점", status: "done", createdAt: "2026-03-18", unread: 0 },
 ];
+
+/** 예시 데이터의 등록일이 과거이므로 오늘을 고정해 둔다. 기간 조건이 이 날을 기준으로 걸린다. */
+const TODAY = "2026-09-21";
+
+export const CUSTOM = "custom";
+
+export const PERIOD_OPTIONS = [
+  { value: "1m", label: "1개월" },
+  { value: "3m", label: "3개월" },
+  { value: "6m", label: "6개월" },
+  { value: CUSTOM, label: "직접 선택" },
+];
+
+const PERIOD_MONTHS: Record<string, number> = { "1m": 1, "3m": 3, "6m": 6 };
+
+/** 기간 조건이 훑는 구간이다. 직접 선택에서 두 날을 아직 고르지 않았으면 기간을 걸지 않는다. */
+function periodRange(filter: RequestFilter): [string, string] | null {
+  if (filter.period === CUSTOM) return filter.from && filter.to ? [filter.from, filter.to] : null;
+  const months = PERIOD_MONTHS[filter.period];
+  if (months === undefined) return null;
+  const start = new Date(`${TODAY}T00:00:00`);
+  start.setMonth(start.getMonth() - months);
+  return [start.toISOString().slice(0, 10), TODAY];
+}
 
 /** 필터가 고를 수 있는 값들이다. 「전체」는 그 축을 걸지 않은 상태다. */
 export const ALL = "all";
@@ -69,11 +98,18 @@ export const STATUS_OPTIONS = [
 ];
 
 export type RequestFilter = {
+  /** `1m`·`3m`·`6m` 가운데 하나이거나 직접 선택이다. */
+  period: string;
+  /** 직접 선택일 때의 두 날이다. 고르기 전에는 비어 있다. */
+  from: string;
+  to: string;
   category: string;
   status: string;
 };
 
-export const EMPTY_FILTER: RequestFilter = { category: ALL, status: ALL };
+// 들어왔을 때 1 개월이다. 지원요청은 지금 처리해야 할 건을 찾는 목록이라, 기본으로 훑는 구간이
+// 넓으면 이미 끝난 건이 최근 건과 섞인다.
+export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", category: ALL, status: ALL };
 
 /**
  * 건 하나가 조건에 맞는지.
@@ -82,6 +118,8 @@ export const EMPTY_FILTER: RequestFilter = { category: ALL, status: ALL };
  * 목록 안에서 한 건을 집어내는 자리라 층이 다르다.
  */
 export function matches(request: SupportRequest, filter: RequestFilter) {
+  const range = periodRange(filter);
+  if (range && (request.createdAt < range[0] || request.createdAt > range[1])) return false;
   if (filter.category !== ALL && request.category !== filter.category) return false;
   return filter.status === ALL || request.status === filter.status;
 }

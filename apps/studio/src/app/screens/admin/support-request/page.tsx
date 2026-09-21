@@ -16,7 +16,7 @@ import { useState } from "react";
 
 import { RiCalendarLine, RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
-import { Badge, Button, Input, InputButton, NotificationBadge, Select } from "@ooee/ui";
+import { Badge, Button, Chip, Input, InputButton, NotificationBadge, Select } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
@@ -24,9 +24,11 @@ import { ScreenPlaceholder } from "@/components/screens/screen-chrome";
 
 import {
   CATEGORY_OPTIONS,
+  CUSTOM,
   EMPTY_FILTER,
   found,
   matches,
+  PERIOD_OPTIONS,
   REQUESTS,
   STATUS,
   STATUS_OPTIONS,
@@ -145,14 +147,47 @@ function FilterBar({
         onSubmit();
       }}
     >
-      {/* 기간은 자리만 세워 두었다. 날짜를 고르는 달력을 아직 붙이지 않았으므로 눌러도 열리지
-          않으며, 값은 예시로 둔 기본 구간이다. */}
+      {/* 기간은 자주 쓰는 세 구간을 칩으로 펼쳐 두고, 그 밖의 구간만 직접 고르게 한다. 목록을
+          여는 사람 대부분이 최근 한두 달을 보므로 날짜 두 개를 매번 채우게 할 이유가 없다. */}
       <FilterAxis label="조회기간">
-        <InputButton className="w-[132px]" controlSize="small" value="2026-09-01" leadingElement={<RiCalendarLine />} readOnly />
-        <span aria-hidden="true" className="text-oe-foreground-tertiary">
-          —
-        </span>
-        <InputButton className="w-[132px]" controlSize="small" value="2026-09-21" leadingElement={<RiCalendarLine />} readOnly />
+        <div className="flex items-center gap-1.5">
+          {PERIOD_OPTIONS.map((option) => (
+            <Chip
+              key={option.value}
+              shape="rounded"
+              controlSize="small"
+              active={draft.period === option.value}
+              onClick={() => onDraftChange({ period: option.value })}
+            >
+              {option.label}
+            </Chip>
+          ))}
+        </div>
+        {/* 직접 고를 때만 두 칸이 선다. 날짜를 고르는 달력을 아직 붙이지 않아 눌러도 열리지
+            않으며, 두 날이 비어 있는 동안에는 기간을 걸지 않는다. */}
+        {draft.period === CUSTOM ? (
+          <div className="flex items-center gap-1.5">
+            <InputButton
+              className="w-[132px]"
+              controlSize="small"
+              aria-label="시작일"
+              placeholder="시작일"
+              value={draft.from}
+              leadingElement={<RiCalendarLine />}
+            />
+            <span aria-hidden="true" className="text-oe-foreground-tertiary">
+              —
+            </span>
+            <InputButton
+              className="w-[132px]"
+              controlSize="small"
+              aria-label="종료일"
+              placeholder="종료일"
+              value={draft.to}
+              leadingElement={<RiCalendarLine />}
+            />
+          </div>
+        ) : null}
       </FilterAxis>
 
       <FilterAxis label="카테고리">
