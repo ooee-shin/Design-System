@@ -151,17 +151,15 @@ export function regionOf(name: string) {
 }
 
 /**
- * SV 가 속한 팀이다. 담당 SV 를 고를 때 한 단계 위에서 팀이 먼저 보인다.
+ * 담당 SV 목록이다. 지금 목록에 건을 가진 사람만 선다.
  *
- * 담당자를 찾는 사람이 이름부터 아는 경우는 드물다. 「수도권 1팀이 맡은 건」처럼 팀으로 먼저
- * 좁히고 그 안에서 사람을 고르는 것이 실제 순서이므로, 열 명을 한 줄로 늘어놓지 않고 팀으로 묶는다.
- * 팀 구분은 담당 지역을 따른다.
+ * 전체 SV 명부가 아니라 이 목록에서 실제로 고를 수 있는 이름만 둔다. 걸어 봐야 한 건도 나오지 않는
+ * 이름이 목록에 서면, 고르는 사람이 그 이름을 눌러 보고 나서야 없다는 것을 안다.
+ *
+ * 팀으로 한 단계 묶어 두었다가 걷어냈다. 지금은 이름이 열 개뿐이라 묶음의 이름이 목록에서 자리만
+ * 차지한다. 전체 SV 를 노출하게 되면 팀을 1depth 로 올리는 구조를 다시 검토한다.
  */
-export const SV_GROUPS = [
-  { label: "수도권 1팀", options: ["박지우", "한지훈", "최은영", "오세진"] },
-  { label: "수도권 2팀", options: ["김도현", "윤가람", "서지호"] },
-  { label: "영남·호남팀", options: ["이서준", "임채원", "배수현"] },
-].map((team) => ({ label: team.label, options: team.options.map((sv) => ({ value: sv, label: sv })) }));
+export const SV_OPTIONS = [...new Set(REQUESTS.map((request) => request.sv))].map((sv) => ({ value: sv, label: sv }));
 
 /**
  * 로그인한 사람이 맡은 점포다.

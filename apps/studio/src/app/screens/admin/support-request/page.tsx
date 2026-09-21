@@ -35,7 +35,7 @@ import {
   SORT_OPTIONS,
   STATUS,
   STATUS_OPTIONS,
-  SV_GROUPS,
+  SV_OPTIONS,
   type RequestFilter,
   type SupportRequest,
 } from "./request-data";
@@ -275,13 +275,11 @@ function FilterBar({
         </div>
       </FilterAxis>
 
-      {/* 담당 SV 는 팀으로 한 번 묶어 연다. 이름만 열 개를 늘어놓으면 찾는 사람이 그 이름이 어느
-          팀인지부터 떠올려야 한다. */}
       <FilterAxis label="담당 SV">
         <MultiCombobox
           controlSize="small"
           className="w-36"
-          groups={SV_GROUPS}
+          options={SV_OPTIONS}
           value={draft.sv}
           onValueChange={(value) => onDraftChange({ sv: value })}
           placeholder="전체"
