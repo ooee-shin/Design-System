@@ -14,15 +14,24 @@
 
 import { useState } from "react";
 
-import { RiInboxLine } from "@remixicon/react";
+import { RiCalendarLine, RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
-import { Badge } from "@ooee/ui";
+import { Badge, Button, Input, InputButton, Select } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
 import { ScreenPlaceholder } from "@/components/screens/screen-chrome";
 
-import { REQUESTS, STATUS, type SupportRequest } from "./request-data";
+import {
+  CATEGORY_OPTIONS,
+  EMPTY_FILTER,
+  matches,
+  REQUESTS,
+  STATUS,
+  STATUS_OPTIONS,
+  type RequestFilter,
+  type SupportRequest,
+} from "./request-data";
 
 // 좌측 내비게이션의 이름을 그대로 따른다. 점주의 소리가 「파트너 & 고객센터」 아래에 있는 것과
 // 달리 지원요청관리는 운영관리 바로 아래에 선다.
@@ -33,32 +42,147 @@ export default function AdminSupportRequestScreenPage() {
   // 그 건을 자기가 고른 것으로 읽고, 목록이 무엇을 담고 있는지보다 그 건을 먼저 읽기 때문이다.
   const [picked, setPicked] = useState<SupportRequest | null>(null);
 
+  // 조건은 고르는 즉시 걸리지 않고 「조회」를 눌러야 걸린다. 관리자웹이 쓰던 방식이며, 축이
+  // 여럿이라 하나 바꿀 때마다 목록이 다시 그려지면 조건을 다 세우기 전에 화면이 먼저 움직인다.
+  const [draft, setDraft] = useState<RequestFilter>(EMPTY_FILTER);
+  const [filter, setFilter] = useState<RequestFilter>(EMPTY_FILTER);
+  const shown = REQUESTS.filter((request) => matches(request, filter));
+
   return (
     <AdminLayout>
       <div className="flex min-h-0 flex-1 flex-col">
         <PageHeader path={PAGE_PATH} title="지원요청관리" />
-        {/* 왼쪽 폭은 400px 로 잡아 둔다. 옮겨 오는 것이 사장님 앱의 목록이라 그 앱의 폭(390px)에
-            맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
-        <div className="flex min-h-0 flex-1 gap-3 p-6">
-          {/* 조건은 목록 위에 둔다. 앞의 관리자 목록은 조건을 왼쪽 패널에 세로로 세웠으나, 이
-              화면에서는 그 자리를 목록이 쓴다. */}
-          <div className="flex w-[400px] shrink-0 flex-col gap-3">
-            <ScreenPlaceholder name="Filter" className="h-16 shrink-0" />
-            <ul className="min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg border border-oe-border-secondary bg-oe-background-primary">
-              {REQUESTS.map((request) => (
-                <li key={request.no}>
-                  <RequestRow request={request} picked={picked?.no === request.no} onPick={() => setPicked(request)} />
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-3 p-6">
+          {/* 조건은 목록 위가 아니라 화면 폭을 가로질러 선다. 조건은 목록과 상세 둘 다에 걸리는
+              값이라 한쪽 칼럼 안에 두면 왼쪽 목록에만 걸리는 것으로 읽히고, 400px 안에서는 축
+              하나에 라벨과 컨트롤을 나란히 둘 자리도 나오지 않는다. */}
+          <FilterBar
+            draft={draft}
+            onDraftChange={(next) => setDraft({ ...draft, ...next })}
+            onReset={() => {
+              setDraft(EMPTY_FILTER);
+              setFilter(EMPTY_FILTER);
+              setPicked(null);
+            }}
+            onSubmit={() => {
+              setFilter(draft);
+              // 걸러 낸 목록에 없는 건이 오른쪽에 남아 있으면, 목록에 없는 건을 보고 있게 된다.
+              setPicked((current) => (current && matches(current, draft) ? current : null));
+            }}
+          />
 
-          <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-oe-border-secondary bg-oe-background-primary">
-            {picked === null ? <EmptyDetail /> : <Detail request={picked} />}
+          {/* 왼쪽 폭은 400px 로 잡아 둔다. 옮겨 오는 것이 사장님 앱의 목록이라 그 앱의 폭(390px)에
+              맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
+          <div className="flex min-h-0 flex-1 gap-3">
+            <div className="flex w-[400px] shrink-0 flex-col">
+              <ul className="min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+                {shown.map((request) => (
+                  <li key={request.no}>
+                    <RequestRow request={request} picked={picked?.no === request.no} onPick={() => setPicked(request)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+              {picked === null ? <EmptyDetail /> : <Detail request={picked} />}
+            </div>
           </div>
         </div>
       </div>
     </AdminLayout>
+  );
+}
+
+/**
+ * 화면 폭을 가로지르는 조건 줄이다.
+ *
+ * 관리자웹이 쓰던 배치를 그대로 가져왔다. 축마다 라벨을 컨트롤 왼쪽에 붙여 가로로 늘어놓고,
+ * 줄 끝에 초기화와 조회를 둔다. 축이 늘어 한 줄에 다 서지 못하면 다음 줄로 흐른다.
+ */
+function FilterBar({
+  draft,
+  onDraftChange,
+  onReset,
+  onSubmit,
+}: {
+  draft: RequestFilter;
+  onDraftChange: (next: Partial<RequestFilter>) => void;
+  onReset: () => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <form
+      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-5 py-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        onSubmit();
+      }}
+    >
+      {/* 기간은 자리만 세워 두었다. 날짜를 고르는 달력을 아직 붙이지 않았으므로 눌러도 열리지
+          않으며, 값은 예시로 둔 기본 구간이다. */}
+      <FilterAxis label="조회기간">
+        <InputButton className="w-[132px]" controlSize="small" value="2026-09-01" leadingElement={<RiCalendarLine />} readOnly />
+        <span aria-hidden="true" className="text-oe-foreground-tertiary">
+          —
+        </span>
+        <InputButton className="w-[132px]" controlSize="small" value="2026-09-21" leadingElement={<RiCalendarLine />} readOnly />
+      </FilterAxis>
+
+      <FilterAxis label="카테고리">
+        <Select
+          controlSize="small"
+          className="w-36"
+          options={CATEGORY_OPTIONS}
+          value={draft.category}
+          onValueChange={(value) => onDraftChange({ category: value ?? undefined })}
+          ariaLabel="카테고리"
+        />
+      </FilterAxis>
+
+      <FilterAxis label="처리상태">
+        <Select
+          controlSize="small"
+          className="w-28"
+          options={STATUS_OPTIONS}
+          value={draft.status}
+          onValueChange={(value) => onDraftChange({ status: value ?? undefined })}
+          ariaLabel="처리상태"
+        />
+      </FilterAxis>
+
+      <FilterAxis label="제목 검색">
+        <Input
+          controlSize="small"
+          className="w-56"
+          placeholder="제목 검색"
+          aria-label="제목 검색"
+          value={draft.keyword}
+          onChange={(event) => onDraftChange({ keyword: event.target.value })}
+          trailingElement={<RiSearchLine />}
+        />
+      </FilterAxis>
+
+      {/* 두 버튼은 줄 끝으로 민다. 조건을 다 세운 다음에 누르는 것이라 읽는 순서의 끝이다. */}
+      <div className="ml-auto flex items-center gap-1.5">
+        <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiResetLeftLine />} onClick={onReset}>
+          초기화
+        </Button>
+        <Button type="submit" controlSize="small">
+          조회
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+/** 라벨과 컨트롤이 한 줄에 서는 조건 하나다. */
+function FilterAxis({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="shrink-0 text-sm font-medium text-oe-foreground-secondary">{label}</span>
+      {children}
+    </div>
   );
 }
 

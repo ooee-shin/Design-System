@@ -47,3 +47,32 @@ export const REQUESTS: SupportRequest[] = [
   { no: 2372, title: "본사 방문 일정을 다시 잡고 싶습니다", category: "기타", store: "아현점", status: "done", createdAt: "2026-09-08" },
   { no: 2371, title: "포장 용기 뚜껑이 맞지 않습니다", category: "제품 불량", store: "가재울점", status: "done", createdAt: "2026-09-05" },
 ];
+
+/** 필터가 고를 수 있는 값들이다. 「전체」는 그 축을 걸지 않은 상태다. */
+export const ALL = "all";
+
+export const CATEGORY_OPTIONS = [
+  { value: ALL, label: "전체" },
+  ...[...new Set(REQUESTS.map((request) => request.category))].map((category) => ({ value: category, label: category })),
+];
+
+export const STATUS_OPTIONS = [
+  { value: ALL, label: "전체" },
+  ...Object.entries(STATUS).map(([value, { label }]) => ({ value, label })),
+];
+
+export type RequestFilter = {
+  category: string;
+  status: string;
+  keyword: string;
+};
+
+export const EMPTY_FILTER: RequestFilter = { category: ALL, status: ALL, keyword: "" };
+
+/** 건 하나가 조건에 맞는지. 제목만 찾는다. 점포와 카테고리는 전용 축이 따로 있다. */
+export function matches(request: SupportRequest, filter: RequestFilter) {
+  if (filter.category !== ALL && request.category !== filter.category) return false;
+  if (filter.status !== ALL && request.status !== filter.status) return false;
+  const keyword = filter.keyword.trim();
+  return keyword === "" || request.title.includes(keyword);
+}
