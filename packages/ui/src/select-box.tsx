@@ -129,6 +129,15 @@ function SelectBoxGroup({
   )
 }
 
+// 카드 안의 Control 은 카드와 같은 중립으로 켠다. 단독으로 선 Radio 와 Checkbox 는 표식 하나가
+// 켜짐을 말하는 유일한 신호라 brand 를 쓰지만, 카드 안에서는 카드가 이미 선택을 알리고 있어 그
+// 표식이 유일한 신호가 아니다. 카드의 선을 중립으로 두고 표식만 brand 로 남기면 한 카드 안에서
+// 지목하는 색이 둘이 된다. 근거는 `interaction.md` 의 「선택 상태와 Hover·Pressed」다.
+const neutralControlClassName = {
+  radio: "data-[checked]:border-oe-border-bold-primary data-[checked]:bg-oe-background-bold-primary data-[checked]:active:bg-oe-background-bold-primary",
+  checkbox: "data-[checked]:[&>[data-slot=checkbox-indicator]]:border-oe-border-bold-primary data-[checked]:[&>[data-slot=checkbox-indicator]]:bg-oe-background-bold-primary data-[indeterminate]:[&>[data-slot=checkbox-indicator]]:border-oe-border-bold-primary data-[indeterminate]:[&>[data-slot=checkbox-indicator]]:bg-oe-background-bold-primary",
+} as const
+
 function SelectBox({
   value,
   title,
@@ -151,7 +160,7 @@ function SelectBox({
       value={value}
       disabled={isDisabled}
       readOnly={context.readOnly}
-      className={cn("focus-visible:ring-0 focus-visible:ring-offset-0", visuallyHiddenControl && "absolute size-px opacity-0")}
+      className={cn("focus-visible:ring-0 focus-visible:ring-offset-0", neutralControlClassName.radio, visuallyHiddenControl && "absolute size-px opacity-0")}
     />
   ) : (
     <Checkbox
@@ -159,7 +168,7 @@ function SelectBox({
       disabled={isDisabled}
       readOnly={context.readOnly}
       onCheckedChange={(checked) => context.setSelectedValue(value, checked === true)}
-      className={cn("focus-visible:ring-0 focus-visible:ring-offset-0", visuallyHiddenControl && "absolute size-px opacity-0")}
+      className={cn("focus-visible:ring-0 focus-visible:ring-offset-0", neutralControlClassName.checkbox, visuallyHiddenControl && "absolute size-px opacity-0")}
     />
   )
 
