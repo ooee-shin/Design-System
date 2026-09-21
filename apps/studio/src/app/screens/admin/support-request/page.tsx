@@ -300,7 +300,9 @@ function FilterBar({
         <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiResetLeftLine />} onClick={onReset}>
           초기화
         </Button>
-        <Button type="submit" controlSize="small">
+        {/* 두 글자짜리 버튼이라 내용 폭만 쓰면 옆의 「초기화」보다 좁아진다. 줄 끝에서 마지막으로
+            누르는 것이 이 버튼이므로 최소 폭을 64px 로 잡아 둔다. */}
+        <Button type="submit" controlSize="small" className="min-w-16">
           조회
         </Button>
       </div>
