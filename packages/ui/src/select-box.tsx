@@ -178,6 +178,7 @@ function SelectBox({
       data-selected={selected ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
       data-readonly={context.readOnly ? "" : undefined}
+      data-trailing-element={context.trailingElement}
       className={cn(
         "relative flex cursor-pointer items-center gap-3 rounded-lg border border-oe-border-secondary bg-transparent px-4 pt-3 pb-3.5 text-left outline-none transition-[background-color,border-color,box-shadow] duration-150",
         // 고른 카드는 중립 선으로 알린다. 카드는 면을 칠해 선택을 알리는 요소이므로 `interaction.md`

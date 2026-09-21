@@ -76,6 +76,8 @@ function Combobox({
     >
       <ComboboxPrimitive.Trigger
         data-slot="combobox-trigger"
+        data-variant={variant}
+        data-size={controlSize}
         data-invalid={invalid ? "" : undefined}
         aria-invalid={invalid || undefined}
         id={id}

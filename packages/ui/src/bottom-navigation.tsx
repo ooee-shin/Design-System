@@ -182,7 +182,7 @@ function BottomNavigation({ className, items, value, onValueChange, showLabels =
   const selectedIndex = items.findIndex((item) => item.value === value)
 
   return (
-    <nav data-slot="bottom-navigation" data-variant={variant} className={cn(BASE_CLASS, VARIANT_CLASS[variant], className)} {...props}>
+    <nav data-slot="bottom-navigation" data-variant={variant} data-show-labels={showLabels ? "true" : "false"} className={cn(BASE_CLASS, VARIANT_CLASS[variant], className)} {...props}>
       <div
         data-slot="bottom-navigation-list"
         className={cn(

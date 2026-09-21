@@ -95,6 +95,8 @@ function Select({
     >
       <SelectPrimitive.Trigger
         data-slot="select-trigger"
+        data-variant={variant}
+        data-size={controlSize}
         data-invalid={invalid ? "" : undefined}
         data-layout={layout}
         id={id}

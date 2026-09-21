@@ -39,6 +39,7 @@ function Switch({ className, thumbClassName, controlSize = "medium", ...props }:
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
+      data-size={controlSize}
       className={cn(
         "inline-flex shrink-0 cursor-pointer items-center rounded-full bg-oe-background-control-off outline-none ring-1 ring-inset ring-oe-background-control-off transition-[background-color,box-shadow]",
         // 켜짐은 brand 다. Radio 와 Checkbox 의 켜짐이 쓰는 색과 같아야, 브랜드 색을 갈아 끼울 때
