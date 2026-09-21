@@ -72,7 +72,9 @@ export default function AdminSupportRequestScreenPage() {
         {/* 머리에 바탕과 선을 두지 않는다. 아래가 통째로 스크롤되는 한 덩이가 아니라 조건 줄과
             목록과 상세 세 장으로 나뉘어 있어, 머리에도 선을 그으면 가로선이 겹쳐 보인다. */}
         <PageHeader path={PAGE_PATH} title="지원요청관리" variant="ghost" />
-        <div className="flex min-h-0 flex-1 flex-col gap-3 p-6">
+        {/* 위쪽 여백만 좁게 둔다. 머리가 바탕과 선을 갖지 않으므로 머리의 아래 여백과 본문의 위
+            여백이 그대로 이어져 한 덩이로 벌어진다. 좌우와 아래는 본문의 여백 그대로다. */}
+        <div className="flex min-h-0 flex-1 flex-col gap-3 px-6 pt-2 pb-6">
           {/* 조건은 목록 위가 아니라 화면 폭을 가로질러 선다. 조건은 목록과 상세 둘 다에 걸리는
               값이라 한쪽 칼럼 안에 두면 왼쪽 목록에만 걸리는 것으로 읽히고, 400px 안에서는 축
               하나에 라벨과 컨트롤을 나란히 둘 자리도 나오지 않는다. */}
