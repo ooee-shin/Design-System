@@ -129,7 +129,7 @@ export default function StoWriteScreenPage() {
 
                   위의 물음보다 한 단계 작게 둔다. 화면의 물음은 하나이고 이것은 그 답을 받은 뒤에
                   서는 구역의 이름이다. */}
-              <h2 className="text-lg font-semibold text-oe-foreground-primary">{menuLabel(kind)}</h2>
+              <h2 className="text-xl font-semibold text-oe-foreground-primary">{menuLabel(kind)}</h2>
               {/* 카테고리는 열어서 고르지 않고 칩으로 펼쳐 둔다. 목록이 일곱 개 안팎으로 짧고, 점주가
                   무엇 중에서 고르는 것인지를 목록을 열어 보지 않고 알아야 어느 것이 자기 건인지 견줄 수
                   있다. 고른 값도 그 자리에 그대로 남아 접힌 Select 처럼 한 칸으로 줄지 않는다.
