@@ -180,11 +180,13 @@ function SelectBox({
       data-readonly={context.readOnly ? "" : undefined}
       className={cn(
         "relative flex cursor-pointer items-center gap-3 rounded-lg border border-oe-border-secondary bg-transparent px-4 pt-3 pb-3.5 text-left outline-none transition-[background-color,border-color,box-shadow] duration-150",
-        // 고른 카드는 중립 선 하나로 알린다. 카드는 면을 칠해 선택을 알리는 요소이므로
-        // `interaction.md` 의 「선택 상태」가 정한 대로 brand 를 쓰지 않는다. brand 로 알리던 때에는
-        // 그 색이 `--oe-focus-ring` 과 같아서 고른 카드와 커서가 놓인 카드가 갈리지 않았고, 옅은
-        // 바탕이 흰 배경과 거의 구분되지 않아 선을 2px 로 키워 보강해야 했다.
-        "data-[selected]:border-oe-border-bold-primary",
+        // 고른 카드는 중립 선으로 알린다. 카드는 면을 칠해 선택을 알리는 요소이므로 `interaction.md`
+        // 의 「선택 상태」가 정한 대로 brand 를 쓰지 않는다. brand 로 알리던 때에는 그 색이
+        // `--oe-focus-ring` 과 같아서 고른 카드와 커서가 놓인 카드가 갈리지 않았다.
+        //
+        // 두께는 2px 이며 안쪽 1px 을 겹쳐서 만든다. `border-width` 를 키우면 카드 안의 내용이 1px
+        // 씩 밀려서, 고를 때마다 제목과 설명이 움직인다.
+        "data-[selected]:border-oe-border-bold-primary data-[selected]:shadow-[inset_0_0_0_1px_var(--oe-border-bold-primary)]",
         "has-[:focus-visible]:!border-oe-focus-ring has-[:focus-visible]:!shadow-[inset_0_0_0_1px_var(--oe-focus-ring)]",
         // 고른 카드도 Hover 와 Pressed 를 그대로 받는다. 선택을 배경으로 알리지 않으므로 하이라이트가
         // 흐려 놓을 선택 배경이 없다.
