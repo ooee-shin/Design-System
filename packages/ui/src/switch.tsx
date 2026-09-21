@@ -73,7 +73,12 @@ function SwitchField({ label, labelPosition = "right", switchClassName, classNam
   const accessibleLabelledby = ariaLabel || ariaLabelledby ? ariaLabelledby : generatedLabelId
 
   return (
-    <label className={cn("inline-flex w-fit cursor-pointer items-center", sizeClasses.root, labelPosition === "left" && "flex-row-reverse", disabled && "cursor-not-allowed", className)}>
+    <label
+      data-slot="switch-field"
+      data-size={controlSize}
+      data-label-position={labelPosition}
+      className={cn("inline-flex w-fit cursor-pointer items-center", sizeClasses.root, labelPosition === "left" && "flex-row-reverse", disabled && "cursor-not-allowed", className)}
+    >
       <Switch aria-label={ariaLabel} aria-labelledby={accessibleLabelledby} className={cn(switchClassName)} controlSize={controlSize} disabled={disabled} {...props} />
       <span id={generatedLabelId} className={cn("font-normal text-oe-foreground-primary", sizeClasses.label, disabled && "text-oe-foreground-disabled")}>{label}</span>
     </label>
