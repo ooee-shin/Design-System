@@ -26,6 +26,8 @@ export type SupportRequest = {
   title: string;
   category: string;
   store: string;
+  /** 그 점포를 맡은 SV 다. 점포가 정해지면 따라오는 값이라 행마다 적지 않고 짝에서 끌어온다. */
+  sv: string;
   status: RequestStatus;
   /** 목록에는 날짜만 선다. 시각까지 넣으면 400px 한 줄에서 점포명이 먼저 말줄임된다. */
   createdAt: string;
@@ -38,7 +40,24 @@ export type SupportRequest = {
   unread: number;
 };
 
-export const REQUESTS: SupportRequest[] = [
+/**
+ * 점포와 그 점포를 맡은 SV 의 짝이다. 점주의 소리 화면이 쓰는 짝과 같게 두었다. 같은 점포를 두
+ * 화면이 서로 다른 담당자로 보여 주면 어느 쪽이 맞는지 화면에서 가릴 수 없다.
+ */
+const SV_BY_STORE: Record<string, string> = {
+  마천동점: "박지우",
+  아현점: "한지훈",
+  명동점: "최은영",
+  가재울점: "오세진",
+  동의대역점: "이서준",
+  부천원종점: "김도현",
+  인천검단신도시점: "윤가람",
+  수원행궁점: "서지호",
+  광주상무점: "임채원",
+  대구월배점: "배수현",
+};
+
+const ROWS: Omit<SupportRequest, "sv">[] = [
   { no: 2384, title: "감자튀김 2박스가 들어오지 않았습니다", category: "배송·결품", store: "마천동점", status: "recv", createdAt: "2026-09-17", unread: 2 },
   { no: 2383, title: "튀김기 온도가 올라가지 않습니다", category: "기기·시설", store: "명동점", status: "recv", createdAt: "2026-09-17", unread: 0 },
   { no: 2382, title: "배달앱 주문이 포스로 넘어오지 않습니다", category: "배달", store: "아현점", status: "prog", createdAt: "2026-09-16", unread: 5 },
@@ -59,6 +78,8 @@ export const REQUESTS: SupportRequest[] = [
   { no: 2310, title: "냉장고 문 패킹이 떨어졌습니다", category: "기기·시설", store: "광주상무점", status: "done", createdAt: "2026-04-30", unread: 0 },
   { no: 2294, title: "정산서에 지난달 차감분이 그대로 남아 있습니다", category: "발주·정산", store: "대구월배점", status: "done", createdAt: "2026-03-18", unread: 0 },
 ];
+
+export const REQUESTS: SupportRequest[] = ROWS.map((row) => ({ ...row, sv: SV_BY_STORE[row.store] }));
 
 /** 예시 데이터의 등록일이 과거이므로 오늘을 고정해 둔다. 기간 조건이 이 날을 기준으로 걸린다. */
 const TODAY = "2026-09-21";
@@ -98,6 +119,10 @@ export const CATEGORY_OPTIONS = [...new Set(REQUESTS.map((request) => request.ca
 
 export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
 
+export const STORE_OPTIONS = Object.keys(SV_BY_STORE).map((store) => ({ value: store, label: store }));
+
+export const SV_OPTIONS = [...new Set(Object.values(SV_BY_STORE))].map((sv) => ({ value: sv, label: sv }));
+
 export type RequestFilter = {
   /** `1m`·`3m`·`6m` 가운데 하나이거나 직접 선택이다. */
   period: string;
@@ -107,11 +132,13 @@ export type RequestFilter = {
   /** 고른 값이 없으면 그 축을 걸지 않는다. */
   category: string[];
   status: string[];
+  store: string[];
+  sv: string[];
 };
 
 // 들어왔을 때 1 개월이다. 지원요청은 지금 처리해야 할 건을 찾는 목록이라, 기본으로 훑는 구간이
 // 넓으면 이미 끝난 건이 최근 건과 섞인다.
-export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", category: [], status: [] };
+export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", category: [], status: [], store: [], sv: [] };
 
 /**
  * 건 하나가 조건에 맞는지.
@@ -123,6 +150,8 @@ export function matches(request: SupportRequest, filter: RequestFilter) {
   const range = periodRange(filter);
   if (range && (request.createdAt < range[0] || request.createdAt > range[1])) return false;
   if (filter.category.length > 0 && !filter.category.includes(request.category)) return false;
+  if (filter.store.length > 0 && !filter.store.includes(request.store)) return false;
+  if (filter.sv.length > 0 && !filter.sv.includes(request.sv)) return false;
   return filter.status.length === 0 || filter.status.includes(request.status);
 }
 

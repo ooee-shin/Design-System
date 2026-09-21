@@ -32,6 +32,8 @@ import {
   REQUESTS,
   STATUS,
   STATUS_OPTIONS,
+  STORE_OPTIONS,
+  SV_OPTIONS,
   type RequestFilter,
   type SupportRequest,
 } from "./request-data";
@@ -213,6 +215,38 @@ function FilterBar({
           placeholder="전체"
           searchPlaceholder="처리상태 검색"
           ariaLabel="처리상태"
+          selectedItems="none"
+        />
+      </FilterAxis>
+
+      {/* 점포와 담당 SV 는 짝지어진 축이다. 한 SV 가 여러 점포를 맡으므로 SV 를 고르면 그 사람이
+          맡은 점포의 건이 함께 걸리고, 점포를 고르면 그중 한 곳만 남는다. 둘을 함께 걸면 교집합이다.
+
+          목록이 열 곳과 열 명이라 이름을 훑어 찾기에는 길다. 두 축의 팝업에서 검색이 실제로 쓰인다. */}
+      <FilterAxis label="점포">
+        <MultiCombobox
+          controlSize="small"
+          className="w-44"
+          options={STORE_OPTIONS}
+          value={draft.store}
+          onValueChange={(value) => onDraftChange({ store: value })}
+          placeholder="전체"
+          searchPlaceholder="점포 검색"
+          ariaLabel="점포"
+          selectedItems="none"
+        />
+      </FilterAxis>
+
+      <FilterAxis label="담당 SV">
+        <MultiCombobox
+          controlSize="small"
+          className="w-36"
+          options={SV_OPTIONS}
+          value={draft.sv}
+          onValueChange={(value) => onDraftChange({ sv: value })}
+          placeholder="전체"
+          searchPlaceholder="담당 SV 검색"
+          ariaLabel="담당 SV"
           selectedItems="none"
         />
       </FilterAxis>
