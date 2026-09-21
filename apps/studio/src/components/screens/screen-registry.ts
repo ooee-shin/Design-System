@@ -40,7 +40,7 @@ export const screenRoots: ScreenRoot[] = [
       { key: "layout", name: "레이아웃·테마설정", scope: "Admin Layout(Header, Side Navigation, Page Header)", href: "/screens/admin/layout" },
       { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
-      { key: "voice", name: "관리자 테이블 목록", scope: "목록·상세, 지원요청으로 전환", href: "/screens/admin/voice", inProgress: true },
+      { key: "voice", name: "관리자 테이블 목록", scope: "관리자 목록, 필터", href: "/screens/admin/voice" },
     ],
   },
   {
