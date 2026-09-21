@@ -16,7 +16,7 @@ import { useState } from "react";
 
 import { RiCalendarLine, RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
-import { Badge, Button, Input, InputButton, Select } from "@ooee/ui";
+import { Badge, Button, Input, InputButton, NotificationBadge, Select } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
@@ -50,13 +50,7 @@ export default function AdminSupportRequestScreenPage() {
 
   return (
     <AdminLayout>
-      {/* 본문 바탕을 옅은 회색으로 깐다. 조건 줄과 목록과 상세가 저마다 흰 카드로 서므로, 바탕이
-          같은 흰색이면 카드의 경계선 하나로만 세 덩이가 갈린다. 바탕을 한 단계 내리면 카드가
-          스스로 떠 보이므로, 세 카드에서 경계선을 걷고 옅은 그림자만 남겼다.
-
-          `AdminLayout` 이 아니라 이 화면이 깐다. 다른 관리자 화면은 흰 바탕을 그대로 쓰고 있으며,
-          이 화면에서 먼저 시험한 뒤에 레이아웃으로 올릴지 판단한다. */}
-      <div className="flex min-h-0 flex-1 flex-col bg-oe-background-secondary">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* 머리에 바탕과 선을 두지 않는다. 아래가 통째로 스크롤되는 한 덩이가 아니라 조건 줄과
             목록과 상세 세 장으로 나뉘어 있어, 머리에도 선을 그으면 가로선이 겹쳐 보인다. */}
         <PageHeader path={PAGE_PATH} title="지원요청관리" variant="ghost" />
@@ -83,7 +77,9 @@ export default function AdminSupportRequestScreenPage() {
               맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
           <div className="flex min-h-0 flex-1 gap-3">
             <div className="flex w-[400px] shrink-0 flex-col">
-              <ul className="min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg bg-oe-background-primary shadow-xs">
+              {/* 스크롤 막대는 손잡이만 남긴다. 브라우저가 주는 바닥이 카드 오른쪽에 회색 띠로 얹혀서,
+                  카드의 흰 면이 거기서 끊겨 보인다. 유틸리티는 `globals.css` 가 갖는다. */}
+              <ul className="oe-scrollbar-bare min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg border border-oe-border-secondary bg-oe-background-primary">
                 {shown.map((request) => (
                   <li key={request.no}>
                     <RequestRow request={request} picked={picked?.no === request.no} onPick={() => setPicked(request)} />
@@ -92,7 +88,7 @@ export default function AdminSupportRequestScreenPage() {
               </ul>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col rounded-lg bg-oe-background-primary shadow-xs">
+            <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-oe-border-secondary bg-oe-background-primary">
               {picked === null ? <EmptyDetail /> : <Detail request={picked} />}
             </div>
           </div>
@@ -120,8 +116,10 @@ function FilterBar({
   onSubmit: () => void;
 }) {
   return (
+    // 조건 줄만 옅은 회색 면을 갖는다. 화면의 흰 바탕 위에서 이 줄은 값을 읽는 자리가 아니라
+    // 목록을 좁히는 조작을 담은 자리이므로, 면을 한 단계 내려 아래의 목록·상세와 갈라 둔다.
     <form
-      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg bg-oe-background-primary px-5 py-4 shadow-xs"
+      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg bg-oe-background-secondary px-5 py-4"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
@@ -220,16 +218,26 @@ function RequestRow({ request, picked, onPick }: { request: SupportRequest; pick
         picked ? "bg-oe-background-secondary" : "hover:bg-oe-interaction-hover-subtle active:bg-oe-interaction-hover"
       }`}
     >
-      <span className="flex items-start gap-2">
+      <span className="flex items-center gap-2">
         <span className="min-w-0 flex-1 truncate text-base font-medium text-oe-foreground-primary">{request.title}</span>
+        {/* 안 읽은 채팅 수가 제목 옆에 선다. 답을 기다리는 건을 찾는 것이 이 목록을 훑는 첫 번째
+            이유이고, 그 신호는 제목과 같은 높이에서 읽혀야 줄을 훑는 눈을 멈춰 세운다. 읽지 않은
+            것이 없으면 컴포넌트가 스스로 그리지 않는다. */}
+        <NotificationBadge count={request.unread} stroke={false} />
+      </span>
+      {/* 세 값을 띄어 쓰는 가운뎃점으로 가른다. 종류가 다른 값을 한 줄에서 구분하는 표기이며
+          `ux-writing.md` 의 「가운뎃점」이 정한다.
+
+          상태는 그 줄의 오른쪽 끝으로 내렸다. 위에서 안 읽은 수와 자리를 다투면 둘 중 하나가
+          밀리는데, 지금 눈길을 먼저 받아야 하는 것은 답을 기다리는 건이다. 아래로 내려도 오른쪽
+          열에 위아래로 나란히 서므로 어느 줄에서든 같은 자리에서 읽힌다. */}
+      <span className="mt-1 flex items-center gap-2">
+        <span className="text-oe-label min-w-0 flex-1 truncate text-oe-foreground-tertiary">
+          {request.category} · {request.store} · {request.createdAt}
+        </span>
         <Badge tone={status.tone} size="small">
           {status.label}
         </Badge>
-      </span>
-      {/* 세 값을 띄어 쓰는 가운뎃점으로 가른다. 종류가 다른 값을 한 줄에서 구분하는 표기이며
-          `ux-writing.md` 의 「가운뎃점」이 정한다. */}
-      <span className="text-oe-label mt-1 block truncate text-oe-foreground-tertiary">
-        {request.category} · {request.store} · {request.createdAt}
       </span>
     </button>
   );
