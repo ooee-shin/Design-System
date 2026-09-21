@@ -90,7 +90,7 @@ Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Story
 
 **`packages/ui`는 팀원의 영역이다.** 컴포넌트 구현·토큰·Story는 그쪽이 소유한다. 고쳐야 할 것을 찾으면 고치지 말고 `docs/process/working-context.md` 에 근거와 함께 적는다. 화면(`apps/*`)과 하네스(`plugins/`, `scripts/`, `.claude/`)는 이쪽이다.
 
-**새 컴포넌트를 맨바닥에서 만들지 않는다.** shadcn/ui에서 출발해 이 저장소의 스택으로 정규화한다(`@base-ui/react`, cva + tailwind-merge, `oe` 시맨틱 토큰, `data-slot`). 만들기 전에 「정말 새로 만들어야 하는가」를 먼저 묻는다 — 확정 19종으로 되는 일이면 그걸 쓴다.
+**새 컴포넌트를 맨바닥에서 만들지 않는다.** shadcn/ui에서 출발해 이 저장소의 스택으로 정규화하고, **Playground 는 기존 컴포넌트와 같은 양식을 그대로 따른다.** 만드는 절차와 채워야 하는 다섯 자리는 [docs/process/new-component.md](docs/process/new-component.md) 가 갖는다. 만들기 전에 「정말 새로 만들어야 하는가」를 먼저 묻는다.
 
 ## 일하는 방식 (`docs/process/` — 전달본에는 가지 않는다)
 
