@@ -4,8 +4,23 @@
  * 화면을 더할 때 여기에 한 줄을 더한다. `prompt` 는 그 화면을 만들 때 준 요청을 한 줄로 줄인 것이고,
  * `source` 는 대조할 원본이 있으면 그 경로다. 원본이 없는 기획자 요청은 `source` 를 두지 않는다.
  */
+/**
+ * 화면을 묶는 자리다. 화면이 늘수록 목록이 길어져 스크롤만 하게 되므로 프로젝트로 나눈다.
+ * 새 화면을 만들 때 어느 것인지 판단이 서지 않으면 **짐작하지 말고 묻는다** — 잘못 묶으면
+ * 되돌리는 값이 크다. 규칙은 plugins/ooee-harness/skills/generate-code/SKILL.md 가 갖는다.
+ */
+export const SANDBOX_PROJECTS = [
+  { id: "admin", name: "관리자 웹", description: "본사 담당자가 쓰는 웹입니다." },
+  { id: "sto", name: "STO", description: "점주와 매장 직원이 쓰는 앱입니다." },
+  { id: "hr", name: "인사·급여", description: "근태·연차·정산과 그 발행을 다룹니다." },
+] as const;
+
+export type SandboxProject = (typeof SANDBOX_PROJECTS)[number]["id"];
+
 export type SandboxScreen = {
   key: string;
+  /** 어느 프로젝트의 화면인가. 첫 화면이 이 값으로 묶어 보인다. */
+  project: SandboxProject;
   name: string;
   href: `/${string}`;
   /** 화면을 만들 때 준 요청을 한 줄로. */
@@ -19,6 +34,7 @@ export type SandboxScreen = {
 export const sandboxScreens: SandboxScreen[] = [
   {
     key: "admin-login",
+    project: "admin",
     name: "관리자 로그인",
     href: "/admin-login",
     prompt:
@@ -28,6 +44,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "sto-support-request",
+    project: "sto",
     name: "STO 지원요청",
     href: "/sto-support-request",
     prompt: "STO 사장님 앱의 지원요청 폼 한 장. 요청 유형·매장·제목·내용·사진 첨부·연락 가능 시간·긴급 요청 여부.",
@@ -35,6 +52,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "voc",
+    project: "admin",
     name: "고객의 소리",
     href: "/voc",
     prompt: "블루키 관리자 웹의 고객의 소리 화면. 필터·상태 칩·표·상세 답변 패널·페이지 이동.",
@@ -42,6 +60,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "sto-my-page",
+    project: "sto",
     name: "사용자 마이페이지",
     href: "/sto-my-page",
     prompt:
@@ -50,6 +69,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "attendance-kiosk",
+    project: "hr",
     name: "출퇴근 찍기",
     href: "/attendance-kiosk",
     prompt:
@@ -58,6 +78,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "attendance-payroll",
+    project: "hr",
     name: "근태·급여 정산",
     href: "/attendance-payroll",
     prompt:
@@ -66,6 +87,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "annual-leave",
+    project: "hr",
     name: "연차 관리",
     href: "/annual-leave",
     prompt:
@@ -74,6 +96,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "tax-invoice",
+    project: "hr",
     name: "세금계산서 발행",
     href: "/tax-invoice",
     prompt:
@@ -82,6 +105,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "excel-export",
+    project: "hr",
     name: "엑셀 내려받기",
     href: "/excel-export",
     prompt:
@@ -90,6 +114,7 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "weekly-schedule",
+    project: "hr",
     name: "스케줄 관리",
     href: "/weekly-schedule",
     prompt:

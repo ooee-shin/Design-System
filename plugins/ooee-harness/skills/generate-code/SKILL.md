@@ -85,6 +85,8 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 - 파일 머리말 주석에 「입력」의 요구사항 문단을 **그대로** 붙여 넣는다. 줄이거나 고쳐 쓰지 않으며 선택지 목록·placeholder·기본값·Label 문구를 하나도 빠뜨리지 않는다. 그 아래에 정하지 않아 비워 둔 자리를 적는다. 단독 `/review-design`은 요청을 받지 않으므로 이 주석이 근거다.
 - `${user_config.screens_dir}/../screens.ts`의 `sandboxScreens`에 한 줄을 더한다. **이 등록이 빠지면 화면이 목록에 뜨지 않는다.** 7단계의 「변경 파일」에 이 파일이 없으면 등록을 빠뜨린 것이다. `prompt`는 요청의 한 줄 요약, `createdAt`은 오늘 날짜다. 요청에 `원본:`이 있으면 그 경로를 `source`에 그대로 적고, 없으면 `source`를 두지 않는다.
 
+  **`project` 는 화면 목록을 나누는 자리다.** `screens.ts` 가 가진 값 가운데 고르고, 어느 것인지 **판단이 서지 않으면 만들지 않고 묻는다.** 요청에 `프로젝트:` 가 있으면 그 값을 쓴다. 없고 요청만으로 가릴 수 없으면 보고의 첫 제목을 「## 묻고 멈춤」으로 하고, 고를 수 있는 값과 각각을 고르면 어디에 서는지를 적는다. 화면이 늘어날수록 목록이 길어지는데 잘못 묶으면 되돌리는 값이 크기 때문이다.
+
 **색과 경계**
 
 - 색은 `oe-*` 토큰 클래스만 쓴다. 자주 쓰는 것: `text-oe-foreground-primary`·`-secondary`·`-tertiary`·`-placeholder`·`-inverse`, `bg-oe-background-primary`·`-secondary`·`-bold-primary`, `bg-oe-brand-background-bold-primary`, `text-oe-brand-foreground-primary`, `hover:bg-oe-interaction-hover`.
