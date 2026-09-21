@@ -119,7 +119,36 @@ export const CATEGORY_OPTIONS = [...new Set(REQUESTS.map((request) => request.ca
 
 export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
 
-export const STORE_OPTIONS = Object.keys(SV_BY_STORE).map((store) => ({ value: store, label: store }));
+/**
+ * 점포와 그 점포가 선 지역이다. 점주의 소리 화면이 쓰는 값과 같다.
+ *
+ * 실제 점포는 천 곳을 넘어 한 목록에 늘어놓을 수 없으므로, 고르는 자리는 지역을 먼저 옮겨 다니는
+ * 두 단으로 만든다. 예시가 열 곳뿐이어도 구조는 실제 규모를 따른다.
+ */
+export const STORES = [
+  { name: "마천동점", region: "서울" },
+  { name: "아현점", region: "서울" },
+  { name: "명동점", region: "서울" },
+  { name: "가재울점", region: "서울" },
+  { name: "동의대역점", region: "부산" },
+  { name: "부천원종점", region: "경기" },
+  { name: "인천검단신도시점", region: "인천" },
+  { name: "수원행궁점", region: "경기" },
+  { name: "광주상무점", region: "광주" },
+  { name: "대구월배점", region: "대구" },
+];
+
+export const REGIONS = [...new Set(STORES.map((store) => store.region))];
+
+/** 그 지역에 선 점포들이다. */
+export function storesIn(region: string) {
+  return STORES.filter((store) => store.region === region).map((store) => store.name);
+}
+
+/** 점포명으로 그 점포가 선 지역을 찾는다. 검색 결과마다 어느 지역인지 붙일 때 쓴다. */
+export function regionOf(name: string) {
+  return STORES.find((store) => store.name === name)?.region ?? "";
+}
 
 /**
  * SV 가 속한 팀이다. 담당 SV 를 고를 때 한 단계 위에서 팀이 먼저 보인다.

@@ -22,6 +22,7 @@ import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
 import { ScreenPlaceholder } from "@/components/screens/screen-chrome";
 
+import { StorePicker } from "./store-picker";
 import {
   CATEGORY_OPTIONS,
   CUSTOM,
@@ -34,7 +35,6 @@ import {
   SORT_OPTIONS,
   STATUS,
   STATUS_OPTIONS,
-  STORE_OPTIONS,
   SV_GROUPS,
   type RequestFilter,
   type SupportRequest,
@@ -268,17 +268,11 @@ function FilterBar({
 
           목록이 열 곳과 열 명이라 이름을 훑어 찾기에는 길다. 두 축의 팝업에서 검색이 실제로 쓰인다. */}
       <FilterAxis label="점포">
-        <MultiCombobox
-          controlSize="small"
-          className="w-44"
-          options={STORE_OPTIONS}
-          value={draft.store}
-          onValueChange={(value) => onDraftChange({ store: value })}
-          placeholder="전체"
-          searchPlaceholder="점포 검색"
-          ariaLabel="점포"
-          selectedItems="none"
-        />
+        {/* 점포만 두 단으로 연다. 실제 점포가 천 곳을 넘어 한 목록에 늘어놓을 수 없기 때문이며,
+            지역을 먼저 옮겨 다니는 얼개는 점주의 소리 화면이 쓰는 것과 같다. */}
+        <div className="w-44">
+          <StorePicker value={draft.store} onValueChange={(value) => onDraftChange({ store: value })} />
+        </div>
       </FilterAxis>
 
       {/* 담당 SV 는 팀으로 한 번 묶어 연다. 이름만 열 개를 늘어놓으면 찾는 사람이 그 이름이 어느
