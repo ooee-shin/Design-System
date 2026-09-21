@@ -45,7 +45,7 @@ export default function StoSupportRequestPage() {
     <div className="mx-auto flex min-h-dvh w-full max-w-[390px] flex-col bg-oe-background-primary">
       <AppHeader
         title="지원요청"
-        leadingElement={<Button variant="ghost" tone="neutral" aria-label="뒤로가기" leadingIcon={<RiArrowLeftLine />} />}
+        leadingElement={<Button variant="ghost" tone="neutral" aria-label="뒤로가기" leadingIcon={<RiArrowLeftLine aria-hidden />} />}
       />
 
       <form onSubmit={(event) => event.preventDefault()} className="flex flex-1 flex-col">
@@ -75,7 +75,7 @@ export default function StoSupportRequestPage() {
             <InputButton
               controlSize="large"
               placeholder="사진 선택"
-              leadingElement={<RiImageAddLine />}
+              leadingElement={<RiImageAddLine aria-hidden />}
               aria-haspopup="dialog"
               onClick={() => {}}
             />
