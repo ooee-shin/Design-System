@@ -25,7 +25,8 @@
 | [tokens.md](tokens.md) | `oe` 토큰 문법과 Neutral·status·Overlay 체계 |
 | [interaction.md](interaction.md) | Focus, Disabled, Read-only와 Layout 기본값 |
 | [quality.md](quality.md) | 자산이 충족해야 하는 상태·접근성·반응형 기준 |
-| [studio.md](studio.md) | Studio 화면 구성 기준. Storybook으로 옮길 때의 표기 근거 |
+| [ux-writing.md](ux-writing.md) | 화면 문구의 표기와 문장 형태 규칙 |
+| [studio.md](studio.md) | Studio 화면 구성 기준 |
 
 ## 패키지 구조
 
@@ -39,7 +40,7 @@
 
 채택한 UI는 검증 정도와 관계없이 `packages/*`가 실제 원본을 소유한다. Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
 
-Studio는 컴포넌트를 화면에서 확인하는 현재의 채널이자 Storybook의 기반이다. 최종적으로는 Storybook이 기획자와 개발자가 컴포넌트를 찾아보는 표준 채널이 되며, 그때까지 Studio의 화면 구성과 표기 기준을 [studio.md](studio.md)가 소유한다.
+Studio는 기획자와 개발자가 컴포넌트를 찾아보는 표준 채널이다. Storybook은 두지 않기로 했으므로(`2026-09-18`) Studio가 그 역할의 주인이며, 화면 구성과 표기 기준은 [studio.md](studio.md)가 소유한다.
 
 ## 자산 분류
 

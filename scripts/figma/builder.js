@@ -45,7 +45,10 @@ function primitiveVar(name, value) {
   if (!v) { v = figma.variables.createVariable(name, prim, "COLOR"); v.scopes = ["ALL_FILLS", "STROKE_COLOR"]; primVar.set(name, v); }
   if (!syncedPrimitives.has(name)) {
     v.setValueForMode(prim.modes[0].modeId, { r: value.r, g: value.g, b: value.b, a: value.a ?? 1 });
-    v.description = PRIMITIVE_NOTE + (name.startsWith("brand-") ? " 기본 brand seed 와 HCT tone 단계 매핑은 Provisional 이다(docs/process/open-questions.md)." : "");
+    v.description =
+      name.startsWith("hex-")
+        ? "아직 토큰이 아닌 색이다. 코드(toggle-button.tsx 의 custom tone 등)에 날 hex 로 적혀 있어 이름 없이 값만 옮겨 왔다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다."
+        : PRIMITIVE_NOTE + (name.startsWith("brand-") ? " 기본 brand seed 와 HCT tone 단계 매핑은 Provisional 이다(docs/process/open-questions.md)." : "");
     syncedPrimitives.add(name);
   }
   return v;
@@ -64,6 +67,15 @@ function paintFor(ref, where) {
   const opacity = ref.alpha ? Number(ref.alpha) / 100 : 1;
   if (ref.alpha) report.opacityOnToken.push(`${where} ${variable.name}/${ref.alpha}`);
   return figma.variables.setBoundVariableForPaint({ type: "SOLID", color: { r: 0, g: 0, b: 0 }, opacity }, "color", variable);
+}
+// Figma 는 **변수에 묶인 paint 를 노드에 얹는 순간 투명도를 1 로 되돌린다.** 얹기 전 paint 가
+// `opacity: 0.3` 이어도 `node.strokes` 에 넣고 다시 읽으면 1 이다. 얹은 뒤 한 번 더 써야 남는다.
+// 그래서 칠은 언제나 이 함수로 넣는다. `border-…/30` 같은 알파가 이 한 줄에 걸려 있다.
+function setPaints(node, field, paints) {
+  node[field] = paints;
+  const wanted = paints.map((p) => (p && typeof p.opacity === "number" ? p.opacity : 1));
+  if (wanted.every((o) => o === 1)) return;
+  node[field] = node[field].map((p, i) => ({ ...p, opacity: wanted[i] }));
 }
 function bindSize(node, sz, where) {
   if (!sz) return;
@@ -126,6 +138,21 @@ function place(node, spec, parentBox, parent) {
   if (spec.portal) { node.layoutPositioning = "ABSOLUTE"; node.x = ex; node.y = ey; }
 }
 
+// 이 페이지에 이미 있는 컴포넌트 이름. 이름이 같은 프레임을 지운 **뒤에** 처음 세므로,
+// 다시 그리는 프레임의 것은 여기에 들어오지 않는다. 다른 프레임에 있던 것만 남는다.
+let componentNames = null;
+function existingComponentNames() {
+  if (!componentNames) {
+    componentNames = new Set();
+    for (const c of page.findAllWithCriteria({ types: ["COMPONENT"] })) {
+      // 묶인 것은 부모 Component Set 의 이름이, 아직 안 묶인 것은 남겨 둔 plugin data 가 세트 이름이다.
+      const set = c.parent && c.parent.type === "COMPONENT_SET" ? c.parent.name : c.getSharedPluginData(TAG, "set");
+      componentNames.add(`${set || ""}/${c.name}`);
+    }
+  }
+  return componentNames;
+}
+
 // 카탈로그로 만들어 둔 컴포넌트를 이름으로 찾는다. 한 번 찾은 것은 기억한다.
 // 문서 전체를 뒤지면 모든 페이지를 불러오느라 한 단계가 몇십 분씩 걸린다. 「컴포넌트」 페이지만 본다.
 let componentIndex = null;
@@ -135,7 +162,13 @@ async function componentNamed(name) {
     const catalog = figma.root.children.find((p) => p.name === "컴포넌트");
     if (catalog) {
       await catalog.loadAsync();
-      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) if (!componentIndex.has(c.name)) componentIndex.set(c.name, c);
+      // 변형으로 묶고 나면 컴포넌트 이름은 `variant=fill, tone=brand` 처럼 **축만** 남고 세트 이름은
+      // 부모 COMPONENT_SET 이 갖는다. 화면이 찾는 이름은 `Button/variant=fill, …` 꼴이므로 둘을 이어
+      // 색인한다. 아직 안 묶인 컴포넌트는 combine 전에 남겨 둔 `set` 플러그인 값을 쓴다.
+      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) {
+        const set = c.parent && c.parent.type === "COMPONENT_SET" ? c.parent.name : c.getSharedPluginData(TAG, "set");
+        for (const key of set ? [`${set}/${c.name}`, c.name] : [c.name]) if (!componentIndex.has(key)) componentIndex.set(key, c);
+      }
     }
   }
   return componentIndex.get(name) || null;
@@ -149,6 +182,7 @@ function textsOf(spec, acc = []) {
 
 async function build(spec, parent, parentBox) {
   let node;
+  let needsSettle = false;
   // 인스턴스로 놓는 자리는 안쪽이 조각에 실려 오지 않는다. 그래서 컴포넌트를 못 찾으면 그릴 것이 없다.
   // 프레임으로 대신 그리면 이름도 색도 좌표도 없는 글자가 엉뚱한 자리에 놓이므로, 그리지 않고 멈춘다.
   if (spec.inst) {
@@ -156,7 +190,6 @@ async function build(spec, parent, parentBox) {
     const wanted = textsOf(spec);
     if (!component) throw new Error(`컴포넌트를 찾지 못했다: ${spec.inst}. 카탈로그를 이 파일에 먼저 올린다`);
     const instance = component.createInstance();
-    parent.appendChild(instance);
     const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
     if (slots.length !== wanted.length) {
       instance.remove();
@@ -172,19 +205,22 @@ async function build(spec, parent, parentBox) {
     for (const inner of instance.findAll(() => true)) inner.setSharedPluginData(TAG, "p", "");
     report.instances = (report.instances || 0) + 1;
     if (spec.path) instance.setSharedPluginData(TAG, "p", spec.path);
+    parent.appendChild(instance);
     place(instance, spec, parentBox, parent);
     return instance;
   }
+  // 아래 네 갈래는 노드를 만들어 속성을 다 쓴 **뒤에** parent 에 붙인다. 오토 레이아웃 부모에 붙은 노드의
+  // 속성을 고치면 그때마다 부모 트리를 다시 재기 때문이다. 자식이 많을수록 그 값이 커진다
+  // (2026-09-17 측정: 자식 500개 기준 9,558ms → 4,651ms).
   if (spec.t === "x") {
     node = figma.createText();
-    parent.appendChild(node);
     const where = spec.s.slice(0, 16);
     await node.setTextStyleIdAsync(styleFor(spec.fs, spec.fw, where).id);
     node.characters = spec.s;
     node.name = spec.n;
     if (!spec.c) report.defaultTextColor.push(where);
     const p = paintFor(spec.c || { token: "oe-foreground-primary" }, `text:${where}`);
-    if (p) node.fills = [p];
+    if (p) setPaints(node, "fills", [p]);
     node.textAlignHorizontal = spec.al === "center" ? "CENTER" : spec.al === "right" || spec.al === "end" ? "RIGHT" : "LEFT";
     // 폭을 먼저 정하고 높이 자동 맞춤을 켠다. resize 가 textAutoResize 를 되돌리지 않게 하려는 순서다.
     if (!spec.lh || spec.h <= spec.lh * 1.5) node.textAutoResize = "WIDTH_AND_HEIGHT";
@@ -192,13 +228,12 @@ async function build(spec, parent, parentBox) {
   } else if (spec.t === "rect") {
     // 자식 없이 칠·테두리만 있는 상자다. 배치할 것이 없으므로 Frame 이 아니라 Rectangle 로 둔다.
     node = figma.createRectangle();
-    parent.appendChild(node);
     node.name = spec.n;
-    node.fills = spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : [];
+    setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
       const p = paintFor(spec.bd.c, `border:${spec.n}`);
       if (p) {
-        node.strokes = [p];
+        setPaints(node, "strokes", [p]);
         node.strokeAlign = "INSIDE";
         if (spec.bd.ds) node.dashPattern = [4, 4];
         node.strokeWeight = spec.bd.w[0];
@@ -209,22 +244,20 @@ async function build(spec, parent, parentBox) {
     bindSize(node, spec.sz, `rect:${spec.n}`);
   } else if (spec.t === "svg") {
     node = figma.createNodeFromSvg(CHUNK.icons[spec.icon] || spec.svg);
-    parent.appendChild(node);
     node.name = spec.icon || "icon";
     node.resize(spec.w, spec.h);
     node.fills = [];
     const p = paintFor(spec.c, `icon:${node.name}`);
-    if (p) for (const v of node.findAll((n) => "fills" in n && n.type !== "FRAME")) v.fills = [p];
+    if (p) for (const v of node.findAll((n) => "fills" in n && n.type !== "FRAME")) setPaints(v, "fills", [p]);
     bindSize(node, spec.sz, `icon:${node.name}`);
   } else {
     node = figma.createFrame();
-    parent.appendChild(node);
     node.name = spec.n;
-    node.fills = spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : [];
+    setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
       const p = paintFor(spec.bd.c, `border:${spec.n}`);
       if (p) {
-        node.strokes = [p];
+        setPaints(node, "strokes", [p]);
         node.strokeAlign = "INSIDE";
         if (spec.bd.ds) node.dashPattern = [4, 4];
         const [top, right, bottom, left] = spec.bd.w;
@@ -249,15 +282,30 @@ async function build(spec, parent, parentBox) {
     bindSize(node, spec.sz, `frame:${spec.n}`);
     if (!spec.stub) {
       for (const kid of spec.k || []) await build(kid, node, { x: spec.x, y: spec.y });
-      settle(node);
+      needsSettle = true;
     }
   }
+  // 여기서 처음 붙인다. 붙은 뒤에야 하는 것만 아래에 둔다.
+  parent.appendChild(node);
+  // settle 은 붙은 뒤에 잰다. 떨어져 있는 동안의 좌표는 부모의 배치를 거치지 않은 값이다.
+  if (needsSettle) settle(node);
   report.created++;
   // 카탈로그의 항목은 프레임이 아니라 Figma 컴포넌트로 만든다. 화면을 그릴 때 인스턴스로 놓을 수 있다.
   if (spec.component) {
+    const name = `${spec.component.name}/${spec.component.props}`;
+    // 같은 이름이 이 페이지에 이미 있으면 만들지 않고 멈춘다. 이름이 겹치면 Assets 에서 어느 쪽이 나올지
+    // 알 수 없고, 되읽기도 이름으로 컴포넌트를 찾으므로 조용히 틀린다. 실제로 --only 로 나눠 올리다
+    // 예전 프레임에 있던 것과 26개가 겹친 적이 있다(2026-09-17).
+    if (existingComponentNames().has(name)) {
+      throw new Error(`같은 이름의 컴포넌트가 이 페이지에 이미 있다: ${name}. 예전 프레임을 지우고 다시 올린다`);
+    }
     node = figma.createComponentFromNode(node);
-    node.name = `${spec.component.name}/${spec.component.props}`;
+    // 이름은 축=값 짝만 둔다. Figma 는 Variant 를 묶을 때 이 이름에서 옵션을 읽는다.
+    // 어느 세트에 들어갈지는 아래 plugin data 로 남기고, 마지막 combine 단계가 그것으로 묶는다.
+    node.name = spec.component.props;
     node.description = `${spec.component.name} ${spec.component.props}. packages/ui 의 코드에서 그대로 옮겼다.`;
+    node.setSharedPluginData(TAG, "set", spec.component.name);
+    existingComponentNames().add(name);
     report.components = (report.components || 0) + 1;
   }
   // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
@@ -274,9 +322,24 @@ for (CHUNK of RUN) {
     for (const old of page.children.filter((n) => n.name === CHUNK.rootFrame.name)) { report.replacedFrames.push(old.name); old.remove(); }
     parent = page;
   } else {
+    // 한 단계가 도중에 멈추면 그때까지 그린 것은 남는다. 사람이 고치고 **그 단계부터 다시 돌리면**
+    // 남아 있던 것 위에 또 그려서 노드가 조용히 두 벌 생긴다(루트 프레임을 만드는 단계는 같은 이름을
+    // 지우고 다시 그리므로 이 일이 없고, 자식 조각만 그렇다). 이번 조각이 만들 경로를 미리 지운다.
+    const mine = new Set(CHUNK.nodes.map((item) => item.path).filter(Boolean));
     const root = page.children.find((n) => n.type === "FRAME" && n.name === CHUNK.frameName && n.getSharedPluginData(TAG, "p"));
-    parent = root && (root.getSharedPluginData(TAG, "p") === CHUNK.parentPath ? root : root.findOne((n) => n.type === "FRAME" && n.getSharedPluginData(TAG, "p") === CHUNK.parentPath));
-    if (!parent) return { error: `부모 프레임을 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`, report };
+    if (root && mine.size) {
+      for (const old of root.findAll((n) => mine.has(n.getSharedPluginData(TAG, "p")))) {
+        // 앞의 것을 지우며 함께 사라진 자손일 수 있다. 이미 사라진 노드에 remove 를 부르면 던진다.
+        if (old.removed) continue;
+        report.replacedFrames.push(`다시 그림: ${old.getSharedPluginData(TAG, "p")}`);
+        old.remove();
+      }
+    }
+    // 자식을 담을 수 있는 노드면 무엇이든 부모가 된다. 카탈로그 항목은 createComponentFromNode 로
+    // COMPONENT 가 되므로 FRAME 만 찾으면 그 안쪽을 부모로 하는 뒤 조각이 부모를 잃는다(2026-09-18).
+    const canHoldChildren = (n) => "children" in n;
+    parent = root && (root.getSharedPluginData(TAG, "p") === CHUNK.parentPath ? root : root.findOne((n) => canHoldChildren(n) && n.getSharedPluginData(TAG, "p") === CHUNK.parentPath));
+    if (!parent) return { error: `부모를 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`, report };
   }
   for (const item of CHUNK.nodes) {
     const node = await build(item, parent, CHUNK.parentBox || { x: 0, y: 0 });

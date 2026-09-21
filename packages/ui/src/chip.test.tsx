@@ -128,9 +128,9 @@ test("the type rejects forcing the icon only variant from outside", () => {
   assert.ok(forcedIconOnly)
 })
 
-// Label 이 있으면 그 글자가 접근 가능한 이름이다. `ariaLabel` 을 함께 받아도 덮어쓰면
-// 화면에 보이는 글자와 읽히는 이름이 갈린다. Icon only 에서만 `aria-label` 을 붙인다.
-test("a labelled chip is never renamed by ariaLabel", () => {
+// 보이는 글자와 읽히는 이름이 갈리면 화면을 보며 말하는 사람과 듣는 사람이 같은 것을
+// 가리키지 못한다. Label 을 담지 않은 `ariaLabel` 은 이름으로 쓰지 않는다.
+test("a labelled chip is never renamed by an ariaLabel that drops the label", () => {
   for (const props of [
     { children: "Label", ariaLabel: "다른 이름" },
     { children: "Label", ariaLabel: "다른 이름", onClick: () => undefined },
@@ -141,6 +141,26 @@ test("a labelled chip is never renamed by ariaLabel", () => {
     const chip = view.container.querySelector("[data-slot=chip]")
 
     assert.equal(chip?.getAttribute("aria-label"), null, `${JSON.stringify(props)} 에서 Label 이 덮어써졌다`)
+  }
+})
+
+// 「2」처럼 짧은 Label 은 그 자체로 무엇을 하는 자리인지 말하지 못한다. 보이는 글자를 담은
+// 이름은 그 Label 을 보태는 것이므로 받는다. 기준은 chip.md 의 「Label 을 담은 이름만 보태기」다.
+test("a labelled chip takes an ariaLabel that contains its label", () => {
+  for (const props of [
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기" },
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기", onClick: () => undefined },
+    { children: "2", ariaLabel: "처리상태 조건 2개 지우기", onRemove: () => undefined, removeLabel: "삭제" },
+  ] as const) {
+    cleanup()
+    const view = render(<Chip {...props} />)
+    const chip = view.container.querySelector("[data-slot=chip]")
+
+    assert.equal(
+      chip?.getAttribute("aria-label"),
+      "처리상태 조건 2개 지우기",
+      `${JSON.stringify(props)} 에서 Label 을 담은 이름이 붙지 않았다`,
+    )
   }
 })
 
@@ -163,4 +183,55 @@ test("an icon only chip warns when it has no accessible name", () => {
 
   const chipWarnings = warnings.filter((text) => text.includes("ariaLabel"))
   assert.equal(chipWarnings.length, 1, `경고가 한 번만 나와야 한다: ${JSON.stringify(warnings)}`)
+})
+
+// chip.md 는 Active 의 채움을 둘로 두고, `fill` 이 어두운 Neutral surface 와 inverse 글자를
+// 쓴다고 정한다. brand 색을 쓰는 요소가 여럿인 화면에서 고른 값을 색으로 가르기 위한 축이므로,
+// 기본값이 종전의 `tonal` 로 남아 있는지와 `fill` 이 brand 를 걷어내는지를 함께 검사한다.
+test("the active chip tints itself with brand by default", () => {
+  const view = render(<Chip active>Label</Chip>)
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("bg-[var(--brand-alpha-05)]"))
+  assert.ok(chip?.className.includes("text-oe-brand-foreground-primary"))
+})
+
+test("the filled active chip uses the bold neutral surface instead of brand", () => {
+  const view = render(
+    <Chip active activeStyle="fill">
+      Label
+    </Chip>,
+  )
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(!chip?.className.includes("brand-alpha"))
+})
+
+// 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. 채움마다 자기 배경을 붙들어야
+// 포인터를 얹었을 때 다른 채움의 색이 돌아오지 않는다.
+test("the filled active chip holds its surface on hover and press", () => {
+  const view = render(
+    <Chip active activeStyle="fill" onClick={() => {}}>
+      Label
+    </Chip>,
+  )
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("hover:bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("active:bg-oe-background-bold-primary"))
+})
+
+// 아이콘 위계는 채움 안에서 유지된다. `secondary` 는 Label 과 같은 위계, `tertiary` 는 한 단계
+// 옅은 위계이며, `fill` 에서는 그 관계를 inverse 계열로 지킨다.
+test("the filled active chip keeps the icon hierarchy in the inverse family", () => {
+  const view = render(
+    <Chip active activeStyle="fill" leadingElement={<svg />} trailingElement={<svg />} trailingTone="tertiary">
+      Label
+    </Chip>,
+  )
+
+  assert.ok(view.container.querySelector("[data-slot=chip-leading-element]")?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(view.container.querySelector("[data-slot=chip-trailing-element]")?.className.includes("text-oe-foreground-inverse-secondary"))
 })

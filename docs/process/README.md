@@ -20,6 +20,7 @@
 | [figma-component-map.md](figma-component-map.md) | Figma 레이어 이름·변수·크기로 `@ooee/ui` 컴포넌트와 Property를 되짚는 표 |
 | [open-questions.md](open-questions.md) | 화면을 만들며 검증할 항목 |
 | [component-audit.md](component-audit.md) | 13개 컴포넌트 3중 대조 검수 결과와 확정한 정책. 고치는 작업이 끝나면 제거한다 |
+| [voice-request-misfiling.md](voice-request-misfiling.md) | 점주의소리·지원요청 오입 개선 화면의 범위, 상태, 새로 만들 컴포넌트와 차례 |
 
 ## 핵심 제작 철학: Template First, Asset Later
 

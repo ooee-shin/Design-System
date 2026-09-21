@@ -18,7 +18,7 @@ export function ScreenRootTabs({ current }: { current: ScreenRoot["key"] }) {
       <ul className="flex gap-1">
         {screenRoots.map((root) => {
           const active = root.key === current;
-          const done = root.items.filter((item) => item.href).length;
+          const done = root.items.filter((item) => item.href && !item.inProgress).length;
 
           return (
             <li key={root.key}>

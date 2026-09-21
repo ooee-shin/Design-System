@@ -40,4 +40,28 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "블루키 관리자 웹의 고객의 소리 화면. 필터·상태 칩·표·상세 답변 패널·페이지 이동.",
     createdAt: "2026-09-15",
   },
+  {
+    key: "sto-my-page",
+    name: "사용자 마이페이지",
+    href: "/sto-my-page",
+    prompt:
+      "STO 사장님 앱의 마이페이지. 아이디·비밀번호·점포·이름·권한을 보여 주고, 수정 가능한 비밀번호만 현재 비밀번호를 확인해 조회한다.",
+    createdAt: "2026-09-16",
+  },
+  {
+    key: "attendance-kiosk",
+    name: "출퇴근 찍기",
+    href: "/attendance-kiosk",
+    prompt:
+      "매장 입구 태블릿의 출퇴근 화면. 머리글에 매장명·날짜·시각, 근무 중/대기 중 두 덩이에 직원 칸과 퇴근하기·출근하기 버튼.",
+    createdAt: "2026-09-17",
+  },
+  {
+    key: "attendance-payroll",
+    name: "근태·급여 정산",
+    href: "/attendance-payroll",
+    prompt:
+      "점주·본사 담당자가 기간을 골라 직원별 근무 시간과 급여를 확인하는 태블릿 화면. 기간·매장 필터, 내보내기, 요약, 표, 페이지 이동.",
+    createdAt: "2026-09-17",
+  },
 ];

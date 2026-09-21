@@ -152,6 +152,30 @@
 }
 
 @layer utilities {
+  /* 스크롤 막대의 손잡이만 보인다. 브라우저가 주는 바닥과 경계선은 내용 옆이나 아래에 회색 띠처럼
+     얹혀서, 더 볼 것이 남았다는 사실보다 그 띠가 먼저 눈에 든다. 손잡이만 남기면 얼마나 남았는지는
+     그대로 말하면서 화면에 다른 선을 더하지 않는다.
+     막대를 아예 감추는 자리는 `[scrollbar-width:none]` 을 그대로 쓴다. 여기는 막대가 보여야 하는
+     자리다. */
+  .oe-scrollbar-bare {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-oe-border-primary) transparent;
+  }
+
+  .oe-scrollbar-bare::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .oe-scrollbar-bare::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .oe-scrollbar-bare::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-full, 9999px);
+    background: var(--color-oe-border-primary);
+  }
+
   .preview-canvas:lang(ko) {
     font-family: var(--oe-font-family-ko);
   }

@@ -2,7 +2,7 @@
 
 Figma 프레임을 다시 읽었을 때 남는 것으로 `@ooee/ui` 컴포넌트와 Property를 되짚는 표다. `/design-page`의 ②가 코드를 Figma로 옮기고, ④가 사람이 고친 Figma를 다시 읽어 코드로 되돌릴 때 이 표를 근거로 쓴다. 절차는 [ai-environment.md](ai-environment.md)의 순서 6·7, 도구는 [`scripts/figma/README.md`](../../scripts/figma/README.md)에 있다.
 
-**화면의 요소는 기본적으로 인스턴스가 아니라 이름을 가진 프레임이라서 이 표가 필요하다.** 카탈로그(`apps/sandbox/src/app/catalog/page.tsx`)로 Figma에 `@ooee/ui` 컴포넌트를 만들어 두기는 했지만(18종 135개), 화면을 그 인스턴스로 놓는 것은 `prepare.mjs --instances`로 켤 때뿐이다. Code Connect는 여전히 없다(Pro 플랜). 인스턴스로 놓인 자리는 주 컴포넌트 이름이 곧 답이므로 이 표가 필요 없고, 나머지 자리의 되짚기 근거는 넷뿐이다.
+**화면의 요소는 기본적으로 인스턴스가 아니라 이름을 가진 프레임이라서 이 표가 필요하다.** 카탈로그(`apps/sandbox/src/app/catalog/page.tsx`)로 Figma에 `@ooee/ui` 컴포넌트 18종을 만들어 두기는 했지만(변형 개수는 카탈로그가 정본이라 여기 적지 않는다), 화면을 그 인스턴스로 놓는 것은 `prepare.mjs --instances`로 켤 때뿐이다. Code Connect는 여전히 없다(Pro 플랜). 인스턴스로 놓인 자리는 주 컴포넌트 이름이 곧 답이므로 이 표가 필요 없고, 나머지 자리의 되짚기 근거는 넷뿐이다.
 
 1. **레이어 이름** — `dom-extract.js`가 `data-slot`, 없으면 `role`, 없으면 태그 이름을 쓴다. `aria-label`이 있으면 ` / <이름>`이 뒤에 붙는다. 아이콘 레이어는 `builder.js`가 Remix 이름(`RiCheckLine`)으로 덮어쓴다.
 2. **칠·테두리·글자에 묶인 변수 이름** — `oe color`·`oe primitive` 컬렉션의 변수 이름이 재조회에 `var(--oe-…)`·`var(--brand-…)`로 나온다.

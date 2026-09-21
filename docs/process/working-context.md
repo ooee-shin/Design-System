@@ -297,7 +297,7 @@
 ## 확정된 이관 전제
 
 - 이 저장소의 목적은 개인 자산화가 아니라 블루키 제품에서 사용할 UI 시스템의 1차 컴포넌트 완성이다. 통합 방식(블루키 코드 직접 삽입 vs 별도 패키지 연동)은 개발 검토 후 결정하며 1차 작업에 영향을 주지 않는다.
-- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이며 Storybook의 기반이 된다. 최종적으로 컴포넌트를 찾아보는 표준 채널은 Storybook이 맡는다.
+- 전달 범위는 `docs/system/` + `packages/` + `apps/studio`다. Studio는 그 자체가 자산이고, **컴포넌트를 찾아보는 표준 채널이다.** Storybook은 두지 않기로 했다(`2026-09-18`, [ai-environment.md](ai-environment.md)). AI 가 읽는 색인은 저장소 루트의 `llms.txt` 다.
 - `docs/process/`와 `AGENTS.md`는 전달 시 제거한다. 그래서 `docs/system/`의 문서는 이 둘을 참조하지 않는다.
 - 디자인 토큰은 변환 없이 그대로 사용하며 기존 개발 네이밍·스택과의 정합성은 1차 범위에서 고려하지 않는다.
 
@@ -348,7 +348,18 @@
 7. **Chip 확정 후 Combobox 잔여 작업.** Combobox의 선택값 Container가 Chip을 렌더링하므로 Chip 디자인이 바뀌면 Container를 두 번 만들게 된다. Chip을 먼저 처리한다. 다섯 항목은 [component-audit.md](component-audit.md)의 「Combobox 잔여 작업」에 있다.
 8. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 9. **Button의 Ghost.** 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다. 그 밖의 미정 항목은 [button.md](../system/components/button.md)의 「현재 정의하지 않은 항목」이 갖는다.
-10. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Storybook 폴더 구조와 함께 정하면 두 번 바꾸지 않는다.
+10. **Chip `xsmall` 의 글자 색이 빠지던 것은 고쳤다(`2026-09-18`).** `cn()`(tailwind-merge)이 `text-oe-label`(글자 크기 토큰)을 색 클래스와 같은 무리로 보고 앞의 색을 지우던 것이 까닭이었다. `switch.tsx` 처럼 arbitrary value 로 우회하는 대신 `packages/ui/src/utils.ts` 에서 `extendTailwindMerge` 로 `text-oe-*` 크기 토큰을 font-size 무리에 넣어 뿌리에서 막았고, `utils.test.ts` 가 고정한다. 우회가 필요한 자리는 이제 없다.
+12. **Studio 의 Chip Playground 가 새 `ariaLabel` 규칙을 스스로 어긴다.** `chip.tsx` 에 「보이는 Label 을 담은 이름만 보탠다」 가드가 들어오면서, copy 가 `label: "Label"`·`ariaLabel: "Chip"` 인 Playground(`apps/studio/src/components/candidates/chip-workbench.tsx:52·72`)가 조건에 걸린다. `next dev` 에서 `/components/chip` 을 열면 렌더마다 콘솔 경고가 찍히고, 디자인 시스템의 정본 예시가 이번에 새로 쓴 규칙을 어기는 예시가 된다. 렌더 결과는 main 과 같아 접근성 회귀는 없고 프로덕션 빌드에도 남지 않는다. copy 의 `ariaLabel` 을 Label 을 포함하는 문구로 바꾸거나 Icon only 일 때만 넘기면 된다. (`2026-09-18` 릴리스 점검)
+
+13. **`color.md` 가 `oe-border-tertiary` 와 `oe-border-disabled` 의 값이 같다고 적지만 다르다.** 실제 값은 tertiary 가 Light `neutral-150`·Dark `neutral-850`, disabled 가 Light `neutral-100`·Dark `neutral-900` 이다(`packages/tokens/src/index.ts:113~114`). 문서를 고칠 일인지 토큰 값을 고칠 일인지는 의도에 달려 있어 그대로 두었다 — 둘을 같은 값으로 두려던 것이었다면 토큰 쪽이 버그다. 근거를 틀린 사실로 적어 두면 「값이 같으니 합치자」는 판단이나 disabled 자리에 tertiary 를 쓰는 오용을 부른다. (`2026-09-18` 릴리스 점검)
+
+14. **ToggleButton 의 custom tone 색이 토큰이 아니라 날 hex 다.** 즐겨찾기·찜의 색이 `toggle-button.tsx` 의 `CUSTOM_ON_CLASS` 에 `bg-[#fdf5e2]`·`text-[#dfa010]` 처럼 적혀 있다. 그래서 Figma 로 옮길 때 이 칠만 변수에 묶이지 않았다. 지금은 값 그대로를 이름으로 삼은 `hex-fdf5e2` primitive 로 올려 두었고, 변수 설명에도 「아직 토큰이 아니다」라고 적었다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다. (`2026-09-18`)
+
+16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠해 Figma 로 못 옮긴다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 19 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
+
+    고치는 길은 둘이다. ① `packages/ui` 가 그 색을 토큰 class 로 칠한다(`--oe-message-*` 로 갈아 끼우는 길을 남기려면 그 자리만 CSS 변수로 두고 기본값은 토큰 class 로). ② `dom-extract.js` 가 `.oe-*` class 의 CSS 규칙을 읽어 `var(--oe-…)` 참조를 후보로 삼는다. ①이 다른 컴포넌트와 같아지는 길이고 ②는 이 컴포넌트 하나를 위해 추출기에 규칙을 더하는 길이다. 어느 쪽인지는 디자인 시스템이 정한다. 같은 자리에 `data-slot` 도 없어(`figma-component-map.md:49`) 되짚기도 안 되므로 함께 보면 좋다.
+
+17. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Studio 의 메뉴 구조와 함께 정하면 두 번 바꾸지 않는다.
 
 `Presentation` 화면은 무엇을, 왜, 어떻게 바꿨는지 전달하는 화면이며 현재 열네 꼭지가 있다. 원본은 `apps/studio/src/components/presentation-entries.ts`이고 작성 규칙과 기록 절차는 [presentation.md](presentation.md)에 있다.
 
@@ -375,15 +386,15 @@ pnpm visual --path /components/badge \
 
 개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-담당은 신주희가 Component·Variant, Token·UI 개선과 Story 작성이고, 유진식이 Figma MCP, Storybook MCP, Agent Rules, `AGENTS.md`, Skill·Plugin이다.
+담당은 신주희가 Component·Variant 와 Token·UI 개선이고, 유진식이 Figma MCP, Agent Rules, `AGENTS.md`, Skill·Plugin, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
 
-**통합 검증 항목 다섯 중 셋은 아직 대상이 없다.** Storybook, Storybook MCP와 `.mcp.json`의 Figma MCP 설정이 없다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 유진식의 작업이 들어오는 순서대로 채운다.
+**통합 검증 항목은 넷이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), 대신 「Figma 라이브러리가 카탈로그와 어긋나지 않는가」가 들어왔다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 유진식의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
 ### 2026-09-14 AI 개발 환경 트랙을 시작했다
 
-유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Storybook과 Figma 확인이다. Studio가 이미 문서와 Playground를 제공하므로 Storybook을 만들지 자체를 A/B 검증 뒤 함께 다시 정하며, 그때까지 `apps/storybook` 골격은 Skill v0 결과로 필요할 때만 유진식이 `9/17~18`에 만든다. 확정 컴포넌트마다 최소 `Default` Story 하나를 그 pull request에 한 번에 넣는 것은 신주희가 `9/16`까지 동의하면 유진식이 하는 제안이고, Story 파일 위치와 기본 브랜드 값의 자리(Storybook decorator 또는 `packages/tokens`)는 그 pull request 전에 함께 정한다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
+유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Figma 확인이다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

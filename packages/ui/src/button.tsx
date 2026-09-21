@@ -79,6 +79,9 @@ function paletteStep(palette: string, step: number) {
 // Badge 가 갖지 않는 Hover 와 Pressed 는 어느 variant 에서나 배경을 한 단계씩 진하게 밟는다.
 // Light 는 100→200→300 으로 내려가고 Dark 는 800→700→600 으로 올라가 방향이 서로 반대다.
 // outline 과 ghost 는 정지 상태에 배경이 없으므로 같은 사다리를 한 칸 늦게 밟는다.
+// ghost 만 글자를 한 칸 옅게 쓴다. Light 700, Dark 400 이며 나머지 셋은 Light 800, Dark 300 이다.
+// 배경도 경계도 없는 Style 이라 글자 하나로 무게가 정해지는데, 다른 Style 과 같은 단계를 쓰면
+// 물러나 있어야 할 조작이 본문 글자와 같은 무게로 읽힌다.
 // 클래스를 문자열로 조립하므로 Tailwind 가 소스에서 찾지 못한다. 여기서 쓰는 단계는
 // `styles.css` 의 `@source inline` 이 미리 생성한다. 단계를 바꾸면 그쪽도 함께 고친다.
 function toneClass(palette: string, variant: ButtonVariant) {
@@ -87,7 +90,7 @@ function toneClass(palette: string, variant: ButtonVariant) {
   if (variant === "fill") return `border-transparent bg-${color(600)} text-white hover:bg-${color(700)} active:bg-${color(800)}`
   if (variant === "tonal") return `border-transparent bg-${color(100)} text-${color(800)} hover:bg-${color(200)} active:bg-${color(300)} dark:bg-${color(800)} dark:text-${color(200)} dark:hover:bg-${color(700)} dark:active:bg-${color(600)}`
   if (variant === "outline") return `border-${color(500)}/30 bg-transparent text-${color(800)} hover:bg-${color(100)} active:bg-${color(200)} dark:text-${color(300)} dark:hover:bg-${color(800)} dark:active:bg-${color(700)}`
-  return `border-transparent bg-transparent text-${color(800)} hover:bg-${color(100)} active:bg-${color(200)} dark:text-${color(300)} dark:hover:bg-${color(800)} dark:active:bg-${color(700)}`
+  return `border-transparent bg-transparent text-${color(700)} hover:bg-${color(100)} active:bg-${color(200)} dark:text-${color(400)} dark:hover:bg-${color(800)} dark:active:bg-${color(700)}`
 }
 
 // 엑셀 색은 위 단계 규칙에 들어오지 않는다. Tailwind 팔레트도 seed 에서 생성한 값도 아니고
@@ -101,7 +104,9 @@ const EXCEL_CLASS: Record<ButtonVariant, string> = {
   fill: "border-transparent bg-[#217346] text-white hover:bg-[#1a5c38] active:bg-[#14452a]",
   tonal: "border-transparent bg-[#e4f0ea] text-[#14452a] hover:bg-[#c3dfd1] active:bg-[#9ac9b2] dark:bg-[#14452a] dark:text-[#c3dfd1] dark:hover:bg-[#1a5c38] dark:active:bg-[#217346]",
   outline: "border-[#2e9160]/30 bg-transparent text-[#14452a] hover:bg-[#e4f0ea] active:bg-[#c3dfd1] dark:text-[#9ac9b2] dark:hover:bg-[#14452a] dark:active:bg-[#1a5c38]",
-  ghost: "border-transparent bg-transparent text-[#14452a] hover:bg-[#e4f0ea] active:bg-[#c3dfd1] dark:text-[#9ac9b2] dark:hover:bg-[#14452a] dark:active:bg-[#1a5c38]",
+  // Light 는 다른 tone 의 ghost 와 같이 한 칸 옅은 700 자리 값을 쓴다. Dark 는 이 고정 사다리에
+  // 400 자리 값이 없어 300 자리인 `#9ac9b2` 를 그대로 둔다.
+  ghost: "border-transparent bg-transparent text-[#1a5c38] hover:bg-[#e4f0ea] active:bg-[#c3dfd1] dark:text-[#9ac9b2] dark:hover:bg-[#14452a] dark:active:bg-[#1a5c38]",
 }
 
 // Focus 표시는 `interaction.md` 가 제공하는 세 유형 중에서 고른다. 경계가 1px 로 보이는 outline 은

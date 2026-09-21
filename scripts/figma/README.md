@@ -19,6 +19,10 @@ Figma 쪽 호출은 Figma remote MCP의 `use_figma`로 한다. `prepare.mjs`가 
 | `reread.js` | 되읽기(④)에서 프레임을 줄(`rows`)로 읽는다. 파일을 바꾸지 않는다. `use_figma` 응답이 20,000자에서 잘려 자리를 아끼려고 객체 대신 줄로 돌려준다 |
 | `reread.mjs` | `step`은 위 단계 파일을 만들고(`--parts`로 나눌 수 있다), `diff`는 읽어 온 JSON을 `spec-<상태>.json`과 견주어 무엇이 바뀌었는지 낸다 |
 | `reread.test.mjs` | 차이 판정 시험. `pnpm test`에 들어 있어 Figma 없이 돈다 |
+| `combine-variants.js` | build 가 만든 컴포넌트를 `ooee.build`/`set` 값으로 묶어 **Component Set** 을 만든다. build 뒤 audit 앞에 선다 |
+| `export-keys.js` | 라이브러리 파일의 Component Set 과 변형 키를 뽑는다. 아직 어느 단계도 부르지 않는다 |
+| `step-payload.test.mjs` | 주석 떼기·인스턴스 접기·조각 나누기 시험. Figma 없이 돈다 |
+| `token-export.test.mjs` | 토큰 뽑기 시험. `color-mix` 중간 단계가 빠지지 않는지 본다 |
 
 ## 사람이 직접 돌릴 때
 
@@ -33,10 +37,15 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 - `--state`는 `이름=브라우저 JS`이고 여러 번 줄 수 있다. 이름은 첫 `=`까지이며 상태마다 달라야 한다. 하나라도 주면 첫 `--state`에 기본 화면 이름만 둔다. 주지 않으면 「기본」 하나다.
 - 모바일 화면은 `--width 390 --height 844`를 준다. 헤드리스 Chrome 창은 500px보다 좁아지지 않아서 창은 500으로 두고 문서 폭을 줄여 읽는다. 프레임 이름의 기기 표기는 폭 480 이하면 `Mobile`이다.
 - `--version`은 같은 날 같은 화면의 새 파일 이름에 ` · v2`처럼 버전을 붙인다. 이 기기에서 만든 이름은 `.figma-work/files.json`에 쌓여 같은 이름을 자동으로 피한다.
-- 돌릴 때마다 `.figma-work/<key>/`를 지우고 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- 돌릴 때마다 `.figma-work/<key>/`를 **지우고** 새로 쓴다. 이 디렉터리는 `.gitignore`에 있다.
+- **올리는 중에 같은 key 로 다시 돌리지 않는다.** 단계 파일이 통째로 사라져 올리던 세션이 원본을 잃는다. 실제로 그렇게 한 번 끊겼다(2026-09-18). 올리는 동안 무언가 고쳐야 하면 다 올린 뒤에 다시 준비한다.
 - **두 개를 한꺼번에 돌리지 않는다.** 화면을 읽을 때 띄우는 Chrome 이 디버깅 포트 9222 를 쓰므로 서로 막혀 멈춘다. 굳이 나란히 돌려야 하면 `CDP_PORT=9301` 처럼 실행마다 다른 포트를 준다.
 
 `manifest.json`의 `steps`를 순서대로 `use_figma`에 넘긴다. 결과에 `error`가 있으면 멈춘다. 세 번째 단계가 **「builder 를 문서에 둔다」**이고, 뒤따르는 build 단계는 조각만 실은 채 문서에 둔 그것을 꺼내 쓴다. 그래서 build 단계를 다시 돌릴 때도 그 앞 단계는 건너뛰지 않는다 — 문서에 builder 가 없거나 다르면 build 단계가 `error` 로 멈춘다. build 단계는 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번 프레임과 이름이 정확히 같은 프레임만 지우고 다시 그린다. 마지막 audit 단계에서 `missingFrames`·`unboundPaints`·`textsWithoutStyle`이 모두 비고 모든 프레임의 `rootWithoutFill`이 `false`면 완료다. 브라우저 스크린샷은 `browserScreenshots`에 있다.
+
+**단계를 건너뛰거나 앞뒤를 바꾸지 않는다.** 뒤 단계의 조각은 앞 단계가 만든 노드를 부모로 찾는다. 한 단계를 건너뛰고 다음 것을 돌리면 「부모를 찾지 못했다」로 멈춘다. 나눠서 돌릴 때도 순서는 그대로여야 한다.
+
+**「옮기는 중 조각 내용이 바뀌었다」는 대개 다시 보내면 풀린다.** 모델이 옮겨 적다 한 글자를 틀린 것이고, 단계 파일 자체는 멀쩡하다. 같은 단계를 **세 번까지** 다시 보내고, 세 번째도 같으면 그때 파일을 의심한다. 파일이 맞는지는 Figma 없이 확인할 수 있다 — 단계의 `RUN` 을 그대로 평가해 `fnv(JSON.stringify(RUN))` 가 그 파일의 `EXPECT` 와 같은지 보면 된다.
 
 ## 어떻게 틀리지 않게 하는가
 
@@ -76,38 +85,54 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 | 화면 루트 | 오토 레이아웃 Frame |
 | 자식을 배치하는 상자(자식 둘 이상, 또는 여백·간격을 주는 상자) | 오토 레이아웃 Frame |
 | 칠·테두리·모서리를 가진 상자 | Frame (자식이 없으면 Rectangle) |
-| `data-slot` 이 붙은 컴포넌트 노드 | Frame. 되짚기의 근거라 접지 않는다 |
-| 글자 하나만 감싼 상자 | 없애고 글자가 그 자리를 차지한다. 가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다 |
+| `data-slot` 이 붙은 컴포넌트 노드 | Frame. 되짚기의 근거라 접지 않는다. **단 카탈로그 컴포넌트 안쪽은 접는다**(아래) |
+| 글자 하나만 감싼 상자 | 없애고 글자가 그 자리를 차지한다. 가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다. `overflow: hidden`(말줄임)이 붙어 있어도 접는다 — Figma 에서 글자는 제 크기를 갖고 잘림은 부모 auto layout 이 다룬다 |
 | 아이콘 하나만 감싼 상자, 자식을 그대로 통과시키는 상자 | 없앤다 |
 
 `manifest.json` 의 `folded` 가 이번에 접은 수를 센다. 「고객의 소리」는 Frame 124개가 69개로 줄었다.
 
 ## 컴포넌트 카탈로그
 
-`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 `Button/fill·brand·regular` 꼴이라 Figma 자산 패널에서 컴포넌트별로 묶인다.
+`apps/sandbox/src/app/catalog/page.tsx` 는 화면이 아니라 `@ooee/ui` 컴포넌트의 변형을 한 번에 그려 두는 자리다. 항목마다 `data-component`(컴포넌트 이름)와 `data-variant-props`(변형 이름)를 적으면, `builder.js` 가 그 프레임을 Figma **컴포넌트**로 만든다. 이름은 카탈로그의 `data-variant-props` 그대로인 `variant=fill, tone=brand, controlSize=regular, state=기본` 꼴이다. 자산 패널에서 컴포넌트별로 묶는 것은 이름이 아니라 `combine-variants.js` 가 만드는 **Component Set** 이고, 세트 이름은 그때 붙는다.
 
 ```bash
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --height 2400
+# 한 종류씩 옮긴다. 프레임이 「컴포넌트 / Button」처럼 나뉘고 한 번에 할 일이 작아진다.
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only Button --only Chip --height 900
 # manifest 의 steps 를 use_figma 에 순서대로 넘긴다
 ```
 
+**한 번에 다 옮기지 않는다.** 큰 오토 레이아웃 프레임에 노드를 붙이는 값은 **이미 있는 자식 수에 비례해** 커진다(2026-09-17 측정: 자식 100개 473ms · 300개 2,019ms · 500개 4,651ms). 139개를 한 프레임에 넣으면 뒤 단계가 몇 분씩 걸리고, 실제로 한 단계가 1,026초 무응답으로 MCP 타임아웃을 냈다. `--only` 로 종류를 나누면 프레임마다 자식이 수십 개라 이 값이 붙지 않는다.
+
 **이 실행은 지금 23단계 223,095자다(2026-09-17, 컴포넌트 139개).** builder 를 한 번만 보내기 전에는 42단계 702,691자였고, 그때는 글자의 74%가 39번 되풀이되는 같은 코드였다.
 
-변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 지금은 18종 135개다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
+변형을 더하려면 카탈로그 화면에 항목을 더하고 다시 돌린다. 값은 코드의 variant 정의에서 나오므로 Figma 쪽을 손으로 고치지 않는다. 종류는 열여덟이다(Button·Badge·Input·Select·Checkbox·Chip·Field·Switch·Radio·Textarea·InputButton·NumberInput·Combobox·ToggleButton·NotificationBadge·SelectBox·AppHeader·BottomNavigation).
+
+**개수는 여기에 적지 않는다.** 카탈로그가 정본이고 항목이 늘 때마다 바뀐다. 문서에 베껴 두면 반드시 어긋난다(실제로 135·139 두 값이 서로 다른 채 남아 있었고 둘 다 실제와 달랐다). 지금 개수는 이렇게 센다:
+
+```bash
+node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only <종류>   # 준비 결과의 프레임·단계 수
+```
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
+
+**컴포넌트 안쪽은 `data-slot` 상자도 접는다.** 화면에서는 레이어 이름이 되짚기의 다리라 남기지만, 카탈로그는 Component Set 이름과 Variant 속성이 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다. `Group` 이 씌운 감싸개도 컴포넌트 표시를 자식에게 넘기고 걷어낸다. 그래서 Figma 의 `Button` 컴포넌트 안에는 글자 하나만 있다(2026-09-18 유진식).
+
+```
+전:  COMPONENT → Frame button → Frame button-label → Text 버튼
+후:  COMPONENT(button) → Text 버튼
+```
 
 `--height` 는 화면 전체가 들어갈 만큼 준다. 항목을 더해 화면이 길어졌으면 그만큼 올린다. 작게 주면 브라우저 스크린샷이 잘려 눈으로 대조할 때 아래쪽을 보지 못한다.
 
 ## 컴포넌트 인스턴스 (실험)
 
-`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/fill·brand·xlarge` 같은 이름을 만든다. 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
+`--instances` 를 주면 화면의 Button·Input·Checkbox 를 카탈로그 컴포넌트의 **인스턴스**로 놓는다. 코드가 DOM 에 남긴 `data-variant`·`data-tone`·`data-size`·`data-checked` 로 `Button/variant=fill, tone=brand, controlSize=xlarge, state=기본` 같은 이름을 만든다(첫 `/` 앞이 세트 이름, 뒤가 그 안의 Variant 다). 인스턴스 안쪽의 경로는 지워 되읽기가 화면의 자리로 착각하지 않게 한다.
 
 **인스턴스로 놓을 자리는 안쪽을 단계에 싣지 않는다.** 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은 글자뿐이고, 노드 자신의 칠·테두리·모서리·오토 레이아웃도 컴포넌트가 가진 값이라 뗀다. 그만큼 옮겨 적을 글자가 준다(관리자 로그인: 6단계 67,456자 → 5단계 50,095자).
 
 **그래서 그 이름의 컴포넌트가 없으면 그리지 않고 멈춘다.** 안쪽을 싣지 않았으니 대신 그릴 것이 없다. build 단계가 `error` 로 「컴포넌트를 찾지 못했다: `<이름>`」 또는 「컴포넌트의 글자 수가 다르다」를 돌려준다. 카탈로그를 그 파일에 먼저 올리고 그 단계부터 다시 돌린다. 그때까지 그린 것은 남는다.
 
-**기본은 꺼 둔다.** 느려서가 아니라, 카탈로그를 이미 올려 둔 파일에서만 맞기 때문이다. 예전에 적어 둔 「인스턴스 둘에 23분」은 틀린 기록이었다. 2026-09-17 에 `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 훑기 17ms(그때 카탈로그는 77개였다. 지금은 135개이고 이 비용만 개수에 비례한다), `createInstance` 131ms, 글자 바꾸기 11ms 로 **인스턴스 하나에 0.2초**다. 그 23분은 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다(그 실행은 11단계 157,897자).
+**기본은 꺼 둔다.** 느려서가 아니라, 카탈로그를 이미 올려 둔 파일에서만 맞기 때문이다. 예전에 적어 둔 「인스턴스 둘에 23분」은 틀린 기록이었다. 2026-09-17 에 `use_figma` 로 구간을 재 보니 페이지 찾기 11ms, `loadAsync` 25ms, 컴포넌트 훑기 17ms(그때 카탈로그는 77개였다. 이 비용만 개수에 비례한다), `createInstance` 131ms, 글자 바꾸기 11ms 로 **인스턴스 하나에 0.2초**다. 그 23분은 단계마다 함께 실리는 `builder.js` 를 모델이 한 글자도 틀리지 않게 다시 쳐서 넘기는 시간이었다(그 실행은 11단계 157,897자).
 
 **전제 하나.** 글자를 슬롯에 넣을 때 `instance.findAllWithCriteria({types:["TEXT"]})` 가 돌려주는 차례가 화면 사양을 전위 순회한 차례와 같다고 본다. 카탈로그와 화면이 같은 React 컴포넌트에서 나오므로 지금은 맞지만, 코드로 확인할 수 있는 것이 아니다. 인스턴스 안 글자가 뒤바뀌어 보이면 이 전제를 먼저 의심한다.
 

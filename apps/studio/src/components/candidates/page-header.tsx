@@ -83,6 +83,10 @@ export function PageHeader({
           누를 곳이 아니므로 링크가 아니다. 앞선 항목들도 아직 실제 경로가 없어 글자로만 둔다.
           설명은 그 마지막 항목 바로 뒤에 선다. 지금 화면의 이름이 나오는 자리이고, 설명은 그
           이름을 보충하는 글이기 때문이다. */}
+      {/* 동작 버튼은 제목 줄이 아니라 경로와 제목 두 줄 전체와 나란히 서고, 그 높이의 가운데에
+          놓인다. 제목 줄에만 맞추면 버튼 위로 경로 줄만큼이 빈자리로 남는다. */}
+      <div className="flex items-center justify-between gap-4">
+      <div className="min-w-0 flex-1">
       <div className="flex items-center">
         <nav aria-label="현재 위치">
           <ol className="flex flex-wrap items-center gap-1 text-xs text-oe-foreground-tertiary">
@@ -125,8 +129,8 @@ export function PageHeader({
         )}
       </div>
 
-      {/* 제목과 동작 버튼은 한 줄에서 좌우로 갈린다. 버튼이 여럿이면 제목 쪽이 먼저 줄어든다. */}
-      <div className="mt-1.5 flex items-start justify-between gap-4">
+      {/* 제목 줄이다. 버튼이 여럿이어서 자리가 모자라면 제목 쪽이 먼저 줄어든다. */}
+      <div className="mt-1.5 flex items-start gap-4">
         {/* 별은 제목 옆에 붙는다. 이 화면이 다루는 대상을 바꾸는 오른쪽 버튼들과 달리, 이
             화면 자체를 각자 담아 두는 표시이기 때문이다. */}
         <div className="flex min-w-0 items-center gap-0.5">
@@ -149,6 +153,8 @@ export function PageHeader({
             />
           )}
         </div>
+      </div>
+      </div>
         {actions ? <div className="flex shrink-0 items-center gap-1.5">{actions}</div> : null}
       </div>
 

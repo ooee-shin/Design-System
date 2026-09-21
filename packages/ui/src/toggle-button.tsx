@@ -63,8 +63,8 @@ function brandStep(step: number) {
 // 켜짐의 단계는 Button 이 쓰는 것과 같다. Ghost 는 글자와 아이콘만 tone 색이 되고 Tonal 은
 // 배경까지 함께 생긴다. Hover 와 Pressed 는 어느 Style 에서나 한 단계씩 진하게 밟으며
 // Light 는 100→200→300 으로 내려가고 Dark 는 800→700→600 으로 올라가 방향이 서로 반대다.
-// Ghost 켜짐의 글자가 Button 의 Label 단계인 800 이 아니라 600 인 것은, 배경이 없어 글자와
-// 아이콘만으로 켜짐을 말해야 하는데 800 에는 유채색이 거의 남지 않기 때문이다.
+// Ghost 켜짐의 글자가 Button 의 Ghost Label 단계인 700 이 아니라 600 인 것은, 배경이 없어 글자와
+// 아이콘만으로 켜짐을 말해야 하는데 700 에는 유채색이 거의 남지 않기 때문이다.
 // 클래스를 문자열로 조립하므로 Tailwind 가 소스에서 찾지 못한다. 여기서 쓰는 단계는
 // `styles.css` 의 `@source inline` 이 미리 생성한다. 단계를 바꾸면 그쪽도 함께 고친다.
 function onClass(variant: ToggleButtonVariant) {

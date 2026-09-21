@@ -57,7 +57,7 @@ ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 Claude
       "Edit(/apps/sandbox/src/app/page.tsx)",
       "Edit(/apps/sandbox/src/app/globals.css)"
     ],
-    "allow": ["Bash(node * /lib/check-screens.mjs *)"],
+    "allow": ["Bash(node *lib/check-screens.mjs *)"],
     "deny": ["Bash(git push origin main)", "Bash(git push origin main *)", "Bash(git push * origin main)", "Bash(git push *:main)"]
   }
 }

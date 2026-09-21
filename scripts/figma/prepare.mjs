@@ -21,7 +21,7 @@ const all = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] 
 const key = opt("key");
 const screenName = opt("name");
 if (!key || !screenName) {
-  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version]');
+  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--only <컴포넌트>]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version]');
   process.exit(1);
 }
 const base = opt("base", "http://localhost:3001");
@@ -29,8 +29,14 @@ const width = Number(opt("width", "1440"));
 // 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 까닭은 아래 prep() 의 주석에 있다.
 const useInstances = args.includes("--instances");
 const height = Number(opt("height", "900"));
-// 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 를 주지 않으면 「기본」 하나만 옮긴다.
-const states = (all("state").length ? all("state") : ["기본"]).map((s) => {
+// 카탈로그를 컴포넌트 한 종류씩 옮길 때 쓴다. 그 종류가 없는 구역을 지우고 읽어 프레임이 작아진다.
+// 큰 오토 레이아웃 프레임에 노드를 붙이는 값은 이미 있는 자식 수에 비례해 커지므로(2026-09-17 측정:
+// 자식 100개 473ms · 500개 4,651ms), 139개를 한 프레임에 넣으면 뒤 단계가 몇 분씩 걸린다.
+const only = all("only");
+const onlyState = (name) => `${name}=[...document.querySelectorAll("section")].forEach((s) => { if (!s.querySelector('[data-component="${name}"]')) s.remove(); })`;
+
+// 이름은 첫 = 까지다. 이름에는 = 를 쓰지 않는다. --state 도 --only 도 없으면 「기본」 하나만 옮긴다.
+const states = (only.length ? only.map(onlyState) : all("state").length ? all("state") : ["기본"]).map((s) => {
   const i = s.indexOf("=");
   return i < 0 ? { label: s, script: "" } : { label: s.slice(0, i), script: s.slice(i + 1) };
 });
@@ -106,6 +112,8 @@ function primitiveValue(name) {
   if (name.startsWith("brand-")) return tokens.brandSolid[name] ? hexRgb(tokens.brandSolid[name]) : null;
   if (name === "white") return { r: 1, g: 1, b: 1 };
   if (name === "black") return { r: 0, g: 0, b: 0 };
+  // 코드에 날 hex 로 적힌 색이다. 이름이 값 그 자체라 값을 다시 뜯어 쓴다.
+  if (name.startsWith("hex-")) return hexRgb("#" + name.slice(4));
   return tw[name] ? oklch(tw[name]) : null;
 }
 function refValue(ref) {
@@ -161,12 +169,40 @@ function prep(node, nodePath, icons, primitives) {
  * `data-slot` 이 붙은 노드(컴포넌트를 가리키는 이름)와 루트, 칠·테두리·모서리를 가진 상자는 접지 않는다.
  */
 const folded = { text: 0, icon: 0, pass: 0, rect: 0 };
-function fold(node, isRoot = false) {
-  if (node.k) node.k = node.k.map((kid) => fold(kid));
+/**
+ * 카탈로그 항목의 감싸개를 컴포넌트 밖으로 밀어낸다. `Group` 이 씌운 div 는 항목을 늘어놓으려고 둔 것이지
+ * Figma 컴포넌트의 몸이 될 이유가 없다. 자식이 하나뿐이고 제 칠·테두리가 없으면 표시를 자식에게 넘긴다.
+ * 그러면 남은 감싸개는 평범한 통과 상자가 되어 fold 가 걷어낸다.
+ */
+function hoistComponents(node) {
+  if (node.component) {
+    let cur = node;
+    while ((cur.k || []).length === 1 && !cur.bg && !cur.bd && !cur.r && cur.k[0].t === "f") {
+      cur.k[0].component = cur.component;
+      delete cur.component;
+      cur = cur.k[0];
+    }
+  }
+  for (const kid of node.k || []) hoistComponents(kid);
+}
+
+/**
+ * `inComponent` 는 카탈로그 컴포넌트 **안쪽**이라는 뜻이다. 거기서는 `data-slot` 상자도 접는다.
+ * 화면에서는 레이어 이름이 되짚기의 다리라 접지 않지만, 카탈로그는 Component Set 이름과 Variant 속성이
+ * 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다(2026-09-18 유진식).
+ */
+function fold(node, isRoot = false, inComponent = false) {
+  const inside = inComponent || Boolean(node.component);
+  if (node.k) node.k = node.k.map((kid) => fold(kid, false, inside));
   if (node.t === "x" || node.t === "svg") return node;
   const kids = node.k || [];
-  if (!kids.length && (node.bg || node.bd) && !node.slot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
-  const plain = !node.bg && !node.bd && !node.r && !node.clip && !node.slot && !node.component && !isRoot;
+  const keepSlot = node.slot && !inComponent;
+  if (!kids.length && (node.bg || node.bd) && !keepSlot) { folded.rect++; return { ...node, t: "rect", k: undefined }; }
+  // 글자·아이콘 하나만 감싼 상자는 `overflow: hidden`(말줄임)이 붙어 있어도 접는다. Figma 에서 글자는
+  // 제 크기를 갖고 잘림은 부모 auto layout 이 다루므로, clip 만으로 상자를 남길 까닭이 없다.
+  const onlyTextOrIcon = kids.length === 1 && (kids[0].t === "x" || kids[0].t === "svg");
+  const keepClip = node.clip && !onlyTextOrIcon;
+  const plain = !node.bg && !node.bd && !node.r && !keepClip && !keepSlot && !node.component && !isRoot;
   if (!plain || kids.length !== 1) return node;
   const kid = kids[0];
   const near = (a, b) => Math.abs(a - b) <= 1;
@@ -254,6 +290,7 @@ const builtAt = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" 
 trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
+  hoistComponents(tree);
   tree = fold(tree, true);
   inferLayout(tree);
   foldInstances(tree);
@@ -312,6 +349,15 @@ writeStep(`${num()}-setup-text-styles.js`, readFileSync(path.join(here, "setup-t
 const loaders = loaderSteps(builder, STEP_LIMIT - 1400);
 loaders.forEach((code, i) => writeStep(`${num()}-load-builder.js`, code, `builder 를 문서에 둔다 (${i + 1}/${loaders.length}). 이후 build 단계가 이것을 꺼내 쓴다`));
 runs.forEach((chunks, i) => writeStep(`${num()}-build.js`, buildCode(chunks), `프레임을 만든다 (${i + 1}/${runs.length})`));
+// 카탈로그를 옮길 때만 나온다. 만들어 둔 컴포넌트를 종류별로 Component Set(Variants)으로 묶는다.
+const hasComponents = trees.some(({ tree }) => JSON.stringify(tree).includes('"component"'));
+if (hasComponents) {
+  writeStep(
+    `${num()}-combine-variants.js`,
+    readFileSync(path.join(here, "combine-variants.js"), "utf8").replace("const SCREEN = __SCREEN__;", () => `const SCREEN = ${JSON.stringify(screenName)};`),
+    "컴포넌트를 종류별로 Variants 로 묶는다",
+  );
+}
 writeStep(
   `${num()}-audit.js`,
   readFileSync(path.join(here, "audit.js"), "utf8")
