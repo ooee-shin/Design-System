@@ -26,13 +26,7 @@ export default function LlmsPage() {
             <RiArrowLeftLine className="size-oe-icon-xsmall" aria-hidden="true" />
             Home
           </Link>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">llms.txt</h1>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-              AI 가 이 저장소를 처음 읽을 때 보는 <strong className="font-medium text-foreground">색인 한 장</strong>입니다. 무엇을 어디서 읽으면 되는지만 적고, 내용은 기존 문서가 그대로 갖습니다.
-              당근 <code className="rounded bg-muted px-1 py-0.5 text-[13px]">seed-design.io/llms.txt</code> 와 같은 꼴입니다.
-            </p>
-          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">llms.txt</h1>
         </header>
 
         <section className="space-y-3">
