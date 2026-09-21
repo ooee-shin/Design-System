@@ -25,6 +25,7 @@ import { ScreenPlaceholder } from "@/components/screens/screen-chrome";
 import {
   CATEGORY_OPTIONS,
   EMPTY_FILTER,
+  found,
   matches,
   REQUESTS,
   STATUS,
@@ -46,7 +47,11 @@ export default function AdminSupportRequestScreenPage() {
   // 여럿이라 하나 바꿀 때마다 목록이 다시 그려지면 조건을 다 세우기 전에 화면이 먼저 움직인다.
   const [draft, setDraft] = useState<RequestFilter>(EMPTY_FILTER);
   const [filter, setFilter] = useState<RequestFilter>(EMPTY_FILTER);
-  const shown = REQUESTS.filter((request) => matches(request, filter));
+
+  // 검색어는 조건과 층이 다르므로 「조회」를 기다리지 않고 치는 대로 걸린다. 담긴 목록에서 한
+  // 건을 집어내는 일이라, 눌러야 걸리면 집어내는 동안 화면이 멈춰 있게 된다.
+  const [keyword, setKeyword] = useState("");
+  const shown = REQUESTS.filter((request) => matches(request, filter) && found(request, keyword));
 
   return (
     <AdminLayout>
@@ -62,6 +67,7 @@ export default function AdminSupportRequestScreenPage() {
             draft={draft}
             onDraftChange={(next) => setDraft({ ...draft, ...next })}
             onReset={() => {
+              // 검색어는 비우지 않는다. 초기화는 조건을 되돌리는 조작이고 검색은 조건이 아니다.
               setDraft(EMPTY_FILTER);
               setFilter(EMPTY_FILTER);
               setPicked(null);
@@ -76,10 +82,24 @@ export default function AdminSupportRequestScreenPage() {
           {/* 왼쪽 폭은 400px 로 잡아 둔다. 옮겨 오는 것이 사장님 앱의 목록이라 그 앱의 폭(390px)에
               맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
           <div className="flex min-h-0 flex-1 gap-3">
-            <div className="flex w-[400px] shrink-0 flex-col">
+            <div className="flex w-[400px] shrink-0 flex-col overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+              {/* 검색은 목록의 머리에 붙는다. 위의 조건 줄에 함께 두었다가 뺐는데, 조건은 목록에
+                  무엇을 담을지 정하고 검색은 담긴 목록 안에서 한 건을 집어내는 자리라 층이 다르다.
+                  집어내는 대상 바로 위에 두면 그 관계가 자리로 드러난다. */}
+              <div className="shrink-0 border-b border-oe-border-tertiary p-3">
+                <Input
+                  controlSize="small"
+                  layout="fill"
+                  placeholder="제목 검색"
+                  aria-label="제목 검색"
+                  value={keyword}
+                  onChange={(event) => setKeyword(event.target.value)}
+                  trailingElement={<RiSearchLine />}
+                />
+              </div>
               {/* 스크롤 막대는 손잡이만 남긴다. 브라우저가 주는 바닥이 카드 오른쪽에 회색 띠로 얹혀서,
                   카드의 흰 면이 거기서 끊겨 보인다. 유틸리티는 `globals.css` 가 갖는다. */}
-              <ul className="oe-scrollbar-bare min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+              <ul className="oe-scrollbar-bare min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto">
                 {shown.map((request) => (
                   <li key={request.no}>
                     <RequestRow request={request} picked={picked?.no === request.no} onPick={() => setPicked(request)} />
@@ -157,18 +177,6 @@ function FilterBar({
         />
       </FilterAxis>
 
-      <FilterAxis label="제목 검색">
-        <Input
-          controlSize="small"
-          className="w-56"
-          placeholder="제목 검색"
-          aria-label="제목 검색"
-          value={draft.keyword}
-          onChange={(event) => onDraftChange({ keyword: event.target.value })}
-          trailingElement={<RiSearchLine />}
-        />
-      </FilterAxis>
-
       {/* 두 버튼은 줄 끝으로 민다. 조건을 다 세운 다음에 누르는 것이라 읽는 순서의 끝이다. */}
       <div className="ml-auto flex items-center gap-1.5">
         <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiResetLeftLine />} onClick={onReset}>
@@ -218,26 +226,24 @@ function RequestRow({ request, picked, onPick }: { request: SupportRequest; pick
         picked ? "bg-oe-background-secondary" : "hover:bg-oe-interaction-hover-subtle active:bg-oe-interaction-hover"
       }`}
     >
+      {/* 줄의 오른쪽 끝은 안 읽은 수만 쓴다. 상태를 그 옆에 함께 두었더니 안 읽은 수가 있는 줄과
+          없는 줄에서 상태가 서는 x 좌표가 달라져, 목록을 훑을 때 상태가 줄마다 움직였다. 한 자리에
+          두 표시를 세우면 둘 중 하나는 다른 하나의 유무에 밀린다. */}
       <span className="flex items-center gap-2">
         <span className="min-w-0 flex-1 truncate text-base font-medium text-oe-foreground-primary">{request.title}</span>
-        {/* 안 읽은 채팅 수가 제목 옆에 선다. 답을 기다리는 건을 찾는 것이 이 목록을 훑는 첫 번째
-            이유이고, 그 신호는 제목과 같은 높이에서 읽혀야 줄을 훑는 눈을 멈춰 세운다. 읽지 않은
-            것이 없으면 컴포넌트가 스스로 그리지 않는다. */}
+        {/* 읽지 않은 것이 없으면 컴포넌트가 스스로 그리지 않는다. */}
         <NotificationBadge count={request.unread} stroke={false} />
       </span>
-      {/* 세 값을 띄어 쓰는 가운뎃점으로 가른다. 종류가 다른 값을 한 줄에서 구분하는 표기이며
-          `ux-writing.md` 의 「가운뎃점」이 정한다.
-
-          상태는 그 줄의 오른쪽 끝으로 내렸다. 위에서 안 읽은 수와 자리를 다투면 둘 중 하나가
-          밀리는데, 지금 눈길을 먼저 받아야 하는 것은 답을 기다리는 건이다. 아래로 내려도 오른쪽
-          열에 위아래로 나란히 서므로 어느 줄에서든 같은 자리에서 읽힌다. */}
-      <span className="mt-1 flex items-center gap-2">
-        <span className="text-oe-label min-w-0 flex-1 truncate text-oe-foreground-tertiary">
-          {request.category} · {request.store} · {request.createdAt}
-        </span>
+      {/* 상태는 아랫줄의 맨 앞이다. 왼쪽 끝은 줄마다 같은 자리이므로 무엇이 옆에 있든 움직이지
+          않는다. 뒤의 세 값은 띄어 쓰는 가운뎃점으로 가른다. 종류가 다른 값을 한 줄에서 구분하는
+          표기이며 `ux-writing.md` 의 「가운뎃점」이 정한다. */}
+      <span className="mt-1.5 flex items-center gap-1.5">
         <Badge tone={status.tone} size="small">
           {status.label}
         </Badge>
+        <span className="text-oe-label min-w-0 flex-1 truncate text-oe-foreground-tertiary">
+          {request.category} · {request.store} · {request.createdAt}
+        </span>
       </span>
     </button>
   );

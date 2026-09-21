@@ -71,15 +71,23 @@ export const STATUS_OPTIONS = [
 export type RequestFilter = {
   category: string;
   status: string;
-  keyword: string;
 };
 
-export const EMPTY_FILTER: RequestFilter = { category: ALL, status: ALL, keyword: "" };
+export const EMPTY_FILTER: RequestFilter = { category: ALL, status: ALL };
 
-/** 건 하나가 조건에 맞는지. 제목만 찾는다. 점포와 카테고리는 전용 축이 따로 있다. */
+/**
+ * 건 하나가 조건에 맞는지.
+ *
+ * 검색어는 여기에 들지 않는다. 조건은 목록에 무엇을 담을지 정하는 자리이고, 검색은 이미 담긴
+ * 목록 안에서 한 건을 집어내는 자리라 층이 다르다.
+ */
 export function matches(request: SupportRequest, filter: RequestFilter) {
   if (filter.category !== ALL && request.category !== filter.category) return false;
-  if (filter.status !== ALL && request.status !== filter.status) return false;
-  const keyword = filter.keyword.trim();
-  return keyword === "" || request.title.includes(keyword);
+  return filter.status === ALL || request.status === filter.status;
+}
+
+/** 담긴 목록 안에서 제목으로 한 건을 집어낸다. */
+export function found(request: SupportRequest, keyword: string) {
+  const word = keyword.trim();
+  return word === "" || request.title.includes(word);
 }
