@@ -174,18 +174,18 @@ export default function StoWriteScreenPage() {
                 />
               </Field>
 
-              {/* 첨부는 있으면 돕는 값이라 필수가 아니다. 그래서 위의 세 칸과 한 묶음으로 두지 않고
-                  옅은 선으로 한 번 끊는다. 넷을 같은 간격으로 늘어놓으면 알려야 하는 것과 덧붙이는
-                  것이 같은 무게로 읽힌다.
+              {/* 첨부도 위의 세 칸과 같은 간격으로 늘어놓는다. 끊는 선을 두었다가 걷어냈는데, 폼의
+                  칸이 넷뿐이라 선 하나가 구역을 가르는 표시로 읽히고 그 아래 첨부만 따로 떨어진
+                  덩이가 되기 때문이다.
 
-                  라벨과 버튼을 한 줄에 둔다. 첨부는 채워 넣는 값이 아니라 누르는 조작인데, 다른
-                  칸들처럼 라벨 아래에 컨트롤이 서면 입력할 값으로 읽힌다. `Field` 의 Header 오른쪽
-                  끝이 보조 조작을 담는 자리이므로 그 자리를 쓴다.
+                  버튼은 라벨 아래에 둔다. `Field` 의 Header 오른쪽 끝도 보조 조작을 담는 자리이지만,
+                  그 자리에서는 버튼이 라벨과 같은 줄에 서서 작아지고 눌러야 할 것으로 읽히지 않는다.
+                  아래로 내리면 위의 세 칸이 컨트롤을 두는 자리와 같은 자리에 선다.
 
                   버튼을 누르면 기기의 파일 선택이 실제로 열린다. 모양만 있는 버튼으로 두면 눌러도
                   아무 일이 없어서, 이 자리가 무엇을 하는 자리인지 화면에서 확인할 수 없다. 고른
                   파일은 올리지 않고 이름과 크기만 아래에 세운다. */}
-              <div className="mt-1 border-t border-oe-border-secondary pt-5">
+              <div>
                 <input
                   ref={filePicker}
                   type="file"
@@ -212,17 +212,13 @@ export default function StoWriteScreenPage() {
                     event.target.value = "";
                   }}
                 />
-                <Field
-                  label="첨부"
-                  group
-                  trailingElement={
-                    <Button controlSize="small" onClick={() => filePicker.current?.click()}>
-                      파일 첨부하기
-                    </Button>
-                  }
-                >
+                <Field label="첨부" group>
+                  <div className="flex flex-col items-start gap-2">
+                  <Button controlSize="large" onClick={() => filePicker.current?.click()}>
+                    파일 첨부하기
+                  </Button>
                   {files.length === 0 ? null : (
-                    <ul className="flex flex-col gap-1">
+                    <ul className="flex w-full flex-col gap-1">
                       {files.map((file) => (
                         <li
                           key={file.name}
@@ -296,6 +292,7 @@ export default function StoWriteScreenPage() {
                       ))}
                     </ul>
                   )}
+                  </div>
                 </Field>
               </div>
             </div>
