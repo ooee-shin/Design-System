@@ -57,7 +57,7 @@ Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContain
 - 선택·활성 상태의 Option, 전체 선택 행과 2-depth Checkbox 행에 이 규칙이 적용된다. 근거는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」다.
 - 단일 선택에서 선택된 Option의 Check icon은 `oe-brand-foreground-primary`, 행 배경은 현재 Brand alpha primitive `brand-alpha-08`을 사용한다. 다중 선택 Checkbox는 기존 Neutral 스타일을 유지한다.
 - Popup Option 행의 배경은 scrollbar 폭까지 확장해 Search input과 가로 범위를 맞춘다.
-- 다중 선택은 첫 번째 선택 label과 나머지 개수를 `서울특별시 외 2곳`처럼 Trigger에 표시하고, 아래의 별도 선택 영역 Container 안에 공용 Chip을 전부 표시한다. Container는 끌 수 없다. 선택한 값을 계속 보면서 개별로 빼는 것이 Combobox의 역할이기 때문이다.
+- 다중 선택은 첫 번째 선택 label과 나머지 개수를 `서울특별시 외 2곳`처럼 Trigger에 표시하고, 아래의 별도 선택 영역 Container 안에 공용 Chip을 전부 표시한다. 선택한 값을 계속 보면서 개별로 빼는 것이 Combobox의 역할이므로 Container가 기본이며, `selectedItems="none"`으로 끄는 것은 조건 줄처럼 여러 축이 한 줄에 나란히 선 자리에 한한다. 그 자리에서는 한 축만 아래로 자라면 줄의 높이가 흔들리고 옆 축이 따라 밀린다.
 - Container는 외곽 Border 없이 Neutral secondary background로만 구분한다.
 - Container 상단의 내부 검색은 공용 Input의 Filled 타입을 사용하고 선택된 Chip만 필터링하며 실제 선택값을 바꾸지 않는다.
 - 각 Chip의 Remix close trailing action은 해당 선택값을 즉시 제거한다.
@@ -76,7 +76,7 @@ Popup Search input은 Single, Multiple, 2-depth가 공통 `comboboxSearchContain
 
 - Clear button
 - Leading element와 Option image
-- Option group과 description
+- Option description
 - Async search
 - 선택 결과가 없는 Container의 별도 Empty state
 - Creatable option
