@@ -144,6 +144,9 @@ function MultiCombobox({
       <div className="w-full space-y-2">
         <ComboboxPrimitive.Trigger
           data-slot="combobox-trigger"
+          data-selection-mode="multiple"
+          data-variant={variant}
+          data-size={controlSize}
           data-invalid={invalid ? "" : undefined}
           aria-invalid={invalid || undefined}
           id={id}

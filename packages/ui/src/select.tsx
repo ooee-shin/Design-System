@@ -181,6 +181,9 @@ function MultiSelect({
     >
       <SelectPrimitive.Trigger
         data-slot="select-trigger"
+        data-selection-mode="multiple"
+        data-variant={variant}
+        data-size={controlSize}
         data-invalid={invalid ? "" : undefined}
         data-layout={layout}
         id={id}

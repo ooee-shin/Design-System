@@ -63,7 +63,10 @@ function RadioFieldBase({ label, rightDescription, bottomDescription, leadingEle
   const labelId = React.useId()
 
   return (
-    <label className={cn(
+    <label
+      data-slot="radio-field"
+      data-description={bottomDescription === undefined ? "없음" : "있음"}
+      className={cn(
       "flex min-h-oe-control-regular items-start gap-2 rounded-md bg-transparent px-2 py-2 transition-colors duration-[60ms]",
       !readOnly && "[&:not(:has([data-slot=radio][data-disabled])):hover]:bg-oe-interaction-hover-subtle",
       layout === "fill" ? "w-full" : "w-fit",

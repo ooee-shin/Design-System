@@ -79,6 +79,18 @@ function NotificationBadgeShape({ className, count, max = 99, tone = "accent", s
           className,
         ),
         children: count === undefined ? undefined : count > max ? `${max}+` : String(count),
+        // Figma 카탈로그가 이 넷으로 Variant 를 가른다. 넘침은 표시 문자열에서도 읽히지만
+        // `max` 를 바꾸면 그 규칙이 깨지므로 값을 그대로 남긴다.
+        //
+        // `mergeProps` 의 첫 인자 타입은 `data-*` 를 모른다. 이 컴포넌트는 `useRender` 로 태그를
+        // 갈아 끼울 수 있어 span 의 속성으로 좁혀져 있기 때문이며, 넘기는 값 자체는 문자열이라
+        // 런타임에 달라지는 것이 없다.
+        ...({
+          "data-slot": "notification-badge",
+          "data-shape": shape,
+          "data-tone": tone,
+          "data-overflow": count === undefined || count <= max ? "아님" : `${max}+`,
+        } as React.HTMLAttributes<HTMLSpanElement>),
       },
       props,
     ),
