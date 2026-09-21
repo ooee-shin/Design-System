@@ -167,7 +167,7 @@ function SubwayDepthExample() {
       <div className="p-2">
         <div className={comboboxSearchContainerVariants()}><RiSearchLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="역 검색" aria-label="역 검색" className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-oe-foreground-placeholder" /></div>
       </div>
-      <div className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] border-t border-oe-border-secondary">
+      <div className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)]">
         <div className="relative h-[270px] bg-neutral-50 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary">
           <div className="h-full overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {subwayDepths.map((depth) => (
