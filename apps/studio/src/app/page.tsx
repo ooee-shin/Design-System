@@ -4,6 +4,7 @@ import {
   RiArrowRightLine as ArrowRight,
   RiBookOpenLine as BookOpen,
   RiBox3Line as Boxes,
+  RiRobot2Line as Robot,
   RiShapesLine as Shapes,
   RiSlideshowLine as Slideshow,
   RiStackLine as Layers3,
@@ -13,6 +14,7 @@ import { buttonVariants } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 import { componentRegistry } from "@/components/component-registry";
 import { listDocs } from "@/lib/docs";
+import { readLlmsTxt } from "@/lib/llms";
 import { presentationEntries } from "@/components/presentation-entries";
 
 type Destination = {
@@ -27,6 +29,7 @@ type Destination = {
 export default function Home() {
   const docCount = listDocs().length;
 
+  const llmsSections = (readLlmsTxt().match(/^## /gm) ?? []).length;
   const groups: Array<{ id: string; label: string; description: string; items: Destination[] }> = [
     {
       id: "assets",
@@ -65,6 +68,13 @@ export default function Home() {
           status: `${docCount}개 문서`,
           href: "/docs",
           icon: BookOpen,
+        },
+        {
+          title: "llms.txt",
+          description: "AI 가 이 저장소를 처음 읽을 때 보는 색인입니다. 무엇을 어디서 읽으면 되는지만 적습니다.",
+          status: `${llmsSections}개 절`,
+          href: "/llms",
+          icon: Robot,
         },
         {
           title: "Presentation",
