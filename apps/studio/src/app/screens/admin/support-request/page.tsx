@@ -155,6 +155,7 @@ export default function AdminSupportRequestScreenPage() {
                       onValueChange={(next) => setOrder(next ?? "latest")}
                       ariaLabel="정렬"
                       selectedIndicator="none"
+                      align="end"
                     />
                   </div>
                 </div>
@@ -406,14 +407,18 @@ function Detail({ request }: { request: SupportRequest }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
+      {/* 상태는 목록의 줄과 같은 자리에 둔다. 목록에서 아랫줄 맨 앞에 서던 것이 상세에서 제목
+          오른쪽으로 옮겨 가면, 같은 건을 열었는데 같은 값이 다른 곳에 있다. */}
       <div className="flex flex-col gap-2 border-b border-oe-border-secondary px-6 py-5">
-        <div className="flex items-start gap-3">
-          <h2 className="min-w-0 flex-1 text-xl font-semibold text-oe-foreground-primary">{request.title}</h2>
-          <Badge tone={status.tone}>{status.label}</Badge>
+        <h2 className="text-xl font-semibold text-oe-foreground-primary">{request.title}</h2>
+        <div className="flex items-center gap-2">
+          <Badge tone={status.tone} size="small">
+            {status.label}
+          </Badge>
+          <p className="min-w-0 flex-1 truncate text-sm text-oe-foreground-tertiary">
+            {request.category} · {request.store} · {request.createdAt}
+          </p>
         </div>
-        <p className="text-sm text-oe-foreground-tertiary">
-          {request.category} · {request.store} · {request.createdAt}
-        </p>
       </div>
       <ScreenPlaceholder name="Detail content" className="m-6 flex-1" />
     </div>

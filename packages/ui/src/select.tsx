@@ -53,6 +53,13 @@ type SelectProps = VariantProps<typeof selectionTriggerVariants> &
      * Trigger 만으로 가려지지 않으면 기본값을 그대로 둔다.
      */
     selectedIndicator?: "check" | "none"
+    /**
+     * 팝업이 Trigger 의 어느 끝에 맞춰 열릴지.
+     *
+     * 팝업은 Trigger 폭을 바닥으로 삼고 내용만큼 벌어지므로, 좁은 Trigger 가 줄의 오른쪽 끝에
+     * 서 있으면 `start` 에서는 넘친 폭이 화면 밖으로 나간다. 그런 자리는 `end` 로 둔다.
+     */
+    align?: "start" | "end"
   } & SelectItemsProps
 
 type MultiSelectProps = Omit<SelectProps, "value" | "defaultValue" | "onValueChange"> & {
@@ -86,6 +93,7 @@ function Select({
   className,
   leadingElement,
   selectedIndicator = "check",
+  align = "start",
 }: SelectProps) {
   const resolvedOptions = options ?? groups?.flatMap((group) => group.options) ?? []
   const paddingX = optionPaddingX[controlSize ?? "regular"]
@@ -125,7 +133,7 @@ function Select({
       </SelectPrimitive.Trigger>
 
       <SelectPrimitive.Portal>
-        <SelectPrimitive.Positioner align="start" sideOffset={4} alignItemWithTrigger={false} className="z-50">
+        <SelectPrimitive.Positioner align={align} sideOffset={4} alignItemWithTrigger={false} className="z-50">
           <SelectPrimitive.Popup className="w-max min-w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
             <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto p-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
               {groups ? groups.map((group, groupIndex) => (
