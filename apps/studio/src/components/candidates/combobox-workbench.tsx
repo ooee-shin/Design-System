@@ -90,7 +90,7 @@ export function ComboboxWorkbench() {
               <AnatomySurface ariaLabel="Combobox content anatomy" title="Content anatomy" className="px-5">
                 <div lang="en" className="mx-auto max-w-md px-11 py-14">
                   <AnatomyFrame className="w-full">
-                  <div data-slot="combobox-popup" className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 shadow-lg">
+                  <div data-slot="combobox-popup" className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary p-2 text-sm shadow-lg">
                     <div className={comboboxSearchContainerVariants()}>
                       <RiSearchLine className="size-4 text-oe-foreground-tertiary" />
                       <span className="text-sm text-oe-foreground-placeholder"><span data-slot="combobox-search">Search input</span></span>
@@ -163,15 +163,15 @@ function SubwayDepthExample() {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-oe-border-primary bg-oe-background-primary text-sm shadow-sm">
       <div className="p-2">
         <div className={comboboxSearchContainerVariants()}><RiSearchLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="역 검색" aria-label="역 검색" className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-oe-foreground-placeholder" /></div>
       </div>
-      <div className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)] border-t border-oe-border-secondary">
+      <div className="grid min-w-0 grid-cols-[minmax(7rem,0.8fr)_minmax(0,1.2fr)]">
         <div className="relative h-[270px] bg-neutral-50 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:z-10 after:w-px after:bg-oe-border-secondary">
           <div className="h-full overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {subwayDepths.map((depth) => (
-              <button key={depth.id} type="button" onClick={() => { setActiveDepth(depth.id); setQuery(""); }} className={`flex min-h-9 w-full items-center border-b border-oe-border-secondary pl-[18px] pr-2 text-left text-oe-label ${activeDepth === depth.id ? "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}>
+              <button key={depth.id} type="button" onClick={() => { setActiveDepth(depth.id); setQuery(""); }} className={`flex min-h-9 w-full items-center border-b border-oe-border-secondary pl-[18px] pr-2 text-left ${activeDepth === depth.id ? "relative z-20 bg-oe-background-primary font-medium text-oe-foreground-primary" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}>
                 <span className="min-w-0 flex-1 truncate">{depth.label}</span><RiArrowDownSLine className="size-4 -rotate-90 text-oe-foreground-tertiary" aria-hidden="true" />
               </button>
             ))}
@@ -179,14 +179,14 @@ function SubwayDepthExample() {
         </div>
         <div className="h-[270px] overflow-x-hidden overflow-y-auto p-2 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
           <p className="px-2.5 pb-1.5 pt-1 text-[11px] font-medium text-oe-foreground-tertiary">{currentDepth.label}</p>
-          <button type="button" role="checkbox" aria-checked={someCurrentSelected ? "mixed" : allCurrentSelected} onClick={toggleAllCurrent} className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left text-oe-label ${allCurrentSelected ? "hover:bg-transparent" : "hover:bg-oe-interaction-hover"}`}>
+          <button type="button" role="checkbox" aria-checked={someCurrentSelected ? "mixed" : allCurrentSelected} onClick={toggleAllCurrent} className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${allCurrentSelected ? "hover:bg-transparent" : "hover:bg-oe-interaction-hover"}`}>
             <CheckboxIndicator checked={allCurrentSelected} indeterminate={someCurrentSelected} />
             <span className="font-semibold">전체</span>
           </button>
           {visibleOptions.map((line) => {
             const selected = selectedStations.includes(line);
             return (
-              <button key={line} type="button" aria-pressed={selected} onClick={() => setSelectedStations((current) => selected ? current.filter((value) => value !== line) : [...current, line])} className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left text-oe-label ${selected ? "" : "hover:bg-oe-interaction-hover"}`}>
+              <button key={line} type="button" aria-pressed={selected} onClick={() => setSelectedStations((current) => selected ? current.filter((value) => value !== line) : [...current, line])} className={`flex min-h-9 w-full items-center gap-2 rounded-md px-2.5 text-left ${selected ? "" : "hover:bg-oe-interaction-hover"}`}>
                 <CheckboxIndicator checked={selected} />
                 <span>{line}</span>
               </button>

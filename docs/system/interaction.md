@@ -12,6 +12,12 @@ Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Foc
 2. 선택선처럼 기존 경계가 이미 2px인 요소는 두께, 위치와 레이아웃을 바꾸지 않고 같은 2px 선의 색만 `oe-focus-ring`으로 교체한다. 선택선과 별도 Focus ring을 중첩하지 않는다.
 3. 기존 경계와 분리된 Focus 표시가 필요한 요소는 기본 2px 간격을 두고 바깥에 2px ring을 그린다. 컴포넌트 구조상 별도 조정이 필요한 경우에만 간격을 2px보다 크게 할 수 있다.
 
+## Popup을 연 Trigger
+
+**Trigger로 여는 Popup이 열려 있는 동안 Trigger는 Focus와 같은 표시를 유지한다.** Select와 Combobox 모두 열리는 순간 실제 초점이 팝업 안으로 옮겨 가므로, 표시를 두지 않으면 Trigger에 아무 흔적도 남지 않는다. 조건 줄처럼 같은 종류의 Trigger가 여럿 선 자리에서는 어느 것을 열어 둔 것인지 화면이 말하지 못하게 된다.
+
+이 표시는 고른 값이 아니라 지금 쓰고 있는 컨트롤을 가리키므로, 「선택 상태와 Hover·Pressed」가 선택에 중립을 쓰도록 정한 것과 어긋나지 않는다. 같은 뜻에 표현을 하나만 두기 위해 Focus가 쓰는 선과 ring을 그대로 쓴다.
+
 ## 오류와 Focus가 겹칠 때
 
 오류가 있는 Control에 커서가 가면 Focus 색이 아니라 오류 색을 유지한다. Focus 색으로 덮으면 고치려고 들어간 순간에 그 칸이 틀렸다는 표시가 사라진다.
@@ -89,6 +95,7 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 
 - 적용 대상: Button, Input, Input Button, Number Input, Textarea, Select, Combobox의 Container와 Chip의 `rounded`
 - 적용하지 않는 것: 카드형 선택지인 Select Box, Trigger로 여는 Popup, Tooltip, Message Bubble과 첨부 카드. 컨트롤과 나란히 놓이는 요소가 아니므로 각자의 단계를 사용한다.
+- 다만 Select와 Combobox의 Popup은 서로 같은 `rounded-lg`(10px)를 쓴다. 닫힌 상태의 Trigger를 공유하는 두 컴포넌트이므로, 열린 면의 모서리가 갈리면 같은 컨트롤을 열었는데 다른 것이 열린 것처럼 보인다.
 - Chip의 기본 모양은 `circle`이며 이 기준은 `rounded`를 골랐을 때 적용된다.
 
 `packages/ui/src/control-radius.test.tsx`가 컨트롤들이 같은 토큰을 쓰는지 검사하고, `packages/tokens/src/index.test.ts`가 토큰 값과 `RADII` 원본의 일치를 검사한다.
