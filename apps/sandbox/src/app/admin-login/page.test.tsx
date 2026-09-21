@@ -12,13 +12,13 @@ afterEach(() => {
   cleanup();
 });
 
-test("shows the system name as the screen heading", () => {
+test("화면 제목으로 시스템 이름을 보인다", () => {
   const view = render(<AdminLoginPage />);
 
   assert.ok(view.getByRole("heading", { name: "{환경설정 시스템명}" }));
 });
 
-test("has accessible id and password inputs and a save-id checkbox", () => {
+test("아이디·비밀번호 입력칸과 아이디 저장 체크박스에 이름이 붙어 있다", () => {
   const view = render(<AdminLoginPage />);
 
   assert.ok(view.getByLabelText("아이디"));
@@ -26,7 +26,7 @@ test("has accessible id and password inputs and a save-id checkbox", () => {
   assert.ok(view.getByRole("checkbox", { name: "아이디 저장" }));
 });
 
-test("has a submit button labeled 로그인", () => {
+test("「로그인」이라 적힌 제출 버튼이 있다", () => {
   const view = render(<AdminLoginPage />);
 
   const button = view.getByRole("button", { name: "로그인" });

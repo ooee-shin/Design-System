@@ -1,6 +1,6 @@
 /**
  * `/review-design` 검사 항목 가운데 소스만 읽고 거짓 양성 없이 가를 수 있는 것을 기계로 본다.
- * 판정 기준의 원본은 `.claude/skills/review-design/SKILL.md`의 「검사 항목」이고 규칙 이름의 번호도
+ * 판정 기준의 원본은 `plugins/ooee-harness/skills/review-design/SKILL.md`의 「검사 항목」이고 규칙 이름의 번호도
  * 그 번호다. Property 값, 역할과 경계, 정렬, 문구처럼 요청과 문서를 함께 읽어야 하는 항목은
  * 여기서 보지 않으며 `/review-design`이 본다.
  *
@@ -8,10 +8,25 @@
  * 보류한다. 걸리지 않았다고 위반이 없다는 뜻은 아니다.
  */
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+/**
+ * 화면 파일에서 위로 올라가며 저장소 루트를 찾는다. `pnpm-workspace.yaml` 이나 `.git` 이 있는
+ * 첫 자리다. 못 찾으면 null 을 돌려주고 부르는 쪽이 옛 규칙으로 돌아간다.
+ */
+function findRepoRoot(from) {
+  let dir = from;
+  for (let depth = 0; depth < 12; depth++) {
+    if (existsSync(path.join(dir, "pnpm-workspace.yaml")) || existsSync(path.join(dir, ".git"))) return dir;
+    const up = path.dirname(dir);
+    if (up === dir) return null;
+    dir = up;
+  }
+  return null;
+}
 
 /**
  * `typescript` 는 화면을 둔 저장소의 것을 쓴다. Plugin 자체는 의존성을 갖지 않는다.
@@ -30,7 +45,6 @@ function loadTypeScript(fromPath) {
   }
   throw new Error("typescript 를 찾지 못했다. 화면을 둔 저장소에 typescript 가 설치돼 있어야 한다");
 }
-
 
 
 const PALETTE =
@@ -258,8 +272,10 @@ export function checkScreenSource(source, filePath, drafts) {
   });
 
   // 12·14: import
-  // filePath 는 `<저장소>/apps/sandbox/src/app/<key>/page.tsx` 다.
-  const repo = path.resolve(path.dirname(filePath), "../../../../..");
+  // 저장소 루트를 「화면 파일에서 다섯 단계 위」로 박아 두면 `apps/sandbox/src/app` 이 아닌
+  // `screens_dir` 에서는 엉뚱한 곳을 가리켜 아래 검사가 조용히 빠진다. 이 Plugin 은 화면 자리를
+  // 설정값으로 받으므로 그 일이 실제로 생긴다. 위로 올라가며 표시를 찾고, 못 찾으면 옛 규칙을 쓴다.
+  const repo = findRepoRoot(path.dirname(filePath)) ?? path.resolve(path.dirname(filePath), "../../../../..");
   walk(sf, (n) => {
     if (!(ts.isImportDeclaration(n) || ts.isExportDeclaration(n)) || !n.moduleSpecifier || !ts.isStringLiteral(n.moduleSpecifier)) return;
     const spec = n.moduleSpecifier.text;

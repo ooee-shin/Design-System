@@ -40,23 +40,31 @@ Extended anatomy는 선택 요소를 표시한다.
 - `onRemove`, `removeLabel`, `removeTooltip`: Chip 자체를 삭제하는 Remove button
 - `ariaLabel`: Icon only에서 필수이며, Label이 있는 Chip에서는 그 Label을 담은 이름만 받는다. 규칙은 아래 Guidelines의 「Label을 담은 이름만 보태기」에 있다
 
-Style variant는 제공하지 않는다. 한 가지 스타일만 두며 Neutral border와 기본 surface를 사용한다.
+Style variant는 제공하지 않는다. 고르지 않은 Chip은 Neutral border와 기본 surface를, 고른 Chip은 어두운 Neutral surface를 사용하며 화면이 그 색을 고르지 않는다.
 
 `onClick`과 `onRemove`는 타입으로 갈라 함께 넘길 수 없다. Container 전체가 Button인데 안에 또 Button을 두면 어느 것을 눌렀는지 알 수 없다.
 
 ## 현재 구현 규칙
 
-- Active는 `brand-alpha-40` 경계와 `brand-alpha-05` 배경을 사용하고, Label과 아이콘은 `oe-brand-foreground-primary`, Prefix는 `oe-brand-foreground-secondary`를 사용한다.
+- Active는 경계를 지우고 `oe-background-bold-primary` 배경을 채우며, Label과 아이콘은 `oe-foreground-inverse`, Prefix는 `oe-foreground-inverse-secondary`를 사용한다. Button의 뉴트럴 `fill`이 `neutral-600`인 것과 달리 한참 진한 단계를 쓰는 것은, 고른 Chip이 뉴트럴 Button과 같은 모양으로 보이면 누르면 실행되는 자리인지 골라지는 자리인지 화면에서 갈리지 않기 때문이다.
+- Active에서 Remove button은 Hover 층을 얹지 않고 글자 위계만 `oe-foreground-inverse-secondary`에서 `oe-foreground-inverse`로 올린다. 뉴트럴 Hover 층이 Black alpha라 어두운 surface 위에서는 보이지 않으며, 밝은 alpha 층은 현재 token이 없다.
 - 선택된 상태에는 Hover와 Pressed 하이라이트를 중첩하지 않는다. 근거는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」다.
 - XSmall은 Label을 공용 `text-oe-label` token의 13px/16px로 줄이고 굵기도 `font-normal`로 한 단계 내린다. 나머지 단계는 다른 컨트롤과 같은 14px과 `font-medium`을 사용한다. 28px 상자에 14px 글자를 그대로 담으면 위아래 여유가 남지 않는다. 아이콘도 같은 이유로 XSmall에서만 12px을 사용하고 Small 이상은 16px 또는 20px을 사용한다.
-- 아이콘 위계는 `secondary`가 Label과 같은 위계, `tertiary`가 한 단계 옅은 위계다. Active에서도 같은 관계를 brand 계열 안에서 유지한다.
+- 아이콘 위계는 `secondary`가 Label과 같은 위계, `tertiary`가 한 단계 옅은 위계다. Active에서도 같은 관계를 inverse 계열 안에서 유지한다.
 - 한쪽 변이 아이콘으로 끝나고 반대 변이 글자로 끝나면 글자가 닿는 변에만 여백을 더한다. 아이콘 쪽을 줄이지 않으므로 어느 변도 기준보다 좁아지지 않는다. 양쪽이 같은 종류로 끝나면 기준 여백을 사용한다.
 - `rounded`는 [interaction.md](../interaction.md)의 「공통 Control Radius」를 따른다. Chip이 공통 Control Height를 따르고 같은 페이지에서, 때로는 같은 Field 안에서 다른 컨트롤과 함께 놓이기 때문이다.
+- 여러 Chip을 나열할 때 사이 간격은 6px이며 줄이 넘어갈 때의 줄 간격도 같다. [interaction.md](../interaction.md)의 「나란히 둘 때 간격」이 Button에 정한 값과 같다. 한 자리에 선 Chip들은 함께 고르는 선택지라 하나의 묶음으로 읽혀야 하고, 그러려면 Chip 안쪽의 좌우 여백보다 사이가 좁아야 한다.
 - Remove button은 Hover에서 Tooltip으로 동작을 알린다. 접근 가능한 이름은 `removeLabel`, 보이는 문구는 `removeTooltip`이 소유한다.
 
 ## Guidelines
 
 Studio 화면의 Guidelines와 소제목을 동일하게 유지한다.
+
+### 고른 Chip의 색은 화면이 고르지 않기
+
+**고른 Chip은 어두운 Neutral로 채우며 화면이 그 색을 바꾸지 않는다.** brand를 옅게 까는 채움을 함께 두고 화면이 고르게 했었으나, 그러면 같은 「고른 값」이 화면마다 다른 색으로 보인다. 근거는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」이며, 그 절이 면을 칠해 선택을 알리는 요소에 brand를 쓰지 않도록 정한다.
+
+Chip이 작은 면이라 선이 아니라 채움으로 알리는 이유도 같은 절에 있다. 선 색만 진해져서는 고르지 않은 Chip과 갈리지 않는다.
 
 ### 모든 쓰임의 공통 규칙
 

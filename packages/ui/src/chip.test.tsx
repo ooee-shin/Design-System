@@ -184,3 +184,37 @@ test("an icon only chip warns when it has no accessible name", () => {
   const chipWarnings = warnings.filter((text) => text.includes("ariaLabel"))
   assert.equal(chipWarnings.length, 1, `경고가 한 번만 나와야 한다: ${JSON.stringify(warnings)}`)
 })
+
+// interaction.md 의 「선택 상태」는 면을 칠해 선택을 알리는 요소가 중립으로 알리도록 정한다. 고른
+// 칩에 brand 를 옅게 까는 채움이 따로 있었으므로, 그 갈래가 남아 있지 않은지 함께 검사한다.
+test("the active chip fills itself with the bold neutral surface", () => {
+  const view = render(<Chip active>Label</Chip>)
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(!chip?.className.includes("brand-alpha"))
+})
+
+// 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. 자기 배경을 붙들어야 포인터를
+// 얹었을 때 고른 칩의 색이 옅어지지 않는다.
+test("the active chip holds its surface on hover and press", () => {
+  const view = render(<Chip active onClick={() => {}}>Label</Chip>)
+  const chip = view.container.querySelector("[data-slot=chip]")
+
+  assert.ok(chip?.className.includes("hover:bg-oe-background-bold-primary"))
+  assert.ok(chip?.className.includes("active:bg-oe-background-bold-primary"))
+})
+
+// 아이콘 위계는 채움 안에서 유지된다. `secondary` 는 Label 과 같은 위계, `tertiary` 는 한 단계
+// 옅은 위계이며, 고른 칩에서는 그 관계를 inverse 계열로 지킨다.
+test("the active chip keeps the icon hierarchy in the inverse family", () => {
+  const view = render(
+    <Chip active leadingElement={<svg />} trailingElement={<svg />} trailingTone="tertiary">
+      Label
+    </Chip>,
+  )
+
+  assert.ok(view.container.querySelector("[data-slot=chip-leading-element]")?.className.includes("text-oe-foreground-inverse"))
+  assert.ok(view.container.querySelector("[data-slot=chip-trailing-element]")?.className.includes("text-oe-foreground-inverse-secondary"))
+})

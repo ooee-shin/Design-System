@@ -57,11 +57,29 @@ const textSidePadding: Record<ChipSize, { left: string; right: string }> = {
   xlarge: { left: "pl-5", right: "pr-5" },
 }
 
-// 아이콘은 Label 과 같은 위계(secondary)나 한 단계 옅은 위계(tertiary)를 고를 수 있다.
-// Active 에서도 같은 관계를 brand 계열 안에서 유지한다.
+// 고른 칩은 어두운 Neutral surface 를 채우고 글자를 inverse 로 쓴다. 칩은 면을 칠해 선택을 알리는
+// 요소이므로 `interaction.md` 의 「선택 상태」가 정한 대로 brand 를 쓰지 않는다. brand 를 옅게 까는
+// 채움을 함께 두고 화면이 고르게 했었는데, 그러면 고른 값과 Focus 와 Brand action 이 같은 색조로
+// 번져 무엇이 지목된 것인지 색으로 갈리지 않으므로 걷어냈다.
+//
+// surface 는 `oe-background-bold-primary` 다. Button 의 뉴트럴 fill 이 `neutral-600` 인 것과 달리
+// 한참 진한 단계이므로, 고른 칩이 뉴트럴 Button 과 같은 모양으로 보이지 않는다.
+const activeSurfaceClassName = "border-transparent bg-oe-background-bold-primary text-oe-foreground-inverse"
+
+// 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않으므로, 자기 배경을 그대로 붙들어 둔다.
+const activeHoldClassName = "hover:bg-oe-background-bold-primary active:bg-oe-background-bold-primary"
+
+// 아이콘은 Label 과 같은 위계(secondary)나 한 단계 옅은 위계(tertiary)를 고를 수 있다. 고른 칩에서도
+// 같은 관계를 inverse 계열 안에서 지킨다.
 const toneClassName: Record<ChipTone, { default: string; active: string }> = {
-  secondary: { default: "text-oe-foreground-secondary", active: "text-oe-brand-foreground-primary" },
-  tertiary: { default: "text-oe-foreground-tertiary", active: "text-oe-brand-foreground-secondary" },
+  secondary: {
+    default: "text-oe-foreground-secondary",
+    active: "text-oe-foreground-inverse",
+  },
+  tertiary: {
+    default: "text-oe-foreground-tertiary",
+    active: "text-oe-foreground-inverse-secondary",
+  },
 }
 
 const iconSize: Record<ChipSize, string> = {
@@ -144,13 +162,13 @@ function Chip({
     !iconOnly && oneSideOnly && !rightEndsWithIcon && textSidePadding[size].right,
     iconOnly && iconOnlyWidth[size],
     iconSize[size],
-    active && "border-[var(--brand-alpha-40)] bg-[var(--brand-alpha-05)] text-oe-brand-foreground-primary",
+    active && activeSurfaceClassName,
     className,
   )
   const content = (
     <>
       {leadingElement ? <span data-slot="chip-leading-element" className={cn("flex shrink-0 items-center", active ? toneClassName[leadingTone].active : toneClassName[leadingTone].default)} aria-hidden="true">{leadingElement}</span> : null}
-      {prefix && !iconOnly ? <span data-slot="chip-prefix" className={cn("shrink-0", active ? "text-oe-brand-foreground-secondary" : "text-oe-foreground-tertiary")}>{prefix}</span> : null}
+      {prefix && !iconOnly ? <span data-slot="chip-prefix" className={cn("shrink-0", active ? toneClassName.tertiary.active : toneClassName.tertiary.default)}>{prefix}</span> : null}
       {children ? <span data-slot="chip-label" className="min-w-0 truncate">{children}</span> : null}
       {trailingElement ? <span data-slot="chip-trailing-element" className={cn("flex shrink-0 items-center", active ? toneClassName[trailingTone].active : toneClassName[trailingTone].default)} aria-hidden="true">{trailingElement}</span> : null}
     </>
@@ -166,7 +184,15 @@ function Chip({
             delay={150}
             aria-label={removeLabel}
             onClick={onRemove}
-            className={cn("grid shrink-0 cursor-pointer place-items-center rounded-md text-oe-foreground-tertiary outline-none transition-colors hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring", size === "small" || size === "compact" ? "size-4" : "size-5")}
+            // 어두운 surface 에서는 Hover 층을 얹지 않고 글자 위계만 올린다. 뉴트럴 Hover 층이
+            // black alpha 라서 그 위에서는 보이지 않고, 밝은 alpha 층은 아직 token 이 없다.
+            className={cn(
+              "grid shrink-0 cursor-pointer place-items-center rounded-md outline-none transition-colors focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+              active
+                ? "text-oe-foreground-inverse-secondary hover:text-oe-foreground-inverse"
+                : "text-oe-foreground-tertiary hover:bg-oe-interaction-hover hover:text-oe-foreground-primary active:bg-oe-interaction-hover",
+              size === "small" || size === "compact" ? "size-4" : "size-5",
+            )}
           >
             <RiCloseLine aria-hidden="true" />
           </Tooltip.Trigger>
@@ -198,7 +224,7 @@ function Chip({
           "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
           "hover:bg-oe-interaction-hover-subtle active:bg-oe-interaction-hover",
           // 선택된 상태에는 Hover 와 Pressed 하이라이트를 중첩하지 않는다. Active 가 우선한다.
-          active && "hover:bg-[var(--brand-alpha-05)] active:bg-[var(--brand-alpha-05)]",
+          active && activeHoldClassName,
         )}
       >
         {content}

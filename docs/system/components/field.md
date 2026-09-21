@@ -14,9 +14,9 @@ Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶
 
 ## Anatomy
 
-1. Requirement: 선택 요소다. 필수 항목일 때 Label 앞에 `*`를 표시한다.
-2. Label: 필수 요소다.
-3. Right description: 선택 요소다. Label 바로 뒤에 낮은 위계로 붙는다.
+1. Label: 필수 요소다.
+2. Requirement: 선택 요소다. 필수 항목일 때 Label 뒤에 `*`를 표시한다. 앞에 두면 줄마다 `*`가 먼저 서서 칸 이름이 한 칸씩 밀려 시작하고, 필수가 아닌 칸과 이름의 시작점이 어긋난다.
+3. Right description: 선택 요소다. Requirement 뒤에 낮은 위계로 붙는다.
 4. Trailing element: 선택 요소다. Header 오른쪽 끝으로 밀려 보조 액션을 담는다.
 5. Input slot: 필수 요소다. Control이 갈아 끼워지는 교체 가능 영역이다.
 6. Helper text · Error message: 선택 요소다. Footer 왼쪽에 온다.

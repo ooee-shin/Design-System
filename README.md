@@ -23,7 +23,7 @@
 
 `docs/system/`의 문서는 바깥 문서를 참조하지 않는다. 그래서 `docs/process/`와 `AGENTS.md`를 제거해도 `docs/system/` + `packages/` + `apps/studio`만으로 시스템이 그대로 성립한다.
 
-전달 범위에는 `apps/studio`도 포함한다. Studio는 컴포넌트를 화면에서 확인하는 현재의 채널이자 Storybook의 기반이며, 최종적으로는 Storybook이 그 역할을 맡는다.
+전달 범위에는 `apps/studio`도 포함한다. Studio는 컴포넌트를 화면에서 확인하는 채널이다. Storybook은 두지 않기로 했다(`2026-09-18`, [ai-environment.md](docs/process/ai-environment.md)). AI가 읽는 진입점은 저장소 루트의 [llms.txt](llms.txt)다.
 
 **컴포넌트를 사용하거나 검토하려면 [`docs/system/README.md`](docs/system/README.md)부터 본다.** 자산 카탈로그, 구조 용어, 토큰 체계와 상호작용 규칙이 그 아래에 있다.
 

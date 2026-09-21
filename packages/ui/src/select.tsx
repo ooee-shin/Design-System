@@ -120,7 +120,7 @@ function Select({
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner align="start" sideOffset={4} alignItemWithTrigger={false} className="z-50">
           <SelectPrimitive.Popup className="w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
-            <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto px-1 pt-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
+            <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto p-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
               {groups ? groups.map((group, groupIndex) => (
                 <React.Fragment key={group.label}>
                   {groupIndex > 0 ? <SelectPrimitive.Separator className="my-1.5 h-px bg-oe-border-secondary" /> : null}
@@ -209,7 +209,7 @@ function MultiSelect({
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner align="start" sideOffset={4} alignItemWithTrigger={false} className="z-50">
           <SelectPrimitive.Popup className="w-[var(--anchor-width)] max-h-[min(20rem,var(--available-height))] max-w-[var(--available-width)] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary text-sm text-oe-foreground-primary shadow-lg outline-none">
-            <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto px-1 pt-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
+            <SelectPrimitive.List className="max-h-[15.5rem] overflow-x-hidden overflow-y-auto p-1 [scrollbar-color:transparent_transparent] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">
               {groups ? groups.map((group, groupIndex) => (
                 <React.Fragment key={group.label}>
                   {groupIndex > 0 ? <SelectPrimitive.Separator className="my-1.5 h-px bg-oe-border-secondary" /> : null}

@@ -112,6 +112,8 @@ function primitiveValue(name) {
   if (name.startsWith("brand-")) return tokens.brandSolid[name] ? hexRgb(tokens.brandSolid[name]) : null;
   if (name === "white") return { r: 1, g: 1, b: 1 };
   if (name === "black") return { r: 0, g: 0, b: 0 };
+  // 코드에 날 hex 로 적힌 색이다. 이름이 값 그 자체라 값을 다시 뜯어 쓴다.
+  if (name.startsWith("hex-")) return hexRgb("#" + name.slice(4));
   return tw[name] ? oklch(tw[name]) : null;
 }
 function refValue(ref) {

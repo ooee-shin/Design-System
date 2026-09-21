@@ -22,7 +22,7 @@ test("Field names the control it wraps with its own label", () => {
   view.getByRole("textbox", { name: "이름" })
 })
 
-test("Field puts the requirement mark before the label", () => {
+test("Field puts the requirement mark after the label", () => {
   const view = render(
     <Field label="이름" required>
       <Input />
@@ -32,7 +32,7 @@ test("Field puts the requirement mark before the label", () => {
 
   assert.ok(header)
 
-  assert.equal(header.textContent, "*이름")
+  assert.equal(header.textContent, "이름*")
 })
 
 test("Field hides the requirement mark from assistive technology", () => {

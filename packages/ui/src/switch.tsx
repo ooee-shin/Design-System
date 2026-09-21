@@ -42,7 +42,10 @@ function Switch({ className, thumbClassName, controlSize = "medium", ...props }:
       data-size={controlSize}
       className={cn(
         "inline-flex shrink-0 cursor-pointer items-center rounded-full bg-oe-background-control-off outline-none ring-1 ring-inset ring-oe-background-control-off transition-[background-color,box-shadow]",
-        "data-[checked]:bg-oe-info-background-bold-primary data-[checked]:ring-transparent",
+        // 켜짐은 brand 다. Radio 와 Checkbox 의 켜짐이 쓰는 색과 같아야, 브랜드 색을 갈아 끼울 때
+        // 선택 컨트롤 셋이 함께 따라온다. `info` 를 쓰고 있었는데 그것은 정보와 알림을 뜻하는 의미
+        // 색이라 켜짐 상태를 맡을 자리가 아니며, 지금 두 값이 모두 파랗다는 것에 가려져 있었다.
+        "data-[checked]:bg-oe-brand-background-bold-primary data-[checked]:ring-transparent",
         "focus-visible:[outline-style:solid] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-oe-focus-ring",
         "data-[disabled]:cursor-not-allowed data-[disabled]:bg-oe-background-control-disabled data-[disabled]:ring-transparent data-[disabled]:!transition-[background-color,box-shadow]",
         "data-[disabled]:data-[checked]:bg-oe-background-control-disabled",

@@ -46,14 +46,14 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 
 다음을 이 순서로 읽는다. 요약본을 기억에서 꺼내지 않고 파일을 연다.
 
-1. `AGENTS.md`의 「코드 소유 경계」와 「변경 원칙」.
+1. 저장소 루트에 `AGENTS.md`(또는 `CLAUDE.md`)가 있으면 그 「코드 소유 경계」와 「변경 원칙」. **없으면 건너뛴다** — 이 Plugin 은 저장소 밖으로 전달되고 그 문서는 전달본에 가지 않는다. 대신 아래 두 가지는 어느 저장소에서나 지킨다: 컴포넌트 구현(`packages/ui`)은 이 명령이 고치지 않는다. Plugin 자신(`${CLAUDE_PLUGIN_ROOT}`)도 고치지 않는다.
 2. `${user_config.docs_root}/README.md`의 「이 문서의 독자」와 「Component」 표. 표에서 요구사항의 요소마다 쓸 컴포넌트를 고른다. 상태가 `초안`인 컴포넌트는 `packages/ui/src/index.ts`가 export해도 쓰지 않는다. 표의 용도가 한 요소에 둘 이상 맞으면(예: 하나를 고르는 항목에 `Radio`와 `Select`) 둘 다 고르고 3번에서 두 문서를 모두 연다.
 3. 고른 컴포넌트마다 `${user_config.docs_root}/components/<이름>.md` 전체. Property 이름과 값은 문서에 적힌 코드 문자열 그대로 쓴다. 「역할과 경계」, 「Guidelines」, 「현재 정의하지 않은 항목」을 함께 읽고, 읽은 기준은 2단계에서 요소마다 대조한다.
 4. `${user_config.docs_root}/vocabulary.md`의 「Form 구성 층」, `${user_config.docs_root}/tokens.md`의 「Neutral semantic token」·「사용 규칙」, `${user_config.docs_root}/interaction.md` 전체, `${user_config.docs_root}/quality.md` 전체, `${user_config.docs_root}/foundations/icon.md`의 「스타일 규칙」·「크기 토큰」.
 5. `packages/ui/src/index.ts`. 여기서 export하지 않는 이름은 import하지 않는다.
 6. `${user_config.screens_dir}/../screens.ts`와 `${user_config.screens_dir}/page.tsx`. 등록 형식과 기존 화면의 key를 본다.
 
-Storybook MCP의 `docs-list`·`docs-show` 도구가 이 세션에 있으면 3번 뒤에 같은 컴포넌트를 한 번 더 조회한다. 없으면 건너뛴다. 파일이 원본이고 MCP는 덧붙이는 것이다.
+컴포넌트 문서가 원본이다. 이 저장소에 Storybook·Storybook MCP는 두지 않는다 — Property 목록은 컴포넌트 문서가 코드 문자열 그대로 갖고 있고, 화면으로 보는 자리는 Studio 의 Playground 가 갖는다.
 
 ### 2. 매핑표를 적는다
 
