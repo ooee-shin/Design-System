@@ -42,6 +42,17 @@ type MultiComboboxProps = Omit<ComboboxProps, "value" | "defaultValue" | "onValu
   selectAllLabel?: string
   selectedSearchPlaceholder?: string
   removeSelectedLabel?: (label: string) => string
+  /**
+   * 고른 값을 Trigger 아래 Container 에 펼쳐 둘지.
+   *
+   * `container` 는 고른 값을 Chip 으로 세우고 그 안에서 다시 찾거나 하나씩 뺄 수 있게 한다. 고른
+   * 값을 계속 보면서 다루는 자리가 쓴다.
+   *
+   * `none` 은 Trigger 한 줄만 남긴다. 조건 줄처럼 여러 축이 나란히 선 자리가 쓴다. 한 축에서 값을
+   * 고를 때마다 그 축만 아래로 자라면 줄의 높이가 흔들리고, 옆 축들이 따라 밀린다. 고른 값은
+   * Trigger 의 요약이 말하며, 빼는 것은 목록을 다시 열어 체크를 지운다.
+   */
+  selectedItems?: "container" | "none"
 }
 
 function Combobox({
@@ -110,6 +121,7 @@ function MultiCombobox({
   selectedSummaryLabel = (firstLabel, remainingCount) => remainingCount > 0 ? `${firstLabel} +${remainingCount}` : firstLabel,
   selectAllLabel = "All",
   selectedSearchPlaceholder = "Search selected items",
+  selectedItems = "container",
   removeSelectedLabel = (label) => `Remove ${label}`,
   disabled = false,
   invalid = false,
@@ -158,9 +170,9 @@ function MultiCombobox({
             <RiArrowDownSLine className="size-4 transition-transform" aria-hidden="true" />
           </ComboboxPrimitive.Icon>
         </ComboboxPrimitive.Trigger>
-        <ComboboxPrimitive.Value>
+        {selectedItems === "none" ? null : <ComboboxPrimitive.Value>
             {(selected: ComboboxOption[]) => selected.length > 0 ? <div data-slot="combobox-selected-items" className="rounded-lg bg-oe-background-secondary p-2"><Input type="search" variant="filled" controlSize="small" value={selectedSearch} onChange={(event) => setSelectedSearch(event.target.value)} aria-label={selectedSearchPlaceholder} placeholder={selectedSearchPlaceholder} leadingElement={<RiSearchLine />} /><div className="mt-2 flex max-h-20 flex-wrap content-start gap-1.5 overflow-y-auto [scrollbar-color:transparent_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin] hover:[scrollbar-color:var(--oe-border-primary)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-oe-border-primary">{selected.filter((option) => option.label.toLocaleLowerCase().includes(selectedSearch.trim().toLocaleLowerCase())).map((option) => <Chip key={option.value} controlSize="small" removeLabel={removeSelectedLabel(option.label)} onRemove={() => updateValue(resolvedValue.filter((optionValue) => optionValue !== option.value))}>{option.label}</Chip>)}</div></div> : <></>}
-        </ComboboxPrimitive.Value>
+        </ComboboxPrimitive.Value>}
       </div>
       <ComboboxPopup ariaLabel={ariaLabel} searchPlaceholder={searchPlaceholder} emptyMessage={emptyMessage} multiple selectAllLabel={selectAllLabel} totalCount={enabledValues.length} allSelected={allSelected} someSelected={someSelected} onToggleAll={() => updateValue(allSelected ? resolvedValue.filter((optionValue) => !enabledValues.includes(optionValue)) : Array.from(new Set([...resolvedValue, ...enabledValues])))} />
     </ComboboxPrimitive.Root>
@@ -171,7 +183,7 @@ function ComboboxPopup({ ariaLabel, searchPlaceholder, emptyMessage, multiple, s
   return (
     <ComboboxPrimitive.Portal>
       <ComboboxPrimitive.Positioner align="start" sideOffset={4} className="z-50 w-[var(--anchor-width)] max-w-[var(--available-width)]">
-        <ComboboxPrimitive.Popup aria-label={ariaLabel} initialFocus className="max-h-[min(20rem,var(--available-height))] overflow-hidden rounded-xl border border-oe-border-secondary bg-oe-background-primary p-2 text-sm text-oe-foreground-primary shadow-lg outline-none">
+        <ComboboxPrimitive.Popup aria-label={ariaLabel} initialFocus className="max-h-[min(20rem,var(--available-height))] overflow-hidden rounded-lg border border-oe-border-secondary bg-oe-background-primary p-2 text-sm text-oe-foreground-primary shadow-lg outline-none">
           <div className={comboboxSearchContainerVariants()}>
             <RiSearchLine className="size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
             <ComboboxPrimitive.Input aria-label={searchPlaceholder} placeholder={searchPlaceholder} className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-oe-foreground-placeholder" />

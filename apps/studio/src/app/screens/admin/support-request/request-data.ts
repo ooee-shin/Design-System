@@ -84,18 +84,19 @@ function periodRange(filter: RequestFilter): [string, string] | null {
   return [start.toISOString().slice(0, 10), TODAY];
 }
 
-/** 필터가 고를 수 있는 값들이다. 「전체」는 그 축을 걸지 않은 상태다. */
-export const ALL = "all";
+/**
+ * 필터가 고를 수 있는 값들이다.
+ *
+ * 「전체」를 값으로 두지 않는다. 두 축 모두 여러 값을 고를 수 있으므로, 아무것도 고르지 않은
+ * 상태가 곧 전체다. 목록에 「전체」를 함께 두면 그것을 고른 상태와 아무것도 고르지 않은 상태가
+ * 같은 뜻인데 화면에는 둘로 보인다.
+ */
+export const CATEGORY_OPTIONS = [...new Set(REQUESTS.map((request) => request.category))].map((category) => ({
+  value: category,
+  label: category,
+}));
 
-export const CATEGORY_OPTIONS = [
-  { value: ALL, label: "전체" },
-  ...[...new Set(REQUESTS.map((request) => request.category))].map((category) => ({ value: category, label: category })),
-];
-
-export const STATUS_OPTIONS = [
-  { value: ALL, label: "전체" },
-  ...Object.entries(STATUS).map(([value, { label }]) => ({ value, label })),
-];
+export const STATUS_OPTIONS = Object.entries(STATUS).map(([value, { label }]) => ({ value, label }));
 
 export type RequestFilter = {
   /** `1m`·`3m`·`6m` 가운데 하나이거나 직접 선택이다. */
@@ -103,13 +104,14 @@ export type RequestFilter = {
   /** 직접 선택일 때의 두 날이다. 고르기 전에는 비어 있다. */
   from: string;
   to: string;
-  category: string;
-  status: string;
+  /** 고른 값이 없으면 그 축을 걸지 않는다. */
+  category: string[];
+  status: string[];
 };
 
 // 들어왔을 때 1 개월이다. 지원요청은 지금 처리해야 할 건을 찾는 목록이라, 기본으로 훑는 구간이
 // 넓으면 이미 끝난 건이 최근 건과 섞인다.
-export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", category: ALL, status: ALL };
+export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", category: [], status: [] };
 
 /**
  * 건 하나가 조건에 맞는지.
@@ -120,8 +122,8 @@ export const EMPTY_FILTER: RequestFilter = { period: "1m", from: "", to: "", cat
 export function matches(request: SupportRequest, filter: RequestFilter) {
   const range = periodRange(filter);
   if (range && (request.createdAt < range[0] || request.createdAt > range[1])) return false;
-  if (filter.category !== ALL && request.category !== filter.category) return false;
-  return filter.status === ALL || request.status === filter.status;
+  if (filter.category.length > 0 && !filter.category.includes(request.category)) return false;
+  return filter.status.length === 0 || filter.status.includes(request.status);
 }
 
 /** 담긴 목록 안에서 제목으로 한 건을 집어낸다. */

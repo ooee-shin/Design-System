@@ -16,7 +16,7 @@ import { useState } from "react";
 
 import { RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
-import { Badge, Button, Chip, Input, InputButton, NotificationBadge, Select } from "@ooee/ui";
+import { Badge, Button, Chip, Input, InputButton, MultiCombobox, NotificationBadge } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
@@ -180,25 +180,40 @@ function FilterBar({
         ) : null}
       </FilterAxis>
 
+      {/* 두 축은 여러 값을 고른다. 한 건씩만 고르게 두면 「접수와 처리중을 함께 보기」처럼 실제로
+          거는 조건을 못 걸고, 담당자가 축을 바꿔 가며 두 번 조회하게 된다.
+
+          열었을 때 체크박스가 서는 다중 선택은 `MultiCombobox` 가 맡는다. 목록이 일곱과 셋으로
+          짧아 검색이 꼭 필요하지는 않으나, 고른 것이 무엇인지 체크박스로 한눈에 보이는 쪽을
+          골랐다. 고르지 않은 동안에는 Placeholder 가 「전체」라고 말한다.
+
+          고른 값을 Trigger 아래에 펼치지 않는다(`selectedItems="none"`). 한 축에서 값을 고를 때마다
+          그 축만 아래로 자라면 조건 줄의 높이가 흔들리고 옆 축들이 따라 밀린다. */}
       <FilterAxis label="카테고리">
-        <Select
+        <MultiCombobox
           controlSize="small"
-          className="w-36"
+          className="w-44"
           options={CATEGORY_OPTIONS}
           value={draft.category}
-          onValueChange={(value) => onDraftChange({ category: value ?? undefined })}
+          onValueChange={(value) => onDraftChange({ category: value })}
+          placeholder="전체"
+          searchPlaceholder="카테고리 검색"
           ariaLabel="카테고리"
+          selectedItems="none"
         />
       </FilterAxis>
 
       <FilterAxis label="처리상태">
-        <Select
+        <MultiCombobox
           controlSize="small"
-          className="w-28"
+          className="w-36"
           options={STATUS_OPTIONS}
           value={draft.status}
-          onValueChange={(value) => onDraftChange({ status: value ?? undefined })}
+          onValueChange={(value) => onDraftChange({ status: value })}
+          placeholder="전체"
+          searchPlaceholder="처리상태 검색"
           ariaLabel="처리상태"
+          selectedItems="none"
         />
       </FilterAxis>
 

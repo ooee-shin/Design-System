@@ -89,6 +89,7 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 
 - 적용 대상: Button, Input, Input Button, Number Input, Textarea, Select, Combobox의 Container와 Chip의 `rounded`
 - 적용하지 않는 것: 카드형 선택지인 Select Box, Trigger로 여는 Popup, Tooltip, Message Bubble과 첨부 카드. 컨트롤과 나란히 놓이는 요소가 아니므로 각자의 단계를 사용한다.
+- 다만 Select와 Combobox의 Popup은 서로 같은 `rounded-lg`(10px)를 쓴다. 닫힌 상태의 Trigger를 공유하는 두 컴포넌트이므로, 열린 면의 모서리가 갈리면 같은 컨트롤을 열었는데 다른 것이 열린 것처럼 보인다.
 - Chip의 기본 모양은 `circle`이며 이 기준은 `rounded`를 골랐을 때 적용된다.
 
 `packages/ui/src/control-radius.test.tsx`가 컨트롤들이 같은 토큰을 쓰는지 검사하고, `packages/tokens/src/index.test.ts`가 토큰 값과 `RADII` 원본의 일치를 검사한다.
