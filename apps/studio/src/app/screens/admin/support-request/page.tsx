@@ -14,7 +14,7 @@
 
 import { useState } from "react";
 
-import { RiCalendarLine, RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
+import { RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
 import { Badge, Button, Chip, Input, InputButton, NotificationBadge, Select } from "@ooee/ui";
 
@@ -164,28 +164,18 @@ function FilterBar({
           ))}
         </div>
         {/* 직접 고를 때만 두 칸이 선다. 날짜를 고르는 달력을 아직 붙이지 않아 눌러도 열리지
-            않으며, 두 날이 비어 있는 동안에는 기간을 걸지 않는다. */}
+            않으며, 두 날이 비어 있는 동안에는 기간을 걸지 않는다.
+
+            두 칸에 달력 아이콘을 달지 않는다. 같은 아이콘이 두 번 나오면 뜻을 더하지 않고 값이 쓸
+            폭만 줄이므로, 각 자리는 Placeholder 가 말한다. `input-button.md` 의 「값을 나눠 받을 때는
+            시각 요소를 줄이기」가 정한 규칙이며, 사이 기호도 그 절이 물결표로 정한다. */}
         {draft.period === CUSTOM ? (
           <div className="flex items-center gap-1.5">
-            <InputButton
-              className="w-[132px]"
-              controlSize="small"
-              aria-label="시작일"
-              placeholder="시작일"
-              value={draft.from}
-              leadingElement={<RiCalendarLine />}
-            />
+            <InputButton className="w-[124px]" controlSize="small" aria-label="시작일" placeholder="시작일" value={draft.from} />
             <span aria-hidden="true" className="text-oe-foreground-tertiary">
-              —
+              ~
             </span>
-            <InputButton
-              className="w-[132px]"
-              controlSize="small"
-              aria-label="종료일"
-              placeholder="종료일"
-              value={draft.to}
-              leadingElement={<RiCalendarLine />}
-            />
+            <InputButton className="w-[124px]" controlSize="small" aria-label="종료일" placeholder="종료일" value={draft.to} />
           </div>
         ) : null}
       </FilterAxis>
