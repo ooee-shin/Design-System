@@ -75,6 +75,7 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 | Badge | 확정 | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
 | Bottom Navigation | 확정 | [bottom-navigation.md](components/bottom-navigation.md) | 모바일 화면 맨 아래에서 최상위 화면을 오가는 한 줄 |
 | Button | 확정 | [button.md](components/button.md) | 누르면 실행되는 액션 |
+| Calendar | 확정 | [calendar.md](components/calendar.md) | 날짜를 고르는 격자 |
 | Checkbox | 확정 | [checkbox.md](components/checkbox.md) | 항목의 선택 여부와 부분 선택 상태를 표시하고 제어 |
 | Chip | 확정 | [chip.md](components/chip.md) | 짧은 Label로 값 하나를 표시하고 쓰임에 따라 전체를 눌러 상태를 바꾸거나 개별로 지움 |
 | Combobox | 확정 | [combobox.md](components/combobox.md) | Popup 내부 검색으로 미리 정의된 옵션을 필터링하고 선택 |
