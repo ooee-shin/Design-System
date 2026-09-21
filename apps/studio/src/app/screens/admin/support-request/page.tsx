@@ -16,7 +16,7 @@ import { useState } from "react";
 
 import { RiInboxLine, RiResetLeftLine, RiSearchLine } from "@remixicon/react";
 
-import { Badge, Button, Chip, Input, InputButton, MultiCombobox, NotificationBadge } from "@ooee/ui";
+import { Badge, Button, Chip, Input, InputButton, MultiCombobox, NotificationBadge, Select, SwitchField } from "@ooee/ui";
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
 import { PageHeader } from "@/components/candidates/page-header";
@@ -28,8 +28,10 @@ import {
   EMPTY_FILTER,
   found,
   matches,
+  MY_STORES,
   PERIOD_OPTIONS,
   REQUESTS,
+  SORT_OPTIONS,
   STATUS,
   STATUS_OPTIONS,
   STORE_OPTIONS,
@@ -55,7 +57,14 @@ export default function AdminSupportRequestScreenPage() {
   // 검색어는 조건과 층이 다르므로 「조회」를 기다리지 않고 치는 대로 걸린다. 담긴 목록에서 한
   // 건을 집어내는 일이라, 눌러야 걸리면 집어내는 동안 화면이 멈춰 있게 된다.
   const [keyword, setKeyword] = useState("");
-  const shown = REQUESTS.filter((request) => matches(request, filter) && found(request, keyword));
+
+  // 자기가 맡은 점포만 볼지. 조건 줄의 점포 축과 달리 고르는 값이 없고 켜고 끄는 것뿐이라 목록
+  // 머리에 둔다. 「조회」를 기다리지 않고 바로 걸린다.
+  const [mineOnly, setMineOnly] = useState(false);
+
+  const shown = REQUESTS.filter(
+    (request) => matches(request, filter) && found(request, keyword) && (!mineOnly || MY_STORES.includes(request.store)),
+  );
 
   return (
     <AdminLayout>
@@ -90,7 +99,7 @@ export default function AdminSupportRequestScreenPage() {
               {/* 검색은 목록의 머리에 붙는다. 위의 조건 줄에 함께 두었다가 뺐는데, 조건은 목록에
                   무엇을 담을지 정하고 검색은 담긴 목록 안에서 한 건을 집어내는 자리라 층이 다르다.
                   집어내는 대상 바로 위에 두면 그 관계가 자리로 드러난다. */}
-              <div className="shrink-0 border-b border-oe-border-tertiary p-3">
+              <div className="flex shrink-0 flex-col gap-2.5 border-b border-oe-border-tertiary p-3">
                 <Input
                   controlSize="small"
                   layout="fill"
@@ -100,6 +109,40 @@ export default function AdminSupportRequestScreenPage() {
                   onChange={(event) => setKeyword(event.target.value)}
                   trailingElement={<RiSearchLine />}
                 />
+                {/* 조건과 검색을 다 걸고 난 결과가 몇 건인지, 그것을 어떤 차례로 보고 있는지, 그리고
+                    그중 내 점포만 볼지가 한 줄에 선다. 셋 다 목록에 무엇이 담겼는지를 말하는 값이라
+                    담긴 것 바로 위가 자리다. */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-oe-label shrink-0 text-oe-foreground-secondary">
+                    전체 <span className="font-medium text-oe-foreground-primary tabular-nums">{shown.length}</span>건
+                  </span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {/* 라벨을 줄바꿈하지 않는다. 400px 카드 안에서 셋이 한 줄을 나눠 쓰므로, 두 글자
+                        묶음이 접히면 그 줄만 높이가 늘어난다. */}
+                    <SwitchField
+                      controlSize="small"
+                      label={<span className="text-oe-label whitespace-nowrap">내 점포</span>}
+                      labelPosition="left"
+                      checked={mineOnly}
+                      onCheckedChange={setMineOnly}
+                    />
+                    {/* 정렬은 줄의 맨 끝이다. 목록을 좁히는 조작이 아니라 담긴 것을 어떤 차례로
+                        볼지 정하는 값이라, 좁히는 것들 뒤에 선다.
+
+                        경계를 지운다. 이 줄의 다른 둘은 경계가 없는 글자와 스위치이고, 목록 카드
+                        안에서 폼 컨트롤 하나만 상자를 두르면 그 자리만 입력할 값처럼 보인다.
+
+                        정렬 기준은 아직 최신순 하나다. 늘어날 자리라 Select 로 두었고, 값이 하나인
+                        동안에는 눌러도 바뀌지 않는다. */}
+                    <Select
+                      controlSize="small"
+                      className="text-oe-label h-auto gap-1 border-transparent bg-transparent px-0 text-oe-foreground-secondary hover:bg-transparent"
+                      options={SORT_OPTIONS}
+                      value="latest"
+                      ariaLabel="정렬"
+                    />
+                  </div>
+                </div>
               </div>
               {/* 스크롤 막대는 손잡이만 남긴다. 브라우저가 주는 바닥이 카드 오른쪽에 회색 띠로 얹혀서,
                   카드의 흰 면이 거기서 끊겨 보인다. 유틸리티는 `globals.css` 가 갖는다. */}

@@ -123,6 +123,17 @@ export const STORE_OPTIONS = Object.keys(SV_BY_STORE).map((store) => ({ value: s
 
 export const SV_OPTIONS = [...new Set(Object.values(SV_BY_STORE))].map((sv) => ({ value: sv, label: sv }));
 
+/**
+ * 로그인한 사람이 맡은 점포다.
+ *
+ * 예시 값이다. 제품에서는 로그인한 사람의 담당 점포에서 오며, 화면이 목록으로 들고 있을 값이
+ * 아니다. 관리자는 전부를 보고 SV 는 자기 점포만 보는 것이 기본이므로, 이 토글은 관리자가 자기가
+ * 맡은 곳만 잠깐 좁혀 보는 자리다.
+ */
+export const MY_STORES = ["마천동점", "명동점", "아현점"];
+
+export const SORT_OPTIONS = [{ value: "latest", label: "최신순" }];
+
 export type RequestFilter = {
   /** `1m`·`3m`·`6m` 가운데 하나이거나 직접 선택이다. */
   period: string;
