@@ -1,9 +1,13 @@
 /**
  * 관리자 웹의 지원요청 목록이다.
  *
- * 관리자 레이아웃과 화면 머리까지만 세운 껍데기다. 목록에 무엇이 서는지는 아직 정하지 않았다.
- * 점주의 소리 목록과 같은 틀로 갈지, 채팅을 가진 채널이라 다른 열이 서야 하는지가 남아 있다.
- * 자리를 미리 채우면 그것이 결정처럼 굳으므로 지금은 본문을 비워 둔다.
+ * 앞의 관리자 목록이 표 한 장으로 뷰포트를 채우는 안이라면, 이 화면은 **왼쪽에 목록, 오른쪽에
+ * 상세**를 함께 두는 안이다. 사장님 앱에서 목록과 상세가 두 장으로 나뉘어 있는 것을 PC 의 넓은
+ * 폭에서 한 화면에 펼친다. 목록에서 한 건을 고르면 오른쪽이 그 건으로 바뀌므로, 건을 오갈 때마다
+ * 목록으로 돌아갔다 다시 들어오지 않는다.
+ *
+ * 두 자리에 무엇이 서는지는 아직 정하지 않았다. 자리를 미리 채우면 그것이 결정처럼 굳으므로 지금은
+ * 폭만 잡아 둔다.
  */
 
 import { AdminLayout } from "@/components/candidates/admin-layout";
@@ -19,7 +23,12 @@ export default function AdminSupportRequestScreenPage() {
     <AdminLayout>
       <div className="flex min-h-0 flex-1 flex-col">
         <PageHeader path={PAGE_PATH} title="지원요청관리" />
-        <ScreenPlaceholder name="Content" className="m-6 flex-1" />
+        {/* 왼쪽 폭은 400px 로 잡아 둔다. 옮겨 오는 것이 사장님 앱의 목록이라 그 앱의 폭(390px)에
+            맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
+        <div className="flex min-h-0 flex-1 gap-3 p-6">
+          <ScreenPlaceholder name="List" className="w-[400px] shrink-0" />
+          <ScreenPlaceholder name="Detail" className="flex-1" />
+        </div>
       </div>
     </AdminLayout>
   );
