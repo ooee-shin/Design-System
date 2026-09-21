@@ -15,7 +15,7 @@
 | [tooling.md](tooling.md) | 작업 환경과 검증 명령 |
 | [working-context.md](working-context.md) | 현재 구현, 열린 결정과 바로 다음 작업 |
 | [git-workflow.md](git-workflow.md) | 안전한 branch·commit 운영 |
-| [ai-environment.md](ai-environment.md) | AI 개발 환경 트랙의 순서, 스파이크, 기획자 요청 폼, 통합 검증 항목과 아직 정하지 않은 것 |
+| [ai-environment.md](ai-environment.md) | AI 개발 환경 트랙의 순서, 스파이크, 통합 검증 항목과 아직 정하지 않은 것 |
 | [figma-page-agent.md](figma-page-agent.md) | 이전에 단일 에이전트로 쓰던 Figma 페이지 디자이너 프롬프트 원문. `/design-page`의 입력 자료 |
 | [figma-component-map.md](figma-component-map.md) | Figma 레이어 이름·변수·크기로 `@ooee/ui` 컴포넌트와 Property를 되짚는 표 |
 | [open-questions.md](open-questions.md) | 화면을 만들며 검증할 항목 |
