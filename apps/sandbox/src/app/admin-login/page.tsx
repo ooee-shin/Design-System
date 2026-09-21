@@ -58,21 +58,21 @@ export default function AdminLoginPage() {
                     type="button"
                     onClick={() => setPasswordVisible((visible) => !visible)}
                     aria-label={passwordVisible ? "비밀번호 숨기기" : "비밀번호 보기"}
-                    className="flex items-center justify-center rounded-sm text-oe-foreground-tertiary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+                    className="flex items-center justify-center rounded-sm text-oe-foreground-tertiary outline-none hover:bg-oe-interaction-hover focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2"
                   >
-                    {passwordVisible ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
+                    {passwordVisible ? <RiEyeOffLine aria-hidden className="size-oe-icon-small" /> : <RiEyeLine aria-hidden className="size-oe-icon-small" />}
                   </button>
                 }
               />
 
               <div className="flex items-center justify-between">
                 <CheckboxField label="아이디 저장" className="-ml-2" />
-                <button
-                  type="button"
-                  className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+                <a
+                  href="#"
+                  className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2"
                 >
                   비밀번호 찾기
-                </button>
+                </a>
               </div>
 
               <Button type="submit" controlSize="xlarge" layout="fill">
@@ -84,18 +84,18 @@ export default function AdminLoginPage() {
 
         <footer className="flex flex-col items-center gap-2 pb-2 text-center">
           <div className="flex items-center gap-4">
-            <button
-              type="button"
-              className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+            <a
+              href="#"
+              className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2"
             >
               이용약관
-            </button>
-            <button
-              type="button"
-              className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+            </a>
+            <a
+              href="#"
+              className="rounded-sm text-sm text-oe-foreground-secondary outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2"
             >
               개인정보처리방침
-            </button>
+            </a>
           </div>
           <p className="text-xs text-oe-foreground-tertiary">Copyright © {"{브랜드명}"}. All rights reserved.</p>
         </footer>
