@@ -55,11 +55,11 @@ export const INSTANCE_FIELDS = ["t", "n", "x", "y", "w", "h", "path", "inst", "p
  */
 export function foldInstances(node) {
   if (node.inst) {
-    const texts = [];
-    const walk = (n) => { if (n.t === "x") texts.push({ t: "x", s: n.s }); (n.k || []).forEach(walk); };
-    (node.k || []).forEach(walk);
-    for (const field of Object.keys(node)) if (!INSTANCE_FIELDS.includes(field)) delete node[field];
-    if (texts.length) node.k = texts;
+    // 안쪽을 **버리지 않는다.** builder 는 라이브러리에 맞는 컴포넌트가 없거나 글자 자리 수가
+    // 어긋나면 인스턴스를 포기하고 보통 프레임으로 내려가는데, 그때 그릴 것이 남아 있어야 한다.
+    // 예전에는 글자만 남기고 다 버려서 그 자리에서 멈췄다 — 한 자리 때문에 화면 한 장을 잃었다.
+    // 조각이 커지는 값을 치르고 화면이 통째로 날아가지 않는 쪽을 고른다.
+    (node.k || []).forEach(foldInstances);
     return node;
   }
   (node.k || []).forEach(foldInstances);

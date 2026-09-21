@@ -21,7 +21,7 @@ if (!page) {
 }
 await figma.setCurrentPageAsync(page);
 
-const report = { unmappedColors: [], unmappedText: [], weightFallback: [], defaultTextColor: [], opacityOnToken: [], replacedFrames: [], absoluteFallback: 0, created: 0 };
+const report = { instanceMiss: [], unmappedColors: [], unmappedText: [], weightFallback: [], defaultTextColor: [], opacityOnToken: [], replacedFrames: [], absoluteFallback: 0, created: 0 };
 
 // 변수는 oe 컬렉션 안에서만 찾는다. 다른 라이브러리(BKDS 등)에서 들어온 같은 이름 변수에 묶지 않는다.
 const collections = await figma.variables.getLocalVariableCollectionsAsync();
@@ -183,18 +183,27 @@ function textsOf(spec, acc = []) {
 async function build(spec, parent, parentBox) {
   let node;
   let needsSettle = false;
-  // 인스턴스로 놓는 자리는 안쪽이 조각에 실려 오지 않는다. 그래서 컴포넌트를 못 찾으면 그릴 것이 없다.
-  // 프레임으로 대신 그리면 이름도 색도 좌표도 없는 글자가 엉뚱한 자리에 놓이므로, 그리지 않고 멈춘다.
+  // 인스턴스는 **최선 노력**이다. 라이브러리에 맞는 컴포넌트가 있고 글자 자리 수까지 같을 때만 놓고,
+  // 아니면 아래 갈래로 내려가 보통 프레임으로 그린다. 예전에는 여기서 멈췄는데, 카탈로그가 「버튼」
+  // 같은 고정 예시 글자를 쓰는 한 화면의 임의 내용과 자리 수가 어긋나는 일은 늘 생긴다
+  // (아이콘만 있는 버튼은 0 개, 줄바꿈이 난 배지는 2 개). 한 자리 때문에 화면 한 장을 통째로
+  // 잃지 않는다. 무엇이 인스턴스가 되지 못했는지는 report 가 남긴다.
   if (spec.inst) {
     const component = await componentNamed(spec.inst);
     const wanted = textsOf(spec);
-    if (!component) throw new Error(`컴포넌트를 찾지 못했다: ${spec.inst}. 카탈로그를 이 파일에 먼저 올린다`);
+    const instance = component && component.createInstance();
+    const slots = instance ? instance.findAllWithCriteria({ types: ["TEXT"] }) : [];
+    if (!component || slots.length !== wanted.length) {
+      if (instance) instance.remove();
+      report.instanceMiss.push(!component ? `없는 컴포넌트: ${spec.inst}` : `글자 수가 다르다: ${spec.inst} 화면 ${wanted.length} ≠ 컴포넌트 ${slots.length}`);
+      spec.inst = undefined;
+    }
+  }
+  if (spec.inst) {
+    const component = await componentNamed(spec.inst);
     const instance = component.createInstance();
     const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
-    if (slots.length !== wanted.length) {
-      instance.remove();
-      throw new Error(`컴포넌트의 글자 수가 다르다: ${spec.inst} 화면 ${wanted.length}개 ≠ 컴포넌트 ${slots.length}개. 카탈로그를 다시 올린다`);
-    }
+    const wanted = textsOf(spec);
     for (const [i, text] of slots.entries()) {
       await figma.loadFontAsync(text.fontName);
       text.characters = wanted[i].s;
@@ -357,5 +366,5 @@ for (CHUNK of RUN) {
   // 여기까지 그린 것은 남는다. 무엇이 왜 멈췄는지 돌려주고 사람이 고친 뒤 이 단계부터 다시 돌린다.
   return { error: (e && e.message) || String(e), report };
 }
-for (const key of ["unmappedColors", "unmappedText", "weightFallback", "defaultTextColor", "opacityOnToken"]) report[key] = [...new Set(report[key])].slice(0, 20);
+for (const key of ["instanceMiss", "unmappedColors", "unmappedText", "weightFallback", "defaultTextColor", "opacityOnToken"]) report[key] = [...new Set(report[key])].slice(0, 20);
 return report;
