@@ -322,7 +322,19 @@ for (CHUNK of RUN) {
     for (const old of page.children.filter((n) => n.name === CHUNK.rootFrame.name)) { report.replacedFrames.push(old.name); old.remove(); }
     parent = page;
   } else {
+    // 한 단계가 도중에 멈추면 그때까지 그린 것은 남는다. 사람이 고치고 **그 단계부터 다시 돌리면**
+    // 남아 있던 것 위에 또 그려서 노드가 조용히 두 벌 생긴다(루트 프레임을 만드는 단계는 같은 이름을
+    // 지우고 다시 그리므로 이 일이 없고, 자식 조각만 그렇다). 이번 조각이 만들 경로를 미리 지운다.
+    const mine = new Set(CHUNK.nodes.map((item) => item.path).filter(Boolean));
     const root = page.children.find((n) => n.type === "FRAME" && n.name === CHUNK.frameName && n.getSharedPluginData(TAG, "p"));
+    if (root && mine.size) {
+      for (const old of root.findAll((n) => mine.has(n.getSharedPluginData(TAG, "p")))) {
+        // 앞의 것을 지우며 함께 사라진 자손일 수 있다. 이미 사라진 노드에 remove 를 부르면 던진다.
+        if (old.removed) continue;
+        report.replacedFrames.push(`다시 그림: ${old.getSharedPluginData(TAG, "p")}`);
+        old.remove();
+      }
+    }
     // 자식을 담을 수 있는 노드면 무엇이든 부모가 된다. 카탈로그 항목은 createComponentFromNode 로
     // COMPONENT 가 되므로 FRAME 만 찾으면 그 안쪽을 부모로 하는 뒤 조각이 부모를 잃는다(2026-09-18).
     const canHoldChildren = (n) => "children" in n;
