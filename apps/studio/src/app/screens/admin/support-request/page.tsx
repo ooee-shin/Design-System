@@ -122,9 +122,11 @@ export default function AdminSupportRequestScreenPage() {
                     그중 내 점포만 볼지가 한 줄에 선다. 셋 다 목록에 무엇이 담겼는지를 말하는 값이라
                     담긴 것 바로 위가 자리다. */}
                 <div className="flex items-center justify-between gap-2">
-                  {/* 건수는 이 줄에서 가장 먼저 읽히는 값이라 옆의 조작들보다 두 단계 크다. */}
-                  <span className="shrink-0 text-base text-oe-foreground-secondary">
-                    전체 <span className="font-medium text-oe-foreground-primary tabular-nums">{shown.length}</span>건
+                  {/* 건수는 이 줄에서 가장 먼저 읽히는 값이다. 크기를 키워 앞세우는 대신 한 단계
+                      내리고 굵기를 올렸다. 옆의 조작들과 같은 14px 이라 줄의 높이가 이 값 때문에
+                      늘어나지 않으면서, 굵기만으로 먼저 읽힌다. */}
+                  <span className="shrink-0 text-sm font-medium text-oe-foreground-secondary">
+                    전체 <span className="text-oe-foreground-primary tabular-nums">{shown.length}</span>건
                   </span>
                   <div className="flex shrink-0 items-center gap-3">
                     {/* 라벨을 줄바꿈하지 않는 것만 화면이 정한다. 400px 카드 안에서 셋이 한 줄을
