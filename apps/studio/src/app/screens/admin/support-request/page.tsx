@@ -50,7 +50,13 @@ export default function AdminSupportRequestScreenPage() {
 
   return (
     <AdminLayout>
-      <div className="flex min-h-0 flex-1 flex-col">
+      {/* 본문 바탕을 옅은 회색으로 깐다. 조건 줄과 목록과 상세가 저마다 흰 카드로 서므로, 바탕이
+          같은 흰색이면 카드의 경계선 하나로만 세 덩이가 갈린다. 바탕을 한 단계 내리면 카드가
+          스스로 떠 보이므로, 세 카드에서 경계선을 걷고 옅은 그림자만 남겼다.
+
+          `AdminLayout` 이 아니라 이 화면이 깐다. 다른 관리자 화면은 흰 바탕을 그대로 쓰고 있으며,
+          이 화면에서 먼저 시험한 뒤에 레이아웃으로 올릴지 판단한다. */}
+      <div className="flex min-h-0 flex-1 flex-col bg-oe-background-secondary">
         {/* 머리에 바탕과 선을 두지 않는다. 아래가 통째로 스크롤되는 한 덩이가 아니라 조건 줄과
             목록과 상세 세 장으로 나뉘어 있어, 머리에도 선을 그으면 가로선이 겹쳐 보인다. */}
         <PageHeader path={PAGE_PATH} title="지원요청관리" variant="ghost" />
@@ -77,7 +83,7 @@ export default function AdminSupportRequestScreenPage() {
               맞춰 두면 한 줄에 담기던 것이 그대로 담긴다. 오른쪽 상세가 남은 폭을 전부 쓴다. */}
           <div className="flex min-h-0 flex-1 gap-3">
             <div className="flex w-[400px] shrink-0 flex-col">
-              <ul className="min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+              <ul className="min-h-0 flex-1 divide-y divide-oe-border-tertiary overflow-y-auto rounded-lg bg-oe-background-primary shadow-xs">
                 {shown.map((request) => (
                   <li key={request.no}>
                     <RequestRow request={request} picked={picked?.no === request.no} onPick={() => setPicked(request)} />
@@ -86,7 +92,7 @@ export default function AdminSupportRequestScreenPage() {
               </ul>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col rounded-lg border border-oe-border-secondary bg-oe-background-primary">
+            <div className="flex min-h-0 flex-1 flex-col rounded-lg bg-oe-background-primary shadow-xs">
               {picked === null ? <EmptyDetail /> : <Detail request={picked} />}
             </div>
           </div>
@@ -115,7 +121,7 @@ function FilterBar({
 }) {
   return (
     <form
-      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-5 py-4"
+      className="flex shrink-0 flex-wrap items-center gap-x-7 gap-y-3 rounded-lg bg-oe-background-primary px-5 py-4 shadow-xs"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
