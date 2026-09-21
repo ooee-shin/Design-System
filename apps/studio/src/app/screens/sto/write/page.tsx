@@ -84,13 +84,7 @@ export default function StoWriteScreenPage() {
             }}
           >
             {CHANNELS.map((channel) => (
-              <SelectBox
-                key={channel.value}
-                value={channel.value}
-                title={channel.choice}
-                description={channel.example}
-                className={NEUTRAL_SELECTED}
-              />
+              <SelectBox key={channel.value} value={channel.value} title={channel.choice} description={channel.example} />
             ))}
           </SelectBoxGroup>
 
@@ -133,11 +127,7 @@ export default function StoWriteScreenPage() {
                   있다. 고른 값도 그 자리에 그대로 남아 접힌 Select 처럼 한 칸으로 줄지 않는다.
 
                   고를 수 있는 것은 하나다. 이미 고른 칩을 다시 눌러 비우지는 않는다. 필수 값이라
-                  비운 상태는 등록할 수 없는 상태이며, 바꾸려면 다른 칩을 누르면 된다.
-
-                  고른 칩은 `activeStyle="fill"` 로 진한 뉴트럴을 채운다. 위에 Focus 색으로 맞춘 선택
-                  경계가 있고 등록 버튼도 brand 색으로 설 자리이므로, 고른 칩까지 brand 를 옅게 깔면
-                  파란 기가 세 곳에서 돌아 무엇이 지목된 것인지 색으로 갈리지 않는다. */}
+                  비운 상태는 등록할 수 없는 상태이며, 바꾸려면 다른 칩을 누르면 된다. */}
               <Field label="카테고리" group required>
                 <div role="group" className="flex flex-wrap gap-1.5">
                   {categoriesOf(kind).map((name) => (
@@ -146,7 +136,6 @@ export default function StoWriteScreenPage() {
                       shape="rounded"
                       controlSize="large"
                       active={category === name}
-                      activeStyle="fill"
                       onClick={() => setCategory(name)}
                     >
                       {name}
@@ -311,27 +300,6 @@ export default function StoWriteScreenPage() {
     </MobileWebView>
   );
 }
-
-/**
- * 고른 SelectBox 를 중립으로 내린다.
- *
- * 컴포넌트의 기본은 브랜드 테두리와 브랜드 5% 바탕인데, 그 테두리 색이 `--oe-focus-ring` 과 같은
- * 값이라 고른 것과 포커스가 놓인 것이 화면에서 갈리지 않는다. 검정 1px 로 내리면 둘이 분리되고,
- * 폼의 맨 위가 파랗게 번지지 않는다. 안의 라디오도 같은 검정으로 맞춰야 한 컨트롤 안에서 색이
- * 갈리지 않는다.
- *
- * 이 화면에서 먼저 쓰고, 다른 화면에서 다시 검증한 뒤에 `packages/ui` 의 SelectBox 로 올린다.
- * 그때까지는 화면이 컴포넌트의 클래스를 덮는 자리라 `!` 가 붙는다. 올리고 나면 이 상수는 지운다.
- */
-const NEUTRAL_SELECTED = [
-  "data-[selected]:!border-oe-border-bold-primary",
-  "data-[selected]:!bg-transparent",
-  "data-[selected]:!shadow-none",
-  "data-[selected]:hover:!bg-oe-interaction-hover-subtle",
-  "data-[selected]:active:!bg-oe-interaction-hover",
-  "[&_[data-slot=radio][data-checked]]:!border-oe-border-bold-primary",
-  "[&_[data-slot=radio][data-checked]]:!bg-oe-background-bold-primary",
-].join(" ");
 
 /**
  * 화면이 들고 있는 첨부 파일이다. 올리지 않으므로 파일 자체는 남기지 않고, 줄에 세울 이름과

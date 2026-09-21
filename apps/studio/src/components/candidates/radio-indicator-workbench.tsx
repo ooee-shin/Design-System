@@ -253,7 +253,7 @@ function StateGroup({ title, description, children }: { title: string; descripti
 function ThemeOptionCard({ value, label, theme }: { value: string; label: string; theme: "system" | "light" | "dark" }) {
   const labelId = `theme-option-${theme}`;
   return (
-    <label className="relative grid cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.theme-preview-frame]:border-[var(--brand-alpha-40)] [&:has([data-slot=radio]:focus-visible)_.theme-preview-frame]:!border-oe-focus-ring">
+    <label className="relative grid cursor-pointer gap-1 [&:has([data-slot=radio][data-checked])_.theme-preview-frame]:border-oe-border-bold-primary [&:has([data-slot=radio]:focus-visible)_.theme-preview-frame]:!border-oe-focus-ring">
       <span className="theme-preview-frame block rounded-xl border-2 border-transparent p-[3px] transition-[border-color] duration-150">
         <ThemePreview theme={theme} />
       </span>
