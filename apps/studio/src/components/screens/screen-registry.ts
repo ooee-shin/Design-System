@@ -41,6 +41,7 @@ export const screenRoots: ScreenRoot[] = [
       { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
       { key: "voice", name: "관리자 테이블 목록", scope: "관리자 목록, 필터", href: "/screens/admin/voice" },
+      { key: "support-request", name: "관리자 테이블 목록 B", href: "/screens/admin/support-request", inProgress: true },
     ],
   },
   {
