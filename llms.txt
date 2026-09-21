@@ -54,10 +54,6 @@ Storybook이 주는 것과 같은 것을 여기서 얻는다.
 
 `docs-list`·`docs-show` 같은 MCP 도구를 찾지 마라. 없다. 파일을 직접 읽는 것이 원본이고, 화면이 필요하면 위 URL을 `curl`로 받아 읽는다.
 
-**Playground의 옵션과 Figma 카탈로그의 축은 같아야 한다.** 한쪽에만 있으면 그 변형은 디자이너가 Figma에서 쓸 수 없거나, 반대로 Figma에 쓰이지 않는 변형이 서 있는 것이다. 어긋난 것을 찾으면 고치지 말고 보고한다 — 어느 쪽이 맞는지는 사람이 정한다.
-
-**새 컴포넌트가 필요하면 shadcn/ui에서 출발해** 이 저장소의 스택으로 정규화한다(`@base-ui/react`, cva + tailwind-merge, `oe` 시맨틱 토큰, `data-slot`). 맨바닥에서 만들지 않는다.
-
 ## 하네스 (AI가 쓰는 명령)
 
 | 명령 | 하는 일 | 정의 |
@@ -76,9 +72,25 @@ Storybook이 주는 것과 같은 것을 여기서 얻는다.
 | 컴포넌트 카탈로그 (Figma 라이브러리의 원본) | `apps/sandbox/src/app/catalog/page.tsx` |
 | Figma에서 코드로 되짚는 표 | [docs/process/figma-component-map.md](docs/process/figma-component-map.md) |
 
-**카탈로그가 Figma 라이브러리의 정본이다.** 변형을 더하려면 카탈로그에 항목을 더하고 다시 올린다 — Figma 쪽을 손으로 고치지 않는다. 축의 값은 모두 곱해져 Variant가 되므로 곱집합에 빈칸이 있으면 테스트가 실패한다.
+**카탈로그가 Figma 라이브러리의 정본이다.** 변형을 더하려면 카탈로그에 항목을 더하고 다시 올린다 — Figma 쪽을 손으로 고치지 않는다. 축의 값은 모두 곱해져 Variant가 되므로 곱집합에 빈칸이 있으면 테스트가 실패한다. 세트로 묶는 것(`combine as variants`)도 `combine-variants.js`가 자동으로 하니 Figma에서 손으로 누르지 않는다.
+
+확정 19종 가운데 **`MessageBubble` 하나만 라이브러리에 없다.** 이 컴포넌트만 색을 Tailwind 토큰 class가 아니라 손으로 쓴 CSS class(`.oe-message-bubble-outgoing` 등)로 칠해서, class 이름에서 토큰을 읽는 추출기가 아무것도 못 찾는다. 까닭과 다음 수는 `docs/process/working-context.md` 16번에 있다.
 
 Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Storybook이 하던 일은 이미 Studio의 Playground가 한다** — 위 「Playground」 절을 본다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md)의 「2026-09-18 순서 3·5를 하지 않기로 했다」에 있다.
+
+## 이 저장소에서 자주 틀리는 것
+
+실제로 틀렸던 것만 적는다. 고친 자리에는 테스트가 붙어 있으니, 테스트가 막아 주는 것은 여기 다시 적지 않는다.
+
+**Base UI는 상태를 빈 문자열로 찍는다.** `data-checked=""`·`data-disabled=""`·`data-indeterminate=""` 이므로 `attr("data-checked") === "true"` 는 **언제나 거짓**이다. 있고 없음으로 본다(`hasAttribute`). 일부 선택은 값이 아니라 `data-indeterminate` 라는 별도 속성이다. 이 비교를 틀려서 체크박스가 무슨 상태든 `off` 로 나가고 있었다.
+
+**개수·목록을 문서에 베끼지 않는다.** 카탈로그 변형 개수가 문서 네 곳에 복사돼 서로 다른 값이 남았고 넷 다 실제와 달랐다. 세는 방법을 적고 숫자는 적지 않는다.
+
+**Studio 플레이그라운드의 옵션과 Figma 카탈로그의 축은 같아야 한다.** 한쪽에만 있으면 그 변형은 디자이너가 Figma에서 쓸 수 없거나, 반대로 쓰이지 않는 변형이 서 있는 것이다. 새 옵션을 더하면 양쪽을 함께 본다. 어긋난 것을 찾았을 때 어느 쪽이 맞는지는 사람이 정한다.
+
+**`packages/ui`는 팀원의 영역이다.** 컴포넌트 구현·토큰·Story는 그쪽이 소유한다. 고쳐야 할 것을 찾으면 고치지 말고 `docs/process/working-context.md` 에 근거와 함께 적는다. 화면(`apps/*`)과 하네스(`plugins/`, `scripts/`, `.claude/`)는 이쪽이다.
+
+**새 컴포넌트를 맨바닥에서 만들지 않는다.** shadcn/ui에서 출발해 이 저장소의 스택으로 정규화한다(`@base-ui/react`, cva + tailwind-merge, `oe` 시맨틱 토큰, `data-slot`). 만들기 전에 「정말 새로 만들어야 하는가」를 먼저 묻는다 — 확정 19종으로 되는 일이면 그걸 쓴다.
 
 ## 일하는 방식 (`docs/process/` — 전달본에는 가지 않는다)
 
