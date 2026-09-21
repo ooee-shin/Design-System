@@ -26,7 +26,7 @@
 
 컴포넌트마다 문서가 하나씩 있다 — [docs/system/components/](docs/system/components/). 각 문서는 「역할과 경계」, 「Guidelines」, 「현재 정의하지 않은 항목」을 갖고, **Property 이름과 값은 문서에 적힌 코드 문자열 그대로 쓴다.**
 
-확정 19종: `app-header` `badge` `bottom-navigation` `button` `checkbox` `chip` `combobox` `field` `input` `input-button` `message-bubble` `notification-badge` `number-input` `radio` `select` `select-box` `switch` `textarea` `toggle-button`
+확정 20종: `app-header` `badge` `bottom-navigation` `button` `calendar` `checkbox` `chip` `combobox` `field` `input` `input-button` `message-bubble` `notification-badge` `number-input` `radio` `select` `select-box` `switch` `textarea` `toggle-button`
 
 초안(쓰지 않는다): `admin-header` `message-attachment` `message-composer` `page-header` `side-navigation` `tabs`
 
@@ -74,7 +74,7 @@ Storybook이 주는 것과 같은 것을 여기서 얻는다.
 
 **카탈로그가 Figma 라이브러리의 정본이다.** 변형을 더하려면 카탈로그에 항목을 더하고 다시 올린다 — Figma 쪽을 손으로 고치지 않는다. 축의 값은 모두 곱해져 Variant가 되므로 곱집합에 빈칸이 있으면 테스트가 실패한다. 세트로 묶는 것(`combine as variants`)도 `combine-variants.js`가 자동으로 하니 Figma에서 손으로 누르지 않는다.
 
-확정 19종 가운데 **`MessageBubble` 하나만 라이브러리에 없다.** 이 컴포넌트만 색을 Tailwind 토큰 class가 아니라 손으로 쓴 CSS class(`.oe-message-bubble-outgoing` 등)로 칠해서, class 이름에서 토큰을 읽는 추출기가 아무것도 못 찾는다. 까닭과 다음 수는 `docs/process/working-context.md` 16번에 있다.
+확정 20종 가운데 **`MessageBubble` 하나만 라이브러리에 없다.** 이 컴포넌트만 색을 Tailwind 토큰 class가 아니라 손으로 쓴 CSS class(`.oe-message-bubble-outgoing` 등)로 칠해서, class 이름에서 토큰을 읽는 추출기가 아무것도 못 찾는다. 까닭과 다음 수는 `docs/process/working-context.md` 16번에 있다.
 
 Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Storybook이 하던 일은 이미 Studio의 Playground가 한다** — 위 「Playground」 절을 본다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md)의 「2026-09-18 순서 3·5를 하지 않기로 했다」에 있다.
 
@@ -90,7 +90,7 @@ Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Story
 
 **`packages/ui`는 팀원의 영역이다.** 컴포넌트 구현·토큰·Story는 그쪽이 소유한다. 고쳐야 할 것을 찾으면 고치지 말고 `docs/process/working-context.md` 에 근거와 함께 적는다. 화면(`apps/*`)과 하네스(`plugins/`, `scripts/`, `.claude/`)는 이쪽이다.
 
-**새 컴포넌트를 맨바닥에서 만들지 않는다.** shadcn/ui에서 출발해 이 저장소의 스택으로 정규화한다(`@base-ui/react`, cva + tailwind-merge, `oe` 시맨틱 토큰, `data-slot`). 만들기 전에 「정말 새로 만들어야 하는가」를 먼저 묻는다 — 확정 19종으로 되는 일이면 그걸 쓴다.
+**새 컴포넌트를 맨바닥에서 만들지 않는다.** shadcn/ui에서 출발해 이 저장소의 스택으로 정규화하고, **Playground 는 기존 컴포넌트와 같은 양식을 그대로 따른다.** 만드는 절차와 채워야 하는 다섯 자리는 [docs/process/new-component.md](docs/process/new-component.md) 가 갖는다. 만들기 전에 「정말 새로 만들어야 하는가」를 먼저 묻는다.
 
 ## 일하는 방식 (`docs/process/` — 전달본에는 가지 않는다)
 

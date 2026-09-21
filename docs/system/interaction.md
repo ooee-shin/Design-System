@@ -12,6 +12,12 @@ Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Foc
 2. 선택선처럼 기존 경계가 이미 2px인 요소는 두께, 위치와 레이아웃을 바꾸지 않고 같은 2px 선의 색만 `oe-focus-ring`으로 교체한다. 선택선과 별도 Focus ring을 중첩하지 않는다.
 3. 기존 경계와 분리된 Focus 표시가 필요한 요소는 기본 2px 간격을 두고 바깥에 2px ring을 그린다. 컴포넌트 구조상 별도 조정이 필요한 경우에만 간격을 2px보다 크게 할 수 있다.
 
+## Popup을 연 Trigger
+
+**Trigger로 여는 Popup이 열려 있는 동안 Trigger는 Focus와 같은 표시를 유지한다.** Select와 Combobox 모두 열리는 순간 실제 초점이 팝업 안으로 옮겨 가므로, 표시를 두지 않으면 Trigger에 아무 흔적도 남지 않는다. 조건 줄처럼 같은 종류의 Trigger가 여럿 선 자리에서는 어느 것을 열어 둔 것인지 화면이 말하지 못하게 된다.
+
+이 표시는 고른 값이 아니라 지금 쓰고 있는 컨트롤을 가리키므로, 「선택 상태와 Hover·Pressed」가 선택에 중립을 쓰도록 정한 것과 어긋나지 않는다. 같은 뜻에 표현을 하나만 두기 위해 Focus가 쓰는 선과 ring을 그대로 쓴다.
+
 ## 오류와 Focus가 겹칠 때
 
 오류가 있는 Control에 커서가 가면 Focus 색이 아니라 오류 색을 유지한다. Focus 색으로 덮으면 고치려고 들어간 순간에 그 칸이 틀렸다는 표시가 사라진다.
@@ -21,7 +27,19 @@ Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만, Foc
 
 ## 선택 상태와 Hover·Pressed
 
-선택된 상태에는 Hover와 Pressed 하이라이트를 중첩하지 않는다. 선택 배경이 pointer와 키보드 Hover highlight보다 우선하며, 선택된 요소 위에서 포인터를 움직이거나 누르는 동안에도 그 배경을 유지한다.
+선택을 무슨 색으로 알릴지는 그 요소가 면을 칠하는지 표식을 찍는지로 가른다.
+
+**면을 칠해 선택을 알리는 요소는 중립으로 알린다.** Select Box 카드, Chip, 목록 행, 탭이 여기 든다. 이런 요소는 제목과 설명이라는 내용을 이미 담고 있어서 색을 걷어도 읽을 것이 남고, 한 화면에 여럿이 동시에 켜져 있을 수 있다. 여럿이 쓰는 색과 실행 하나가 쓰는 색이 같으면 그 하나가 묻힌다.
+
+중립 안에서 선으로 알릴지 면을 채워 알릴지는 그 면의 크기를 따른다. Select Box 카드처럼 제목과 설명을 담는 큰 면은 `oe-border-bold-primary` 선으로 알린다. 큰 면을 채우면 여러 장 가운데 하나가 눌려 있는 것처럼 무거워진다. Chip처럼 한 낱말이 드는 작은 면과 경계가 없는 목록 행은 면을 채워 알린다. 작은 면은 선 색만 진해져서는 고르지 않은 것과 갈리지 않는다.
+
+**선택 표시가 전부인 컨트롤은 brand로 알린다.** Radio, Checkbox, Switch가 여기 든다. 표식 하나가 켜졌는지 여부를 말하는 유일한 신호이므로, 색을 걷으면 채움 유무만 남아 꺼진 채 켜져 있는 상태와 무채색 안에서 갈리게 된다. 셋은 같은 `oe-brand-background-bold-primary`를 쓴다. 한 컨트롤만 `oe-info-*`처럼 다른 유채색을 쓰면 브랜드 색을 갈아 끼울 때 그 컨트롤만 남는다.
+
+**표식이 면과 함께 선택을 알리는 자리에서는 면의 색을 따른다.** Select Box 카드 안의 Radio와 Checkbox가 그렇다. 카드가 이미 선택을 알리고 있어 표식이 유일한 신호가 아니며, 카드의 선을 중립으로 두고 표식만 brand로 남기면 한 카드 안에서 지목하는 색이 둘이 된다. 반대로 Combobox의 여러 값 고르기처럼 행에 배경을 깔지 않고 표식만으로 알리는 자리에서는 brand를 유지한다.
+
+**brand는 그 밖에 실행과 Focus에만 쓴다.** 화면에서 파란 것이 곧 눌러야 할 것이 되도록 색을 아낀다. 고른 값에 brand를 쓰면 Focus ring과 같은 색조가 되어, 고른 것과 커서가 놓인 것이 색으로 갈리지 않는다.
+
+선택된 상태에는 Hover와 Pressed 하이라이트를 중첩하지 않는다. 선택 배경이 pointer와 키보드 Hover highlight보다 우선하며, 선택된 요소 위에서 포인터를 움직이거나 누르는 동안에도 그 배경을 유지한다. 다만 선택을 배경이 아니라 선으로 알리는 요소는 선택된 상태에서도 Hover와 Pressed를 그대로 받는다. 하이라이트가 흐려 놓을 선택 배경이 없기 때문이며, 받지 않으면 고른 요소만 눌러도 반응하지 않는 것처럼 보인다.
 
 회색조 하이라이트를 선택 배경 위에 덧입히면 선택 색이 흐려져 무엇이 선택되어 있는지 알기 어려워진다. 선택되지 않은 요소에는 Hover에 `oe-interaction-hover-subtle`, Pressed에 `oe-interaction-hover`를 사용한다.
 
@@ -77,6 +95,7 @@ Checkbox, Radio, Switch는 이 높이를 직접 적용하지 않는다. Textarea
 
 - 적용 대상: Button, Input, Input Button, Number Input, Textarea, Select, Combobox의 Container와 Chip의 `rounded`
 - 적용하지 않는 것: 카드형 선택지인 Select Box, Trigger로 여는 Popup, Tooltip, Message Bubble과 첨부 카드. 컨트롤과 나란히 놓이는 요소가 아니므로 각자의 단계를 사용한다.
+- 다만 Select와 Combobox의 Popup은 서로 같은 `rounded-lg`(10px)를 쓴다. 닫힌 상태의 Trigger를 공유하는 두 컴포넌트이므로, 열린 면의 모서리가 갈리면 같은 컨트롤을 열었는데 다른 것이 열린 것처럼 보인다.
 - Chip의 기본 모양은 `circle`이며 이 기준은 `rounded`를 골랐을 때 적용된다.
 
 `packages/ui/src/control-radius.test.tsx`가 컨트롤들이 같은 토큰을 쓰는지 검사하고, `packages/tokens/src/index.test.ts`가 토큰 값과 `RADII` 원본의 일치를 검사한다.

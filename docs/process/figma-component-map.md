@@ -79,9 +79,9 @@ Figma 프레임을 다시 읽었을 때 남는 것으로 `@ooee/ui` 컴포넌트
 | `Field` | `errorMessage` 유무, `required`, `characterCount`, 그룹 | **레이어 이름이 `field-error-message`면 오류 상태, `field-helper-text`면 아니다.** Property가 이름에 실리는 유일한 자리다. `field-requirement` 자식이 있으면 `required`, `field-character-count`가 있으면 글자 수 표시. `field-group`이 있으면 Control 여러 개를 묶은 자리다. 다만 `field-group`이 없다고 `group=false`는 아니다(자식이 하나면 그리지 않는다) |
 | `Checkbox` | checked, indeterminate, disabled, `shape` | 칠이 `oe-brand-background-bold-primary`면 checked. 자식 아이콘이 `RiCheckLine`이면 checked, `RiSubtractLine`이면 indeterminate. 모서리 0이면 `square`, 4면 `rounded` 또는 `ghost`이며, 칠도 테두리도 없으면 `ghost`다. `ghost`는 아이콘이 늘 있으므로 아이콘으로 checked를 되짚지 않고 글자 색으로 본다 |
 | `Radio` | checked, disabled | 칠이 `oe-brand-background-bold-primary`면 checked. `indeterminate`와 `shape`는 Radio에 없다 |
-| `Switch` | `controlSize`, checked | 트랙 16×26 small · 24×38 medium · 32×52 large. 칠이 `oe-info-background-bold-primary`면 checked |
-| `Chip` | `controlSize`, `shape`, `active`, `prefix`, `onRemove`, iconOnly | 높이. 모서리가 8이면 `rounded`, 높이의 절반이면 `circle`. 테두리 `brand-alpha-40`+칠 `brand-alpha-05`면 `active`. `chip-remove` 자식이 있으면 삭제형 |
-| `SelectBox` | 그룹의 `selectionMode`, selected | `select-box-trailing-element` 안이 `radio`면 그룹이 `single`, `checkbox`면 `multiple`이다(`selectionMode`는 `SelectBoxGroup`이 갖는다). 안이 비어 있으면 `trailingElement="none"`이라 되짚지 않는다. 테두리 `brand-alpha-40`+칠 `brand-alpha-05`면 선택됨 |
+| `Switch` | `controlSize`, checked | 트랙 16×26 small · 24×38 medium · 32×52 large. 칠이 `oe-brand-background-bold-primary`면 checked |
+| `Chip` | `controlSize`, `shape`, `active`, `prefix`, `onRemove`, iconOnly | 높이. 모서리가 8이면 `rounded`, 높이의 절반이면 `circle`. 칠이 `oe-background-bold-primary`면 `active`. `chip-remove` 자식이 있으면 삭제형 |
+| `SelectBox` | 그룹의 `selectionMode`, selected | `select-box-trailing-element` 안이 `radio`면 그룹이 `single`, `checkbox`면 `multiple`이다(`selectionMode`는 `SelectBoxGroup`이 갖는다). 안이 비어 있으면 `trailingElement="none"`이라 되짚지 않는다. 테두리가 `oe-border-bold-primary`면 선택됨 |
 | `ToggleButton` | `controlSize`, `pressed`, 켜졌을 때의 `variant` | 칠 없이 글자 `oe-foreground-tertiary`면 꺼짐. 켜짐은 글자 `brand-600`이면 `ghost`, 칠 `brand-100`+글자 `brand-800`이면 `tonal` |
 | `AppHeader` | `description` 유무 | 높이 56. 아래 테두리 `oe-border-secondary`가 있으면 본문이 헤더 아래로 들어간 상태(`data-stuck`)로 그린 것이다. `sticky` 자체는 흔적이 없다 |
 | `BottomNavigation` | `variant`, `showLabels`, 항목 수, 선택 항목 | 모서리가 높이의 절반이면 `floating`, 0이고 위 테두리 `neutral-100`이 있으면 `bar`. `bottom-navigation-label` 레이어가 없으면 `showLabels=false`. 글자가 `oe-foreground-primary`인 항목이 선택된 것이다(나머지는 `oe-foreground-subtle`) |

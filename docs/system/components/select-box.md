@@ -2,7 +2,7 @@
 
 `packages/ui/src/select-box.tsx`
 
-정의된 선택지를 화면에 펼쳐 놓고 제목, 설명과 시각 정보를 비교하며 하나 이상의 값을 선택하는 입력 컴포넌트다. 공용 Radio·Checkbox Control과 Field 경계를 사용하고 선택 표현은 Brand alpha를 사용한다.
+정의된 선택지를 화면에 펼쳐 놓고 제목, 설명과 시각 정보를 비교하며 하나 이상의 값을 선택하는 입력 컴포넌트다. 공용 Radio·Checkbox Control과 Field 경계를 사용하고, 고른 카드는 중립 경계로 알린다.
 
 ## 역할과 경계
 
@@ -43,9 +43,11 @@ Select Box 전체 Container가 하나의 선택 영역이다. Content container�
 - 한 열에서 Leading element와 Trailing element는 항목 전체 높이를 기준으로 수직 중앙 정렬한다. 여러 열에서 Leading element는 Title 위로 올라가며 왼쪽 시작점을 Title과 맞추고, Trailing element만 수직 중앙 정렬을 유지한다. 공통 Image 예시는 정사각 Avatar를 사용하고 `oe-border-visual` 1px inset 경계를 적용한다.
 - Title과 Description 간격은 2px이다. Title은 `text-base`(16px / 24px) Medium, Description은 `text-oe-label`(13px / 16px) Tertiary foreground를 사용한다. Description이 Label token인 것은 제목이 본문 단계로 올라가 12px과의 간격이 네 단계로 벌어졌기 때문이며, 한 단계만 좁혀 두 글이 한 덩이로 읽히게 한다.
 - Description의 글자 크기는 `text-oe-label` 클래스가 아니라 `text-[length:var(--text-oe-label)]`과 짝이 되는 줄 높이로 적는다. `cn()`이 `text-oe-label`을 색 클래스와 같은 무리로 보고 앞의 `text-oe-foreground-tertiary`를 지우기 때문이다. Switch가 같은 방식을 쓴다. Title이 본문 단계인 것은 이 컴포넌트가 한 줄 목록이 아니라 고르는 덩이이고, 14px에서는 아래 설명과 크기 차이가 좁아 제목으로 읽히지 않기 때문이다.
-- 선택 상태는 진한 Filled action과 구분하기 위해 `brand-alpha-05` 배경을 사용하고, 2px 경계는 `oe-focus-ring`을 사용한다. 경계가 Focus와 같은 색인 것은 선택된 항목과 지금 키보드가 짚은 항목이 둘 다 「이 항목이 지금 지목되어 있다」는 같은 뜻이기 때문이며, 그 둘을 다른 색으로 두면 한 상자 안에 지목의 뜻을 갖는 색이 둘이 된다. Pointer 선택만으로 Focus ring을 표시하지 않는다.
-- 키보드 `:focus-visible`에서는 선택선과 별도 ring을 중첩하지 않고 같은 2px 경계를 사용한다. 선택되지 않은 항목에서는 Neutral 경계가 그 색으로 바뀌고, 이미 선택된 항목에서는 경계가 이미 같은 색이므로 달라지지 않는다.
-- Disabled에서는 선택 상태의 Brand 색을 제거하고 Disabled Neutral border와 background를 사용한다. Read only는 현재 값을 보존하고 Focus는 허용하지만 Hover·Pressed와 값 변경은 제공하지 않는다.
+- 선택 상태는 배경을 채우지 않고 `oe-border-bold-primary` 2px 경계로 알린다. 2px은 `border`와 안쪽 1px `box-shadow`를 겹쳐 만든다. `border-width`를 키우면 카드 안의 Title과 Description이 1px씩 밀려 고를 때마다 움직인다. 카드는 면을 칠해 선택을 알리는 요소이므로 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」가 정한 대로 brand를 쓰지 않는다. 경계를 brand로 두었을 때에는 그 색이 `oe-focus-ring`과 같아서 고른 카드와 키보드가 짚은 카드가 색으로 갈리지 않았고, 옅은 brand 배경이 흰 배경과 거의 구분되지 않아 경계를 2px로 키워 보강해야 했다. Pointer 선택만으로 Focus ring을 표시하지 않는다.
+- 키보드 `:focus-visible`에서는 `oe-focus-ring` 색의 2px 경계를 사용한다. 선택 경계와 색이 다르므로 이미 선택된 카드에서도 지금 짚고 있는 것이 어느 카드인지 드러난다.
+- 카드 안의 Radio와 Checkbox는 카드와 같은 `oe-background-bold-primary`로 켠다. 단독으로 선 Control은 표식 하나가 유일한 신호라 brand를 쓰지만, 카드 안에서는 카드가 이미 선택을 알리고 있어 표식만 brand로 남기면 한 카드 안에서 지목하는 색이 둘이 된다.
+- 고른 카드도 Hover와 Pressed를 그대로 받는다. 선택을 배경으로 알리지 않아 하이라이트가 흐려 놓을 선택 배경이 없기 때문이다.
+- Disabled에서는 선택 경계를 Disabled Neutral border와 background로 바꾼다. Read only는 현재 값을 보존하고 Focus는 허용하지만 Hover·Pressed와 값 변경은 제공하지 않는다.
 - Trailing element를 `none`으로 설정해도 접근 가능한 Radio 또는 Checkbox input은 시각적으로만 숨기고 DOM과 키보드 순서에서 제거하지 않는다.
 
 ## Guidelines

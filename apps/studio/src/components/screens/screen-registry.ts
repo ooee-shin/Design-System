@@ -40,8 +40,8 @@ export const screenRoots: ScreenRoot[] = [
       { key: "layout", name: "레이아웃·테마설정", scope: "Admin Layout(Header, Side Navigation, Page Header)", href: "/screens/admin/layout" },
       { key: "test", name: "테스트", href: "/screens/admin/test" },
       { key: "login", name: "로그인", href: "/screens/admin/login" },
-      { key: "voice", name: "점주의 소리", scope: "목록·상세, 지원요청으로 전환", href: "/screens/admin/voice", inProgress: true },
-      { key: "support-request", name: "지원요청", scope: "목록·상세, 점주의소리로 전환, 채팅" },
+      { key: "voice", name: "관리자 테이블 목록 A", scope: "필터 우측", href: "/screens/admin/voice" },
+      { key: "support-request", name: "관리자 테이블 목록 B", scope: "목록 좌우 배치, 필터 상단", href: "/screens/admin/support-request", inProgress: true },
     ],
   },
   {
@@ -54,8 +54,6 @@ export const screenRoots: ScreenRoot[] = [
       { key: "layout-v3", name: "App Layout V3·Floating", scope: "Bottom Navigation을 제공합니다.", href: "/screens/sto/layout-v3" },
       { key: "test", name: "테스트", href: "/screens/sto/test" },
       { key: "login", name: "로그인", href: "/screens/sto/login" },
-      { key: "voice", name: "점주의 소리", scope: "목록·상세, 전환된 건 표시" },
-      { key: "support-request", name: "지원요청", scope: "목록·상세 탭(요청 내용·채팅)" },
       {
         key: "write",
         name: "통합 작성 폼",

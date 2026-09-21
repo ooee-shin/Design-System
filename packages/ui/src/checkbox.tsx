@@ -88,6 +88,7 @@ function Checkbox({ className, indeterminate = false, shape = "rounded", disable
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
+      data-shape={shape}
       indeterminate={shape !== "ghost" ? indeterminate : false}
       disabled={shape !== "ghost" ? disabled : undefined}
       className={cn(
@@ -108,7 +109,11 @@ function CheckboxFieldBase({ label, rightDescription, bottomDescription, leading
   const labelId = React.useId()
 
   return (
-    <label className={cn(
+    <label
+      data-slot="checkbox-field"
+      data-shape={shape}
+      data-description={bottomDescription === undefined ? "없음" : "있음"}
+      className={cn(
       "flex min-h-oe-control-regular items-start gap-2 rounded-md bg-transparent px-2 py-2 transition-colors duration-[60ms]",
       !readOnly && "[&:not(:has([data-slot=checkbox][data-disabled])):hover]:bg-oe-interaction-hover-subtle",
       layout === "fill" ? "w-full" : "w-fit",

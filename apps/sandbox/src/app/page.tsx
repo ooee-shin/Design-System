@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { sandboxScreens } from "@/screens";
+import { SANDBOX_PROJECTS, sandboxScreens } from "@/screens";
 
 export default function SandboxIndexPage() {
   return (
@@ -9,30 +9,46 @@ export default function SandboxIndexPage() {
         <h1 className="text-2xl font-semibold text-oe-foreground-primary">ooee sandbox</h1>
         <p className="text-sm text-oe-foreground-secondary">
           <code className="rounded-sm bg-oe-background-secondary px-1 py-0.5 text-oe-foreground-primary">/generate-code</code> 가 만든
-          화면이다. 전달 범위 밖이며 채택 여부는 신주희가 정한다.
+          화면이다. 전달 범위 밖이며 채택 여부는 기획자가 정한다.
         </p>
       </header>
 
       {sandboxScreens.length === 0 ? (
         <p className="text-sm text-oe-foreground-tertiary">아직 만든 화면이 없다.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
-          {sandboxScreens.map((screen) => (
-            <li key={screen.key} className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-4">
-              <Link
-                href={screen.href}
-                className="rounded-sm text-base font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
-              >
-                {screen.name}
-              </Link>
-              <p className="mt-1 text-sm text-oe-foreground-secondary">{screen.prompt}</p>
-              <p className="mt-2 text-xs text-oe-foreground-tertiary">
-                {screen.createdAt}
-                {screen.source ? ` · 원본 ${screen.source}` : " · 원본 없음"}
-              </p>
-            </li>
-          ))}
-        </ul>
+        SANDBOX_PROJECTS.map((project) => {
+          const screens = sandboxScreens.filter((screen) => screen.project === project.id);
+          if (screens.length === 0) return null;
+
+          return (
+            <section key={project.id} aria-labelledby={`${project.id}-title`} className="flex flex-col gap-3">
+              <div className="flex flex-col gap-0.5">
+                <h2 id={`${project.id}-title`} className="text-base font-semibold text-oe-foreground-primary">
+                  {project.name}
+                  <span className="ml-2 text-sm font-normal text-oe-foreground-tertiary">{screens.length}</span>
+                </h2>
+                <p className="text-sm text-oe-foreground-secondary">{project.description}</p>
+              </div>
+              <ul className="flex flex-col gap-3">
+                {screens.map((screen) => (
+                  <li key={screen.key} className="rounded-lg border border-oe-border-secondary bg-oe-background-primary p-4">
+                    <Link
+                      href={screen.href}
+                      className="rounded-sm text-base font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+                    >
+                      {screen.name}
+                    </Link>
+                    <p className="mt-1 text-sm text-oe-foreground-secondary">{screen.prompt}</p>
+                    <p className="mt-2 text-xs text-oe-foreground-tertiary">
+                      {screen.createdAt}
+                      {screen.source ? ` · 원본 ${screen.source}` : " · 원본 없음"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })
       )}
     </main>
   );

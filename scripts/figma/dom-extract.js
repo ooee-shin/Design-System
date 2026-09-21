@@ -42,6 +42,16 @@
       const ref = parseRef(prop, parts.at(-1));
       if (ref) out.push({ ...ref, v: variants.length ? 1 : 0 });
     }
+    // Tailwind 의 `divide-*` 는 **부모에 붙고 자식의 테두리를 칠한다**(`& > * + *`). 그래서 자식의
+    // class 만 보면 후보가 하나도 잡히지 않는다. 표가 칸을 가르는 흔한 방법이라 그냥 두면 표 한 장이
+    // 통째로 변수에 묶이지 않는다(스케줄 화면에서 56 건). 자기 class 에서 못 찾았을 때만 부모를 본다.
+    if (prop === "border" && !out.length && el.parentElement) {
+      for (const c of classList(el.parentElement)) {
+        if (c.includes(":")) continue;
+        const ref = parseRef("border", c.replace(/^divide-/, "border-"));
+        if (ref && !/^divide-[xy]$/.test(c)) out.push({ ...ref, v: 0 });
+      }
+    }
     return out;
   }
   // 글자·아이콘 색은 가까운 조상부터 후보를 모은다.
@@ -174,20 +184,98 @@
       const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled" : "기본";
       node.inst = `Button/variant=${attr("data-variant")}, tone=${attr("data-tone") || "brand"}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
     }
+    // 값을 담는 컨트롤의 상태다. 카탈로그의 FIELD_STATES 와 값이 글자까지 같아야 한다.
+    const valueState = (el, field) =>
+      el.hasAttribute("data-disabled") || (field && field.disabled) ? "disabled"
+        : el.hasAttribute("data-invalid") || (field && field.getAttribute("aria-invalid") === "true") ? "invalid"
+          : field && field.value ? "값 있음" : "비어 있음";
+    // 켜고 끄는 컨트롤의 상태다. 카탈로그의 TOGGLE_STATES 와 같다.
+    const onOffState = (el) => {
+      const on = el.hasAttribute("data-checked");
+      return el.hasAttribute("data-disabled") ? (on ? "disabled-on" : "disabled-off") : on ? "on" : "off";
+    };
+    const size = () => attr("data-size") || "regular";
+
+    // Input 과 NumberInput 은 컨테이너가 같다. 안쪽 input 의 data-controls 가 둘을 가른다.
     if (slot === "input-container" && attr("data-variant")) {
-      const input = el.querySelector("input, textarea");
-      const state = input && input.disabled ? "disabled" : input && input.value ? "값 있음" : "비어 있음";
-      node.inst = `Input/variant=${attr("data-variant")}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
+      const field = el.querySelector("input, textarea");
+      const controls = field && field.getAttribute("data-controls");
+      if (controls) node.inst = `NumberInput/variant=${attr("data-variant")}, controlSize=${size()}, controls=${controls === "none" ? "없음" : controls}`;
+      else node.inst = `Input/variant=${attr("data-variant")}, controlSize=${size()}, state=${valueState(el, field)}`;
+    }
+    if (slot === "textarea-container" && attr("data-variant")) {
+      node.inst = `Textarea/variant=${attr("data-variant")}, state=${valueState(el, el.querySelector("textarea"))}`;
+    }
+    if (slot === "input-button" && attr("data-variant")) {
+      const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled"
+        : el.hasAttribute("data-invalid") ? "invalid"
+          : attr("data-has-value") === "true" ? "값 있음" : "비어 있음";
+      node.inst = `InputButton/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`;
+    }
+    // Select·Combobox 는 고른 값이 없으면 data-placeholder 가 선다. Multi 는 data-selection-mode 로 갈린다.
+    if ((slot === "select-trigger" || slot === "combobox-trigger") && attr("data-variant")) {
+      const set = (attr("data-selection-mode") === "multiple" ? "Multi" : "") + (slot === "select-trigger" ? "Select" : "Combobox");
+      const state = el.hasAttribute("data-disabled") ? "disabled"
+        : el.hasAttribute("data-invalid") ? "invalid"
+          : el.hasAttribute("data-placeholder") ? "비어 있음" : "값 있음";
+      node.inst = `${set}/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`;
     }
     if (slot === "checkbox" && el.hasAttribute("data-shape")) {
-      const state = el.hasAttribute("data-disabled")
-        ? "disabled"
-        : el.hasAttribute("data-indeterminate")
-          ? "indeterminate"
-          : el.hasAttribute("data-checked")
-            ? "on"
-            : "off";
+      const state = el.hasAttribute("data-disabled") ? "disabled"
+        : el.hasAttribute("data-indeterminate") ? "indeterminate"
+          : el.hasAttribute("data-checked") ? "on" : "off";
       node.inst = `Checkbox/shape=${attr("data-shape")}, state=${state}`;
+    }
+    if (slot === "checkbox-field") {
+      const box = el.querySelector("[data-slot=checkbox]");
+      const state = !box ? "off"
+        : box.hasAttribute("data-disabled") ? "disabled"
+          : box.hasAttribute("data-indeterminate") ? "indeterminate"
+            : box.hasAttribute("data-checked") ? "on" : "off";
+      node.inst = `CheckboxField/shape=${attr("data-shape")}, state=${state}, description=${attr("data-description")}`;
+    }
+    if (slot === "radio") node.inst = `Radio/state=${onOffState(el)}`;
+    if (slot === "radio-field") {
+      const dot = el.querySelector("[data-slot=radio]");
+      node.inst = `RadioField/state=${dot ? onOffState(dot) : "off"}, description=${attr("data-description")}`;
+    }
+    if (slot === "switch" && attr("data-size")) node.inst = `Switch/controlSize=${attr("data-size")}, state=${onOffState(el)}`;
+    if (slot === "switch-field") {
+      const sw = el.querySelector("[data-slot=switch]");
+      node.inst = `SwitchField/controlSize=${attr("data-size")}, state=${sw ? onOffState(sw) : "off"}, labelPosition=${attr("data-label-position")}`;
+    }
+    if (slot === "chip" && el.hasAttribute("data-shape")) {
+      node.inst = `Chip/shape=${attr("data-shape")}, controlSize=${size()}, state=${el.hasAttribute("data-active") ? "active" : "기본"}`;
+    }
+    if (slot === "badge" && attr("data-variant")) {
+      node.inst = `Badge/variant=${attr("data-variant")}, tone=${attr("data-tone") || "neutral"}, size=${attr("data-size") || "small"}`;
+    }
+    if (slot === "notification-badge") {
+      node.inst = `NotificationBadge/shape=${attr("data-shape")}, tone=${attr("data-tone")}, overflow=${attr("data-overflow")}`;
+    }
+    if (slot === "toggle-button" && attr("data-variant")) {
+      const tone = attr("data-tone") === "custom" ? attr("data-color") : attr("data-tone");
+      const count = el.querySelector("[data-slot=toggle-button-count]") ? "있음" : "없음";
+      if (tone) node.inst = `ToggleButton/variant=${attr("data-variant")}, tone=${tone}, controlSize=${size()}, state=${el.hasAttribute("data-pressed") ? "pressed" : "기본"}, count=${count}`;
+    }
+    if (slot === "select-box" && attr("data-trailing-element")) {
+      const trailing = attr("data-trailing-element");
+      node.inst = `SelectBox/selectionMode=${trailing === "checkbox" ? "multiple" : "single"}, trailingElement=${trailing}`;
+    }
+    // Field 는 어느 자식이 섰는지로 갈린다. 오류·필수·도움말은 그 상태에서만 생기는 전용 표식이다.
+    if (slot === "field") {
+      const has = (name) => !!el.querySelector(`[data-slot="${name}"]`);
+      const state = has("field-error-message") ? "error" : has("field-requirement") ? "required" : has("field-helper-text") ? "helper" : "기본";
+      node.inst = `Field/state=${state}`;
+    }
+    if (slot === "app-header" && attr("data-sides")) {
+      // 카탈로그에 「오른쪽만」 변형이 없다. 없는 조합에 이름을 붙이면 build 가 멈추므로
+      // 그 자리는 이름을 만들지 않고 프레임으로 둔다 — 틀린 이름보다 없는 편이 낫다.
+      const sides = { none: "없음", leading: "왼쪽", both: "양옆" }[attr("data-sides")];
+      if (sides) node.inst = `AppHeader/titleAlign=${attr("data-title-align")}, sides=${sides}`;
+    }
+    if (slot === "bottom-navigation" && attr("data-variant")) {
+      node.inst = `BottomNavigation/variant=${attr("data-variant")}, labels=${attr("data-show-labels") === "true" ? "있음" : "없음"}`;
     }
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";

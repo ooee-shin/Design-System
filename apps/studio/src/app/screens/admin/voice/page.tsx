@@ -2,7 +2,7 @@
 "use client";
 
 /**
- * 관리자 웹의 점주의 소리 목록이다. 조건을 목록 왼쪽에 세로로 세우는 안이다.
+ * 관리자 웹의 점주의 소리 목록이다. 조건을 목록 오른쪽에 세로로 세우는 안이다.
  *
  * 위에 가로로 늘어놓는 안과 담기는 것도 거르는 규칙도 같고 조건을 보여 주는 방식만 다르다.
  *
@@ -321,7 +321,7 @@ export default function Page() {
   // 필터 값에 담지 않고 이 화면만 들고 있다.
   const [supervisorQuery, setSupervisorQuery] = useState("");
   const edit = (patch: Partial<Filter>) => setDraft((previous) => ({ ...previous, ...patch }));
-  // 목록 위 줄의 조작은 조회를 거치지 않고 곧바로 적용한다. 왼쪽 패널이 목록에 무엇을 담을지
+  // 목록 위 줄의 조작은 조회를 거치지 않고 곧바로 적용한다. 오른쪽 패널이 목록에 무엇을 담을지
   // 정하는 자리라면, 검색과 전환 건 보기는 이미 담긴 목록 안에서 무엇을 볼지 정하는 자리다.
   // 쳐 넣은 글자가 화면에 남으려면 고른 값과 적용된 값을 함께 고쳐야 한다.
   const applyNow = (patch: Partial<Filter>) => {
