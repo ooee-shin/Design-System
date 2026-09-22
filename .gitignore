@@ -22,7 +22,6 @@ next-env.d.ts
 
 # 화면 검수 산출물
 .visual/
-.figma-work/
 # /process-issue 가 쓰는 결과 댓글 입력과 pull request 본문. 추적하면 남은 파일이 다음 처리의 「working tree 가 깨끗한가」를 막는다.
 .harness-work/
 

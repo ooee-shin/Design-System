@@ -30,13 +30,12 @@ export const EXTRA_ALLOWED = ["Bash(git revert --no-edit *)", "Bash(git revert -
 
 /**
  * `/process-issue` 가 Skill 로 부르는 하위 명령. 하위 명령 머리말의 allowed-tools 는 바깥 명령 안에서 불릴 때
- * 적용되지 않는다 — #29 에서 design-page 가 적어 둔 `node scripts/figma/sandbox-server.mjs:*` 가 그대로 거부됐다.
- * 그래서 러너가 그 머리말을 읽어 CLI 로 넘긴다. 원본은 여전히 각 SKILL.md 다.
+ * 적용되지 않는다 — #29 에서 하위 명령이 머리말에 적어 둔 명령이 그대로 거부됐다. 그래서 러너가 그 머리말을
+ * 읽어 CLI 로 넘긴다. 원본은 여전히 각 SKILL.md 다.
  */
 export const CHAINED_SKILLS = [
   "plugins/ooee-harness/skills/generate-code/SKILL.md",
   "plugins/ooee-harness/skills/review-design/SKILL.md",
-  ".claude/skills/design-page/SKILL.md",
 ];
 
 /** 하위 명령 머리말의 allowed-tools 를 겹치지 않게 모은다. */
@@ -69,7 +68,7 @@ export function stateFile(env = process.env) {
 export function buildClaudeArgs(prompt, { resume } = {}) {
   const args = ["-p", prompt, "--output-format", "json", "--model", MODEL, "--effort", EFFORT];
   args.push("--permission-mode", "acceptEdits");
-  args.push("--plugin-dir", "plugins/ooee-harness", "--mcp-config", ".mcp.json");
+  args.push("--plugin-dir", "plugins/ooee-harness");
   if (resume) args.push("-r", resume);
   args.push("--allowedTools", ...EXTRA_ALLOWED, ...chainedAllowedTools());
   return args;
@@ -77,7 +76,7 @@ export function buildClaudeArgs(prompt, { resume } = {}) {
 
 /** 합친 뒤 세션을 이어 받게 하는 말. 스킬의 「러너에서 돌 때」가 이 꼴을 기다린다. */
 export function continuationPrompt(pr, mergeCommit) {
-  return `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}). 「러너에서 돌 때」대로 7단계부터 이어 간다.`;
+  return `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}). 「러너에서 돌 때」대로 6단계부터 이어 간다.`;
 }
 
 /**

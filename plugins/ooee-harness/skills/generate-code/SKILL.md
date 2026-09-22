@@ -7,7 +7,7 @@ effort: high
 
 # /generate-code
 
-`docs/process/ai-environment.md`가 정한 여덟 단계 가운데 ① 디자인 시스템 검색, ⑤ `@ooee/ui` 조회, ⑥ 코드 생성, ⑦ 테스트, ⑧ pull request 준비를 이 명령이 맡는다. ③ 검수는 `/review-design`의 검사 항목을 그대로 쓴다. Figma(②④)는 다루지 않는다.
+`docs/process/ai-environment.md`가 정한 여덟 단계 가운데 ① 디자인 시스템 검색, ⑤ `@ooee/ui` 조회, ⑥ 코드 생성, ⑦ 테스트, ⑧ pull request 준비를 이 명령이 맡는다. ③ 검수는 `/review-design`의 검사 항목을 그대로 쓴다. 결과는 sandbox 에서 본다.
 
 ## 입력
 

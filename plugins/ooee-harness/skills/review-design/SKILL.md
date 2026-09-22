@@ -7,7 +7,7 @@ effort: high
 
 # /review-design
 
-`docs/process/ai-environment.md`의 ③ 검수다. 화면 코드를 `${user_config.docs_root}`의 규칙에 하나씩 대조해 위반 목록을 내고 건수를 센다. Figma 없이 돈다. 이 명령은 고치지 않는다. 고치는 것은 `/generate-code`나 사람이 한다.
+`docs/process/ai-environment.md`의 ③ 검수다. 화면 코드를 `${user_config.docs_root}`의 규칙에 하나씩 대조해 위반 목록을 내고 건수를 센다. 이 명령은 고치지 않는다. 고치는 것은 `/generate-code`나 사람이 한다.
 
 ## 입력
 

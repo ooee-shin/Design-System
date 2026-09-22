@@ -4,7 +4,7 @@
 
 ## 목표와 범위
 
-최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/design-page`, `/review-design`, `/generate-code` 명령으로 다음 여덟 단계를 수행하는 Skill 또는 Plugin을 만든다.
+최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/review-design`, `/generate-code` 명령으로 다음 단계를 수행하는 Skill 또는 Plugin을 만든다. **②④(Figma)는 `2026-09-23` 에 뺐다** — 결과는 sandbox 에서 본다(「2026-09-23 Figma 를 뺐다」).
 
 ```text
 ① 디자인 시스템 검색
@@ -17,7 +17,7 @@
 ⑧ Pull request 준비
 ```
 
-명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③, `/design-page`가 ②④다. `/design-page`는 ②부터 만들었고, ④는 순서 6의 매핑표가 생긴 뒤 같은 명령에 더한다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
+명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③이다. ②④를 맡던 `/design-page`는 `2026-09-23` 에 지웠다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
 
 [roadmap.md](roadmap.md)의 5단계(이하 roadmap N단계)와 대응하면 ①⑤는 roadmap 3단계(스토리북 MCP), ②④는 roadmap 2단계(Figma MCP), 나머지는 roadmap 4·5단계(에이전트 룰, 자동화)다. roadmap.md는 4·5단계를 1차 제외로 두고 [working-context.md](working-context.md)의 「일정과 분담」은 `2026-09-20`부터 `2026-09-23`까지 그 테스트를 잡아 두었다. 이 문서는 roadmap 4·5단계를 **개발자 트랙의 검증용 실험 구현**으로 다룬다. roadmap.md와 루트 `README.md`의 1차 범위 문구를 고칠지는 「아직 정하지 않은 것」에 있다. 이 문서에서 「순서 N」은 「순서와 의존 관계」의 0~8 번호다.
 
@@ -231,7 +231,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 ```text
 요청 이슈 (요청 채널의 폼 → GitHub 「문제 생성」)
 → 러너가 바로 /process-issue <n> 러너
-    이슈 읽기 → 화면 생성 · 검사 (generate-code) → Figma 프레임 (design-page) → push
+    이슈 읽기 → 화면 생성 · 검사 (generate-code) → push
     → 러너가 pull request → Quality 확인 → dev squash 머지
     → Deploy workflow 가 Cloudflare Pages 에 올린다 → 화면 주소 확인
     → 결과 댓글 (결과 채널에 카드로 뜬다)
@@ -249,13 +249,12 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **dev 가 보는 자리다.** 기획자는 코드가 아니라 배포된 화면을 보고 판단한다. 화면이 도는 주소가 생기기 전에는 승인을 묻지 않는다.
 - **Cloudflare Pages 가 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. `dev`에 머지될 때마다 `.github/workflows/deploy.yml`이 올리고, 페이지 주소는 `https://ooee-sandbox.pages.dev/<화면 key>` 가 된다. Vercel 도 GitHub Pages 도 아닌 까닭은 「만들면서 확인된 것」에 적었다.
 - **배포가 실패하면 승인을 묻지 않는다.** 그 경우는 반려가 아니라 처리 중 실패이고, 결과 댓글도 올리지 않는다. 배포는 workflow 의 결과가 아니라 화면 주소가 `200` 인지로 본다. secret 이 없으면 workflow 가 배포를 건너뛰고도 성공으로 끝나기 때문이다(「배포는 wrangler 로 직접 올린다」). 없는 key 의 주소는 `404` 다.
-- **결과는 이슈 댓글 한 장으로 낸다.** 결과 채널 `#디자인시스템-화면-요청-결과물`이 GitHub for Slack 앱으로 이 저장소의 댓글을 받아 카드로 띄운다. 카드는 댓글 앞부분만 보여 주므로, 기획자가 Slack 만 보고도 어느 요청의 결과이고 어디서 보는지 알게 첫 다섯 줄에 요청 · 샌드박스 · Figma · 작업 요약을 몰아 둔다. 이 다섯 줄은 markdown 문법 없이 쓰고 주소를 날 글자로 둔다. Slack 과 GitHub 이 같은 글자로 읽고 둘 다 주소를 링크로 잡는다.
+- **결과는 이슈 댓글 한 장으로 낸다.** 결과 채널 `#디자인시스템-화면-요청-결과물`이 GitHub for Slack 앱으로 이 저장소의 댓글을 받아 카드로 띄운다. 카드는 댓글 앞부분만 보여 주므로, 기획자가 Slack 만 보고도 어느 요청의 결과이고 어디서 보는지 알게 첫 네 줄에 요청 · 샌드박스 · 작업 요약을 몰아 둔다. 이 네 줄은 markdown 문법 없이 쓰고 주소를 날 글자로 둔다. Slack 과 GitHub 이 같은 글자로 읽고 둘 다 주소를 링크로 잡는다.
 
   ```text
   화면 요청 #<n> 결과 · <회차>회차 — <화면 이름> · 결정은 GitHub 댓글에 👍 👎 😕
   요청: <요청자> · 프로젝트 <요청한 프로젝트>
   샌드박스: <이번 회차 첫 화면 주소> 외 <N>장 · 목록 https://ooee-sandbox.pages.dev/
-  Figma: <Figma 파일 주소>
   작업: 페이지 <N>장 추가(<프로젝트>) — <화면 이름>·<화면 이름>·<화면 이름> 외 <N>장 · 새 컴포넌트 없음 · PR #<번호>
   ```
 
@@ -268,10 +267,10 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **에이전트가 결정을 만들지 못하게 한다.** 이슈를 고치거나 닫는 `gh issue edit`·`close`·`reopen`, `gh label`, 그리고 `gh api` 전부가 공용 권한의 `deny`다. `gh api`를 통째로 막는 것은 필드를 붙이면 gh 가 저절로 POST 로 보내는 `gh api …/reactions -f content=+1`·`--method=POST`·graphql `addReaction` 까지 막으려는 것이다 — 처음에는 `-X POST` 꼴만 대조해 이 틈이 있었고 `2026-09-22`에 막았다. `gh issue comment`는 `ask`다. 판독은 계정으로 거르지 않는다(지금은 커넥터와 처리 세션이 같은 GitHub 계정이라 거르면 어떤 결정도 읽히지 않는다). 그래서 에이전트가 이슈에 쓸 수 있는 글은 `scripts/harness/post-result.mjs`가 양식으로 만든 결과 댓글 하나로 좁혔다. 그 첫 줄은 「화면 요청 #<n> 결과」라 결정으로 읽히지 않고, 판독·양식·게시 스크립트를 고치는 것은 `ask`다. 누구의 결정을 받을지는 「아직 정하지 않은 것」의 확정 권한과 함께 정한다.
 - **결정 뒤에 도는 것.**
   - 승인: `dev → main` pull request 를 만들고 멈춘다. 머지는 사람이 한다. `dev`에 승인되지 않은 다른 요청의 화면(대기·개선·결과 없음, 되돌리지 않은 반려)이나 어느 요청의 것인지 알 수 없는 화면 pull request 가 섞여 있으면 만들지 않고, 각각을 푸는 길을 보고한다.
-  - 반려: 사유를 보고하고, 이 요청의 squash commit 을 되돌리는 pull request 를 `dev`에 올린다(본문 첫 줄 `되돌림: #<n>`, 생성·머지는 `ask`). 되돌리지 않으면 반려가 하나 나온 뒤로 어떤 승인도 `main`으로 가지 못한다. Figma 파일은 지우지 않고, 화면은 git 이력과 결과 댓글에 남는다. 이슈를 닫는 것은 사람이다.
+  - 반려: 사유를 보고하고, 이 요청의 squash commit 을 되돌리는 pull request 를 `dev`에 올린다(본문 첫 줄 `되돌림: #<n>`, 생성·머지는 `ask`). 되돌리지 않으면 반려가 하나 나온 뒤로 어떤 승인도 `main`으로 가지 못한다. 화면은 git 이력과 결과 댓글에 남는다. 이슈를 닫는 것은 사람이다.
   - 개선: 사유가 그 회차 dev pull request 본문의 「판단이 필요한 것」, 지어낸 것, 검수 결과를 가리킬 때만, 앞 회차 인수(그 pull request 본문 「화면별 인수」)에 사유를 붙여 다시 만들고 다음 회차 결과 댓글을 올린다. 대조와 인수는 pull request 본문에서 읽고 화면 코드를 열지 않는다. 같은 대화에서 부르는 generate-code 에 앞 회차 코드가 맥락으로 넘어가면 「다른 화면의 코드 읽기」 금지가 무너진다. 앞 회차 화면과 Figma 파일은 남긴다. 요청에 없던 새 요구면 개선이 아니라 반려로 보고한다. 요청 문단의 원본은 이슈 본문이라, 댓글로 요구가 늘면 원본이 둘이 된다. 새 요구는 폼으로 새 요청을 받는다.
 - **이미 처리한 요청은 다시 만들지 않는다.** `/process-issue <n>`은 이슈를 읽은 뒤 본문에 `요청: #<n>` 줄이 있는 `dev` pull request 와 `(#<n>)`이 든 `dev` commit 을 찾고, 있으면 멈춘다. 화면은 들어갔는데 결과 댓글이 없는 요청은 `/process-issue 결과 <n>`이 화면을 다시 만들지 않고 결과 댓글만 올린다.
-- **개선은 세 번까지다(4회차까지).** 네 번째 개선이 오면 다시 만들지 않고 멈춘다. 개선은 요청이 비워 둔 자리를 기획자가 하나씩 채우는 일이다. 같은 문단으로 세 번 채워도 맞지 않으면 모자란 것은 화면이 아니라 요청 문단이고, 그때는 폼으로 요청을 다시 쓰는 편이 이슈 본문을 원본으로 지킨다. 한 회차가 화면 생성부터 배포·Figma 까지 한 바퀴라는 값도 있다. 3 은 겪어 본 값이 아니라 출발값이며, 실제 회차를 보고 고친다.
+- **개선은 세 번까지다(4회차까지).** 네 번째 개선이 오면 다시 만들지 않고 멈춘다. 개선은 요청이 비워 둔 자리를 기획자가 하나씩 채우는 일이다. 같은 문단으로 세 번 채워도 맞지 않으면 모자란 것은 화면이 아니라 요청 문단이고, 그때는 폼으로 요청을 다시 쓰는 편이 이슈 본문을 원본으로 지킨다. 한 회차가 화면 생성부터 배포까지 한 바퀴라는 값도 있다. 3 은 겪어 본 값이 아니라 출발값이며, 실제 회차를 보고 고친다.
 - **main 은 승인된 요청만 담는다.** 승인 뒤의 `dev → main` pull request 가 그 기록이다. 누가 언제 무엇에 동의했는지가 본문(결정한 사람·시각·반응인지 댓글인지·결과 댓글 주소)과 머지 기록으로 남는다. 개선을 거친 요청은 개선 전 회차의 화면(새 key 로 대신한 앞 key)도 그 요청의 회차 기록으로 함께 가며, 본문에 그렇게 적는다. 앞 key 를 빼려면 화면을 지우는 수정이 따로 들고, `dev → main` 머지는 채택이 아니라 확인의 기록이라 이렇게 두었다. 반려 때 `dev`에서 되돌리는 것과 함께 **개발자가 확인하기 전의 출발값**이다. 바꾸려면 Skill D2 에서 앞 key 를 지우는 pull request 를 먼저 두게 한다.
 - **승인은 화면 확인까지다.** 기획자가 판단하는 것은 「요청한 화면이 요청대로 나왔는가」 하나다. 코드를 제품에 넣을지, 컴포넌트로 승격할지는 이 승인이 정하지 않는다. `dev → main` 머지는 그 확인을 남기는 기록이지 채택이 아니다. 채택은 `docs/process` 의 이관 절차가 따로 갖는다.
 
@@ -335,7 +334,7 @@ pnpm deploy:sandbox                                 # 빌드 + 올리기
 
 | 항목 | 담당 | 기한 |
 | --- | --- | --- |
-| `@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 기획자·개발자 | `2026-09-23` |
+| ~~`@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당~~ → **Figma 를 뺐다**(`2026-09-23`, 「2026-09-23 Figma 를 뺐다」). 아래는 그때의 물음이다. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 기획자·개발자 | `2026-09-23` |
 | Story 파일 위치(`packages/ui/src/<component>.stories.tsx` 병치 또는 `apps/storybook/stories/`)와 폴더 구조. [working-context.md](working-context.md) 「남은 작업」 10번의 카테고리화와 함께 정한다 | 기획자·개발자 | `2026-09-16` |
 | 확정 컴포넌트 19개의 최소 `Default` Story(필수 prop만)를 개발자가 순서 3의 pull request에 한 번에 넣어도 되는가. 순서 3의 완료 기준이 컴포넌트마다 Story 하나를 전제하고 기획자는 `9/14~` 화면 개선 중이라 제안한다. Property를 나열하는 Story는 제안 밖이며 [open-questions.md](open-questions.md)의 Style·Size 이름 통일 뒤에 기획자가 쓴다 | 기획자 | `2026-09-16` |
 | 기본 브랜드 값의 자리: Storybook decorator에 두는 채로 갈지, `packages/tokens/src/styles.css`가 `DEFAULT_BRAND_SEED`의 `--brand-*`·`--oe-brand-*` 값을 갖게 할지. 후자는 브랜드만 런타임 주입으로 남겨 둔 tokens 구조와 전달 패키지가 싣는 값을 바꾸며, [open-questions.md](open-questions.md)의 「기본 ooee brand seed」가 Provisional인 채로 값이 공용 package에 들어간다 | 기획자 | `2026-09-16` |
@@ -348,8 +347,8 @@ pnpm deploy:sandbox                                 # 빌드 + 올리기
 | ~~이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치~~ → **`plugins/ooee-harness/` Claude Code Plugin으로 정했다**(`2026-09-16` 스파이크 R3. 「이관 시 남기는 것」). 별도 저장소는 열지 않되 나중에 뽑아낼 수 있게 둔다고 했으나, `2026-09-21`에 `bluekey-kr/Design-System-Harness`를 열어 `plugins/ooee-harness/`·`scripts/figma/`·`apps/sandbox/`와 이 문서를 **이력과 함께** 옮겼다. 원본 저장소에도 같은 파일이 남아 있고 어느 쪽이 정본인지는 아래 줄에 있다 | 개발자 | 정해짐 |
 | `AGENTS.md` 「코드 소유 경계」의 import 경계(`@ooee/ui`에서만 가져온다)를 `docs/system/quality.md`로 승격할지. 하네스가 이관 뒤에도 그 규칙을 읽어야 해서 원본의 자리가 필요하다. `data-slot` 승격과 같은 성격이라 함께 정한다 | 기획자 | `2026-09-23` |
 | 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 개발자 | `2026-09-25` |
-| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 기획자 | `2026-09-23` |
-| `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 기획자 | `2026-09-23` |
+| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. sandbox 의 컴포넌트 표시·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 기획자 | `2026-09-23` |
+| `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 sandbox 가 어떤 컴포넌트인지 읽지 못한다 | 기획자 | `2026-09-23` |
 | ~~Slack 폼에서 issue를 만드는 수단~~ → **Workflow Builder 의 GitHub 커넥터 「문제 생성」으로 정했다**(`2026-09-21`). github.com 용으로 뜨고 실제로 이슈 넷을 만들었다. 인증 계정은 기획자별로 붙이지 않고 `YUJINSIK-momo` 하나로 고정했다 — 기획자가 자기 GitHub 을 연결하지 않아도 돌아야 하기 때문이다. 대가로 이슈 작성자가 모두 같은 이름이 되므로, 요청자는 본문 첫 줄 `요청자:` 가 갖는다 | 개발자 | 정해짐 |
 | 확정 권한을 어떻게 보는지. ✅는 누구나 달 수 있고 「리액션을 단 사람 == 요청자」 조건 분기는 Business+ 이상이다. Pro면 확정 댓글에 남긴 이름을 `harness-check`가 요청자와 대조하는 쪽으로 간다 | 개발자 | 미정 |
 | ~~트랙 파일의 정본이 어느 저장소인가~~ → **`bluekey-kr/Design-System-Harness`로 정했다**(`2026-09-21`). 저장소 문서와 스크립트는 여기서 관리한다. `ooee-shin/ooee-ui`는 디자인 시스템 원본으로 남고, 그쪽의 `docs/process/` 문서는 기획자가 계속 쓴다 | 개발자 | 정해짐 |
@@ -422,14 +421,16 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 `@ooee/ui` 에 없는 컴포넌트를 만드는 절차는 [new-component.md](new-component.md) 가 갖는다. 채워야 하는 다섯 자리(구현·export·문서·등록·Playground 와 카탈로그 축)와 shadcn 에서 옮겨 쓰는 방식, Playground 양식이 거기 있다.
 
-### Figma 화면은 라이브러리로 그린다
+### 2026-09-23 Figma 를 뺐다
 
-`2026-09-22` 개발자 결정이다.
+개발자 결정이다. **화면 요청 처리에서 Figma 를 뺐고, 결과는 sandbox 에서만 본다.**
 
-- **Figma 화면의 컴포넌트는 게시된 라이브러리 `ooee · 컴포넌트 라이브러리`의 인스턴스다.** `/design-page` 가 기본으로 그렇게 그리고, 라이브러리가 화면을 다 덮지 못하면 프레임으로 대신 그리지 않고 멈춘다. 멈추는 것은 둘이다. 라이브러리에 없는 변형 이름과, **세트는 있는데 맞는 변형이 없는 자리**(앞 아이콘이 붙은 검색 Input, 최솟값에 닿은 수량 NumberInput, 굵은 라벨의 CheckboxField, 속이 굳어 있는 Field·AppHeader·BottomNavigation 등)다. 뒤의 것은 처음에 조용히 프레임으로 그렸다가 2026-09-22 반박 시험(장바구니 13곳 가운데 6곳)으로 멈추게 바꿨다. 도구의 동작은 [`scripts/figma/README.md`](../../scripts/figma/README.md) 「라이브러리 인스턴스」가 갖는다.
-- **요청에 라이브러리에 없는 컴포넌트나 변형이 필요하면 화면보다 먼저 만든다.** [new-component.md](new-component.md) 절차로 `@ooee/ui` 에 만들거나 변형을 더하고, 카탈로그에 올려 라이브러리에 게시하고 키 표를 다시 뽑은 뒤 화면을 만든다. `/process-issue` 로 처리하는 요청도 같다. 결과 댓글 작업 줄의 「컴포넌트 추가 <이름>」이 이 경우다. 버튼처럼 보이는 링크는 컴포넌트가 없는 것이 아니다. `<Button render={<a href="…" />} nativeButton={false} role="link">` 로 쓰면 Button 인스턴스가 된다(generate-code 「링크와 버튼」).
-- **라이브러리가 코드보다 낡았으면 먼저 다시 올린다.** 화면이 인스턴스로 쓰는 세트의 원본이 라이브러리를 올린 뒤 모양이 바뀌었으면 `/design-page` 가 멈춘다. 사람이 알고도 옮기라고 할 때만(`낡은 라이브러리 허용`) 옮기고, 그 세트를 보고의 「확인이 필요한 것」에 적는다.
-- **#9(이커머스 5장)는 예외다.** 화면을 이미 만든 뒤에 정한 규칙이라, 새 컴포넌트를 만들지 않고 라이브러리에 있는 것만 인스턴스로 놓는다. 머리글·상품 카드·Breadcrumb·Pagination·주문 상품 줄·금액 요약과, 라이브러리에 맞는 변형이 없는 자리는 프레임으로 남는다. 이 예외는 `scripts/figma/library.mjs` 의 `FRAME_EXCEPTIONS` 에 적혀 있고 `/design-page` 는 그 표에 있는 요청의 화면에서만 프레임을 허용한다. 예외를 더하는 것은 저장소 주인이 정한다. 다음 요청부터 위 규칙을 따른다.
+- **까닭.** 화면마다 Figma 로 옮기는 데 오래 걸렸다 — 이커머스 5장(#9)은 코드가 다 된 뒤에도 Figma 에 한 시간 넘게 걸렸다. 그것을 줄이려고 붙인 것(게시된 라이브러리의 인스턴스로 그리기, 라이브러리가 코드보다 낡았는지 보는 검사, 키를 지키는 제자리 갱신)이 도구를 더 크게 만들었다. 요청한 사람이 보는 것은 sandbox 의 화면이고, 채택 판단도 거기서 한다.
+- **지운 것.** `/design-page` Skill, `scripts/figma/`, `.mcp.json`(Figma remote MCP), sandbox 의 Figma 카탈로그(`/catalog`)와 개발 서버 지문 route, `docs/process/figma-component-map.md`·`figma-page-agent.md`. `/process-issue` 와 러너는 Figma 단계 없이 돈다. 결과 댓글은 첫 네 줄(제목·요청·샌드박스·작업)이다.
+- **남긴 것.** 컴포넌트가 DOM 에 남기는 `data-slot`·`data-*` 표식. sandbox 가 화면에 어떤 컴포넌트를 썼는지 보여 주는 데 쓴다(다음 작업). 버튼처럼 보이는 링크를 `<Button render={<a href="…" />} nativeButton={false} role="link">` 로 쓰는 generate-code 규칙도 같은 까닭으로 둔다 — Button 표식이 있어야 sandbox 가 그 자리를 Button 으로 읽는다.
+- **Figma 라이브러리.** `ooee · 컴포넌트 라이브러리` 파일은 Figma 에 남아 있지만 이 저장소는 더 갱신하지 않는다. `2026-09-22` 기준으로 코드보다 낡았다(Chip 켜짐 · Switch 켜짐 · SelectBox 선택).
+- 아래 「스파이크 결과」의 Figma 기록은 그때의 기록이다. 가리키는 파일은 지웠다.
+- **다음.** 디자인 시스템 → 요청 → sandbox. sandbox 에서 화면마다 어떤 컴포넌트를 썼는지 보고, 그 컴포넌트의 문서로 건너간다.
 
 ## 스파이크 결과
 

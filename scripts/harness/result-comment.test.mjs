@@ -14,21 +14,21 @@ const inputFile = path.join(here, "fixtures", "result-input.example.json");
 const example = () => JSON.parse(readFileSync(inputFile, "utf8"));
 const lines = (markdown) => markdown.split("\n");
 
-test("첫 다섯 줄에 요청 · 샌드박스 · Figma · 작업 요약이 있다", () => {
-  const head = lines(renderResultComment(example())).slice(0, 5);
+test("첫 네 줄에 요청 · 샌드박스 · 작업 요약이 있다", () => {
+  // 2026-09-23 에 요청 처리에서 Figma 를 뺐다. 결과는 샌드박스에서만 본다.
+  const head = lines(renderResultComment(example())).slice(0, 4);
   assert.deepEqual(head, [
     "화면 요청 #9 결과 · 1회차 — 이커머스 구매 페이비 · 결정은 GitHub 댓글에 👍 👎 😕",
     "요청: @유진식 · 프로젝트 web, sto, sv",
     "샌드박스: https://ooee-sandbox.pages.dev/shop-product-list 외 4장 · 목록 https://ooee-sandbox.pages.dev/",
-    "Figma: https://www.figma.com/design/EXAMPLEFILEKEY",
     "작업: 페이지 5장 추가(web) — 상품 목록·상품 상세·장바구니 외 2장 · 새 컴포넌트 없음 · PR #17",
   ]);
-  assert.equal(lines(renderResultComment(example()))[5], "", "머리 다섯 줄 뒤는 빈 줄로 끊는다");
+  assert.equal(lines(renderResultComment(example()))[4], "", "머리 네 줄 뒤는 빈 줄로 끊는다");
 });
 
-test("머리 다섯 줄에는 markdown 문법을 쓰지 않는다", () => {
+test("머리 네 줄에는 markdown 문법을 쓰지 않는다", () => {
   // Slack 카드가 그 글자를 그대로 보여 줄 수 있다. 주소는 날 글자면 양쪽 모두 링크로 잡는다.
-  for (const line of lines(renderResultComment(example())).slice(0, 5)) {
+  for (const line of lines(renderResultComment(example())).slice(0, 4)) {
     assert.doesNotMatch(line, /\*\*|\]\(|^#|\|/, `머리 줄에 markdown 문법이 있다: ${line}`);
   }
 });
@@ -48,22 +48,20 @@ test("아래에 화면 표, 작업한 것, 판단이 필요한 것, 검사, 결�
   assert.deepEqual([...order].sort((a, b) => a - b), order, "절의 차례가 바뀌었다");
   assert.ok(markdown.includes(DECISION_GUIDE));
   assert.match(DECISION_GUIDE, /👍 승인 · 👎 반려 · 😕 개선/);
-  assert.ok(markdown.includes("| 상품 목록 | web | [/shop-product-list](https://ooee-sandbox.pages.dev/shop-product-list) | [프레임](https://www.figma.com/design/EXAMPLEFILEKEY?node-id=1-2) |"));
-  assert.ok(markdown.includes("| 주문 완료 | web | [/shop-order-complete](https://ooee-sandbox.pages.dev/shop-order-complete) | [파일](https://www.figma.com/design/EXAMPLEFILEKEY) |"), "프레임 링크가 없는 화면은 파일 링크로 둔다");
+  assert.ok(markdown.includes("| 상품 목록 | web | [/shop-product-list](https://ooee-sandbox.pages.dev/shop-product-list) |"));
+  assert.ok(markdown.includes("| 주문 완료 | web | [/shop-order-complete](https://ooee-sandbox.pages.dev/shop-order-complete) |"));
+  assert.doesNotMatch(markdown, /figma/i, "결과 댓글에 Figma 가 남았다");
   assert.ok(markdown.includes("- 페이지 추가: 5장 — 상품 목록, 상품 상세, 장바구니, 주문서, 주문 완료"));
   assert.ok(markdown.includes("- 쓴 컴포넌트: Button, Input, Select, CheckboxField, Badge"));
   assert.ok(markdown.includes("- 프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv 셋이었다"));
   assert.ok(markdown.includes("- [x] pnpm check"));
 });
 
-test("화면이 하나면 「외 N장」 을 붙이지 않고, Figma 파일이 없으면 첫 프레임 + 「외 N장」 이다", () => {
+test("화면이 하나면 「외 N장」 을 붙이지 않는다", () => {
   const one = { ...example(), screens: [example().screens[0]], pullRequest: undefined };
   one.summary.pagesAdded = ["상품 목록"];
   assert.equal(lines(renderResultComment(one))[2], "샌드박스: https://ooee-sandbox.pages.dev/shop-product-list · 목록 https://ooee-sandbox.pages.dev/");
-  assert.equal(lines(renderResultComment(one))[4], "작업: 페이지 1장 추가(web) — 상품 목록 · 새 컴포넌트 없음", "PR 이 없으면 적지 않는다");
-
-  const framesOnly = { ...example(), figmaFileUrl: undefined };
-  assert.equal(lines(renderResultComment(framesOnly))[3], "Figma: https://www.figma.com/design/EXAMPLEFILEKEY?node-id=1-2 외 3장");
+  assert.equal(lines(renderResultComment(one))[3], "작업: 페이지 1장 추가(web) — 상품 목록 · 새 컴포넌트 없음", "PR 이 없으면 적지 않는다");
 });
 
 test("컴포넌트를 더했거나 페이지 밖의 작업이면 요약 줄이 그것을 말한다", () => {
@@ -72,7 +70,7 @@ test("컴포넌트를 더했거나 페이지 밖의 작업이면 요약 줄이 �
   input.round = 2;
   const head = lines(renderResultComment(input));
   assert.equal(head[0], `화면 요청 #9 결과 · 2회차 — 이커머스 구매 페이비 · ${HEAD_DECISION_HINT}`);
-  assert.equal(head[4], "작업: 상품 상세 버튼 문구 수정 외 1건 · 컴포넌트 추가 Rating · PR #17");
+  assert.equal(head[3], "작업: 상품 상세 버튼 문구 수정 외 1건 · 컴포넌트 추가 Rating · PR #17");
 });
 
 test("작업 줄은 만든 페이지 이름을 앞의 셋까지 적고 나머지는 「외 N장」으로 줄인다", () => {
@@ -80,11 +78,11 @@ test("작업 줄은 만든 페이지 이름을 앞의 셋까지 적고 나머지
   const input = example();
   input.screens = input.screens.slice(0, 3);
   input.summary.pagesAdded = ["상품 목록", "상품 상세", "장바구니"];
-  assert.equal(lines(renderResultComment(input))[4], "작업: 페이지 3장 추가(web) — 상품 목록·상품 상세·장바구니 · 새 컴포넌트 없음 · PR #17", "셋이면 줄이지 않는다");
+  assert.equal(lines(renderResultComment(input))[3], "작업: 페이지 3장 추가(web) — 상품 목록·상품 상세·장바구니 · 새 컴포넌트 없음 · PR #17", "셋이면 줄이지 않는다");
 
   const many = example();
   many.summary.componentsAdded = ["Rating", "Stepper", "Carousel", "Tag"];
-  assert.match(lines(renderResultComment(many))[4], /· 컴포넌트 추가 Rating·Stepper·Carousel 외 1개 · PR #17$/);
+  assert.match(lines(renderResultComment(many))[3], /· 컴포넌트 추가 Rating·Stepper·Carousel 외 1개 · PR #17$/);
 });
 
 test("개선 회차의 샌드박스 링크는 그대로 둔 화면이 아니라 다시 만든 화면이다", () => {
@@ -97,7 +95,7 @@ test("개선 회차의 샌드박스 링크는 그대로 둔 화면이 아니라 
   input.summary.other = ["1회차 개선 반영: 담기 버튼 색"];
   const out = lines(renderResultComment(input));
   assert.equal(out[2], "샌드박스: https://ooee-sandbox.pages.dev/shop-cart-2 (다시 만듦) · 전체 5장 · 목록 https://ooee-sandbox.pages.dev/");
-  assert.equal(out[4], "작업: 페이지 1장 다시 만듦(web) — 장바구니 · 1회차 개선 반영: 담기 버튼 색 · 새 컴포넌트 없음 · PR #17");
+  assert.equal(out[3], "작업: 페이지 1장 다시 만듦(web) — 장바구니 · 1회차 개선 반영: 담기 버튼 색 · 새 컴포넌트 없음 · PR #17");
   const markdown = out.join("\n");
   assert.ok(markdown.includes("| 장바구니 (다시 만듦) | web | [/shop-cart-2](https://ooee-sandbox.pages.dev/shop-cart-2) |"));
   assert.ok(markdown.includes("| 상품 목록 | web |"), "그대로 둔 화면에는 표시를 붙이지 않는다");
@@ -110,8 +108,8 @@ test("pagesAdded 의 이름이 screens 에 없으면 던진다 — 링크가 조
   assert.throws(() => renderResultComment(input), /summary\.pagesAdded 의 「장바구니 화면」 가 screens 의 name 에 없다/);
 });
 
-test("머리는 입력에 줄바꿈이 섞여도 정확히 다섯 줄이다", () => {
-  // Slack 카드가 앞의 몇 줄만 보여 준다. 값 하나의 줄바꿈이 작업 줄을 여섯째 줄로 밀면 카드에서 빠진다.
+test("머리는 입력에 줄바꿈이 섞여도 정확히 네 줄이다", () => {
+  // Slack 카드가 앞의 몇 줄만 보여 준다. 값 하나의 줄바꿈이 작업 줄을 다섯째 줄로 밀면 카드에서 빠진다.
   const input = example();
   input.issue.screenName = "이커머스\n구매 페이비";
   input.issue.requester = "@유진식\n마감일: 2026-10-01";
@@ -121,22 +119,20 @@ test("머리는 입력에 줄바꿈이 섞여도 정확히 다섯 줄이다", ()
     screen.project = `${screen.project}\n`;
   });
   input.screens[0].sandboxUrl = "https://ooee-sandbox.pages.dev/shop-product-list\n";
-  input.figmaFileUrl = " https://www.figma.com/design/EXAMPLEFILEKEY\t";
   input.summary.pagesAdded = input.screens.map((screen) => screen.name.replace("\n", " \n "));
   input.summary.componentsAdded = ["Rating\nStar"];
   input.summary.other = ["토큰 정리\n버튼 색 교체"];
   const out = lines(renderResultComment(input));
   assert.deepEqual(
-    out.slice(0, 5).map((line) => line.match(/^(화면 요청|요청|샌드박스|Figma|작업)[ :]/)?.[1]),
-    ["화면 요청", "요청", "샌드박스", "Figma", "작업"],
-    `머리 다섯 줄이 밀렸다:\n${out.slice(0, 6).join("\n")}`,
+    out.slice(0, 4).map((line) => line.match(/^(화면 요청|요청|샌드박스|작업)[ :]/)?.[1]),
+    ["화면 요청", "요청", "샌드박스", "작업"],
+    `머리 네 줄이 밀렸다:\n${out.slice(0, 5).join("\n")}`,
   );
-  assert.equal(out[5], "", "머리 다섯 줄 뒤는 빈 줄이다");
+  assert.equal(out[4], "", "머리 네 줄 뒤는 빈 줄이다");
   assert.equal(out[0], `화면 요청 #9 결과 · 1회차 — 이커머스 구매 페이비 · ${HEAD_DECISION_HINT}`);
   assert.equal(out[1], "요청: @유진식 마감일: 2026-10-01 · 프로젝트 web, sto");
   assert.equal(out[2], "샌드박스: https://ooee-sandbox.pages.dev/shop-product-list 외 4장 · 목록 https://ooee-sandbox.pages.dev/");
-  assert.equal(out[3], "Figma: https://www.figma.com/design/EXAMPLEFILEKEY");
-  assert.equal(out[4], "작업: 페이지 5장 추가(web) — 상품 목록·상품 상세·장바구니 외 2장 · 토큰 정리 버튼 색 교체 · 컴포넌트 추가 Rating Star · PR #17");
+  assert.equal(out[3], "작업: 페이지 5장 추가(web) — 상품 목록·상품 상세·장바구니 외 2장 · 토큰 정리 버튼 색 교체 · 컴포넌트 추가 Rating Star · PR #17");
 });
 
 test("가운데에 공백·제어 문자가 든 주소는 받지 않는다 — 날 글자 링크가 거기서 끊긴다", () => {
@@ -145,9 +141,6 @@ test("가운데에 공백·제어 문자가 든 주소는 받지 않는다 — �
     input.screens[0].sandboxUrl = bad;
     assert.throws(() => renderResultComment(input), /screens\[0\]\.sandboxUrl 에 공백이나 제어 문자가 들어 있다/, JSON.stringify(bad));
   }
-  const figma = example();
-  figma.figmaFileUrl = "https://www.figma.com/design/EXAMPLE FILEKEY";
-  assert.throws(() => renderResultComment(figma), /figmaFileUrl 에 공백이나 제어 문자/);
 });
 
 test("결정은 GitHub 에서 단다는 것을 머리 첫 줄과 결정 절에 적는다", () => {
@@ -174,8 +167,6 @@ test("빠진 값이 있으면 빈 링크로 올리지 않고 던진다", () => {
     ["샌드박스 주소 없음", (i) => { delete i.screens[0].sandboxUrl; }, /screens\[0\]\.sandboxUrl 가 비었다/],
     ["다른 화면의 주소", (i) => { i.screens[0].sandboxUrl = "https://ooee-sandbox.pages.dev/shop-cart"; }, /key 「shop-product-list」 의 주소가 아니다/],
     ["https 가 아닌 주소", (i) => { i.screens[0].sandboxUrl = "http://ooee-sandbox.pages.dev/shop-product-list"; }, /https/],
-    ["Figma 링크가 하나도 없음", (i) => { delete i.figmaFileUrl; i.screens.forEach((s) => delete s.figmaUrl); }, /Figma 링크가 없다/],
-    ["Figma 가 아닌 주소", (i) => { i.figmaFileUrl = "https://example.com/file"; }, /Figma 주소가 아니다/],
     ["화면 없음", (i) => { i.screens = []; }, /screens 가 비었다/],
     ["요청자 없음", (i) => { i.issue.requester = " "; }, /issue\.requester/],
     ["회차 없음", (i) => { i.round = 0; }, /round/],

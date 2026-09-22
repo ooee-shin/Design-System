@@ -1,6 +1,6 @@
 // `/process-issue` Skill 이 가리키는 파일이 실제로 있는지 본다.
 //
-// 이 Skill 은 규칙을 스스로 갖지 않고 generate-code·design-page·review-design 의 SKILL.md 와 이 폴더의
+// 이 Skill 은 규칙을 스스로 갖지 않고 generate-code·review-design 의 SKILL.md 와 이 폴더의
 // 스크립트를 가리키기만 한다. 그래서 가리킨 자리가 옮겨 가면 Skill 은 오류 없이 엉뚱한 자리를 읽거나
 // 없는 명령을 부른다. llms.txt 가 옮겨 간 파일을 가리킨 채 남아 있던 것과 같은 일이라 같은 방식으로 지킨다.
 import assert from "node:assert/strict";
@@ -68,7 +68,7 @@ test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {
   // `:*` 는 「공백 + *」와 같다(Claude Code 문서 「Configure permissions」). `feature/issue-:*` 는 `feature/issue- …` 만
   // 받고 `feature/issue-29-…` 는 받지 않는다. 사람이 연 세션에서는 확인 창이 가려 주지만, 러너에서는 거부되어
   // #29 가 3단계에서 멈췄다. 낱말 중간에서 이어 받으려면 공백 없이 `*` 를 쓴다.
-  const skills = [".claude/skills/process-issue/SKILL.md", ".claude/skills/design-page/SKILL.md", ...["generate-code", "review-design"].map((name) => `plugins/ooee-harness/skills/${name}/SKILL.md`)];
+  const skills = [".claude/skills/process-issue/SKILL.md", ...["generate-code", "review-design"].map((name) => `plugins/ooee-harness/skills/${name}/SKILL.md`)];
   for (const file of skills) {
     const text = readFileSync(path.join(root, file), "utf8");
     const allowed = (text.match(/^allowed-tools:(.*)$/m)?.[1] ?? "").split(/,\s+/).map((tool) => tool.trim());

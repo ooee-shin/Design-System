@@ -137,7 +137,7 @@ function NumberInput({
       {...(layout === "fixed" ? { layout: "fixed" as const, fixedWidth } : { layout: "fill" as const })}
       type="number"
       inputMode="decimal"
-      // Figma 카탈로그가 이 값으로 NumberInput 을 Input 과 가른다. 컨테이너가 아니라 안쪽 input 에 찍힌다.
+      // 도구가 이 값으로 NumberInput 을 Input 과 가른다. 컨테이너가 아니라 안쪽 input 에 찍힌다.
       data-controls={hideControls ? "none" : controlsPosition}
       min={effectiveMin}
       max={max}

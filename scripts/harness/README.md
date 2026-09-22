@@ -23,7 +23,7 @@ Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 �
 
 ```bash
 node scripts/harness/issue.mjs 9                         # generateArgs 가 null 이면 problems 를 요청자에게 묻는다
-# generate-code · design-page · pull request · dev 머지 · 배포
+# generate-code · pull request · dev 머지 · 배포
 node scripts/harness/result-comment.mjs .harness-work/issue-9/result-1.json   # 올리기 전에 글만 본다
 node scripts/harness/post-result.mjs 9 .harness-work/issue-9/result-1.json
 node scripts/harness/decision.mjs 9 [--round 1]          # 결과 없음 · 대기 · 승인 · 반려 · 개선
@@ -33,7 +33,7 @@ node scripts/harness/decision.mjs 9 [--round 1]          # 결과 없음 · 대�
 
 - `issue.mjs --body-file <경로> --title <제목> [<번호>]`는 gh 없이 파일을 읽는다.
 - 허용 프로젝트는 `apps/sandbox/src/screens.ts`의 `SANDBOX_PROJECTS`에서 읽는다. 폼의 프로젝트 칸과 그 목록 가운데 한쪽만 고치면 모르는 값이 되어 멈춘다.
-- 결과 댓글의 첫 다섯 줄(제목과 결정 안내 · 요청 · 샌드박스 · Figma · 작업 요약)이 Slack 결과 채널의 카드에 보인다. 머리에 드는 값은 한 줄로 펴서 입력이 어떻든 다섯 줄이다. 작업 줄은 만든 페이지 이름을 앞의 셋까지 적는다. 개선 회차의 샌드박스 링크는 `summary.pagesAdded`에 이름이 있는 첫 화면이라, 그 이름은 `screens[].name`과 같아야 한다(다르면 만들지 않는다). 표식 `<!-- harness:result issue=<n> round=<r> -->`는 카드에 드러나지 않게 맨 끝에 둔다.
+- 결과 댓글의 첫 네 줄(제목과 결정 안내 · 요청 · 샌드박스 · 작업 요약)이 Slack 결과 채널의 카드에 보인다. 머리에 드는 값은 한 줄로 펴서 입력이 어떻든 네 줄이다. 결과는 샌드박스에서만 본다(`2026-09-23` 에 Figma 를 뺐다). 작업 줄은 만든 페이지 이름을 앞의 셋까지 적는다. 개선 회차의 샌드박스 링크는 `summary.pagesAdded`에 이름이 있는 첫 화면이라, 그 이름은 `screens[].name`과 같아야 한다(다르면 만들지 않는다). 표식 `<!-- harness:result issue=<n> round=<r> -->`는 카드에 드러나지 않게 맨 끝에 둔다.
 - 결정 신호는 결과 댓글의 👍·👎·😕 반응과 「승인」 한 낱말, 또는 「반려: …」·「개선: …」처럼 콜론을 붙인 댓글이다. 가장 늦은 것이 이긴다.
 - 결정 낱말로 시작하지만 꼴이 맞지 않는 댓글(「승인합니다」「반려합니다. …」「개선 요청: …」)은 결정이 아니고 `lookalikes`에 주소·글과 함께 나온다. 그 가운데 이긴 신호보다 늦은 것이 있으면(신호가 없으면 하나라도 있으면) `lookalikeAfterDecision`이 `true`다. `/process-issue`는 그때 결정을 따르지 않고 묻는다.
 - 반려·개선의 사유는 `reasonSource`와 함께 나온다. `prefix`는 「반려: …」 댓글 자신, `after`는 신호를 남긴 사람이 그 뒤에 쓴 첫 댓글, `before`는 신호 앞 10분(`REASON_BEFORE_MS`) 안의 마지막 댓글이다. `after`·`before`는 짐작이라 `reasonCommentUrl`로 원문을 가리키고 `note`에 적는다.
@@ -57,7 +57,7 @@ node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 
 - **Claude 는 push 까지, 합치기는 스크립트가.** `claude -p "/process-issue <인수> 러너"`는 pull request 를 만들 자리에서 `.harness-work/issue-<n>/handoff.json`을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(이 요청의 `feature/issue-<n>-` 가지인지, 본문이 이 요청의 작업 자리 안에 있고 첫 줄이 `요청:`·`되돌림:`·`승인: #<n>`인지) `gh pr create --base <dev|main>` → 그 head commit 의 Quality 실행을 기다려 `gh run watch` → `dev`는 squash, `main`은 머지 commit 으로 합친다. `resume`이 `true`면 같은 세션을 `-r`로 이어 받아 7·8단계를 맡긴다.
 - **모델은 `claude-sonnet-5`·`high`로 박는다.** 명령 머리말과 같은 값이다. 이어 받는 차례는 명령 밖이라 CLI 인수로도 준다. 실행 기록에 쓴 모델이 찍힌다.
-- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **하위 명령(generate-code · review-design · design-page)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아, #29 에서 design-page 의 `node scripts/figma/sandbox-server.mjs`가 거부됐다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Figma 는 `--mcp-config .mcp.json`, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다.
+- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아, #29 에서 하위 명령이 적어 둔 명령이 거부됐다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Figma 는 `--mcp-config .mcp.json`, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다.
 - **gh·git 은 이 Mac 의 로그인이다.** checkout 은 `persist-credentials: false`로 받아 GITHUB_TOKEN 을 남기지 않는다. GITHUB_TOKEN 으로 만든 pull request 와 머지는 다른 workflow 를 깨우지 않아 Quality 와 Deploy 가 돌지 않는다.
 - **같은 결정은 한 번만 처리한다.** 처리하기 **전에** `~/.ooee-harness/decisions.json`에 `<이슈>:<회차>:<결정>:<신호 시각>`을 적는다. 멈추거나 실패한 결정을 10분마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 기획자가 새 신호를 남기거나(시각이 바뀐다) 개발자가 그 줄을 지운다. `HARNESS_STATE_DIR`로 자리를 옮길 수 있다.
 - **멈추면 실패로 끝난다.** 묻고 멈춤·섞임·검사 실패처럼 넘김 파일이 없거나 Quality 가 실패하면 job 이 빨갛게 끝나고, 보고 전문이 job 요약에 남는다. 이슈에는 아무것도 달지 않는다.

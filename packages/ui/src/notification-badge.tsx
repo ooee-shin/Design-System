@@ -79,7 +79,7 @@ function NotificationBadgeShape({ className, count, max = 99, tone = "accent", s
           className,
         ),
         children: count === undefined ? undefined : count > max ? `${max}+` : String(count),
-        // Figma 카탈로그가 이 넷으로 Variant 를 가른다. 넘침은 표시 문자열에서도 읽히지만
+        // 도구가 이 넷으로 변형을 가른다. 넘침은 표시 문자열에서도 읽히지만
         // `max` 를 바꾸면 그 규칙이 깨지므로 값을 그대로 남긴다.
         //
         // `mergeProps` 의 첫 인자 타입은 `data-*` 를 모른다. 이 컴포넌트는 `useRender` 로 태그를

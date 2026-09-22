@@ -1,8 +1,7 @@
 name: Harness
 
-# 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 처리한다. Figma MCP 는 OAuth 로그인만
-# 받아 GitHub 이 빌려 주는 컴퓨터에서는 쓸 수 없고, 로그인이 살아 있는 곳이 이 Mac 이다. Claude 도 이
-# Mac 에 로그인한 계정으로 돈다.
+# 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 처리한다. Claude 와 gh 가 이 Mac 에
+# 로그인한 계정으로 돈다 — GitHub 이 빌려 주는 컴퓨터에는 그 로그인이 없다.
 #
 # issues · issue_comment · schedule 이벤트는 기본 branch(main)의 이 파일로 돈다. 처리하는 코드는 dev 를
 # 받아 쓴다 — 하네스가 자라는 자리가 dev 다.
@@ -37,7 +36,7 @@ jobs:
       (github.event_name == 'issues' && startsWith(github.event.issue.title, '화면 요청')) ||
       (github.event_name == 'workflow_dispatch' && inputs.mode != '결정')
     runs-on: [self-hosted, ooee-mac]
-    # 여러 장 요청은 화면마다 코드와 Figma 를 만들어 오래 걸린다.
+    # 여러 장 요청은 화면마다 코드와 검사를 돌려 오래 걸린다.
     timeout-minutes: 240
     steps:
       - name: dev 를 받는다

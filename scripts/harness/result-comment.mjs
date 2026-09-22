@@ -7,7 +7,8 @@
 //
 // 결과 채널(#디자인시스템-화면-요청-결과물)은 GitHub for Slack 앱으로 이 저장소의 댓글을 받아 카드로
 // 띄운다. 카드는 댓글 앞부분만 보여 주므로, 기획자가 Slack 만 보고도 「어느 요청의 결과이고 어디서
-// 보는가」를 알 수 있게 첫 다섯 줄에 요청 · 샌드박스 · Figma · 작업 요약을 몰아 둔다.
+// 보는가」를 알 수 있게 첫 네 줄에 요청 · 샌드박스 · 작업 요약을 몰아 둔다. 결과는 샌드박스에서 본다 —
+// 2026-09-23 에 요청 처리에서 Figma 를 뺐다.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -61,11 +62,6 @@ const httpsUrl = (value, name) => {
   if (url.protocol !== "https:") fail(`${name} 는 https 주소여야 한다: ${value}`);
   return url;
 };
-const figmaUrl = (value, name) => {
-  const url = httpsUrl(value, name);
-  if (url.hostname !== "figma.com" && !url.hostname.endsWith(".figma.com")) fail(`${name} 가 Figma 주소가 아니다: ${value}`);
-  return url.href;
-};
 /** 표 칸에 들어갈 글자. 줄바꿈과 `|` 가 표를 깨뜨린다. */
 const cell = (text) => oneLine(text).replace(/\|/g, "\\|");
 
@@ -75,7 +71,7 @@ const cell = (text) => oneLine(text).replace(/\|/g, "\\|");
  */
 function validate(input) {
   if (!input || typeof input !== "object") fail("입력이 없다");
-  const { issue, round, screens, figmaFileUrl, pullRequest, summary, needsDecision, checks } = input;
+  const { issue, round, screens, pullRequest, summary, needsDecision, checks } = input;
 
   if (!issue || !isPositiveInt(issue.number)) fail("issue.number 가 없다");
   if (!isText(issue.screenName)) fail("issue.screenName 이 없다");
@@ -100,14 +96,8 @@ function validate(input) {
       project: oneLine(screen.project),
       sandboxUrl: sandbox.href,
       origin: sandbox.origin,
-      figmaUrl: screen.figmaUrl === undefined || screen.figmaUrl === null ? null : figmaUrl(screen.figmaUrl, `${where}.figmaUrl`),
     };
   });
-
-  const fileUrl = figmaFileUrl === undefined || figmaFileUrl === null ? null : figmaUrl(figmaFileUrl, "figmaFileUrl");
-  if (!fileUrl && !shown.some((screen) => screen.figmaUrl)) {
-    fail("Figma 링크가 없다 — figmaFileUrl 이나 screens[].figmaUrl 가운데 하나는 있어야 한다. Figma 를 만들지 못했으면 처리 중 실패로 보고 결과를 올리지 않는다");
-  }
 
   let pr = null;
   if (pullRequest !== undefined && pullRequest !== null) {
@@ -143,7 +133,7 @@ function validate(input) {
   // 묻는 이 댓글로 올리지 않는다.
   if (failed.length) fail(`검사가 실패했다(${failed.map((check) => check.name).join(", ")}) — 처리 중 실패는 승인을 묻지 않는다`);
 
-  return { issue: { number: issue.number, screenName: oneLine(issue.screenName), requester: oneLine(issue.requester), projects }, round, screens: shown, fileUrl, pr, work, decisions, checked };
+  return { issue: { number: issue.number, screenName: oneLine(issue.screenName), requester: oneLine(issue.requester), projects }, round, screens: shown, pr, work, decisions, checked };
 }
 
 const unique = (items) => [...new Set(items)];
@@ -191,8 +181,7 @@ function sandboxLine({ screens, added, round }) {
  * input: {
  *   issue: { number, screenName, requester, projects[] },
  *   round,                                   // 1부터. 개선 뒤 다시 올리면 2, 3 …
- *   screens: [{ key, name, project, sandboxUrl, figmaUrl? }],
- *   figmaFileUrl?,                           // 화면 프레임들이 든 Figma 파일
+ *   screens: [{ key, name, project, sandboxUrl }],
  *   pullRequest?: { number, url },
  *   summary: {
  *     pagesAdded[],                          // 이번 회차에 만든 화면. screens[].name 과 같은 글자
@@ -202,32 +191,28 @@ function sandboxLine({ screens, added, round }) {
  *   checks: [{ name, passed }],
  * }
  *
- * 첫 다섯 줄은 markdown 문법 없이 쓴다. Slack 카드와 GitHub 이 같은 글자로 읽히게 하려는 것이다.
+ * 첫 네 줄은 markdown 문법 없이 쓴다. Slack 카드와 GitHub 이 같은 글자로 읽히게 하려는 것이다.
  * 주소는 날 글자로 두면 양쪽이 모두 링크로 잡는다. 표와 제목은 그 아래, 카드가 자르는 자리부터 쓴다.
- * 머리에 드는 값은 모두 한 줄로 펴서, 입력이 어떻든 머리는 정확히 다섯 줄이다.
+ * 머리에 드는 값은 모두 한 줄로 펴서, 입력이 어떻든 머리는 정확히 네 줄이다.
  */
 export function renderResultComment(input) {
-  const { issue, round, screens, fileUrl, pr, work, decisions, checked } = validate(input);
+  const { issue, round, screens, pr, work, decisions, checked } = validate(input);
   const addedNames = new Set(work.pagesAdded);
   const added = screens.filter((screen) => addedNames.has(screen.name));
-  const framed = screens.filter((screen) => screen.figmaUrl);
-  const figmaHead = fileUrl ?? `${framed[0].figmaUrl}${framed.length > 1 ? ` 외 ${framed.length - 1}장` : ""}`;
 
   const head = [
     `화면 요청 #${issue.number} 결과 · ${round}회차 — ${issue.screenName} · ${HEAD_DECISION_HINT}`,
     `요청: ${issue.requester} · 프로젝트 ${issue.projects.length ? issue.projects.join(", ") : "없음"}`,
     sandboxLine({ screens, added, round }),
-    `Figma: ${figmaHead}`,
     `작업: ${workLine({ added, work, round, pr })}`,
   ];
 
   const table = [
-    "| 화면 | 프로젝트 | 샌드박스 | Figma |",
-    "| --- | --- | --- | --- |",
+    "| 화면 | 프로젝트 | 샌드박스 |",
+    "| --- | --- | --- |",
     ...screens.map((screen) => {
-      const figma = screen.figmaUrl ? `[프레임](${screen.figmaUrl})` : fileUrl ? `[파일](${fileUrl})` : "—";
       const remade = round > 1 && addedNames.has(screen.name) ? " (다시 만듦)" : "";
-      return `| ${cell(screen.name)}${remade} | ${cell(screen.project)} | [/${screen.key}](${screen.sandboxUrl}) | ${figma} |`;
+      return `| ${cell(screen.name)}${remade} | ${cell(screen.project)} | [/${screen.key}](${screen.sandboxUrl}) |`;
     }),
   ];
 

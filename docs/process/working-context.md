@@ -354,11 +354,11 @@
 
 13. **`color.md` 가 `oe-border-tertiary` 와 `oe-border-disabled` 의 값이 같다고 적지만 다르다.** 실제 값은 tertiary 가 Light `neutral-150`·Dark `neutral-850`, disabled 가 Light `neutral-100`·Dark `neutral-900` 이다(`packages/tokens/src/index.ts:113~114`). 문서를 고칠 일인지 토큰 값을 고칠 일인지는 의도에 달려 있어 그대로 두었다 — 둘을 같은 값으로 두려던 것이었다면 토큰 쪽이 버그다. 근거를 틀린 사실로 적어 두면 「값이 같으니 합치자」는 판단이나 disabled 자리에 tertiary 를 쓰는 오용을 부른다. (`2026-09-18` 릴리스 점검)
 
-14. **ToggleButton 의 custom tone 색이 토큰이 아니라 날 hex 다.** 즐겨찾기·찜의 색이 `toggle-button.tsx` 의 `CUSTOM_ON_CLASS` 에 `bg-[#fdf5e2]`·`text-[#dfa010]` 처럼 적혀 있다. 그래서 Figma 로 옮길 때 이 칠만 변수에 묶이지 않았다. 지금은 값 그대로를 이름으로 삼은 `hex-fdf5e2` primitive 로 올려 두었고, 변수 설명에도 「아직 토큰이 아니다」라고 적었다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다. (`2026-09-18`)
+14. **ToggleButton 의 custom tone 색이 토큰이 아니라 날 hex 다.** 즐겨찾기·찜의 색이 `toggle-button.tsx` 의 `CUSTOM_ON_CLASS` 에 `bg-[#fdf5e2]`·`text-[#dfa010]` 처럼 적혀 있다. 그래서 색을 토큰 이름으로 읽는 도구가 이 칠만 이름을 찾지 못했다. 지금은 값 그대로를 이름으로 삼은 `hex-fdf5e2` primitive 로 올려 두었고, 변수 설명에도 「아직 토큰이 아니다」라고 적었다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다. (`2026-09-18`)
 
-16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠해 Figma 로 못 옮긴다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 19 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
+16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠한다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 19 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
 
-    고치는 길은 둘이다. ① `packages/ui` 가 그 색을 토큰 class 로 칠한다(`--oe-message-*` 로 갈아 끼우는 길을 남기려면 그 자리만 CSS 변수로 두고 기본값은 토큰 class 로). ② `dom-extract.js` 가 `.oe-*` class 의 CSS 규칙을 읽어 `var(--oe-…)` 참조를 후보로 삼는다. ①이 다른 컴포넌트와 같아지는 길이고 ②는 이 컴포넌트 하나를 위해 추출기에 규칙을 더하는 길이다. 어느 쪽인지는 디자인 시스템이 정한다. 같은 자리에 `data-slot` 도 없어(`figma-component-map.md:49`) 되짚기도 안 되므로 함께 보면 좋다.
+    고치는 길은 `packages/ui` 가 그 색을 토큰 class 로 칠하는 것이다(`--oe-message-*` 로 갈아 끼우는 길을 남기려면 그 자리만 CSS 변수로 두고 기본값은 토큰 class 로). 다른 컴포넌트와 같아지는 길이고, 정하는 것은 디자인 시스템이다. 같은 자리에 `data-slot` 도 없어 sandbox 가 어떤 컴포넌트인지 읽지 못하므로 함께 보면 좋다.
 
 17. **컴포넌트 카테고리화 검토.** 13개 컴포넌트 검수가 끝나면 목록을 성격별로 묶을지 판단한다. 지금은 `component-registry`가 소유하는 알파벳순이며 `docs/system/studio.md`가 그 기준과 분류를 미루는 이유를 적고 있다. 판단할 때 걸리는 것은 Select Box가 항상 펼친 선택인지 목록 선택인지, Switch를 Checkbox와 나눌지, Chip이 표시인지 입력 보조인지, Message Bubble을 폼 요소와 같은 층에 둘지다. Studio 의 메뉴 구조와 함께 정하면 두 번 바꾸지 않는다.
 
@@ -387,19 +387,19 @@ pnpm visual --path /components/badge \
 
 개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-담당은 기획자가 Component·Variant 와 Token·UI 개선이고, 개발자가 Figma MCP, Agent Rules, `AGENTS.md`, Skill·Plugin, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
+담당은 기획자가 Component·Variant 와 Token·UI 개선이고, 개발자가 Agent Rules, `AGENTS.md`, Skill·Plugin, 요청 처리 하네스, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
 
-**통합 검증 항목은 넷이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), 대신 「Figma 라이브러리가 카탈로그와 어긋나지 않는가」가 들어왔다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 개발자의 작업이 들어오는 순서대로 채운다.
+**통합 검증 항목은 둘이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), Figma MCP 와 Figma 라이브러리 항목은 `2026-09-23` 에 요청 처리에서 Figma 를 뺐다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 개발자의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
 ### 2026-09-14 AI 개발 환경 트랙을 시작했다
 
-개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 기획자 영역에 닿는 것은 Figma 확인이다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
+개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
-**화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·Figma·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
+**화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
 
-**Figma 화면은 게시된 라이브러리의 인스턴스로만 그린다**(`2026-09-22`). `/design-page` 는 라이브러리가 화면을 다 덮지 못하면(없는 변형, 세트는 있는데 맞는 변형이 없는 자리) 멈추고, 화면이 쓰는 세트의 원본이 라이브러리를 올린 뒤 바뀌었어도 멈춘다. 규칙은 [ai-environment.md](ai-environment.md) 「Figma 화면은 라이브러리로 그린다」, 도구는 [`scripts/figma/README.md`](../../scripts/figma/README.md) 「라이브러리 인스턴스」가 갖는다. 개발자가 할 것이 둘 남았다. **라이브러리를 다시 올린다** — 지금 키 표(`builtFrom` `bac2207`·`da3a2bb`)로는 #9 의 상품 목록(Chip·Select)과 주문·결제(Select)가 「낡은 라이브러리」로 멈추고, outline Button 테두리처럼 파일로 잡히지 않는 차이도 남아 있다. 그리고 **Field·AppHeader·BottomNavigation·SelectBox·Calendar 를 인스턴스로 놓을 수 있게 라이브러리 쪽 변형을 바꾼다** — 지금은 이 다섯을 쓰는 화면이 #9 말고는 모두 멈춘다.
+**Figma 는 쓰지 않는다**(`2026-09-23`). 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해져 요청 처리에서 뺐다. 결과는 sandbox 에서만 본다. `/design-page`·`scripts/figma/`·Figma MCP·sandbox 의 Figma 카탈로그를 지웠고, 까닭과 남긴 것은 [ai-environment.md](ai-environment.md) 「2026-09-23 Figma 를 뺐다」가 갖는다. **다음은 sandbox 가 화면마다 어떤 컴포넌트를 썼는지 보여 주는 UI 다** — 디자인 시스템 → 요청 → sandbox.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

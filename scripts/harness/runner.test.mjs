@@ -1,13 +1,14 @@
 // 러너가 모델이 쓴 넘김 파일을 믿지 않는지, 같은 결정을 두 번 처리하지 않는지를 고정한다. claude·gh 는 부르지 않는다.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  CHAINED_SKILLS,
   EXTRA_ALLOWED,
   MODEL,
   buildClaudeArgs,
@@ -65,12 +66,13 @@ test("러너가 스스로 더 여는 것은 되돌리기뿐이다 — pull reque
   assert.ok(EXTRA_ALLOWED.every((rule) => rule.startsWith("Bash(git revert")), `되돌리기 밖의 규칙이 있다: ${EXTRA_ALLOWED}`);
 });
 
-test("하위 명령이 머리말에 적은 도구를 넘긴다 — #29 에서 막힌 design-page 의 화면 띄우기가 들어 있다", () => {
+test("하위 명령이 머리말에 적은 도구를 넘긴다 — 요청 처리는 Figma 를 부르지 않는다", () => {
+  // 2026-09-23 에 Figma 를 요청 처리에서 뺐다. 하위 명령은 화면 생성·검수 둘뿐이고 결과는 샌드박스로만 본다.
+  for (const file of CHAINED_SKILLS) assert.ok(existsSync(path.join(repoRoot, file)), `하위 명령 파일이 없다: ${file}`);
   const tools = chainedAllowedTools();
-  assert.ok(tools.includes("Bash(node scripts/figma/sandbox-server.mjs:*)"), "design-page 의 화면 띄우기가 빠졌다");
-  assert.ok(tools.includes("mcp__figma__use_figma"), "Figma 에 그리는 도구가 빠졌다");
   const args = buildClaudeArgs("x");
   for (const tool of tools) assert.ok(args.includes(tool), `${tool} 이 CLI 로 넘어가지 않는다`);
+  for (const arg of args) assert.doesNotMatch(arg, /figma|design-page|\.mcp\.json/i, `Figma 흔적이 CLI 에 남았다: ${arg}`);
 });
 
 test("넘기는 도구에 결정을 만들거나 pull request 를 여닫는 명령이 섞이지 않는다", () => {
@@ -154,7 +156,7 @@ test("CLI 는 인수가 틀리면 claude 를 부르지 않고 종료 코드 2 �
 
 test("workflow 는 이 Mac 의 러너에서 dev 를 받아 이 스크립트를 부른다", () => {
   const workflow = readFileSync(path.join(repoRoot, ".github/workflows/harness.yml"), "utf8");
-  assert.match(workflow, /runs-on: \[self-hosted, ooee-mac\]/, "이 Mac 이 아닌 곳에서 돈다 — Figma 로그인이 없다");
+  assert.match(workflow, /runs-on: \[self-hosted, ooee-mac\]/, "이 Mac 이 아닌 곳에서 돈다 — Claude·gh 로그인이 없다");
   assert.match(workflow, /ref: dev/, "처리 코드를 dev 에서 받지 않는다");
   assert.match(workflow, /persist-credentials: false/, "GITHUB_TOKEN 으로 push 하면 Quality·Deploy 가 깨지 않는다");
   assert.match(workflow, /cron: "\*\/10 \* \* \* \*"/, "결정 확인 간격이 10분이 아니다");

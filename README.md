@@ -1,6 +1,6 @@
 # Design-System-Harness
 
-블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin과 Figma 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다.
+블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin, 요청 처리 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다. 결과는 sandbox 에서만 본다 — Figma 는 쓰지 않는다(`2026-09-23`).
 
 `2026-09-21`에 `ooee-shin/ooee-ui`에서 이력과 함께 옮겨 왔다. 저장소 문서와 스크립트는 여기가 정본이다. 디자인 시스템 자체(`packages/*`, `docs/system/`, `apps/studio`)의 원본은 `ooee-ui`이고, 하네스가 그것을 읽어야 돌기 때문에 이 저장소에도 함께 있다. 그쪽을 여기서 고치면 `ooee-ui`에도 같은 변경을 내야 두 저장소가 갈라지지 않는다.
 
@@ -24,7 +24,6 @@ Slack 요청 폼 → GitHub issue (요청서 원본)
 | --- | --- | --- |
 | `/ooee-harness:generate-code` | 요구사항 한 문단을 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다 | [SKILL.md](plugins/ooee-harness/skills/generate-code/SKILL.md) |
 | `/ooee-harness:review-design` | 화면 코드를 디자인 시스템 문서에 대조해 위반 목록을 낸다 | [SKILL.md](plugins/ooee-harness/skills/review-design/SKILL.md) |
-| `/design-page` | 화면을 Figma로 옮기고, 사람이 Figma에서 고친 것을 코드로 되읽는다 | [SKILL.md](.claude/skills/design-page/SKILL.md) |
 
 앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다. `/design-page`는 저장소 전용 Skill이라 설치 없이 보인다.
 
@@ -35,12 +34,11 @@ Slack 요청 폼 → GitHub issue (요청서 원본)
 ```text
 plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과 화면 규칙 검사(lib/)
 .claude-plugin/        Plugin marketplace 정의(ooee)
-.claude/               /design-page Skill과 공용 권한(settings.json)
+.claude/               /process-issue Skill과 공용 권한(settings.json)
 .github/workflows      Quality(pnpm check)와 Deploy(Cloudflare Pages)
-scripts/figma          화면을 Figma로 옮기고 되읽는 도구
 scripts/visual         브라우저에서 화면을 재는 도구
 scripts/docs           llms.txt 링크 시험, 배포본에 시스템 문서 원본을 싣는 빌드 단계
-apps/sandbox           생성 화면과 Figma 컴포넌트 카탈로그 (3001 포트)
+apps/sandbox           요청으로 만든 화면 (3001 포트)
 apps/studio            컴포넌트 문서와 Playground (3000 포트)
 packages/ui            공용 Component (@ooee/ui)
 packages/tokens        oe semantic token
@@ -100,7 +98,6 @@ pnpm deploy:studio
 | 컴포넌트 목록과 고르는 법 | [docs/system/README.md](docs/system/README.md) |
 | 하네스의 설계, 결정, 아직 정하지 않은 것 | [docs/process/ai-environment.md](docs/process/ai-environment.md) |
 | 지금 무엇을 하고 있고 무엇이 남았나 | [docs/process/working-context.md](docs/process/working-context.md) |
-| Figma 도구 | [scripts/figma/README.md](scripts/figma/README.md) |
 
 블루키로 넘길 때 무엇이 가고 무엇이 빠지는지는 ai-environment.md의 「이관 시 남기는 것」이 정한다.
 
@@ -113,7 +110,6 @@ pnpm deploy:studio
 - Node.js `22.22.1` (`.nvmrc`와 `.node-version`에 고정)
 - pnpm `10.32.0` (`packageManager`에 고정)
 - repository에 고정된 preview font: 국문 Pretendard, 영문 Inter, 일문 Noto Sans JP
-- Figma MCP: `.mcp.json`에 서버 URL만 둔다
 
 현재 실행에 필요한 환경변수는 없다. 이후 환경변수가 생기면 실제 값은 `.env.local`에 두고 Git에는 올리지 않으며, 필요한 변수 이름과 설명만 `.env.example`에 기록한다.
 

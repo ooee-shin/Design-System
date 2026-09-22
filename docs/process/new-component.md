@@ -14,7 +14,7 @@
 | 2 | `packages/ui/src/index.ts` export | 화면이 import하지 못한다 |
 | 3 | `docs/system/components/<name>.md` | **하네스가 이 문서를 읽고 컴포넌트를 고른다.** 없으면 만들어도 쓰지 않는다 |
 | 4 | `component-registry.ts` + `docs/system/README.md`의 Component 표 | Studio 목록에 서지 않는다. `ComponentKey` 유니온에도 이름을 더한다 |
-| 5 | Studio Playground + `apps/sandbox/src/app/catalog/page.tsx`의 축 | Playground가 변형의 정본이고, 카탈로그가 Figma 라이브러리의 정본이다 |
+| 5 | Studio Playground | Playground가 변형의 정본이다 |
 
 `llms.txt`의 확정 목록도 함께 고친다 — 테스트가 `component-registry`와 대조한다.
 
@@ -76,14 +76,13 @@ PropertyGroup    Anatomy·State 를 담는 카드
 </div>
 ```
 
-**Playground의 조작은 실제로 동작하는 것만 둔다.** 누르면 미리보기가 바뀌어야 한다. 그리고 **Playground의 조작과 카탈로그의 축은 같아야 한다** — 한쪽에만 있으면 디자이너가 Figma에서 그 변형을 쓸 수 없거나, 반대로 쓰이지 않는 변형이 선다.
+**Playground의 조작은 실제로 동작하는 것만 둔다.** 누르면 미리보기가 바뀌어야 한다.
 
 ## 미리보기는 오늘에 기대지 않는다
 
-날짜나 시각을 쓰는 컴포넌트는 고정한 값을 쓴다. 오늘에 기대면 화면이 날마다 달라져 검수할 수 없고, Figma 캡처도 실행할 때마다 달라진다.
+날짜나 시각을 쓰는 컴포넌트는 고정한 값을 쓴다. 오늘에 기대면 화면이 날마다 달라져 검수할 수 없다.
 
 ## 만든 뒤
 
 - `pnpm check`를 통과시킨다. registry 테스트가 개수를 세므로 그 숫자도 함께 고친다
-- 카탈로그에 축을 더했으면 **Figma 라이브러리를 다시 올리고 사람이 Republish** 해야 한다
 - 상태는 `확정`으로 둔다(`2026-09-21` 결정). 디자인 검수를 먼저 받지 않는다
