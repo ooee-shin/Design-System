@@ -138,7 +138,7 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 - 컴포넌트 모음: 카탈로그(`apps/sandbox/src/app/catalog`)로 Figma에 만들어 둔 컴포넌트가 있지만, 화면은 `--instances`로 돌린 자리만 그 인스턴스다. 나머지는 `docs/system/README.md`의 「Component」 표와 화면 코드(`apps/sandbox/src/app/<key>`)가 대신한다.
 
 ## 승인된 예외
-- 글꼴: Pretendard Variable 대신 Noto Sans KR, semibold는 Bold (2026-09-15 유진식 승인)
+- 글꼴: Pretendard Variable 대신 Noto Sans KR, semibold는 Bold (2026-09-15 개발자 승인)
 
 ## 확인이 필요한 것
 - 토큰에 투명도를 더한 칠: <opacityOnToken 또는 없음>

@@ -78,7 +78,7 @@ node scripts/figma/prepare.mjs --key voc --name "고객의 소리" \
 
 ## Figma 에서 무엇이 Frame 이 되나
 
-**배치하는 곳만 Frame 이다**(`2026-09-16` 유진식 결정). DOM 의 감싸개를 그대로 옮기면 모든 요소가 Frame 이 되어 Figma 에서 다루기 어렵다. `prepare.mjs` 가 옮기기 전에 아래대로 접는다.
+**배치하는 곳만 Frame 이다**(`2026-09-16` 개발자 결정). DOM 의 감싸개를 그대로 옮기면 모든 요소가 Frame 이 되어 Figma 에서 다루기 어렵다. `prepare.mjs` 가 옮기기 전에 아래대로 접는다.
 
 | DOM 의 모습 | Figma |
 | --- | --- |
@@ -115,7 +115,7 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" --only <종�
 
 한 컴포넌트 안에서 변형 이름이 겹치면 Figma 에도 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다. 카탈로그 화면이 그릴 때 멈추므로 빌드가 실패해 바로 드러난다.
 
-**컴포넌트 안쪽은 `data-slot` 상자도 접는다.** 화면에서는 레이어 이름이 되짚기의 다리라 남기지만, 카탈로그는 Component Set 이름과 Variant 속성이 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다. `Group` 이 씌운 감싸개도 컴포넌트 표시를 자식에게 넘기고 걷어낸다. 그래서 Figma 의 `Button` 컴포넌트 안에는 글자 하나만 있다(2026-09-18 유진식).
+**컴포넌트 안쪽은 `data-slot` 상자도 접는다.** 화면에서는 레이어 이름이 되짚기의 다리라 남기지만, 카탈로그는 Component Set 이름과 Variant 속성이 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다. `Group` 이 씌운 감싸개도 컴포넌트 표시를 자식에게 넘기고 걷어낸다. 그래서 Figma 의 `Button` 컴포넌트 안에는 글자 하나만 있다(2026-09-18 개발자).
 
 ```
 전:  COMPONENT → Frame button → Frame button-label → Text 버튼
@@ -161,7 +161,7 @@ Figma를 다시 읽으면(`get_design_context`) 레이어 이름, 칠·테두리
 
 ## 알려진 제약
 
-- **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체하고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다(2026-09-15 유진식 승인). 스타일 설명에 적혀 있다. 글자 폭이 달라 좁은 자리에서 끝 글자가 조금 잘릴 수 있다. Pretendard가 Figma에 생기면 `setup-text-styles.js`가 멈추고 알린다.
+- **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체하고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다(2026-09-15 개발자 승인). 스타일 설명에 적혀 있다. 글자 폭이 달라 좁은 자리에서 끝 글자가 조금 잘릴 수 있다. Pretendard가 Figma에 생기면 `setup-text-styles.js`가 멈추고 알린다.
 - **Dark 모드.** `oe color`는 Light·Dark 모드를 갖지만 Button·Badge처럼 코드가 primitive 단계를 직접 쓰는 자리(`bg-blue-100`, `bg-[var(--brand-600)]`)는 `oe primitive` 변수에 묶여 모드를 바꿔도 뒤집히지 않는다. 코드도 그 자리를 `dark:` class로 따로 둔다.
 - **투명도.** 코드가 `border-[var(--brand-500)]/30`처럼 색에 투명도를 붙인 자리는 변수에 묶은 칠의 opacity로 옮기고 `opacityOnToken`에 적는다. `figma-page-agent.md` 규칙 5와 부딪치므로 보고에 적어 확인받는다.
 - **그림자.** `box-shadow`는 옮기지 않는다. oe 토큰에 그림자 색이 없다.

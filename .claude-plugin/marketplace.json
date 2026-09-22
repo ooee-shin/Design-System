@@ -1,6 +1,6 @@
 {
   "name": "ooee",
-  "owner": { "name": "유진식" },
+  "owner": { "name": "bluekey" },
   "plugins": [
     {
       "name": "ooee-harness",

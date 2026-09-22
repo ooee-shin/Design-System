@@ -12,7 +12,7 @@
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
 | `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/design-page` Skill. 화면을 만들고 검수하는 두 명령은 `plugins/ooee-harness/`로 옮겼다. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거한다 |
-| `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 신주희가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
+| `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 기획자가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
 | `plugins/ooee-harness/` | `/ooee-harness:generate-code`·`/ooee-harness:review-design` 을 싣는 Claude Code Plugin. **전달 대상이다.** 설치·설정·권한 조각은 그 안의 `README.md`가 갖는다 |
 | `scripts/figma/` | `/design-page`가 `apps/sandbox` 화면을 Figma 프레임으로 옮기는 도구. 중간 산출물은 `.figma-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/figma/README.md` |
 
