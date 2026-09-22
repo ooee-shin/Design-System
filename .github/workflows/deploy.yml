@@ -1,0 +1,64 @@
+name: Deploy
+
+# `dev` 에 들어간 것이 보는 자리에 그대로 반영되게 한다. 승인은 화면을 보고 하는 것이라
+# 머지와 화면 사이에 사람 손이 끼면 그만큼 어긋난다.
+on:
+  push:
+    branches:
+      - dev
+  # 코드가 그대로여도 다시 올려야 할 때가 있다. 배포만 실패했거나 토큰을 새로 넣었을 때다.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: sandbox·studio 를 Cloudflare Pages 에 올린다
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # 계정 식별자다. 비밀값이 아니라 대시보드 주소에 그대로 들어 있다.
+      CLOUDFLARE_ACCOUNT_ID: 9632ad6e7c13679dce4fd48da6e997f8
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+    steps:
+      # 토큰을 아직 넣지 않았어도 머지가 빨갛게 되지는 않게 한다. 배포만 건너뛴다.
+      - name: 토큰이 없으면 건너뛴다
+        id: guard
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN 이 없어 배포를 건너뛴다."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out repository
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+
+      - name: Enable Corepack
+        if: steps.guard.outputs.skip != 'true'
+        run: corepack enable
+
+      - name: Install dependencies
+        if: steps.guard.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy sandbox
+        if: steps.guard.outputs.skip != 'true'
+        run: pnpm deploy:sandbox
+
+      - name: Deploy studio
+        if: steps.guard.outputs.skip != 'true'
+        run: pnpm deploy:studio
