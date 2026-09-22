@@ -150,11 +150,9 @@ export function decide({ comments, reactionsByCommentId = {}, round, issue } = {
 
   // 결과 댓글을 쓴 계정과 반응한 계정이 같아도 거르지 않는다. 지금은 Slack 커넥터가 처리하는 세션과
   // 같은 GitHub 계정으로 이슈를 만들어서 처리 계정과 요청자 계정이 같다. 거르면 어떤 결정도 읽히지 않는다.
-  // 그래서 이 판독은 「에이전트가 반응이나 결정 댓글을 달지 않는다」에 기댄다. 그런데 공용 권한
-  // (.claude/settings.json)의 deny 는 `gh api` 에 `-X POST` 를 경로 뒤에, `--method POST` 를 맨 앞에 둔 꼴만
-  // 대조한다. 필드가 붙으면 gh 가 저절로 POST 로 보내는 `gh api …/reactions -f content=+1` 은 어느 줄에도
-  // 걸리지 않고, `gh issue comment` 는 allow 다. 지금 둘을 막는 것은 process-issue Skill 「하지 않는 것」의
-  // 글뿐이다(ai-environment.md 「처리와 승인」, 규칙을 좁히는 제안은 같은 절 「남은 것」).
+  // 그래서 이 판독은 「에이전트가 반응이나 결정 댓글을 달지 않는다」에 기댄다. 공용 권한(.claude/settings.json)이
+  // `gh api` 를 통째로 deny 하고 `gh issue comment` 를 ask 로 두어(#21), 처리하는 세션이 댓글을 다는 길은
+  // 결과 댓글만 만드는 post-result.mjs 하나다. 러너는 headless 라 ask 가 곧 거부다.
   const reactions = reactionsByCommentId[result.id] ?? [];
   const signals = [
     ...reactions

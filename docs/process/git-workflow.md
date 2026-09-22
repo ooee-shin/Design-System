@@ -82,7 +82,7 @@ Storybook과 Storybook MCP 항목은 걷어냈다 — 그 둘을 두지 않기�
 
 `Quality` workflow는 모든 pull request와 `main`·`dev` push에서 돈다. `feature/*`에 push만 하는 동안에는 돌지 않으므로, 올리기 전에 로컬에서 `pnpm check`를 통과시킨다.
 
-`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다. 기본 branch를 `dev`로 둔 것도 같은 이유다. 막을 수 없다면 실수하기 어려운 쪽을 기본값으로 만든다. `.claude/settings.json`의 `deny`가 저장소 루트에서 시작한 Claude Code 세션의 `git push origin main` 같은 명령을 거부하지만, 명령 문자열을 대조할 뿐이라 형태를 바꾸면 통과하고 사람이 터미널에서 친 명령에는 걸리지 않는다. branch 보호를 대신하지 않는다.
+`main` 보호 설정은 비공개 저장소의 무료 플랜에서 열리지 않아 지금 켤 수 없다. GitHub API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 위 순서를 사람이 지킨다. `ooee-ui`는 같은 이유로 기본 branch를 `dev`로 두었지만, 이 저장소(`Design-System-Harness`)의 기본 branch는 `main`이다. 그래서 `gh pr create`에 `--base dev`를 꼭 적는다. 빼면 `main`으로 가는 pull request가 생긴다. issue·댓글·schedule 로 도는 workflow(`harness.yml`)도 기본 branch 의 파일로 돈다. `.claude/settings.json`의 `deny`가 저장소 루트에서 시작한 Claude Code 세션의 `git push origin main` 같은 명령을 거부하지만, 명령 문자열을 대조할 뿐이라 형태를 바꾸면 통과하고 사람이 터미널에서 친 명령에는 걸리지 않는다. branch 보호를 대신하지 않는다.
 
 ## 다른 기기로 이동할 때
 

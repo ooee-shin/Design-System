@@ -138,6 +138,7 @@ node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewpor
   ```
 
 - **캡처를 `Read` 로 열어 눈으로 본다.** 덩이마다(머리글·본문·옆 칸·바닥) 빈 화면, 겹친 요소, 잘린 글자, 상자 밖으로 넘친 요소, 매핑표에 있는데 보이지 않는 요소를 찾는다.
+- **아래 가운데의 「요청 보기 · 컴포넌트 보기」 막대는 화면이 아니다.** sandbox 가 모든 화면에 얹는 도구(`apps/sandbox/src/components/component-inspector/`)다. 겹친 요소로 적지 않는다. 막대가 화면의 마지막 요소를 가려 그 요소를 볼 수 없으면 `--eval` 식 앞에 `document.querySelector("[data-component-inspector]")?.remove()` 를 쉼표로 붙여(`(… .remove(), { h1: … })`) 다시 찍는다. 식이 캡처보다 먼저 돈다.
 - **기계로 재는 둘은 막는다.** `h1` 이 없거나 가로로 넘치면 깨진 것이다. 그 화면의 세 파일(generate-code 「하지 않는 것」) 안에서 고치고 generate-code 5단계의 검사를 다시 돌린 뒤 이 단계를 다시 한다. 고친 것은 새 commit 으로 더한다. 두 번 고쳐도 남거나 세 파일 밖을 고쳐야 하면 멈춘다(「## 처리 중 실패」).
 - 눈으로 본 것 가운데 고친 것은 8단계 `summary.other` 에, 고치지 않은 것(정렬·간격처럼 판단이 갈리는 것)은 `needsDecision` 에 「<화면>: sandbox 검사에서 본 것 — …」으로 남긴다.
 - 캡처는 `.harness-work/issue-<n>/shots/` 에 남는다. 저장소에 넣지 않는다.
@@ -214,7 +215,7 @@ node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방�
 
 ### 9. 멈춘다
 
-「보고」의 꼴로 보고하고 멈춘다. 결정은 사람이 결과 댓글에 단다. 결정을 기다리며 판독을 되풀이하지 않는다. 결정이 달리면 사람이 `/process-issue 결정 <n>`으로 다시 부른다.
+「보고」의 꼴로 보고하고 멈춘다. 결정은 사람이 결과 댓글에 단다. 결정을 기다리며 판독을 되풀이하지 않는다. 결정이 달리면 러너가 읽어 `결정 <n>`으로 다시 부른다(댓글은 바로, 반응은 10분마다). 사람이 연 세션에서는 사람이 `/process-issue 결정 <n>`으로 부른다.
 
 ## 결과만 올리기
 
@@ -259,7 +260,7 @@ node scripts/harness/decision.mjs <n>
 2. **`main`은 승인된 요청만 담는다.** 같은 목록의 pull request를 하나씩 가른다.
    - 본문에 `요청: #<m>` 줄이 있으면 요청 #<m>의 화면이다. `node scripts/harness/decision.mjs <m>`이 승인이어야 한다. 반려면 D3의 되돌리기 pull request(본문에 `되돌림: #<m>` 줄)가 같은 목록에 있어야 하고, 있으면 그 요청은 빠진 것으로 친다. 그 밖(대기·개선·결과 없음, 되돌리지 않은 반려)은 섞인 것이다.
    - 본문에 `되돌림: #<m>` 줄이 있으면 D3의 되돌리기다. 막지 않는다.
-   - 둘 다 없는데 화면 자리(`apps/sandbox/src/app/<key>/`)를 바꿨으면 어느 요청의 화면인지 알 수 없다. 섞인 것이다. 알아볼 수 없는 화면이 승인 없이 `main`으로 가는 것을 막는다.
+   - 둘 다 없는데 생성 화면의 자리(`apps/sandbox/src/screens.ts` 에 등록된 key 의 `apps/sandbox/src/app/<key>/`)를 바꿨으면 어느 요청의 화면인지 알 수 없다. 섞인 것이다. 알아볼 수 없는 화면이 승인 없이 `main`으로 가는 것을 막는다. 등록된 key 가 아닌 자리(루트 `layout.tsx`·`page.tsx`, `(renewal)` 같은 route group)는 sandbox 자체의 변경이라 아래 줄로 간다.
    - 그 밖의 변경(하네스·문서·공용 설정)은 막지 않고 본문에 적는다.
 
    섞인 것이 하나라도 있으면 만들지 않고, 목록과 각각을 푸는 길을 보고한다. 결과 없음은 `/process-issue 결과 <m>`, 대기·개선은 기획자의 결정, 되돌리지 않은 반려는 `/process-issue 결정 <m>`(D3이 되돌린다), 알아볼 수 없는 화면 pull request는 그 작성자가 본문에 `요청: #<m>`을 적거나 되돌리는 것이다.
@@ -282,7 +283,7 @@ node scripts/harness/decision.mjs <n>
    git revert --no-edit <늦은 squash commit> … <이른 squash commit>
    pnpm check
    git push -u origin feature/issue-<n>-revert
-   gh pr create --title "revert(sandbox): 화면 요청 #<n> 반려 — <화면 이름>" --body-file .harness-work/issue-<n>/revert.md
+   gh pr create --base dev --title "revert(sandbox): 화면 요청 #<n> 반려 — <화면 이름>" --body-file .harness-work/issue-<n>/revert.md
    ```
 
    - 0단계를 먼저 한다. `git revert`는 allowed-tools에 없어 확인을 묻는다.
@@ -323,7 +324,10 @@ node scripts/harness/decision.mjs <n>
 
   러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지). 맞지 않으면 만들지 않는다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
 - **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 7단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 7단계(배포 확인)와 8단계(결과 댓글)를 하고 9단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
-- **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다. generate-code·review-design 을 Skill 로 부를 때 그 머리말의 allowed-tools 는 이 명령 안에서 적용되지 않는다. 러너가 그 둘의 머리말을 읽어 CLI 로 넘기므로, 하위 명령이 새 명령을 쓰게 되면 그 명령의 머리말에 적는다.
+- **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다.
+- **머리말의 allowed-tools 는 러너가 CLI 로 넘긴다.** generate-code·review-design 을 Skill 로 부를 때 그 머리말은 이 명령 안에서 적용되지 않고, 이어 받는 차례(7·8단계)는 이 명령 밖이라 이 머리말도 적용되지 않는다. 러너가 셋의 머리말을 읽어 넘기므로, 새 명령을 쓰게 되면 그 명령을 쓰는 Skill 의 머리말에 적는다.
+- **`dev` 넘김은 화면 자리만 바꾼다.** 러너는 pull request 의 파일이 `apps/sandbox/src/app/<key>/` 바로 아래와 `apps/sandbox/src/screens.ts` 밖에 있으면 합치지 않고 열어 둔 채 멈춘다. `git add apps/sandbox/*` 로 올리고 `git commit -a` 를 쓰지 않는다.
+- **결과 댓글이 새로 올라가야 끝난다.** 이어 받은 차례가 끝나면 러너가 `decision.mjs` 로 새 결과 댓글을 찾는다. 없으면 실패로 끝난다.
 - 러너는 이 Mac 에 로그인한 gh·Claude 로 돌고, 모델은 머리말과 같은 `claude-sonnet-5`·`high`로 부른다.
 - 러너 쪽의 입출력과 이미 처리한 결정을 거르는 방법은 `scripts/harness/README.md`의 「러너」에 있다.
 

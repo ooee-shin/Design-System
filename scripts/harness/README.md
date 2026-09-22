@@ -55,12 +55,13 @@ node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 | 10분마다 | 결정 확인 | `결정` — 열린 「화면 요청」 이슈를 모두 판독한다. 👍 👎 😕 반응은 이벤트가 없어 여기서만 읽힌다 |
 | Actions 에서 손으로(workflow_dispatch) | 모드에 따라 | `처리`·`결정`·`결과` |
 
-- **Claude 는 push 까지, 합치기는 스크립트가.** `claude -p "/process-issue <인수> 러너"`는 pull request 를 만들 자리에서 `.harness-work/issue-<n>/handoff.json`을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(이 요청의 `feature/issue-<n>-` 가지인지, 본문이 이 요청의 작업 자리 안에 있고 첫 줄이 `요청:`·`되돌림:`·`승인: #<n>`인지) `gh pr create --base <dev|main>` → 그 head commit 의 Quality 실행을 기다려 `gh run watch` → `dev`는 squash, `main`은 머지 commit 으로 합친다. `resume`이 `true`면 같은 세션을 `-r`로 이어 받아 7·8단계를 맡긴다.
+- **Claude 는 push 까지, 합치기는 스크립트가.** `claude -p "/process-issue <인수> 러너"`는 pull request 를 만들 자리에서 `.harness-work/issue-<n>/handoff.json`을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(이 요청의 `feature/issue-<n>-` 가지인지, 본문이 이 요청의 작업 자리 안에 있고 첫 줄이 `요청:`·`되돌림:`·`승인: #<n>`인지) `gh pr create --base <dev|main>` → 그 head commit 의 Quality 실행을 기다려 `gh run watch` → `dev`는 squash, `main`은 머지 commit 으로 합친다. `resume`이 `true`면 같은 세션을 `-r`로 이어 받아 7·8단계를 맡긴다. `dev`로 합칠 pull request 는 생성 화면의 자리(`apps/sandbox/src/app/<key>/` 바로 아래와 `apps/sandbox/src/screens.ts`)만 바꿔야 한다. 그 밖을 건드렸으면 합치지 않고 열어 둔 채 멈춘다 — 모델이 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌기 때문이다.
 - **모델은 `claude-sonnet-5`·`high`로 박는다.** 명령 머리말과 같은 값이다. 이어 받는 차례는 명령 밖이라 CLI 인수로도 준다. 실행 기록에 쓴 모델이 찍힌다.
-- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아, #29 에서 하위 명령이 적어 둔 명령이 거부됐다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Figma 는 `--mcp-config .mcp.json`, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다.
+- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **`/process-issue` 와 하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아 #29 에서 하위 명령이 적어 둔 명령이 거부됐고, 이어 받는 차례(7·8단계)는 `/process-issue` 밖이라 그 머리말도 적용되지 않는다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다. MCP 서버는 싣지 않는다.
 - **gh·git 은 이 Mac 의 로그인이다.** checkout 은 `persist-credentials: false`로 받아 GITHUB_TOKEN 을 남기지 않는다. GITHUB_TOKEN 으로 만든 pull request 와 머지는 다른 workflow 를 깨우지 않아 Quality 와 Deploy 가 돌지 않는다.
 - **같은 결정은 한 번만 처리한다.** 처리하기 **전에** `~/.ooee-harness/decisions.json`에 `<이슈>:<회차>:<결정>:<신호 시각>`을 적는다. 멈추거나 실패한 결정을 10분마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 기획자가 새 신호를 남기거나(시각이 바뀐다) 개발자가 그 줄을 지운다. `HARNESS_STATE_DIR`로 자리를 옮길 수 있다.
-- **멈추면 실패로 끝난다.** 묻고 멈춤·섞임·검사 실패처럼 넘김 파일이 없거나 Quality 가 실패하면 job 이 빨갛게 끝나고, 보고 전문이 job 요약에 남는다. 이슈에는 아무것도 달지 않는다.
+- **멈추면 실패로 끝난다.** 묻고 멈춤·섞임·검사 실패처럼 넘김 파일이 없거나 Quality 가 실패하면 job 이 빨갛게 끝나고, 보고 전문이 job 요약에 남는다. 이슈에는 아무것도 달지 않는다. 이어 받은 차례나 `결과 <n>`이 끝났는데 새 결과 댓글이 없어도(`decision.mjs`의 `resultCommentId`가 그대로) 실패다 — `claude -p` 는 멈춰도 성공으로 끝나므로 이것을 보지 않으면 dev 에는 합쳐졌는데 결과가 없는 채 초록으로 끝난다.
+- **결정처럼 보이지만 읽지 않은 댓글은 한 번 알린다.** 결정이 없는 요청에 「승인합니다」·「개선 요청: …」처럼 꼴이 맞지 않는 댓글만 있으면 사람은 결정했다고 여기는데 할 일이 없다. 10분 확인이 그 댓글을 job 요약에 적고 실패로 끝낸다. 같은 댓글로는 다시 알리지 않는다(`<이슈>:<회차>:읽지 않은 댓글:<가장 늦은 시각>`).
 - **10분 확인은 결정만 본다.** 결과 댓글이 없는 요청(#9 처럼 이 흐름 전에 처리한 것)을 저절로 올리지 않는다. 올리려면 `결과 <n>`을 손으로 돌린다.
 
 ## 알아 둘 것

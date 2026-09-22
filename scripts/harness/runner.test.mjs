@@ -15,7 +15,10 @@ import {
   chainedAllowedTools,
   continuationPrompt,
   decisionKey,
+  lookalikeKey,
+  outsideScreenFiles,
   pickActionable,
+  pickUnreadLookalikes,
   staleBranches,
   validateHandoff,
 } from "./runner.mjs";
@@ -116,7 +119,7 @@ test("main 넘김은 승인 줄이 있어야 한다", () => {
   const root = fakeRoot(12, "요청: #12");
   const problems = validateHandoff(devHandoff({ target: "main", branch: undefined }), 12, root);
   assert.ok(problems.some((p) => p.includes("승인: #12")), "승인 없이 main 으로 가는 넘김을 받았다");
-  const approved = fakeRoot(12, "승인: #12 1회차 — 신주희 · 2026-09-22 · 반응");
+  const approved = fakeRoot(12, "승인: #12 1회차 — 기획자 · 2026-09-22 · 반응");
   assert.deepEqual(validateHandoff(devHandoff({ target: "main", branch: undefined }), 12, approved), []);
 });
 
@@ -161,4 +164,52 @@ test("workflow 는 이 Mac 의 러너에서 dev 를 받아 이 스크립트를 �
   assert.match(workflow, /persist-credentials: false/, "GITHUB_TOKEN 으로 push 하면 Quality·Deploy 가 깨지 않는다");
   assert.match(workflow, /cron: "\*\/10 \* \* \* \*"/, "결정 확인 간격이 10분이 아니다");
   assert.ok(workflow.includes("scripts/harness/runner.mjs"), "이 스크립트를 부르지 않는다");
+});
+
+test("이어 받는 차례에도 배포 확인과 결과 댓글에 쓰는 도구를 넘긴다", () => {
+  // 7·8단계는 이어 받은 세션이 명령 밖에서 한다. process-issue 머리말이 CLI 로 넘어가지 않으면 거부된다.
+  const args = buildClaudeArgs("러너: …", { resume: "abc" });
+  for (const tool of ["Bash(gh run view:*)", "Bash(node scripts/harness/post-result.mjs:*)", "Bash(node scripts/harness/decision.mjs:*)"]) {
+    assert.ok(args.includes(tool), `${tool} 이 이어 받는 차례에 넘어가지 않는다`);
+  }
+  assert.ok(args.some((arg) => arg.startsWith("Bash(curl -s -o /dev/null")), "배포 주소 확인(curl)이 넘어가지 않는다");
+});
+
+test("dev 로 합칠 pull request 는 생성 화면의 폴더와 목록만 바꿀 수 있다", () => {
+  assert.deepEqual(
+    outsideScreenFiles([
+      "apps/sandbox/src/app/shop-cart/page.tsx",
+      "apps/sandbox/src/app/shop-cart/page.test.tsx",
+      "apps/sandbox/src/screens.ts",
+    ]),
+    [],
+  );
+  assert.deepEqual(
+    outsideScreenFiles([
+      "apps/sandbox/src/app/shop-cart/page.tsx",
+      "scripts/harness/runner.mjs",
+      ".github/workflows/harness.yml",
+      "apps/sandbox/src/app/layout.tsx",
+      "apps/sandbox/src/app/(renewal)/renewal/admin/page.tsx",
+      "apps/sandbox/src/app/shop-cart/parts/list.tsx",
+    ]),
+    [
+      "scripts/harness/runner.mjs",
+      ".github/workflows/harness.yml",
+      "apps/sandbox/src/app/layout.tsx",
+      "apps/sandbox/src/app/(renewal)/renewal/admin/page.tsx",
+      "apps/sandbox/src/app/shop-cart/parts/list.tsx",
+    ],
+    "화면 밖의 파일을 화면 자리로 읽었다",
+  );
+});
+
+test("결정 없이 결정처럼 보이는 댓글만 있으면 한 번 알린다", () => {
+  const waiting = { issue: 12, round: 1, decision: "대기", lookalikes: [{ url: "u1", at: "2026-09-22T10:00:00Z", text: "승인합니다" }] };
+  const clean = { issue: 13, round: 1, decision: "대기", lookalikes: [] };
+  const approved = { issue: 14, round: 1, decision: "승인", lookalikes: [{ url: "u2", at: "2026-09-22T10:00:00Z", text: "승인합니다" }] };
+  assert.deepEqual(pickUnreadLookalikes([waiting, clean, approved], {}), [waiting], "결정이 있는 쪽은 D1 이 묻는다");
+  assert.deepEqual(pickUnreadLookalikes([waiting], { [lookalikeKey(waiting)]: {} }), [], "같은 댓글을 10분마다 다시 알린다");
+  const newer = { ...waiting, lookalikes: [...waiting.lookalikes, { url: "u3", at: "2026-09-22T11:00:00Z", text: "개선 요청: 버튼" }] };
+  assert.deepEqual(pickUnreadLookalikes([newer], { [lookalikeKey(waiting)]: {} }), [newer], "새로 단 댓글을 알리지 않는다");
 });

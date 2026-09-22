@@ -38,9 +38,15 @@ export const CHAINED_SKILLS = [
   "plugins/ooee-harness/skills/review-design/SKILL.md",
 ];
 
-/** 하위 명령 머리말의 allowed-tools 를 겹치지 않게 모은다. */
+/**
+ * `/process-issue` 자신. 이어 받는 차례(7단계 배포 확인 · 8단계 결과 댓글)는 명령 밖에서 돌아 이 머리말도
+ * 적용되지 않는다. 넘기지 않으면 `gh run view`·`curl` 이 거부되어, 이미 dev 에 합친 뒤 결과 댓글 없이 멈춘다.
+ */
+export const OWN_SKILL = ".claude/skills/process-issue/SKILL.md";
+
+/** 러너가 CLI 로 넘기는 머리말 allowed-tools. 이 명령과 하위 명령의 것을 겹치지 않게 모은다. */
 export function chainedAllowedTools(root = repoRoot) {
-  const tools = CHAINED_SKILLS.flatMap((file) => {
+  const tools = [OWN_SKILL, ...CHAINED_SKILLS].flatMap((file) => {
     const text = readFileSync(path.join(root, file), "utf8");
     const line = text.match(/^---\n[\s\S]*?^allowed-tools:(.*)$/m)?.[1] ?? "";
     return line.split(/,\s+/).map((tool) => tool.trim()).filter(Boolean);
@@ -118,6 +124,30 @@ export function pickActionable(reads, done) {
   return reads.filter((read) => ACTIONABLE.has(read.decision) && !done[decisionKey(read)]);
 }
 
+/** 결정처럼 보이지만 읽지 않은 댓글의 열쇠. 가장 늦은 그 댓글의 시각이라, 새로 달려야 다시 알린다. */
+export function lookalikeKey(read) {
+  const last = read.lookalikes.map((item) => item.at ?? "").sort().at(-1);
+  return `${read.issue}:${read.round}:읽지 않은 댓글:${last}`;
+}
+
+/**
+ * 결정이 없는데(대기) 「승인합니다」·「개선 요청: …」처럼 결정 낱말로 시작하는 댓글이 있는 요청. 사람은
+ * 결정했다고 여기는데 러너는 할 일이 없어 조용히 넘어가므로, 한 번은 실패로 끝내 개발자에게 알린다.
+ * 결정이 있는 쪽의 같은 경우는 D1 이 묻고 멈춘다.
+ */
+export function pickUnreadLookalikes(reads, done) {
+  return reads.filter((read) => !ACTIONABLE.has(read.decision) && read.lookalikes?.length && !done[lookalikeKey(read)]);
+}
+
+/**
+ * dev 로 합칠 pull request 가 바꿔도 되는 자리. 생성 화면의 폴더와 목록뿐이다. 모델이 `git commit -a` 로
+ * 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌게 되므로,
+ * 이 밖을 건드린 pull request 는 합치지 않고 열어 둔 채 멈춘다. `(renewal)` 같은 route group 은 화면 자리가 아니다.
+ */
+export function outsideScreenFiles(files) {
+  return files.filter((file) => !/^apps\/sandbox\/src\/app\/[^/()]+\/[^/]+$/.test(file) && file !== "apps/sandbox/src/screens.ts");
+}
+
 function sh(cmd, args, opts = {}) {
   return execFileSync(cmd, args, { cwd: repoRoot, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, ...opts });
 }
@@ -171,7 +201,11 @@ async function landHandoff(issue) {
   const pr = Number(url.split("/").pop());
   log(`- pull request #${pr} (${head} → ${handoff.target}) ${url}`);
 
-  const { headRefOid } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid"]));
+  const { headRefOid, files } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid,files"]));
+  if (handoff.target === "dev") {
+    const outside = outsideScreenFiles(files.map((file) => file.path));
+    if (outside.length) throw new Error(`#${pr} 가 화면 밖을 바꿨다(${outside.join(", ")}). 합치지 않고 열어 둔다`);
+  }
   await waitQuality(headRefOid);
   const method = handoff.target === "dev" ? ["--squash", "--delete-branch"] : ["--merge"];
   sh("gh", ["pr", "merge", String(pr), ...method]);
@@ -203,17 +237,35 @@ function dropStaleBranches(issue) {
   }
 }
 
+/** 이 요청의 가장 늦은 결과 댓글 id. 없으면 null 이다. */
+function latestResultId(issue) {
+  return JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)])).resultCommentId ?? null;
+}
+
+/**
+ * 결과 댓글이 새로 올라갔는지 본다. 세션이 7·8단계에서 멈춰도 `claude -p` 는 성공으로 끝나므로, 보지 않으면
+ * dev 에는 합쳐졌는데 결과가 없는 채 job 이 초록으로 끝나고 10분 확인도 「결과 없음」을 건너뛴다.
+ */
+function postedResult(issue, before) {
+  const after = latestResultId(issue);
+  if (after && after !== before) return true;
+  log("- 결과 댓글이 새로 올라가지 않았다. 멈춘 자리는 위 보고에 있다. 올리려면 `결과 <n>`을 손으로 돌린다.");
+  return false;
+}
+
 async function runChain(issue, argument) {
   rmSync(handoffPath(issue), { force: true });
   dropStaleBranches(issue);
+  const before = latestResultId(issue);
   const first = runClaude(`/process-issue ${argument} 러너`);
   const landed = await landHandoff(issue);
   if (!landed) {
     log("- 넘김 파일이 없다. 처리가 멈춘 자리는 위 보고에 있다.");
     return false;
   }
-  if (landed.handoff.resume) runClaude(continuationPrompt(landed.pr, landed.mergeCommit), { resume: first.session_id });
-  return true;
+  if (!landed.handoff.resume) return true;
+  runClaude(continuationPrompt(landed.pr, landed.mergeCommit), { resume: first.session_id });
+  return postedResult(issue, before);
 }
 
 function readState(file) {
@@ -236,6 +288,17 @@ async function decideAll(only) {
   const todo = pickActionable(reads, done);
   log(`결정 확인: 요청 ${numbers.length}건, 처리할 결정 ${todo.length}건`);
   let ok = true;
+  for (const read of pickUnreadLookalikes(reads, done)) {
+    done[lookalikeKey(read)] = { notedAt: new Date().toISOString() };
+    log(`\n## #${read.issue} 결정처럼 보이지만 읽지 않은 댓글 — ${read.decision}`);
+    for (const item of read.lookalikes) log(`- ${item.url ?? item.at} 「${item.text}」`);
+    log("- 기획자에게 👍 👎 😕 반응이나 「승인」·「반려: …」·「개선: …」 꼴로 다시 남겨 달라고 알린다.");
+    ok = false;
+  }
+  if (!ok) {
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, `${JSON.stringify(done, null, 2)}\n`);
+  }
   for (const read of todo) {
     // 처리하기 전에 적는다. 멈추거나 실패한 결정을 10분마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 사람이 새 신호를 남긴다.
     done[decisionKey(read)] = { startedAt: new Date().toISOString() };
@@ -256,8 +319,9 @@ async function main(argv) {
   }
   if (mode === "결정") return (await decideAll(issue)) ? 0 : 1;
   if (mode === "결과") {
+    const before = latestResultId(issue);
     runClaude(`/process-issue 결과 ${issue} 러너`);
-    return 0;
+    return postedResult(issue, before) ? 0 : 1;
   }
   log(`## 화면 요청 #${issue} 처리`);
   return (await runChain(Number(issue), String(issue))) ? 0 : 1;

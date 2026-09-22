@@ -2,8 +2,8 @@
 //
 //   node scripts/harness/result-comment.mjs <input.json>
 //
-// 입력 모양은 `renderResultComment` 의 설명과 fixtures/result-input.example.json 에 있다. stdout 의 글을
-// `gh issue comment <번호> --body-file -` 로 다는 것은 처리하는 세션이 한다.
+// 입력 모양은 `renderResultComment` 의 설명과 fixtures/result-input.example.json 에 있다. 이슈에 다는 것은
+// post-result.mjs 다. 처리하는 세션은 `gh issue comment` 를 직접 부르지 않는다(공용 권한의 ask).
 //
 // 결과 채널(#디자인시스템-화면-요청-결과물)은 GitHub for Slack 앱으로 이 저장소의 댓글을 받아 카드로
 // 띄운다. 카드는 댓글 앞부분만 보여 주므로, 기획자가 Slack 만 보고도 「어느 요청의 결과이고 어디서
@@ -27,7 +27,9 @@ export const RESULT_MARKER_RE = /^<!-- harness:result issue=(\d+) round=(\d+) --
 // 「이 댓글」이 Slack 에서는 카드를 가리키게 읽혀, 카드에 이모지를 달고 결정했다고 여기게 된다. 판독은
 // GitHub 의 반응만 읽으므로 자리를 못 박는다. 머리 첫 줄에도 짧은 꼴(`HEAD_DECISION_HINT`)을 둔다 —
 // 이 안내가 있는 「결정」 절은 카드가 자르는 자리 아래다.
-export const DECISION_GUIDE = "GitHub 의 이 댓글에 👍 승인 · 👎 반려 · 😕 개선 — 반려·개선은 사유를 댓글로. Slack 카드에 단 이모지는 읽히지 않습니다";
+// 사유는 「반려: …」·「개선: …」 꼴로 받는다. 꼴 없는 댓글도 사유로 짐작은 하지만(decision.mjs reasonSource),
+// 짐작한 사유로는 다시 만들지 않고 묻고 멈추므로 개선 회차가 돌지 않는다.
+export const DECISION_GUIDE = "GitHub 의 이 댓글에 👍 승인 · 👎 반려 · 😕 개선 — 사유는 「반려: 까닭」·「개선: 고칠 것」 꼴의 댓글로. Slack 카드에 단 이모지는 읽히지 않습니다";
 export const HEAD_DECISION_HINT = "결정은 GitHub 댓글에 👍 👎 😕";
 
 const fail = (message) => {
@@ -36,7 +38,7 @@ const fail = (message) => {
 const isText = (value) => typeof value === "string" && value.trim() !== "";
 const isPositiveInt = (value) => Number.isInteger(value) && value > 0;
 /**
- * 한 줄로 편다. 머리 다섯 줄에 드는 값에 줄바꿈이 섞이면 그 뒤가 다음 줄로 밀려, 카드가 보여 주는 다섯 줄
+ * 한 줄로 편다. 머리 네 줄에 드는 값에 줄바꿈이 섞이면 그 뒤가 다음 줄로 밀려, 카드가 보여 주는 네 줄
  * 밖으로 작업 요약이나 PR 표시가 빠진다. 목록(`- …`) 항목도 줄바꿈이 있으면 항목이 갈라진다.
  */
 const oneLine = (text) => String(text).replace(/\s+/g, " ").trim();

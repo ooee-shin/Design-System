@@ -150,6 +150,8 @@ test("결정은 GitHub 에서 단다는 것을 머리 첫 줄과 결정 절에 �
   assert.match(HEAD_DECISION_HINT, /GitHub/);
   assert.match(DECISION_GUIDE, /^GitHub 의 이 댓글에/);
   assert.match(DECISION_GUIDE, /Slack 카드에 단 이모지는 읽히지 않습니다/);
+  // 꼴 없는 사유 댓글은 짐작으로만 읽혀 개선 회차가 돌지 않는다(D4). 안내가 꼴을 알려 준다.
+  assert.match(DECISION_GUIDE, /「반려: 까닭」·「개선: 고칠 것」/);
   // decision.mjs 가 받는 꼴만 적는다. 「…으로 시작하는 댓글」이라고 쓰면 「승인합니다」를 쓰게 된다.
   assert.ok(markdown.includes("「승인」 한 낱말, 또는 「반려: 사유」 · 「개선: 고칠 것」처럼 콜론을 붙인 댓글도 결정으로 칩니다."));
   assert.doesNotMatch(markdown, /으로 시작하는 댓글/);
