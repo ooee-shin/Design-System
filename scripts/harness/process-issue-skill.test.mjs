@@ -63,3 +63,16 @@ test("process-issue 가 부르는 세 스크립트가 frontmatter 의 allowed-to
     assert.ok(existsSync(path.join(root, "scripts/harness", script)), `scripts/harness/${script} 가 없다`);
   }
 });
+
+test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {
+  // `:*` 는 「공백 + *」와 같다(Claude Code 문서 「Configure permissions」). `feature/issue-:*` 는 `feature/issue- …` 만
+  // 받고 `feature/issue-29-…` 는 받지 않는다. 사람이 연 세션에서는 확인 창이 가려 주지만, 러너에서는 거부되어
+  // #29 가 3단계에서 멈췄다. 낱말 중간에서 이어 받으려면 공백 없이 `*` 를 쓴다.
+  const skills = [".claude/skills/process-issue/SKILL.md", ".claude/skills/design-page/SKILL.md", ...["generate-code", "review-design"].map((name) => `plugins/ooee-harness/skills/${name}/SKILL.md`)];
+  for (const file of skills) {
+    const text = readFileSync(path.join(root, file), "utf8");
+    const allowed = (text.match(/^allowed-tools:(.*)$/m)?.[1] ?? "").split(/,\s+/).map((tool) => tool.trim());
+    const broken = allowed.filter((tool) => /[/\-.=]:\*\)$/.test(tool));
+    assert.deepEqual(broken, [], `${file} 의 규칙이 낱말 중간의 :* 라 아무것도 받지 못한다`);
+  }
+});
