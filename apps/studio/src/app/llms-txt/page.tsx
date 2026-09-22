@@ -3,6 +3,9 @@ import { RiArrowLeftLine, RiFileCopyLine } from "@remixicon/react";
 
 import { readLlmsTxt } from "@/lib/llms";
 
+// 라우트가 `/llms` 가 아니라 `/llms-txt` 인 까닭: 정적 내보내기는 페이지마다 RSC 본문을
+// `<라우트>.txt` 로 떨군다. `/llms` 이면 그 파일이 `llms.txt` 가 되어 같은 이름의 route handler
+// 결과(원본 글자)를 덮는다. llms.txt 는 주소 하나로 원본이 내려와야 하는 자리라 페이지를 비켰다.
 export const metadata = {
   title: "llms.txt",
   description: "AI 가 이 저장소를 처음 읽을 때 보는 색인",

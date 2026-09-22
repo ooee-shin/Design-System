@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Cloudflare Pages 는 정적 파일만 내보낸다. 서버가 없어도 서는 화면이라 `out/` 에 떨궈 올린다.
+  output: "export",
+  // 정적 내보내기에는 이미지 최적화 서버가 없다. 켜 두면 빌드가 그 자리에서 멈춘다.
+  images: { unoptimized: true },
   // 개발 표시는 화면 왼쪽 아래에 고정으로 떠서 하단 내비게이션의 마지막 항목을 덮는다. 폰에서
   // 눌러 보면 항목이 아니라 그 표시가 눌린다. 검수하는 화면을 가리므로 끈다.
   devIndicators: false,
