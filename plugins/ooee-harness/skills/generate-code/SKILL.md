@@ -11,7 +11,7 @@ effort: high
 
 ## 입력
 
-`$ARGUMENTS`가 화면 이름과 요구사항이다. 예: `관리자 로그인. 왼쪽에 로그인 폼, 오른쪽에 브랜드 패널… 원본: apps/studio/src/app/screens/admin/login/page.tsx`. 대조할 원본 코드가 있으면 요청 끝에 `원본: <저장소 경로>`로 적는다. 요구사항이 비어 있으면 무엇을 만들지 묻고 멈춘다.
+`$ARGUMENTS`가 화면 이름과 요구사항이다. 예: `관리자 로그인. 왼쪽에 로그인 폼, 오른쪽에 브랜드 패널… 원본: apps/sandbox/src/app/(renewal)/renewal/admin/login/page.tsx`. 대조할 원본 코드가 있으면 요청 끝에 `원본: <저장소 경로>`로 적는다. 요구사항이 비어 있으면 무엇을 만들지 묻고 멈춘다.
 
 - 요구사항에 없는 것은 지어내지 않고 「판단이 필요한 것」에 적는다. 정렬·글자 크기·간격처럼 코드를 쓰려면 정해야만 하는 값은 3단계의 「정렬과 간격」을 따른다.
 - 요구사항이 적은 것이 `${user_config.docs_root}`의 기준과 어긋나면 2단계의 「요구사항과 문서가 어긋날 때」를 따른다.
@@ -22,7 +22,7 @@ effort: high
 - 세 파일 밖의 수정. 고치는 파일은 `${user_config.screens_dir}/<key>/page.tsx`, 같은 디렉터리의 `page.test.tsx`, `${user_config.screens_dir}/../screens.ts` 셋뿐이다. 화면 자리의 공용 파일(`test-setup.ts`, `package.json`, `layout.tsx`, 첫 화면, `globals.css`), 다른 화면의 디렉터리, `packages/*`, `${user_config.docs_root}`, Plugin 자신은 고치지 않는다. 그쪽을 고쳐야만 검사가 통과하면 5단계의 「검사가 실패하면」을 따른다.
 - 빌드 캐시 삭제(`rm -rf .next` 등)와 working tree를 되돌리는 명령(`git stash`, `git checkout`, `git reset`, `git clean`). `docs/process/tooling.md`가 적은 `apps/studio/.next` 삭제는 사람이 확인하고 하는 절차이며 이 명령은 하지 않는다.
 - 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꾸거나(`./` 경로, `rm -fr`, `node -e`, `dangerouslyDisableSandbox`) 같은 일을 하는 다른 명령으로 되풀이하지 않는다. 막힌 명령과 거부 메시지를 7단계 보고의 「막힌 명령」에 그대로 적는다.
-- 원본 파일 읽기. `원본:` 경로는 3단계에서 `screens.ts`의 `source`에 적기만 하고 열지 않는다. `apps/studio/src/app/screens/` 아래는 언제나 읽지 않는다. 원본과의 대조는 사람이 한다.
+- 원본 파일 읽기. `원본:` 경로는 3단계에서 `screens.ts`의 `source`에 적기만 하고 열지 않는다. `${user_config.screens_dir}/(renewal)/` 아래(블루키 리뉴얼 작업장)는 언제나 읽지 않는다. 원본과의 대조는 사람이 한다.
 - 다른 화면의 코드 읽기. `${user_config.screens_dir}/<다른 key>/` 아래 파일은 열지 않는다. 이미 있는 화면은 고치지 않고 둔 기록일 수 있어, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `${user_config.docs_root}`과 `@ooee/ui`의 소스에서만 찾는다.
 - Tailwind primitive 색(`bg-blue-700`, `text-neutral-500`, `text-white`, `bg-black`), hex 값, shadcn 토큰(`bg-background`, `text-muted-foreground`, `bg-primary`). 색은 `oe-*` semantic token 클래스만 쓴다.
 - 서버 호출, 실제 제출 동작, 라우팅 로직. 제출은 `<form onSubmit={(event) => event.preventDefault()}>`까지, 목적지가 정해지지 않은 링크는 `<a href="#">`까지만 둔다. 목적지 없는 `<a href="#">`는 라우팅 로직이 아니다.

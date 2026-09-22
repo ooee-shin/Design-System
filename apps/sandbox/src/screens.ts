@@ -42,7 +42,7 @@ export const sandboxScreens: SandboxScreen[] = [
     href: "/admin-login",
     prompt:
       "블루키 관리자 웹 로그인 화면. 데스크톱 1440 좌우 절반, 왼쪽 로그인 폼(아이디·비밀번호·아이디 저장·비밀번호 찾기·로그인)과 Footer, 오른쪽 브랜드 패널 자리는 비워 둠.",
-    source: "apps/studio/src/app/screens/admin/login/page.tsx",
+    source: "apps/sandbox/src/app/(renewal)/renewal/admin/login/page.tsx",
     createdAt: "2026-09-14",
   },
   {

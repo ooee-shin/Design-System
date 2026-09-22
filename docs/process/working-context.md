@@ -33,7 +33,7 @@
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
-  - `apps/studio`의 `/screens`: 제품 화면을 구현하는 작업장. 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. Studio 의 문서형 레이아웃을 따르지 않는 유일한 자리이며 규칙은 `docs/system/studio.md`의 「화면 프레임과 그 예외」가 소유한다. Studio 메뉴에 올리지 않고 주소로 연다
+  - 제품 화면 작업장(블루키 리뉴얼): `2026-09-23` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다(`apps/sandbox/src/app/(renewal)/renewal/`). 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. 규칙은 `apps/sandbox/src/components/renewal/README.md` 가 갖는다. sandbox 첫 화면의 「블루키 리뉴얼」 탭에서 연다
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - `apps/studio`의 `/llms.txt`: 저장소 루트 `llms.txt` 원본을 그대로 낸다. 빌드 끝에 `scripts/docs/mirror-llms-links.mjs`가 그 링크와 실은 문서의 링크를 따라 닿는 시스템 문서(`docs/system/` 아래와 `packages/ui/src/index.ts`, 허용 목록은 `scripts/docs/llms-links.mjs`의 `PUBLISHABLE`)만 `out/`의 같은 경로에 싣는다. 실리는 파일은 git이 추적하는 보통 파일이어야 한다. `out/llms.txt`는 웹판으로 바꾼다 — `localhost:3000`을 배포 주소로, 허용 목록 밖을 가리키는 링크는 「저장소 안에서만」 글자로 풀고 머리에 범위를 한 줄 적는다. 두 사이트 모두 공개로 두기로 했다(`2026-09-22`, [ai-environment.md](ai-environment.md) 「아직 정하지 않은 것」). 뷰어는 `/llms-txt`이고 상단 메뉴도 그 주소를 가리킨다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -43,7 +43,7 @@
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장인 `/screens`는 메뉴에 올리지 않고 주소로 연다
+  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장은 `2026-09-23` 에 sandbox 로 옮겨 Studio 메뉴에 없다
   - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
   - 모든 화면이 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다. 밀도가 페이지 틀을 건드리면 화면을 옮길 때 본문이 위아래로 밀린다
   - 우측 `On this page` 목차는 공용 `OnThisPage` 하나를 컴포넌트 상세와 Presentation이 함께 사용한다. 최대 높이를 뷰포트 안으로 제한하고 넘치면 목차 안에서 스크롤한다

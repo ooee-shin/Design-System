@@ -14,7 +14,6 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
   { href: "/docs", label: "Docs" },
   // `/llms` 가 아니다. 그 주소에는 페이지가 없고 배포본에서 404 다. 뷰어가 `/llms-txt` 로 비킨 까닭은 그 페이지에 있다.
   { href: "/llms-txt", label: "llms.txt" },
-  { href: "/screens", label: "Screens" },
   { href: "/presentation", label: "Presentation" },
 ];
 
@@ -22,15 +21,6 @@ export function StudioNavigation() {
   const pathname = usePathname();
   const { theme, locale, viewport, setTheme, setLocale, setViewport } = useStudioPreferences();
   const isComponentDetail = /^\/components\/[^/]+$/.test(pathname);
-
-  // `/screens/*` 는 제품 화면 자체를 구현하는 자리다. 상단에 바가 얹히면 관리자 화면이 실제로
-  // 차지하는 높이를 볼 수 없고 앱 화면은 기기 상자 밖에 다른 것이 서게 된다. 그 자리를 고정
-  // 링크로 대신 채우지도 않으며, 돌아가는 길은 브라우저 뒤로 가기가 갖는다. 범위는
-  // `docs/system/studio.md` 가 소유한다.
-  //
-  // 루트마다의 작업 목록인 `/screens/admin` 같은 경로는 제품 화면이 아니므로 이 바를 그대로 쓴다.
-  // 물러나는 것은 그 아래의 개별 화면뿐이다.
-  if (/^\/screens\/[^/]+\/.+/.test(pathname)) return null;
 
   return (
     <>
