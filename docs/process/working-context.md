@@ -396,6 +396,8 @@ pnpm visual --path /components/badge \
 
 개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 기획자 영역에 닿는 것은 Figma 확인이다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
+**화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·Figma·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
+
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
 Badge의 `compoundVariants` 21개를 걷어내고, tone별 팔레트와 variant별 단계의 곱으로 색을 정하게 바꿨다. 결정과 단계표, 대비 수치는 [badge.md](../system/components/badge.md)의 「색」이 소유한다. 여기서는 다른 컴포넌트에도 걸리는 사항만 남긴다.
