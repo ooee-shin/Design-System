@@ -169,4 +169,12 @@ export const sandboxScreens: SandboxScreen[] = [
       "이커머스 웹의 주문 완료 화면. 담긴 수 없는 머리글, 「주문이 완료되었어요」 제목과 안내, 주문 정보(주문번호·결제 금액·결제 수단·받는 분·연락처·주소), 주문 상품 두 개, 주문 내역 보기·쇼핑 계속하기 링크.",
     createdAt: "2026-09-22",
   },
+  {
+    key: "account-settings",
+    project: "web",
+    name: "계정 설정",
+    href: "/account-settings",
+    prompt: "자율 요청(#37). 내용을 정하지 않아 이름·이메일·언어·알림 수신과 저장으로 계정 설정 화면 한 장을 자유롭게 구성함.",
+    createdAt: "2026-09-22",
+  },
 ];
