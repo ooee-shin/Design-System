@@ -1,73 +1,107 @@
-# ooee-ui
+# Design-System-Harness
 
-블루키 제품에서 사용할 UI 시스템이다. `oe` semantic token과 공용 컴포넌트·패턴으로 구성하며, 이 저장소에서 1차 컴포넌트를 완성한 뒤 블루키 코드베이스로 이관하거나 별도 패키지로 연동한다.
+블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin과 Figma 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다.
 
-**최종 목표는 요구사항에서 화면과 코드가 이어서 만들어지는 개발 환경(AX 전환)이다.** UI 시스템은 그 기반이며, 1차 범위는 디자인 시스템·UI 패키지·스토리북·디자인 토큰 구축과 Figma MCP·스토리북 MCP 연동까지다. 전체 단계와 검증 계획은 [`docs/process/roadmap.md`](docs/process/roadmap.md)에 있다.
+`2026-09-21`에 `ooee-shin/ooee-ui`에서 이력과 함께 옮겨 왔다. 저장소 문서와 스크립트는 여기가 정본이다. 디자인 시스템 자체(`packages/*`, `docs/system/`, `apps/studio`)의 원본은 `ooee-ui`이고, 하네스가 그것을 읽어야 돌기 때문에 이 저장소에도 함께 있다. 그쪽을 여기서 고치면 `ooee-ui`에도 같은 변경을 내야 두 저장소가 갈라지지 않는다.
 
-통합 방식은 아직 검토 중이다. 블루키 코드에 직접 삽입할지 별도 디자인 시스템 패키지로 분리해 연동할지는 개발 검토 후 결정하며, 그 결정은 1차 작업에 영향을 주지 않는다. 기존 개발 네이밍·스택·라이브러리와의 정합성은 1차 범위에서 고려하지 않고, 디자인 토큰은 변환 없이 그대로 사용한다.
+## 흐름
 
-구현 기반으로 shadcn/ui를 사용하지만 shadcn의 시각 언어를 유지하는 것이 목적은 아니다. 외부 자료를 입력으로 활용하고 최종 결과물을 `oe` semantic token과 ooee의 컴포넌트 규칙으로 정규화한다.
+```text
+Slack 요청 폼 → GitHub issue (요청서 원본)
+→ 확정
+→ /ooee-harness:generate-code 로 화면 생성 · 검사
+→ pull request → dev 머지
+→ Cloudflare Pages 에 배포 → 화면 주소를 issue 댓글로 보고
+→ 기획자 승인
+→ pull request → main 머지
+```
 
-## 문서 구조
+요청 폼의 칸, issue 본문 양식과 승인 규칙은 [`docs/process/ai-environment.md`](docs/process/ai-environment.md)의 「요청 폼」과 「처리와 승인」이 갖는다.
 
-문서는 두 갈래로 나뉜다.
+## 명령
 
-| 위치 | 성격 | 전달 |
+| 명령 | 하는 일 | 정의 |
 | --- | --- | --- |
-| **[`docs/system/`](docs/system/README.md)** | 시스템에 무엇이 있고, 어떤 정의이며, 어떤 목적으로 써야 하는가 | 전달 대상 |
-| [`docs/process/`](docs/process/README.md) | 무엇을 근거로 어떤 순서와 규칙으로 만드는가 | 전달 시 제거 |
-| [`AGENTS.md`](AGENTS.md) | AI 작업자가 지켜야 하는 작업 운영 규칙 | 전달 시 제거 |
-| `.claude/` | Claude Code 가 이 저장소에서 쓰는 도구 설정 | 전달 시 제거 |
+| `/ooee-harness:generate-code` | 요구사항 한 문단을 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다 | [SKILL.md](plugins/ooee-harness/skills/generate-code/SKILL.md) |
+| `/ooee-harness:review-design` | 화면 코드를 디자인 시스템 문서에 대조해 위반 목록을 낸다 | [SKILL.md](plugins/ooee-harness/skills/review-design/SKILL.md) |
+| `/design-page` | 화면을 Figma로 옮기고, 사람이 Figma에서 고친 것을 코드로 되읽는다 | [SKILL.md](.claude/skills/design-page/SKILL.md) |
 
-`docs/process/`와 `AGENTS.md`가 전달 대상이 아닌 이유는 이렇다. `ㄱ`, `업무시작`, `퇴근백업` 같은 작업 신호와 외부 자료를 수입하는 절차는 **1차 컴포넌트를 완성하는 동안에만 필요한 규칙**이다. 시스템이 무엇인지 설명하지 않으므로 블루키 자산에 포함할 이유가 없고, 남겨두면 넘겨받는 쪽이 지킬 필요 없는 규칙을 규칙으로 오해한다.
-
-`docs/system/`의 문서는 바깥 문서를 참조하지 않는다. 그래서 `docs/process/`와 `AGENTS.md`를 제거해도 `docs/system/` + `packages/` + `apps/studio`만으로 시스템이 그대로 성립한다.
-
-전달 범위에는 `apps/studio`도 포함한다. Studio는 컴포넌트를 화면에서 확인하는 채널이다. Storybook은 두지 않기로 했다(`2026-09-18`, [ai-environment.md](docs/process/ai-environment.md)). AI가 읽는 진입점은 저장소 루트의 [llms.txt](llms.txt)다.
-
-**컴포넌트를 사용하거나 검토하려면 [`docs/system/README.md`](docs/system/README.md)부터 본다.** 자산 카탈로그, 구조 용어, 토큰 체계와 상호작용 규칙이 그 아래에 있다.
+앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다. `/design-page`는 저장소 전용 Skill이라 설치 없이 보인다.
 
 ## 저장소 구조
 
 ```text
-packages/tokens      Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결
-packages/fonts       언어별 공용 font
-packages/ui          공용 Component
-packages/patterns    화면 예시 구현. 확정된 Pattern은 아직 없다
-apps/studio          공용 자산을 소비하는 검수 화면
+plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과 화면 규칙 검사(lib/)
+.claude-plugin/        Plugin marketplace 정의(ooee)
+.claude/               /design-page Skill과 공용 권한(settings.json)
+scripts/figma          화면을 Figma로 옮기고 되읽는 도구
+scripts/visual         브라우저에서 화면을 재는 도구
+scripts/docs           llms.txt 링크 시험
+apps/sandbox           생성 화면과 Figma 컴포넌트 카탈로그 (3001 포트)
+apps/studio            컴포넌트 문서와 Playground (3000 포트)
+packages/ui            공용 Component (@ooee/ui)
+packages/tokens        oe semantic token
+packages/fonts         언어별 공용 font
+docs/system            디자인 시스템 정의. 하네스가 원본으로 읽는다
+docs/process           만드는 과정, 결정 기록, 현재 상태
 ```
-
-공용 자산의 실제 원본은 검증 정도와 관계없이 `packages/*`가 소유한다. Studio는 이를 import해 검수·설명할 뿐 자체 복사본을 만들지 않는다.
 
 ## 실행
 
 ```bash
 corepack enable
 pnpm install --frozen-lockfile
-pnpm dev:studio
+pnpm dev                              # Studio  http://localhost:3000
+pnpm --filter @ooee/sandbox dev       # Sandbox http://localhost:3001
 ```
-
-기본 주소는 `http://localhost:3000`이다. 다른 포트가 필요하면 `pnpm dev:studio -- --port 3002`처럼 지정한다.
 
 ```bash
 pnpm check
 ```
 
-`pnpm check`는 lint, 공용 자산 typecheck·test와 production build를 차례로 실행한다. GitHub도 pull request와 `main` push에서 같은 검사를 자동 실행한다. 안전한 Git 작업 방법은 [`docs/process/git-workflow.md`](docs/process/git-workflow.md)를 따른다.
+`pnpm check`는 lint, typecheck, 테스트, sandbox 테스트, Studio·Sandbox production build를 차례로 돈다. **이 저장소에는 자동 검사(CI)와 branch 보호가 없다.** 옮기면서 `Quality` workflow를 걷어냈고, 비공개 저장소의 무료 플랜이라 보호 설정이 열리지 않는다. 그래서 pull request를 올리기 전과 `dev → main` 전에 로컬에서 `pnpm check`를 통과시킨다.
+
+## 배포
+
+생성 화면을 기획자가 보는 자리는 Cloudflare Pages다. dev에 머지해도 저절로 배포되지 않으며, 사람이 직접 올린다.
+
+```bash
+pnpm dlx wrangler@4.136.1 login   # 한 번만
+pnpm deploy:sandbox               # apps/sandbox → https://ooee-sandbox.pages.dev
+pnpm deploy:studio                # apps/studio → Cloudflare Pages 프로젝트 ooee-studio
+```
+
+배포된 주소는 주소를 아는 사람 누구나 볼 수 있다. 공개 범위를 좁힐지는 아직 정하지 않았다(ai-environment.md 「아직 정하지 않은 것」). 설정값과 Git 연동이 막힌 까닭은 「Cloudflare Pages 설정값」과 「배포는 wrangler 로 직접 올린다」에 있다.
+
+## 브랜치
+
+`feature/*`나 `docs/*` → pull request → `dev` → 통합 검증과 승인 → pull request → `main`이다. `main`에 직접 push하지 않는다. GitHub 기본 branch가 `main`이므로 pull request를 만들 때 base를 `dev`로 지정한다(`gh pr create --base dev`). commit 메시지와 pull request 본문은 한국어로 쓴다. 통합 검증 항목은 [`docs/process/git-workflow.md`](docs/process/git-workflow.md)의 「dev에서 main으로 올릴 때」에 있다.
+
+## 먼저 읽을 것
+
+| 무엇 | 어디 |
+| --- | --- |
+| AI가 저장소를 처음 읽는 진입점 | [llms.txt](llms.txt) |
+| 작업 규칙과 코드 소유 경계 | [AGENTS.md](AGENTS.md) |
+| 컴포넌트 목록과 고르는 법 | [docs/system/README.md](docs/system/README.md) |
+| 하네스의 설계, 결정, 아직 정하지 않은 것 | [docs/process/ai-environment.md](docs/process/ai-environment.md) |
+| 지금 무엇을 하고 있고 무엇이 남았나 | [docs/process/working-context.md](docs/process/working-context.md) |
+| Figma 도구 | [scripts/figma/README.md](scripts/figma/README.md) |
+
+블루키로 넘길 때 무엇이 가고 무엇이 빠지는지는 ai-environment.md의 「이관 시 남기는 것」이 정한다.
 
 ## 현재 환경
 
-- Next.js App Router 기반 Studio: `apps/studio`
+- Next.js App Router 앱 둘: `apps/studio`, `apps/sandbox`
 - React 19, TypeScript, Tailwind CSS v4
 - shadcn CLI v4, Base UI, Nova 프리셋
 - pnpm workspace
 - Node.js `22.22.1` (`.nvmrc`와 `.node-version`에 고정)
 - pnpm `10.32.0` (`packageManager`에 고정)
 - repository에 고정된 preview font: 국문 Pretendard, 영문 Inter, 일문 Noto Sans JP
+- Figma MCP: `.mcp.json`에 서버 URL만 둔다
 
 현재 실행에 필요한 환경변수는 없다. 이후 환경변수가 생기면 실제 값은 `.env.local`에 두고 Git에는 올리지 않으며, 필요한 변수 이름과 설명만 `.env.example`에 기록한다.
-
-확정된 언어별 font 기준은 공용 `packages/fonts`가 소유하고 각 앱이 이를 사용한다. font는 build 결과에 포함되며 로컬 시스템 설치 여부에 의존하지 않는다. 브라우저와 운영체제의 rasterization 차이는 남을 수 있지만 font family, glyph metrics와 줄바꿈 기준은 repository에서 재현 가능하게 유지한다.
 
 ## 이어서 작업할 때
 
