@@ -25,7 +25,10 @@
       "Bash(node *lib/check-screens.mjs *)",
       "Bash(gh issue view *)",
       "Bash(gh issue list *)",
-      "Bash(gh issue comment *)"
+      "Bash(node scripts/harness/issue.mjs *)",
+      "Bash(node scripts/harness/result-comment.mjs *)",
+      "Bash(node scripts/harness/decision.mjs *)",
+      "Bash(node scripts/harness/post-result.mjs *)"
     ],
     "ask": [
       "Bash(git stash)",
@@ -52,7 +55,12 @@
       "Edit(/apps/sandbox/src/app/page.tsx)",
       "Edit(/apps/sandbox/src/app/globals.css)",
       "Bash(gh pr create *)",
-      "Bash(gh pr merge *)"
+      "Bash(gh pr merge *)",
+      "Bash(gh issue comment *)",
+      "Edit(/scripts/harness/issue.mjs)",
+      "Edit(/scripts/harness/result-comment.mjs)",
+      "Edit(/scripts/harness/decision.mjs)",
+      "Edit(/scripts/harness/post-result.mjs)"
     ],
     "deny": [
       "Bash(git push origin main)",
@@ -70,14 +78,8 @@
       "Bash(gh issue close *)",
       "Bash(gh issue reopen *)",
       "Bash(gh label *)",
-      "Bash(gh api * -X POST*)",
-      "Bash(gh api * -X PATCH*)",
-      "Bash(gh api * -X PUT*)",
-      "Bash(gh api * -X DELETE*)",
-      "Bash(gh api --method POST*)",
-      "Bash(gh api --method PATCH*)",
-      "Bash(gh api --method PUT*)",
-      "Bash(gh api --method DELETE*)"
+      "Bash(gh api)",
+      "Bash(gh api *)"
     ]
   }
 }

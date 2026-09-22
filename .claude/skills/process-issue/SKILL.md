@@ -1,7 +1,7 @@
 ---
 name: process-issue
 description: Slack 폼으로 들어온 화면 요청 이슈 하나를 처음부터 결과 댓글까지 처리한다. 이슈를 읽고 /ooee-harness:generate-code 로 화면을, /design-page 로 Figma 프레임을 만든 뒤 dev 에 머지하고 배포된 주소를 확인해 결과를 이슈 댓글로 올리고 멈춘다. 「결정 <n>」으로 다시 부르면 그 댓글에 사람이 단 결정(승인·반려·개선)을 읽어 다음 일을 한다. 화면이 이미 dev 에 들어갔는데 결과 댓글이 없으면 「결과 <n>」으로 결과 댓글만 올린다. 「이슈 <n> 처리」, 「<n> 결정 봐 줘」, 「<n> 결과만 올려 줘」 요청에 쓴다. 인수는 「<이슈 번호>」, 「결정 <이슈 번호>」 또는 「결과 <이슈 번호>」이다.
-allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-:*), Bash(git add apps/sandbox/:*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
+allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-:*), Bash(git add apps/sandbox/:*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
 ---
 
 # /process-issue
@@ -12,7 +12,7 @@ allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-
 
 **이 명령을 부른 것이 commit·push·pull request 요청이다.** generate-code와 design-page는 보고에서 멈추고 commit·push·pull request를 만들지 않는데, 이 명령은 그 보고를 받아 이어 간다. 다만 `gh pr create`·`gh pr merge`는 공용 권한(`.claude/settings.json`)의 `ask`라서 그 자리에서 사람이 한 번 더 확인한다. 확인을 물을 수 없는 headless 세션에서는 거기서 거부되고 멈춘다.
 
-**allowed-tools에 두지 않은 것.** `gh issue comment`는 결과 댓글을 다는 명령이지만 여기서 열지 않는다. 열어 두면 「승인」 댓글도 확인 없이 올라가고, 판독은 그것을 사람의 결정과 가르지 못한다. 결과 댓글은 회차마다 한 번이라 확인 한 번의 값이 싸다. `git revert`(D3)도 되돌리는 일이라 열지 않는다. `curl`은 7단계의 배포 주소 확인 꼴 하나만 연다. 지금 공용 권한은 `gh issue comment`를 `allow`에 두고 있어 대화형 세션에서는 확인 없이 돈다(ai-environment.md 「처리와 승인」의 「남은 것」).
+**allowed-tools에 두지 않은 것.** `gh issue comment`는 여기서 열지 않고 공용 권한에서도 `ask`다. 열어 두면 「승인」 댓글도 확인 없이 올라가고, 판독은 그것을 사람의 결정과 가르지 못한다. 결과 댓글은 `scripts/harness/post-result.mjs` 하나로만 단다 — 양식이 만든 글만 나가므로 첫 줄이 「화면 요청 #<n> 결과」로 고정되어 결정 댓글로 둔갑하지 못한다. `git revert`(D3)도 되돌리는 일이라 열지 않는다. `curl`은 7단계의 배포 주소 확인 꼴 하나만 연다.
 
 ## 입력
 
@@ -23,8 +23,8 @@ allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-
 
 ## 하지 않는 것
 
-- **이슈를 고치거나 닫거나 라벨 달기, `gh api` 쓰기.** `gh issue edit`·`close`·`reopen`, `gh label`은 공용 권한의 `deny`다. `gh api`는 이 명령에서 쓰지 않는다. GitHub 읽기는 세 스크립트와 `gh issue`·`gh pr`의 읽기 명령이 한다. 공용 권한의 `gh api` deny는 `-X POST`를 경로 뒤에, `--method POST`를 맨 앞에 둔 꼴만 대조한다. 필드를 붙이면 gh가 저절로 POST로 보내는 `gh api …/reactions -f content=+1`은 어느 줄에도 걸리지 않으므로, 반응 달기를 막는 것은 이 줄이다. 반려된 이슈를 닫는 것도 사람이 한다.
-- **결정을 만들기.** 결과 댓글에 반응을 달지 않고, 「승인」·「반려」·「개선」으로 시작하는 댓글을 쓰지 않는다. 판독(`decision.mjs`)은 계정으로 거르지 않으므로 에이전트가 쓴 그 댓글은 사람의 결정으로 읽힌다(`scripts/harness/README.md` 「알아 둘 것」). 공용 권한이 `gh issue comment`를 열어 두는 동안 자가 승인을 막는 것은 이 줄이다.
+- **이슈를 고치거나 닫거나 라벨 달기, `gh api` 쓰기.** `gh issue edit`·`close`·`reopen`, `gh label`은 공용 권한의 `deny`다. `gh api`는 이 명령에서 쓰지 않는다. GitHub 읽기는 세 스크립트와 `gh issue`·`gh pr`의 읽기 명령이 한다. `gh api`는 공용 권한이 통째로 `deny`한다 — 필드를 붙이면 gh가 저절로 POST로 보내는 `gh api …/reactions -f content=+1` 같은 꼴까지 막으려는 것이다. 반려된 이슈를 닫는 것도 사람이 한다.
+- **결정을 만들기.** 결과 댓글에 반응을 달지 않고, 「승인」·「반려」·「개선」으로 시작하는 댓글을 쓰지 않는다. 판독(`decision.mjs`)은 계정으로 거르지 않으므로 에이전트가 쓴 그 댓글은 사람의 결정으로 읽힌다(`scripts/harness/README.md` 「알아 둘 것」). `gh issue comment`는 공용 권한의 `ask`이고, 판독·양식·게시 스크립트를 고치는 것도 `ask`라 이 길을 넓혀 스스로 승인할 수 없다.
 - **결과 댓글 말고 이슈에 댓글 달기.** 결과 채널이 이 저장소의 댓글을 모두 카드로 받으므로 물음까지 채널에 뜬다. 물을 것은 대화에서 묻는다.
 - **결과 댓글을 손으로 쓰거나 고치기.** 첫 다섯 줄과 맨 끝 표식은 `result-comment.mjs`가 만들고 판독이 그 모양에 기댄다. 스크립트가 만들기를 거부하면 까닭을 보고한다.
 - **결정 없이 `main`으로 올리기.** `dev → main` pull request는 「결정 뒤」의 승인에서만 만들고, 머지는 사람이 한다.
@@ -191,12 +191,11 @@ node scripts/harness/decision.mjs <n> --round <회차>   # decision 이 「결�
 | `checks` | `pnpm check`, check-screens, `/review-design` 위반 0건, design-page 검사, `Quality`, 배포 주소 <N>장 200. 실제로 돌려 통과한 것만 적는다 |
 
 ```bash
-node scripts/harness/result-comment.mjs .harness-work/issue-<n>/result-<회차>.json > .harness-work/issue-<n>/comment-<회차>.md
-gh issue comment <n> --body-file .harness-work/issue-<n>/comment-<회차>.md
+node scripts/harness/post-result.mjs <n> .harness-work/issue-<n>/result-<회차>.json
 node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방금 단 댓글의 주소가 나와야 한다
 ```
 
-`result-comment.mjs`가 「결과 댓글을 만들지 않는다: …」로 끝나면 올리지 않고 그 줄을 보고한다. `gh issue comment`는 allowed-tools에 없으므로 공용 권한이 열어 두지 않은 세션에서는 확인을 묻는다. 올린 댓글이 결과 채널에 카드로 뜬다. 마지막 판독이 「대기」가 아니면 표식이 읽히지 않는 것이니 보고에 적는다.
+`post-result.mjs`가 「결과 댓글을 만들지 않는다: …」나 「결과 댓글을 달지 않는다: …」로 끝나면 올라가지 않은 것이니 그 줄을 보고한다. 올리기 전에 글을 보려면 `node scripts/harness/result-comment.mjs <input.json>`으로 만들기만 한다. 올린 댓글이 결과 채널에 카드로 뜬다. 마지막 판독이 「대기」가 아니면 표식이 읽히지 않는 것이니 보고에 적는다.
 
 ### 9. 멈춘다
 

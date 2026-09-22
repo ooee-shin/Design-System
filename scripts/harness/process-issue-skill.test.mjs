@@ -34,7 +34,7 @@ test("process-issue SKILL.md 가 적은 저장소 경로가 모두 있다", () =
 
 test("allowed-tools 는 결정을 만들 수 있는 명령을 열지 않고, curl 은 배포 주소 확인 꼴만 연다", () => {
   // 판독(decision.mjs)은 계정으로 거르지 않아 에이전트가 단 반응·「승인」 댓글을 사람의 것과 가르지 못한다.
-  // 공용 권한의 deny 도 암묵 POST(`gh api … -f content=+1`)를 못 막으므로 이 Skill 이 스스로 열지 않는다.
+  // 공용 권한이 `gh api` 를 통째로 막고 `gh issue comment` 를 ask 로 두지만, Skill 도 스스로 열지 않아 두 겹으로 둔다.
   const allowed = (skill.match(/^allowed-tools:(.*)$/m)?.[1] ?? "").split(/,\s+/).map((tool) => tool.trim());
   for (const tool of allowed) {
     assert.doesNotMatch(tool, /gh api|gh issue comment|gh issue (edit|close|reopen)|gh label/, `allowed-tools 가 연다: ${tool}`);
