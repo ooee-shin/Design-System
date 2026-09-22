@@ -3,18 +3,18 @@ name: process-issue
 description: Slack 폼으로 들어온 화면 요청 이슈 하나를 처음부터 결과 댓글까지 처리한다. 이슈를 읽고 /ooee-harness:generate-code 로 화면을 만든 뒤 dev 에 머지하고 배포된 주소를 확인해 결과를 이슈 댓글로 올리고 멈춘다. 「결정 <n>」으로 다시 부르면 그 댓글에 사람이 단 결정(승인·반려·개선)을 읽어 다음 일을 한다. 화면이 이미 dev 에 들어갔는데 결과 댓글이 없으면 「결과 <n>」으로 결과 댓글만 올린다. 「이슈 <n> 처리」, 「<n> 결정 봐 줘」, 「<n> 결과만 올려 줘」 요청에 쓴다. 인수는 「<이슈 번호>」, 「결정 <이슈 번호>」 또는 「결과 <이슈 번호>」이다.
 model: claude-sonnet-5
 effort: high
-allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-*), Bash(git add apps/sandbox/*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
+allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-*), Bash(git add apps/sandbox/*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(pnpm --filter @ooee/sandbox build), Bash(node scripts/visual/inspect.mjs:*), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
 ---
 
 # /process-issue
 
-화면 요청 이슈 하나를 `docs/process/ai-environment.md` 「처리와 승인」의 흐름대로 돌린다. 흐름과 승인 범위는 그 절이, 세 스크립트의 입출력은 `scripts/harness/README.md`가 소유한다. **이 명령은 차례를 잇기만 한다.** 화면을 만드는 규칙은 `plugins/ooee-harness/skills/generate-code/SKILL.md`, 검수 항목은 `plugins/ooee-harness/skills/review-design/SKILL.md`가 가지며 여기에 다시 적지 않는다. 그 둘이 멈추라고 하는 자리에서는 이 명령도 멈춘다. **요청 처리에서 Figma 는 만들지 않는다**(`2026-09-23` 결정, ai-environment.md 「처리와 승인」).
+화면 요청 이슈 하나를 `docs/process/ai-environment.md` 「처리와 승인」의 흐름대로 돌린다. 흐름과 승인 범위는 그 절이, 세 스크립트의 입출력은 `scripts/harness/README.md`가 소유한다. **이 명령은 차례를 잇기만 한다.** 화면을 만드는 규칙은 `plugins/ooee-harness/skills/generate-code/SKILL.md`, 검수 항목은 `plugins/ooee-harness/skills/review-design/SKILL.md`가 가지며 여기에 다시 적지 않는다. 그 둘이 멈추라고 하는 자리에서는 이 명령도 멈춘다. **요청 처리에서 Figma 는 만들지 않는다**(`2026-09-23` 결정, ai-environment.md 「처리와 승인」). 그 자리는 5단계 「sandbox 에서 띄워 보고 검사한다」가 대신한다.
 
 `$ARGUMENTS`가 「결정」으로 시작하면 「결정 뒤」, 「결과」로 시작하면 「결과만 올리기」 절차이고, 아니면 「순서」다.
 
 **이 명령을 부른 것이 commit·push·pull request 요청이다.** generate-code는 보고에서 멈추고 commit·push·pull request를 만들지 않는데, 이 명령은 그 보고를 받아 이어 간다. 다만 `gh pr create`·`gh pr merge`는 공용 권한(`.claude/settings.json`)의 `ask`라서 그 자리에서 사람이 한 번 더 확인한다. 확인을 물을 수 없는 headless 세션에서는 거기서 거부되고 멈춘다.
 
-**allowed-tools에 두지 않은 것.** `gh issue comment`는 여기서 열지 않고 공용 권한에서도 `ask`다. 열어 두면 「승인」 댓글도 확인 없이 올라가고, 판독은 그것을 사람의 결정과 가르지 못한다. 결과 댓글은 `scripts/harness/post-result.mjs` 하나로만 단다 — 양식이 만든 글만 나가므로 첫 줄이 「화면 요청 #<n> 결과」로 고정되어 결정 댓글로 둔갑하지 못한다. `git revert`(D3)도 되돌리는 일이라 열지 않는다. `curl`은 6단계의 배포 주소 확인 꼴 하나만 연다.
+**allowed-tools에 두지 않은 것.** `gh issue comment`는 여기서 열지 않고 공용 권한에서도 `ask`다. 열어 두면 「승인」 댓글도 확인 없이 올라가고, 판독은 그것을 사람의 결정과 가르지 못한다. 결과 댓글은 `scripts/harness/post-result.mjs` 하나로만 단다 — 양식이 만든 글만 나가므로 첫 줄이 「화면 요청 #<n> 결과」로 고정되어 결정 댓글로 둔갑하지 못한다. `git revert`(D3)도 되돌리는 일이라 열지 않는다. `curl`은 7단계의 배포 주소 확인 꼴 하나만 연다.
 
 ## 입력
 
@@ -65,11 +65,11 @@ node scripts/harness/issue.mjs <n>
 
 - **`generateArgs`가 `null`이면 `problems`를 원문 그대로 보고하고 묻고 멈춘다.** 보고의 첫 제목은 「## 묻고 멈춤」이다.
   - 요구사항이 없거나 빈 것은 대화의 답으로 채우지 않는다. 요청 문단의 원본은 이슈 본문이다(ai-environment.md 「요청 폼」). 폼으로 다시 요청하도록 보고한다.
-  - 프로젝트를 하나 고르는 것처럼 답 하나로 풀리는 것은 답을 받은 뒤 이어 간다. 인수는 `issue.mjs`가 만드는 꼴(「<화면 이름>. <요구사항을 한 문단으로 편 것> 프로젝트: <id>」) 그대로 조립하고, 답으로 정한 것은 7단계 `needsDecision`에 남긴다. 예: 「프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv」.
+  - 프로젝트를 하나 고르는 것처럼 답 하나로 풀리는 것은 답을 받은 뒤 이어 간다. 인수는 `issue.mjs`가 만드는 꼴(「<화면 이름>. <요구사항을 한 문단으로 편 것> 프로젝트: <id>」) 그대로 조립하고, 답으로 정한 것은 8단계 `needsDecision`에 남긴다. 예: 「프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv」.
   - 2단계에 해당하는 요청이면 그 목록도 같은 물음에 함께 낸다. 두 번 나눠 묻지 않는다.
 - `fields.requester`가 비었으면 누구의 요청인지 묻는다. 결과 댓글은 요청자 없이 만들어지지 않는다.
 - `notes`는 막지 않지만 보고에 옮긴다. 버린 앞 글(옛 양식)이 요구사항이었는지는 사람이 본다.
-- `fields.onSubmit`·`fields.similar`는 `generateArgs`에 들지 않는다. 비어 있지 않으면 7단계 `needsDecision`에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다.
+- `fields.onSubmit`·`fields.similar`는 `generateArgs`에 들지 않는다. 비어 있지 않으면 8단계 `needsDecision`에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다.
 
 **이미 처리한 요청인지 본다.** 같은 회차 결과 댓글이 있는지만 보면, 화면이 `dev`에 들어갔는데 결과 댓글이 없는 요청(#9 → PR #19)을 다시 만들어 key마다 `-2`가 붙은 화면 다섯 장이 또 생긴다.
 
@@ -94,7 +94,7 @@ generate-code는 한 번에 화면 하나를 만든다. 요구사항이 화면 �
 - key의 꼴은 generate-code 3단계 「파일과 등록」이 정한다. 이미 있는 key면 generate-code가 번호를 붙이므로 여기서 미리 피하지 않는다.
 - 「요청 원문에서 온 것」에는 이슈 본문에 있는 말만 옮긴다. 「지어낸 것」에는 화면에 보일 항목·버튼 문구·기본값 가운데 요청에 없는 것을 한 문단으로 적는다.
 - 확인받은 표의 줄마다 「<화면 이름>. <요청 원문에서 온 것> 지어냄(요청에 없어 처리하는 쪽이 정함): <지어낸 것> 프로젝트: <id>」가 generate-code 인수다. generate-code는 인수의 요구사항 문단을 `page.tsx` 머리말에 그대로 붙이므로(그 SKILL.md 3단계 「파일과 등록」) 머리말에서도 원문과 지어낸 것이 갈린다. 단독 `/review-design`과 다음 회차의 대조가 그 머리말과 pull request 본문을 근거로 읽는다.
-- 표와 줄마다의 인수는 5단계 pull request 본문에 그대로 옮기고, 「지어낸 것」은 7단계 `needsDecision`에 **반드시** 옮긴다. 대화는 남지 않고 저장소와 GitHub만 남는다.
+- 표와 줄마다의 인수는 6단계 pull request 본문에 그대로 옮기고, 「지어낸 것」은 8단계 `needsDecision`에 **반드시** 옮긴다. 대화는 남지 않고 저장소와 GitHub만 남는다.
 - 한 장 요청이면 이 단계를 건너뛰고 `generateArgs`를 그대로 쓴다. 그때 요청에 없어 정한 값은 generate-code 보고의 「판단이 필요한 것」으로 온다.
 
 ### 3. 가지를 만든다
@@ -117,9 +117,33 @@ git switch -c feature/issue-<n>-<slug>
   git commit -m "<보고의 「제목:」>"
   ```
 
-- 그 화면에 넘긴 인수 원문과 보고의 key·매핑표·「검수 결과」·「판단이 필요한 것」·「미확정 자산 후보」를 모아 둔다. 5단계 본문과 7단계 입력에 쓴다.
+- 그 화면에 넘긴 인수 원문과 보고의 key·매핑표·「검수 결과」·「판단이 필요한 것」·「미확정 자산 후보」를 모아 둔다. 6단계 본문과 8단계 입력에 쓴다.
 
-### 5. dev 에 올린다
+### 5. sandbox 에서 띄워 보고 검사한다
+
+Figma 로 옮기던 자리다(`2026-09-23`). 만든 화면을 실제로 띄워 눈으로 보고, 깨진 자리를 `dev` 에 올리기 전에 고친다. 사람의 눈은 `dev` 에 배포된 화면에서 한 번 더 본다 — 그것이 결정(개선이면 다음 회차, 반려면 되돌림, 승인이면 `main`)이다.
+
+```bash
+pnpm --filter @ooee/sandbox build
+node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewport 1440x900 \
+  --shot <key> --out .harness-work/issue-<n>/shots --eval '<아래 식>'
+```
+
+- **빌드한 정적 사이트를 잰다.** `--serve` 가 `apps/sandbox/out` 을 빈 포트에 잠깐 띄우고 끝나면 닫는다. 개발 서버를 띄우지 않는다 — 무인 러너에 프로세스가 남거나, 3001 을 다른 checkout 의 서버가 잡고 있으면 옛 화면을 읽는다. 배포되는 것과 같은 빌드를 본다.
+- 모바일 뷰(`max-w-[390px]`)로 선 화면은 `--viewport 390x844` 로 잰다(generate-code 「화면 폭」).
+- `--eval` 은 셋을 돌려준다: 첫 `h1` 글자, 가로 넘침, 화면에 놓인 컴포넌트 표식.
+
+  ```js
+  ({ h1: document.querySelector("h1")?.textContent, overflowX: document.documentElement.scrollWidth > innerWidth, slots: [...new Set([...document.querySelectorAll("[data-slot]")].map((e) => e.dataset.slot))] })
+  ```
+
+- **캡처를 `Read` 로 열어 눈으로 본다.** 덩이마다(머리글·본문·옆 칸·바닥) 빈 화면, 겹친 요소, 잘린 글자, 상자 밖으로 넘친 요소, 매핑표에 있는데 보이지 않는 요소를 찾는다.
+- **기계로 재는 둘은 막는다.** `h1` 이 없거나 가로로 넘치면 깨진 것이다. 그 화면의 세 파일(generate-code 「하지 않는 것」) 안에서 고치고 generate-code 5단계의 검사를 다시 돌린 뒤 이 단계를 다시 한다. 고친 것은 새 commit 으로 더한다. 두 번 고쳐도 남거나 세 파일 밖을 고쳐야 하면 멈춘다(「## 처리 중 실패」).
+- 눈으로 본 것 가운데 고친 것은 8단계 `summary.other` 에, 고치지 않은 것(정렬·간격처럼 판단이 갈리는 것)은 `needsDecision` 에 「<화면>: sandbox 검사에서 본 것 — …」으로 남긴다.
+- 캡처는 `.harness-work/issue-<n>/shots/` 에 남는다. 저장소에 넣지 않는다.
+- 8단계 `checks` 에 「sandbox 화면 검사 <N>장」을 적는다. 모든 화면이 기계로 재는 둘을 통과했을 때만이다.
+
+### 6. dev 에 올린다
 
 ```bash
 pnpm check
@@ -144,7 +168,7 @@ gh pr merge <번호> --squash --delete-branch
 
 `gh pr create`·`gh pr merge`가 확인 요청에서 거부되면 그대로 멈춘다. 사람이 확인하라고 둔 자리다.
 
-### 6. 배포를 확인한다
+### 7. 배포를 확인한다
 
 `dev`에 들어간 머지 commit(`gh pr view <번호> --json mergeCommit`)으로 `.github/workflows/deploy.yml`의 실행을 찾아 끝날 때까지 본다.
 
@@ -158,7 +182,7 @@ curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/<key>
 - **`success`만으로 배포되었다고 하지 않는다.** 저장소 secret이 없으면 workflow가 경고 한 줄만 남기고 배포를 건너뛴 채 `success`로 끝난다. 화면 key마다 주소가 `200`인지가 기준이다. 없는 key는 `404`를 돌려주므로 옛 화면이 대신 열릴 걱정은 없다. 끝난 직후 `404`면 몇 번 더 본다.
 - 실행이 실패했거나 주소가 끝내 `200`이 아니면 보고의 첫 제목을 「## 처리 중 실패」로 하고 멈춘다. 다시 배포하는 것(Actions에서 `Deploy`를 손으로 돌리기)은 사람이 한다.
 
-### 7. 결과 댓글을 올린다
+### 8. 결과 댓글을 올린다
 
 같은 회차를 두 번 올리지 않는다. 결과 채널에 카드가 두 번 뜬다. 먼저 이 회차의 결과 댓글이 없는지 본다.
 
@@ -173,13 +197,13 @@ node scripts/harness/decision.mjs <n> --round <회차>   # decision 이 「결�
 | `issue` | `number`, `issue.mjs`의 `screenName`, `fields.requester`, `fields.projects`(요청한 그대로) |
 | `round` | 처음이면 `1`, 개선이면 앞 회차 + 1 |
 | `screens[]` | key, `apps/sandbox/src/screens.ts`에 등록된 `name`, 만든 프로젝트, `https://ooee-sandbox.pages.dev/<key>` |
-| `pullRequest` | 5단계의 번호와 주소 |
+| `pullRequest` | 6단계의 번호와 주소 |
 | `summary.pagesAdded` | 이번 회차에 만든 화면 이름. `screens[].name`과 같은 글자로 적는다. 머리의 샌드박스 링크가 이 이름으로 이번 회차 화면을 고르고, 어긋나면 `result-comment.mjs`가 거부한다 |
 | `summary.componentsAdded` | `@ooee/ui`에 새로 더한 컴포넌트. generate-code는 `packages/ui`를 고치지 않으므로 보통 비어 있다 |
 | `summary.componentsUsed` | 매핑표의 컴포넌트 이름. 겹치지 않게 |
 | `summary.other` | 그 밖에 한 일. 개선 회차면 「<앞 회차>회차 개선 반영: <사유 한 줄>」 |
 | `needsDecision` | 여러 장이면 먼저 2단계 표의 화면마다 「<화면>: 요청에 없어 지어낸 것 — <지어낸 것>」. 그다음 화면마다 generate-code의 「판단이 필요한 것」·「미확정 자산 후보」, 1단계에서 답으로 정한 것과 반영하지 않은 칸. 화면 이름을 앞에 붙인다 |
-| `checks` | `pnpm check`, check-screens, `/review-design` 위반 0건, `Quality`, 배포 주소 <N>장 200. 실제로 돌려 통과한 것만 적는다 |
+| `checks` | `pnpm check`, check-screens, `/review-design` 위반 0건, sandbox 화면 검사 <N>장, `Quality`, 배포 주소 <N>장 200. 실제로 돌려 통과한 것만 적는다 |
 
 ```bash
 node scripts/harness/post-result.mjs <n> .harness-work/issue-<n>/result-<회차>.json
@@ -188,7 +212,7 @@ node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방�
 
 `post-result.mjs`가 「결과 댓글을 만들지 않는다: …」나 「결과 댓글을 달지 않는다: …」로 끝나면 올라가지 않은 것이니 그 줄을 보고한다. 올리기 전에 글을 보려면 `node scripts/harness/result-comment.mjs <input.json>`으로 만들기만 한다. 올린 댓글이 결과 채널에 카드로 뜬다. 마지막 판독이 「대기」가 아니면 표식이 읽히지 않는 것이니 보고에 적는다.
 
-### 8. 멈춘다
+### 9. 멈춘다
 
 「보고」의 꼴로 보고하고 멈춘다. 결정은 사람이 결과 댓글에 단다. 결정을 기다리며 판독을 되풀이하지 않는다. 결정이 달리면 사람이 `/process-issue 결정 <n>`으로 다시 부른다.
 
@@ -201,10 +225,10 @@ node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방�
 3. `node scripts/harness/decision.mjs <n>`이 「결과 없음」이어야 한다. 아니면 이미 올린 것이니 `/process-issue 결정 <n>`을 알리고 멈춘다.
 4. 1단계의 검사로 이 요청의 머지된 pull request를 찾는다. 없으면 `/process-issue <n>`을 알리고 멈춘다. 열린 것만 있으면 머지를 기다리라고 알리고 멈춘다. 머지된 것이 둘 이상이면 모두 쓰고, 결과 댓글의 `pullRequest`는 가장 늦게 머지된 것이다.
 5. 화면은 그 pull request들이 더한 `apps/sandbox/src/app/<key>/page.tsx`의 key다(`gh pr view <번호> --json files`). 이름은 `apps/sandbox/src/screens.ts`의 등록에서 읽는다. 화면 코드는 열지 않는다.
-6. 6단계의 주소 확인을 key마다 한다. 머지 commit의 Deploy 실행은 찾지 않아도 된다. 지금 `dev`의 배포에서 주소가 `200`이면 된다.
-7. 7단계를 `round` 1로 돈다.
+6. 7단계의 주소 확인과 5단계의 sandbox 검사를 key마다 한다. 빌드는 지금 `dev`의 것이다. 머지 commit의 Deploy 실행은 찾지 않아도 된다. 지금 `dev`의 배포에서 주소가 `200`이면 된다.
+7. 8단계를 `round` 1로 돈다.
    - `needsDecision`은 pull request 본문의 「판단이 필요한 것」과 2단계 표의 「지어낸 것」에서 옮긴다. 본문이 「화면별 요구사항 문단은 처리하는 쪽이 썼다」처럼 지어냈다고만 적었으면(#19) 화면마다 「<화면>: 요청에 없어 지어낸 것 — 화면 요구사항 문단 전체(요청 원문은 「<요구사항>」)」로 적는다.
-   - `checks`에는 이번에 돌린 것(`pnpm check`, 주소 200)과 `gh pr checks <번호>`로 본 `Quality`만 적는다. pull request 본문의 체크 표시는 옮기지 않는다. 이번에 확인한 것이 아니다.
+   - `checks`에는 이번에 돌린 것(`pnpm check`, 주소 200, sandbox 화면 검사)과 `gh pr checks <번호>`로 본 `Quality`만 적는다. pull request 본문의 체크 표시는 옮기지 않는다. 이번에 확인한 것이 아니다.
 8. 「보고」의 꼴로 보고하고 멈춘다.
 
 ## 결정 뒤
@@ -263,7 +287,7 @@ node scripts/harness/decision.mjs <n>
 
    - 0단계를 먼저 한다. `git revert`는 allowed-tools에 없어 확인을 묻는다.
    - 본문 첫 줄은 `되돌림: #<n>`이다. `요청: #<n>` 줄은 쓰지 않는다. 1단계와 D2가 이 요청의 화면 pull request로 읽는다. 그 아래에 결과 댓글 주소, 반려한 사람·시각, 사유를 둔다.
-   - `Quality`를 본 뒤 5단계처럼 squash로 합친다.
+   - `Quality`를 본 뒤 6단계처럼 squash로 합친다.
    - `git revert`가 충돌하면 손으로 풀지 않는다. `git revert --abort`로 이 명령이 시작한 되돌리기만 거두고 멈춘다. 다른 요청의 화면이 `screens.ts`의 같은 자리를 고친 것이다.
 3. 기록은 결과 댓글과 git 이력(squash commit과 되돌린 commit)에 남는다. 이슈를 닫는 것과 다시 요청받는 것은 사람이 한다.
 
@@ -276,16 +300,16 @@ node scripts/harness/decision.mjs <n>
    - 어느 항목도 가리키지 않는 새 요구면 개선이 아니라 반려로 보고하고 멈춘다. 요청 문단의 원본은 이슈 본문이라, 댓글로 요구가 늘면 원본이 둘이 된다. 새 요구는 폼으로 새 요청을 받는다.
    - 가릴 수 없으면 묻고 멈춘다.
    - **이 세션에서 화면 코드를 열거나 `/ooee-harness:review-design`을 돌리지 않는다.** 4에서 부르는 generate-code는 같은 대화에서 돌므로, 여기서 읽은 앞 회차 코드가 맥락에 남아 generate-code의 「다른 화면의 코드 읽기」 금지를 우회한다. 사유가 규칙 위반을 말하는데 본문의 검수 결과로 가릴 수 없으면, 다른 세션에서 review-design을 돌려 위반 목록만 받아 오라고 묻고 멈춘다.
-4. 사유가 가리키는 화면만 다시 만든다. 0단계를 하고 3단계부터 7단계까지 돈다. 1·2단계는 다시 하지 않는다. generate-code 인수는 앞 회차 pull request 본문 `## 화면별 인수`에 있는 그 화면의 인수 뒤에 `개선: <사유 원문>`을 붙인 것이다. 본문에 인수가 없으면(그 절이 생기기 전의 pull request) 묻고 멈춘다. 인수를 찾으려고 `page.tsx`를 열지 않는다. 요청 문단은 고쳐 쓰지 않고, 사유가 정한 값은 머리말에 남아야 다음 검수가 근거로 읽는다. 이미 있는 key는 generate-code가 번호를 붙인 새 key로 만들므로 앞 회차 화면은 그대로 남는다. 그 화면은 요청이 승인되면 회차 기록으로 함께 `main`에 가고(D2의 4), 반려되면 함께 되돌린다(D3).
-5. 회차는 앞 회차 + 1이다. 가지 이름에 `-r<회차>`를 붙인다. 7단계 `screens`에는 이 요청의 화면을 모두 넣는다. 다시 만든 것은 새 key로, 그대로 둔 것은 앞 회차 결과 댓글의 「화면」 표에서 옮긴다. `summary.pagesAdded`에는 다시 만든 것만 `screens[].name`과 같은 글자로 넣는다. 결과 댓글 머리의 샌드박스 링크가 그 화면을 건다.
+4. 사유가 가리키는 화면만 다시 만든다. 0단계를 하고 3단계부터 8단계까지 돈다. 1·2단계는 다시 하지 않는다. generate-code 인수는 앞 회차 pull request 본문 `## 화면별 인수`에 있는 그 화면의 인수 뒤에 `개선: <사유 원문>`을 붙인 것이다. 본문에 인수가 없으면(그 절이 생기기 전의 pull request) 묻고 멈춘다. 인수를 찾으려고 `page.tsx`를 열지 않는다. 요청 문단은 고쳐 쓰지 않고, 사유가 정한 값은 머리말에 남아야 다음 검수가 근거로 읽는다. 이미 있는 key는 generate-code가 번호를 붙인 새 key로 만들므로 앞 회차 화면은 그대로 남는다. 그 화면은 요청이 승인되면 회차 기록으로 함께 `main`에 가고(D2의 4), 반려되면 함께 되돌린다(D3).
+5. 회차는 앞 회차 + 1이다. 가지 이름에 `-r<회차>`를 붙인다. 8단계 `screens`에는 이 요청의 화면을 모두 넣는다. 다시 만든 것은 새 key로, 그대로 둔 것은 앞 회차 결과 댓글의 「화면」 표에서 옮긴다. `summary.pagesAdded`에는 다시 만든 것만 `screens[].name`과 같은 글자로 넣는다. 결과 댓글 머리의 샌드박스 링크가 그 화면을 건다.
 
 ## 러너에서 돌 때
 
 인수 끝의 `러너`는 이 Mac 의 self-hosted runner(`.github/workflows/harness.yml` → `scripts/harness/runner.mjs`)가 부른 것이다. 저장소 주인이 `2026-09-22`에 이슈가 올라오면 바로 처리하고 결정은 10분마다 읽기로 정했다. 대화할 사람이 없고, `gh pr create`·`gh pr merge`는 공용 권한의 `ask`라 headless 세션에서 거부된다(ask 는 allow 보다 먼저 판정되어 러너가 풀 수 없다). 그래서 pull request 를 만들고 합치는 것은 러너가 하고, 이 명령은 그 앞에서 넘김 파일을 쓰고 멈춘다. 순서와 규칙은 위와 같고 아래만 다르다.
 
 - **묻고 멈춤은 그대로 멈춤이다.** 물을 사람이 없다. 보고는 러너의 실행 기록(job 요약)에 남고, 실행이 실패로 끝나 개발자에게 알림이 간다. 결과 댓글 말고 이슈에 댓글을 달지 않는 규칙도 그대로다.
-- **2단계의 목록은 확인받지 않고 쓴다.** 표를 대화에 내는 대신 pull request 본문에 그대로 두고, 7단계 `needsDecision`의 첫 줄을 「러너가 확인받지 않고 나눈 화면 목록: <key>·<key>…」로 한다. 「지어낸 것」을 화면마다 옮기는 것은 그대로다. 기획자는 결과 댓글에서 보고 개선이나 반려로 고친다.
-- **pull request 를 만들 자리에서 넘긴다.** 5단계, D2 의 4, D3 의 2 에서 `gh pr create`·`gh pr checks`·`gh pr merge`를 부르지 않는다. 본문 파일은 그 단계대로 쓰고, `.harness-work/issue-<n>/handoff.json`을 `Write`로 쓴 뒤 보고의 첫 제목을 「## 러너에 넘김」으로 하고 멈춘다.
+- **2단계의 목록은 확인받지 않고 쓴다.** 표를 대화에 내는 대신 pull request 본문에 그대로 두고, 8단계 `needsDecision`의 첫 줄을 「러너가 확인받지 않고 나눈 화면 목록: <key>·<key>…」로 한다. 「지어낸 것」을 화면마다 옮기는 것은 그대로다. 기획자는 결과 댓글에서 보고 개선이나 반려로 고친다.
+- **pull request 를 만들 자리에서 넘긴다.** 6단계, D2 의 4, D3 의 2 에서 `gh pr create`·`gh pr checks`·`gh pr merge`를 부르지 않는다. 본문 파일은 그 단계대로 쓰고, `.harness-work/issue-<n>/handoff.json`을 `Write`로 쓴 뒤 보고의 첫 제목을 「## 러너에 넘김」으로 하고 멈춘다.
 
   ```json
   { "issue": 12, "target": "dev", "branch": "feature/issue-12-shop", "title": "feat(sandbox): … (#12)", "bodyFile": ".harness-work/issue-12/pr-1.md", "resume": true }
@@ -293,12 +317,12 @@ node scripts/harness/decision.mjs <n>
 
   | 자리 | `target` | `branch` | 본문 첫 줄 | `resume` |
   | --- | --- | --- | --- | --- |
-  | 5단계 (처음 · D4 개선 회차) | `dev` | push 한 가지 | `요청: #<n>` | `true` |
+  | 6단계 (처음 · D4 개선 회차) | `dev` | push 한 가지 | `요청: #<n>` | `true` |
   | D3 되돌리기 | `dev` | `feature/issue-<n>-revert` | `되돌림: #<n>` | `false` |
   | D2 승인 | `main` | 적지 않는다(`dev`를 올린다) | `승인: #<n> …` | `false` |
 
   러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지). 맞지 않으면 만들지 않는다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
-- **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 6단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 6단계(배포 확인)와 7단계(결과 댓글)를 하고 8단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
+- **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 7단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 7단계(배포 확인)와 8단계(결과 댓글)를 하고 9단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
 - **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다. generate-code·review-design 을 Skill 로 부를 때 그 머리말의 allowed-tools 는 이 명령 안에서 적용되지 않는다. 러너가 그 둘의 머리말을 읽어 CLI 로 넘기므로, 하위 명령이 새 명령을 쓰게 되면 그 명령의 머리말에 적는다.
 - 러너는 이 Mac 에 로그인한 gh·Claude 로 돌고, 모델은 머리말과 같은 `claude-sonnet-5`·`high`로 부른다.
 - 러너 쪽의 입출력과 이미 처리한 결정을 거르는 방법은 `scripts/harness/README.md`의 「러너」에 있다.
@@ -335,6 +359,6 @@ node scripts/harness/decision.mjs <n>
 결정은 기획자가 GitHub 의 결과 댓글에 단다. 👍 승인 · 👎 반려 · 😕 개선, 또는 「승인」 한 낱말·「반려: …」·「개선: …」 댓글. Slack 카드에 단 이모지는 읽히지 않는다. 결정이 달리면 `/process-issue 결정 <n>`.
 ```
 
-멈췄으면 첫 제목은 멈춘 자리에 따라 「## 시작하지 않음」(0단계), 「## 이미 처리함」(1단계의 이미 처리한 요청), 「## 묻고 멈춤」(1·2단계, D1의 결정 같은 댓글, D4의 사유 확인·대조), 「## 처리 중 실패」(4~7단계)다. 멈춘 단계, 돌린 명령과 오류 전문, 그 단계를 맡은 명령의 보고를 그대로 붙이고, 그때까지 만든 가지·commit·pull request와 「결과 댓글은 올리지 않았다」를 적는다.
+멈췄으면 첫 제목은 멈춘 자리에 따라 「## 시작하지 않음」(0단계), 「## 이미 처리함」(1단계의 이미 처리한 요청), 「## 묻고 멈춤」(1·2단계, D1의 결정 같은 댓글, D4의 사유 확인·대조), 「## 처리 중 실패」(4~8단계)다. 멈춘 단계, 돌린 명령과 오류 전문, 그 단계를 맡은 명령의 보고를 그대로 붙이고, 그때까지 만든 가지·commit·pull request와 「결과 댓글은 올리지 않았다」를 적는다.
 
 「결정 뒤」의 보고는 첫 제목이 「## 결정: <decision>」이고, 그 아래에 `decision.mjs` 출력의 `by`·`at`·`source`·`reason`·`reasonSource`·`reasonCommentUrl`·`resultCommentUrl`과, 있으면 `lookalikes`를 적는다. 그다음 한 일(만든 pull request 주소, 다시 올린 결과 댓글의 첫 네 줄)이나 멈춘 까닭을 적는다.

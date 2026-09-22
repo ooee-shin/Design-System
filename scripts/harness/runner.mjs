@@ -76,7 +76,7 @@ export function buildClaudeArgs(prompt, { resume } = {}) {
 
 /** 합친 뒤 세션을 이어 받게 하는 말. 스킬의 「러너에서 돌 때」가 이 꼴을 기다린다. */
 export function continuationPrompt(pr, mergeCommit) {
-  return `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}). 「러너에서 돌 때」대로 6단계부터 이어 간다.`;
+  return `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}). 「러너에서 돌 때」대로 7단계부터 이어 간다.`;
 }
 
 /**

@@ -7,8 +7,13 @@
 //     --shot badge-brand-fill --clip "#playground"
 //
 // 옵션은 `--help`로 본다. 결과는 JSON으로 stdout에 나오고 이미지는 --out 디렉터리에 쌓인다.
-import { writeFileSync, mkdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+//
+// 빌드한 정적 사이트를 잴 때는 `--serve apps/sandbox/out` 을 준다. 빈 포트에 잠깐 띄우고 끝나면 닫는다.
+// `/process-issue` 5단계가 이것으로 만든 화면을 띄워 본다 — 개발 서버를 따로 띄우고 끄면 무인 러너에
+// 프로세스가 남거나 포트가 부딪친다(3001 을 다른 저장소의 서버가 잡고 있어 옛 화면을 읽은 일이 있다).
+import { createReadStream, existsSync, writeFileSync, mkdirSync, statSync } from "node:fs";
+import { createServer } from "node:http";
+import { extname, join, normalize, resolve, sep } from "node:path";
 import { launch, openPage, closePage } from "./cdp.mjs";
 
 const HELP = `
@@ -33,6 +38,8 @@ const HELP = `
   --pad <px>           잘라낸 영역 상하좌우 여백. 기본 0
   --scale <배율>        스크린샷 배율. 기본 1
   --out <디렉터리>      이미지 저장 위치. 기본 .visual
+  --serve <디렉터리>    빌드한 정적 사이트를 빈 포트에 띄워 --path 를 잰다. 끝나면 닫는다.
+                       예: --serve apps/sandbox/out --path /shop-cart
 `.trim();
 
 function parseArgs(argv) {
@@ -108,7 +115,31 @@ if (opts.help) {
   process.exit(0);
 }
 
-const base = opts.base ?? process.env.STUDIO_URL ?? "http://localhost:3000";
+const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".woff2": "font/woff2", ".ico": "image/x-icon" };
+
+/**
+ * 정적 사이트를 빈 포트에 띄운다. Cloudflare Pages 가 하듯 `/a` 를 `a.html` → `a/index.html` 차례로 푼다.
+ * 디렉터리 밖을 읽지 않게 경로를 정규화한 뒤 루트 안인지 본다.
+ */
+async function serveStatic(dir) {
+  const root = resolve(dir);
+  if (!existsSync(root)) throw new Error(`${dir} 가 없다 — 먼저 빌드한다(예: pnpm --filter @ooee/sandbox build)`);
+  const server = createServer((req, res) => {
+    const pathname = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    const safe = normalize(join(root, pathname));
+    if (safe !== root && !safe.startsWith(root + sep)) { res.writeHead(403).end(); return; }
+    const candidates = [safe, `${safe}.html`, join(safe, "index.html")];
+    const file = candidates.find((c) => existsSync(c) && statSync(c).isFile());
+    if (!file) { res.writeHead(404).end(); return; }
+    res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
+    createReadStream(file).pipe(res);
+  });
+  await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
+  return { server, base: `http://127.0.0.1:${server.address().port}` };
+}
+
+const served = opts.serve ? await serveStatic(opts.serve) : null;
+const base = served?.base ?? opts.base ?? process.env.STUDIO_URL ?? "http://localhost:3000";
 const url = opts.url ?? base + (opts.path ?? "/");
 const [width, height] = opts.viewport.split("x").map(Number);
 const report = { url, viewport: { width, height } };
@@ -120,7 +151,8 @@ try {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 } catch (cause) {
   console.error(`${url} 에 접속하지 못했습니다: ${cause.message}`);
-  console.error("개발 서버가 떠 있는지 확인하세요. `pnpm dev`");
+  console.error(served ? "빌드에 그 경로가 없습니다. key 와 빌드를 확인하세요." : "개발 서버가 떠 있는지 확인하세요. `pnpm dev`");
+  served?.server.close();
   process.exit(1);
 }
 
@@ -268,4 +300,5 @@ try {
 } finally {
   if (targetId) await closePage(targetId).catch(() => {});
   chrome.kill();
+  served?.server.close();
 }

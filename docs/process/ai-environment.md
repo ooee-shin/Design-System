@@ -4,7 +4,7 @@
 
 ## 목표와 범위
 
-최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/review-design`, `/generate-code` 명령으로 다음 단계를 수행하는 Skill 또는 Plugin을 만든다. **②④(Figma)는 `2026-09-23` 에 뺐다** — 결과는 sandbox 에서 본다(「2026-09-23 Figma 를 뺐다」).
+최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/review-design`, `/generate-code` 명령으로 다음 단계를 수행하는 Skill 또는 Plugin을 만든다. **②④ 는 `2026-09-23` 에 Figma 에서 sandbox 로 바꿨다** — ② 는 만든 화면을 sandbox 에서 띄워 보고 검사하는 것(`/process-issue` 5단계), ④ 는 `dev` 에 배포된 화면을 사람이 보고 개선 회차로 되돌리는 것이다(「2026-09-23 Figma 를 뺐다」).
 
 ```text
 ① 디자인 시스템 검색
@@ -17,7 +17,7 @@
 ⑧ Pull request 준비
 ```
 
-명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③이다. ②④를 맡던 `/design-page`는 `2026-09-23` 에 지웠다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
+명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③, `/process-issue`가 ②④다. ②④를 맡던 `/design-page`는 `2026-09-23` 에 지웠다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
 
 [roadmap.md](roadmap.md)의 5단계(이하 roadmap N단계)와 대응하면 ①⑤는 roadmap 3단계(스토리북 MCP), ②④는 roadmap 2단계(Figma MCP), 나머지는 roadmap 4·5단계(에이전트 룰, 자동화)다. roadmap.md는 4·5단계를 1차 제외로 두고 [working-context.md](working-context.md)의 「일정과 분담」은 `2026-09-20`부터 `2026-09-23`까지 그 테스트를 잡아 두었다. 이 문서는 roadmap 4·5단계를 **개발자 트랙의 검증용 실험 구현**으로 다룬다. roadmap.md와 루트 `README.md`의 1차 범위 문구를 고칠지는 「아직 정하지 않은 것」에 있다. 이 문서에서 「순서 N」은 「순서와 의존 관계」의 0~8 번호다.
 
@@ -231,7 +231,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 ```text
 요청 이슈 (요청 채널의 폼 → GitHub 「문제 생성」)
 → 러너가 바로 /process-issue <n> 러너
-    이슈 읽기 → 화면 생성 · 검사 (generate-code) → push
+    이슈 읽기 → 화면 생성 · 검사 (generate-code) → sandbox 에서 띄워 보고 검사 → push
     → 러너가 pull request → Quality 확인 → dev squash 머지
     → Deploy workflow 가 Cloudflare Pages 에 올린다 → 화면 주소 확인
     → 결과 댓글 (결과 채널에 카드로 뜬다)
@@ -427,6 +427,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 - **까닭.** 화면마다 Figma 로 옮기는 데 오래 걸렸다 — 이커머스 5장(#9)은 코드가 다 된 뒤에도 Figma 에 한 시간 넘게 걸렸다. 그것을 줄이려고 붙인 것(게시된 라이브러리의 인스턴스로 그리기, 라이브러리가 코드보다 낡았는지 보는 검사, 키를 지키는 제자리 갱신)이 도구를 더 크게 만들었다. 요청한 사람이 보는 것은 sandbox 의 화면이고, 채택 판단도 거기서 한다.
 - **지운 것.** `/design-page` Skill, `scripts/figma/`, `.mcp.json`(Figma remote MCP), sandbox 의 Figma 카탈로그(`/catalog`)와 개발 서버 지문 route, `docs/process/figma-component-map.md`·`figma-page-agent.md`. `/process-issue` 와 러너는 Figma 단계 없이 돈다. 결과 댓글은 첫 네 줄(제목·요청·샌드박스·작업)이다.
+- **대신하는 것.** Figma 로 옮기던 자리는 `/process-issue` 5단계 「sandbox 에서 띄워 보고 검사한다」다. 빌드한 sandbox 를 `scripts/visual/inspect.mjs --serve` 로 띄워 화면마다 캡처하고 `h1`·가로 넘침·컴포넌트 표식을 잰 뒤, 캡처를 눈으로 대조해 깨진 자리를 `dev` 에 올리기 전에 고친다. 사람은 `dev` 에 배포된 화면을 보고 결정한다 — 개선이면 다음 회차 PR 이 `dev` 로, 반려면 되돌림 PR 이 `dev` 로, 승인이면 `dev → main` 이다.
 - **남긴 것.** 컴포넌트가 DOM 에 남기는 `data-slot`·`data-*` 표식. sandbox 가 화면에 어떤 컴포넌트를 썼는지 보여 주는 데 쓴다(다음 작업). 버튼처럼 보이는 링크를 `<Button render={<a href="…" />} nativeButton={false} role="link">` 로 쓰는 generate-code 규칙도 같은 까닭으로 둔다 — Button 표식이 있어야 sandbox 가 그 자리를 Button 으로 읽는다.
 - **Figma 라이브러리.** `ooee · 컴포넌트 라이브러리` 파일은 Figma 에 남아 있지만 이 저장소는 더 갱신하지 않는다. `2026-09-22` 기준으로 코드보다 낡았다(Chip 켜짐 · Switch 켜짐 · SelectBox 선택).
 - 아래 「스파이크 결과」의 Figma 기록은 그때의 기록이다. 가리키는 파일은 지웠다.
