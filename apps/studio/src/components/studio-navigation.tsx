@@ -12,7 +12,8 @@ const destinations: Array<{ href: string; label: string; matchPrefix?: string }>
   { href: "/foundations", label: "Foundations" },
   { href: "/components", label: "Components" },
   { href: "/docs", label: "Docs" },
-  { href: "/llms", label: "llms.txt" },
+  // `/llms` 가 아니다. 그 주소에는 페이지가 없고 배포본에서 404 다. 뷰어가 `/llms-txt` 로 비킨 까닭은 그 페이지에 있다.
+  { href: "/llms-txt", label: "llms.txt" },
   { href: "/screens", label: "Screens" },
   { href: "/presentation", label: "Presentation" },
 ];

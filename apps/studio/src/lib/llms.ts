@@ -6,7 +6,9 @@ import { join, resolve } from "node:path";
  * 돌기도 하므로 두 자리를 모두 본다 — `lib/docs.ts` 가 `docs/system` 을 찾는 방식과 같다.
  *
  * 파일을 Studio 안으로 복사하지 않는 까닭은, 복사본은 반드시 원본과 어긋나기 때문이다.
- * 같은 이유로 `scripts/docs/llms-txt.test.mjs` 가 원본의 링크를 지킨다.
+ * 같은 이유로 `scripts/docs/llms-txt.test.mjs` 가 원본의 링크를 지킨다. 배포본에서 시스템 문서 링크가
+ * 열리게 원본 파일을 싣는 것과 웹판 `llms.txt` 도 커밋하지 않고 빌드 때 `out/` 에만 만든다
+ * (`scripts/docs/mirror-llms-links.mjs`).
  */
 export function readLlmsTxt(): string {
   for (const candidate of [join(process.cwd(), "llms.txt"), resolve(process.cwd(), "..", "..", "llms.txt")]) {

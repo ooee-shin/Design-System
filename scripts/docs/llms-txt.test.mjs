@@ -9,19 +9,12 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+// 링크를 고르는 법은 빌드 때 원본을 사이트에 싣는 쪽과 하나여야 한다. 둘이 갈리면 여기서 지킨 링크와
+// 사이트에 실린 링크가 달라진다.
+import { localLinks } from "./llms-links.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const source = readFileSync(path.join(root, "llms.txt"), "utf8");
-
-/** 마크다운 링크의 목적지 가운데 저장소 안의 경로만 고른다. */
-function localLinks(text) {
-  const out = [];
-  for (const match of text.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)) {
-    const target = match[2];
-    if (/^[a-z]+:/.test(target) || target.startsWith("#")) continue;
-    out.push({ label: match[1], target: target.split("#")[0] });
-  }
-  return out;
-}
 
 test("llms.txt 의 링크가 모두 실제 경로를 가리킨다", () => {
   const missing = localLinks(source)

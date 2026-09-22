@@ -37,7 +37,7 @@ plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과
 .github/workflows      Quality(pnpm check)와 Deploy(Cloudflare Pages)
 scripts/figma          화면을 Figma로 옮기고 되읽는 도구
 scripts/visual         브라우저에서 화면을 재는 도구
-scripts/docs           llms.txt 링크 시험
+scripts/docs           llms.txt 링크 시험, 배포본에 시스템 문서 원본을 싣는 빌드 단계
 apps/sandbox           생성 화면과 Figma 컴포넌트 카탈로그 (3001 포트)
 apps/studio            컴포넌트 문서와 Playground (3000 포트)
 packages/ui            공용 Component (@ooee/ui)
@@ -83,7 +83,7 @@ pnpm deploy:sandbox
 pnpm deploy:studio
 ```
 
-배포된 주소는 주소를 아는 사람 누구나 볼 수 있다. 공개 범위를 좁힐지는 아직 정하지 않았다(ai-environment.md 「아직 정하지 않은 것」). Cloudflare의 Git 연동 대신 workflow에서 wrangler로 올리는 까닭은 같은 문서의 「Git 연동이 막힌 까닭」에 있다.
+배포된 주소는 주소를 아는 사람 누구나 볼 수 있고, 두 사이트 모두 공개로 두기로 했다(`2026-09-22`). 저장소 밖의 AI가 `https://ooee-studio.pages.dev/llms.txt`를 받아 링크를 따라 읽게 하려는 것이지만, 빌드가 사이트에 함께 싣는 원본은 시스템 문서(`docs/system/` 아래와 `packages/ui/src/index.ts`)뿐이다. `AGENTS.md`·`docs/process/`·Skill 원본은 싣지 않는다. 결정과 까닭은 ai-environment.md 「아직 정하지 않은 것」에 있다. Cloudflare의 Git 연동 대신 workflow에서 wrangler로 올리는 까닭은 같은 문서의 「Git 연동이 막힌 까닭」에 있다.
 
 ## 브랜치
 
