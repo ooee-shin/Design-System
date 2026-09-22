@@ -314,7 +314,7 @@ node scripts/harness/decision.mjs <n>
 
   러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지). 맞지 않으면 만들지 않는다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
 - **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 7단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 7단계(배포 확인)와 8단계(결과 댓글)를 하고 9단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
-- **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다.
+- **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다. generate-code·review-design·design-page 를 Skill 로 부를 때 그 머리말의 allowed-tools 는 이 명령 안에서 적용되지 않는다. 러너가 그 셋의 머리말을 읽어 CLI 로 넘기므로, 하위 명령이 새 명령을 쓰게 되면 그 명령의 머리말에 적는다.
 - 러너는 이 Mac 에 로그인한 gh·Claude·Figma 로 돌고, 모델은 머리말과 같은 `claude-sonnet-5`·`high`로 부른다. 0단계의 Figma MCP 확인에서 멈추면 이 Mac 의 Figma 로그인이 풀린 것이다.
 - 러너 쪽의 입출력과 이미 처리한 결정을 거르는 방법은 `scripts/harness/README.md`의 「러너」에 있다.
 

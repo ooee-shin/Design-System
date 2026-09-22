@@ -28,6 +28,27 @@ export const EFFORT = "high";
 /** 스킬의 allowed-tools 밖에서 러너가 더 여는 것. D3 의 되돌리기만이다. */
 export const EXTRA_ALLOWED = ["Bash(git revert --no-edit *)", "Bash(git revert --abort)"];
 
+/**
+ * `/process-issue` 가 Skill 로 부르는 하위 명령. 하위 명령 머리말의 allowed-tools 는 바깥 명령 안에서 불릴 때
+ * 적용되지 않는다 — #29 에서 design-page 가 적어 둔 `node scripts/figma/sandbox-server.mjs:*` 가 그대로 거부됐다.
+ * 그래서 러너가 그 머리말을 읽어 CLI 로 넘긴다. 원본은 여전히 각 SKILL.md 다.
+ */
+export const CHAINED_SKILLS = [
+  "plugins/ooee-harness/skills/generate-code/SKILL.md",
+  "plugins/ooee-harness/skills/review-design/SKILL.md",
+  ".claude/skills/design-page/SKILL.md",
+];
+
+/** 하위 명령 머리말의 allowed-tools 를 겹치지 않게 모은다. */
+export function chainedAllowedTools(root = repoRoot) {
+  const tools = CHAINED_SKILLS.flatMap((file) => {
+    const text = readFileSync(path.join(root, file), "utf8");
+    const line = text.match(/^---\n[\s\S]*?^allowed-tools:(.*)$/m)?.[1] ?? "";
+    return line.split(/,\s+/).map((tool) => tool.trim()).filter(Boolean);
+  });
+  return [...new Set(tools)];
+}
+
 /** 결정 가운데 러너가 이어 처리하는 것. 대기·결과 없음은 할 일이 없다. */
 export const ACTIONABLE = new Set(["승인", "반려", "개선"]);
 
@@ -50,7 +71,7 @@ export function buildClaudeArgs(prompt, { resume } = {}) {
   args.push("--permission-mode", "acceptEdits");
   args.push("--plugin-dir", "plugins/ooee-harness", "--mcp-config", ".mcp.json");
   if (resume) args.push("-r", resume);
-  args.push("--allowedTools", ...EXTRA_ALLOWED);
+  args.push("--allowedTools", ...EXTRA_ALLOWED, ...chainedAllowedTools());
   return args;
 }
 
@@ -161,8 +182,31 @@ async function landHandoff(issue) {
 }
 
 /** 한 번의 `/process-issue` 호출과, 넘김이 있으면 합치기·이어 받기까지. */
+/**
+ * 이 요청의 로컬 가지 가운데 origin 에 없는 것을 지운다. 앞 실행이 push 전에 멈추면 가지가 러너 작업 자리에
+ * 남아, 다시 돌릴 때 3단계의 `git switch -c` 가 「이미 있다」로 멈춘다. push 하지 않은 것은 다시 만들면 되고,
+ * push 한 것은 1단계의 「이미 처리한 요청」 검사가 본다.
+ */
+export function staleBranches(issue, local, remote) {
+  const prefix = `feature/issue-${issue}-`;
+  return local.filter((branch) => branch.startsWith(prefix) && !remote.includes(branch));
+}
+
+function dropStaleBranches(issue) {
+  const local = sh("git", ["branch", "--format=%(refname:short)"]).split("\n").filter(Boolean);
+  const remote = sh("git", ["ls-remote", "--heads", "origin"])
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => line.split("refs/heads/")[1]);
+  for (const branch of staleBranches(issue, local, remote)) {
+    sh("git", ["branch", "-D", branch]);
+    log(`- 앞 실행이 push 하지 않고 남긴 가지 ${branch} 를 지웠다`);
+  }
+}
+
 async function runChain(issue, argument) {
   rmSync(handoffPath(issue), { force: true });
+  dropStaleBranches(issue);
   const first = runClaude(`/process-issue ${argument} 러너`);
   const landed = await landHandoff(issue);
   if (!landed) {

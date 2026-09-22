@@ -11,9 +11,11 @@ import {
   EXTRA_ALLOWED,
   MODEL,
   buildClaudeArgs,
+  chainedAllowedTools,
   continuationPrompt,
   decisionKey,
   pickActionable,
+  staleBranches,
   validateHandoff,
 } from "./runner.mjs";
 
@@ -42,7 +44,8 @@ const devHandoff = (over = {}) => ({
 test("프롬프트는 -p 바로 뒤에 두고 --allowedTools 는 맨 끝에 둔다", () => {
   const args = buildClaudeArgs("/process-issue 12 러너");
   assert.deepEqual(args.slice(0, 2), ["-p", "/process-issue 12 러너"], "프롬프트가 --allowedTools 에 삼켜질 자리에 있다");
-  assert.deepEqual(args.slice(-1 - EXTRA_ALLOWED.length), ["--allowedTools", ...EXTRA_ALLOWED], "--allowedTools 뒤에 다른 인수가 있다");
+  const after = args.slice(args.indexOf("--allowedTools") + 1);
+  assert.ok(after.length > 0 && after.every((arg) => !arg.startsWith("--")), "--allowedTools 뒤에 다른 인수가 있다");
 });
 
 test("모델과 effort 를 하네스 명령과 같은 값으로 박는다", () => {
@@ -58,8 +61,29 @@ test("이어 받을 때만 세션을 넘긴다", () => {
   assert.equal(args[args.indexOf("-r") + 1], "abc");
 });
 
-test("러너가 더 여는 것은 되돌리기뿐이다 — pull request 명령은 열지 않는다", () => {
+test("러너가 스스로 더 여는 것은 되돌리기뿐이다 — pull request 명령은 열지 않는다", () => {
   assert.ok(EXTRA_ALLOWED.every((rule) => rule.startsWith("Bash(git revert")), `되돌리기 밖의 규칙이 있다: ${EXTRA_ALLOWED}`);
+});
+
+test("하위 명령이 머리말에 적은 도구를 넘긴다 — #29 에서 막힌 design-page 의 화면 띄우기가 들어 있다", () => {
+  const tools = chainedAllowedTools();
+  assert.ok(tools.includes("Bash(node scripts/figma/sandbox-server.mjs:*)"), "design-page 의 화면 띄우기가 빠졌다");
+  assert.ok(tools.includes("mcp__figma__use_figma"), "Figma 에 그리는 도구가 빠졌다");
+  const args = buildClaudeArgs("x");
+  for (const tool of tools) assert.ok(args.includes(tool), `${tool} 이 CLI 로 넘어가지 않는다`);
+});
+
+test("넘기는 도구에 결정을 만들거나 pull request 를 여닫는 명령이 섞이지 않는다", () => {
+  // 하위 명령 머리말이 넓어지면 러너에서 그대로 열린다. 공용 권한의 ask·deny 가 먼저 판정되지만 두 겹으로 둔다.
+  for (const tool of [...EXTRA_ALLOWED, ...chainedAllowedTools()]) {
+    assert.doesNotMatch(tool, /gh (api|issue (comment|edit|close|reopen)|label|pr (create|merge))/, `넘기면 안 되는 도구: ${tool}`);
+  }
+});
+
+test("앞 실행이 push 하지 않은 이 요청의 가지만 지운다", () => {
+  const local = ["dev", "feature/issue-29-ecommerce-dashboard", "feature/issue-29-shop-r2", "feature/issue-290-x", "feature/issue-3-y"];
+  const remote = ["dev", "main", "feature/issue-29-shop-r2"];
+  assert.deepEqual(staleBranches(29, local, remote), ["feature/issue-29-ecommerce-dashboard"]);
 });
 
 test("이어 받는 말은 스킬의 「러너에서 돌 때」가 기다리는 꼴이다", () => {
