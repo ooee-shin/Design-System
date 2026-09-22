@@ -230,21 +230,22 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ```text
 요청 이슈 (요청 채널의 폼 → GitHub 「문제 생성」)
-→ /process-issue <n>
-    이슈 읽기 → 화면 생성 · 검사 (generate-code) → Figma 프레임 (design-page)
-    → pull request → dev 머지
+→ 러너가 바로 /process-issue <n> 러너
+    이슈 읽기 → 화면 생성 · 검사 (generate-code) → Figma 프레임 (design-page) → push
+    → 러너가 pull request → Quality 확인 → dev squash 머지
     → Deploy workflow 가 Cloudflare Pages 에 올린다 → 화면 주소 확인
     → 결과 댓글 (결과 채널에 카드로 뜬다)
 → 기획자가 결과 댓글에 결정을 단다: 👍 승인 · 👎 반려 · 😕 개선
-→ /process-issue 결정 <n>
-    승인 → dev → main pull request (머지는 사람)
+→ 러너가 10분마다(댓글 결정은 바로) 읽고 /process-issue 결정 <n> 러너
+    승인 → dev → main pull request → Quality 확인 → 러너가 머지
     반려 → 사유를 보고하고 이 요청의 화면을 dev 에서 되돌린다
     개선 → 다시 만들어 다음 회차 결과 댓글
 
-화면은 dev 에 있는데 결과 댓글이 없는 요청 → /process-issue 결과 <n> (결과 댓글만)
+화면은 dev 에 있는데 결과 댓글이 없는 요청 → /process-issue 결과 <n> (결과 댓글만, 사람이 부르거나 러너를 손으로 돌린다)
 ```
 
-- **처리를 부르는 것은 사람이다.** 요청 채널 카드의 ✅도 결과 댓글의 반응도 세션을 깨우지 못한다(「요청 폼」 첫머리). 개발자가 ✅를 보고 `/process-issue <n>`을, 결정을 보고 `/process-issue 결정 <n>`을 부른다.
+- **처리를 부르는 것은 이 Mac 의 러너다**(`2026-09-22` 저장소 주인 결정). `.github/workflows/harness.yml`이 이 Mac(self-hosted runner, 라벨 `ooee-mac`)에서 `scripts/harness/runner.mjs`를 돌린다. 제목이 「화면 요청」인 이슈가 열리면 바로 처리하고, 결정은 10분마다와 댓글이 달릴 때 읽는다. 결과 댓글의 반응은 GitHub Actions 이벤트가 없어 10분 확인이 읽는다. GitHub 이 빌려 주는 컴퓨터가 아니라 이 Mac 인 까닭은 Figma MCP 가 OAuth 로그인만 받아서다. 이 Mac 이 꺼져 있거나 잠들면 처리가 밀린다. 요청 채널 카드의 ✅는 여전히 아무것도 깨우지 않는다 — 요청 이슈가 열리는 순간이 시작이다.
+- **pull request 를 만들고 합치는 것은 러너 스크립트다.** `gh pr create`·`gh pr merge`는 공용 권한의 `ask`이고 ask 는 allow 보다 먼저 판정되어 headless 세션에서 풀 수 없다. Claude 는 push 뒤 넘김 파일을 쓰고 멈추고, 스크립트가 Quality 를 본 뒤 합친 다음 같은 세션을 이어 받게 한다. 승인된 요청은 러너가 `main`까지 합친다 — 승인이 곧 `main` 반영이다. 사람이 연 세션에서는 전처럼 사람이 확인하고 `main` 머지도 사람이 한다. 절차는 Skill 의 「러너에서 돌 때」에 있다.
 - **dev 가 보는 자리다.** 기획자는 코드가 아니라 배포된 화면을 보고 판단한다. 화면이 도는 주소가 생기기 전에는 승인을 묻지 않는다.
 - **Cloudflare Pages 가 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. `dev`에 머지될 때마다 `.github/workflows/deploy.yml`이 올리고, 페이지 주소는 `https://ooee-sandbox.pages.dev/<화면 key>` 가 된다. Vercel 도 GitHub Pages 도 아닌 까닭은 「만들면서 확인된 것」에 적었다.
 - **배포가 실패하면 승인을 묻지 않는다.** 그 경우는 반려가 아니라 처리 중 실패이고, 결과 댓글도 올리지 않는다. 배포는 workflow 의 결과가 아니라 화면 주소가 `200` 인지로 본다. secret 이 없으면 workflow 가 배포를 건너뛰고도 성공으로 끝나기 때문이다(「배포는 wrangler 로 직접 올린다」). 없는 key 의 주소는 `404` 다.

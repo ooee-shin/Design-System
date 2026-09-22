@@ -22,6 +22,7 @@ allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-
 - **`결정 <n>`** — 결과 댓글을 올린 뒤 결정을 읽는다. 가장 최근 회차의 결과 댓글을 본다.
 - **`결과 <n>`** — 이 요청의 화면이 이미 `dev`에 머지되었는데 결과 댓글이 없을 때 결과 댓글만 올린다. 화면을 다시 만들지 않는다.
 - 번호가 없거나 숫자가 아니면 멈추고 `gh issue list --state open --search "화면 요청 in:title"`로 열린 요청을 보여 준다.
+- 인수 끝에 `러너`가 붙으면 이 Mac 의 러너가 부른 것이다. 아래 「러너에서 돌 때」를 함께 따른다.
 
 ## 하지 않는 것
 
@@ -30,7 +31,7 @@ allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-
 - **결과 댓글 말고 이슈에 댓글 달기.** 결과 채널이 이 저장소의 댓글을 모두 카드로 받으므로 물음까지 채널에 뜬다. 물을 것은 대화에서 묻는다.
 - **결과 댓글을 손으로 쓰거나 고치기.** 첫 다섯 줄과 맨 끝 표식은 `result-comment.mjs`가 만들고 판독이 그 모양에 기댄다. 스크립트가 만들기를 거부하면 까닭을 보고한다.
 - **결정 없이 `main`으로 올리기.** `dev → main` pull request는 「결정 뒤」의 승인에서만 만들고, 머지는 사람이 한다.
-- **pull request 본문에 `Closes #<n>`·`Fixes #<n>`·`Resolves #<n>` 쓰기.** 기본 branch가 `dev`라 머지하는 순간 이슈가 닫힌다. 이슈는 `요청: #<n>`으로만 가리킨다.
+- **pull request 본문에 `Closes #<n>`·`Fixes #<n>`·`Resolves #<n>` 쓰기.** 그 커밋이 기본 branch(`main`)에 들어가는 순간 이슈가 닫힌다. 이슈는 `요청: #<n>`으로만 가리킨다.
 - **한 working tree에서 두 이슈를 함께 처리하기.** `AGENTS.md` 「Claude Code 명령과 권한」의 한 tree 한 세션 규칙이다. 이 명령 하나가 generate-code와 design-page를 차례로 부르므로, 이슈 둘을 나란히 돌리면 두 세션이 같은 화면 자리를 쓴다.
 - **막힌 명령 다시 시도하기.** 권한 규칙이나 확인 요청에 막히면 경로·옵션·도구를 바꿔 되풀이하지 않고 보고의 「막힌 명령」에 적는다(AGENTS.md).
 - **멈춘 채로 결과 올리기.** 어느 단계든 멈췄으면 결과 댓글을 올리지 않는다. 검사·배포 실패는 반려가 아니라 처리 중 실패이며 승인을 묻지 않는다(ai-environment.md 「처리와 승인」).
@@ -135,12 +136,12 @@ git switch -c feature/issue-<n>-<slug>
 ```bash
 pnpm check
 git push -u origin feature/issue-<n>-<slug>
-gh pr create --title "<제목>" --body-file .harness-work/issue-<n>/pr-<회차>.md
+gh pr create --base dev --title "<제목>" --body-file .harness-work/issue-<n>/pr-<회차>.md
 ```
 
 - `pnpm check`가 실패하면 push하지 않고 멈춘다(AGENTS.md 「검증」).
 - 본문은 `.harness-work/issue-<n>/pr-<회차>.md`에 `Write`로 쓴다. `.harness-work/`는 저장소에 넣지 않는 자리다.
-- 제목은 한 장이면 generate-code 보고의 「제목:」, 여러 장이면 `feat(sandbox): <이슈의 화면 이름> 화면 <N>장 추가`이고, 어느 쪽이든 끝에 ` (#<n>)`을 붙인다. squash commit 제목에 남아 1단계와 D2가 본문 없이도 이 요청의 것을 찾는다. `--base`는 적지 않는다(기본 branch가 `dev`, git-workflow.md 「dev로 올릴 때」).
+- 제목은 한 장이면 generate-code 보고의 「제목:」, 여러 장이면 `feat(sandbox): <이슈의 화면 이름> 화면 <N>장 추가`이고, 어느 쪽이든 끝에 ` (#<n>)`을 붙인다. squash commit 제목에 남아 1단계와 D2가 본문 없이도 이 요청의 것을 찾는다. `--base dev`를 꼭 적는다. 이 저장소의 GitHub 기본 branch는 `main`이라 빼면 `main`으로 가는 pull request가 생긴다.
 - 본문 첫 줄은 `요청: #<n>`이다. 그 아래에 차례로 둔다. 「결정 뒤」와 「결과만 올리기」는 이 본문을 근거로 읽고 화면 코드를 열지 않는다(D4의 3).
   - `.github/pull_request_template.md`의 절
   - `## 화면별 인수` — 화면마다 key와 generate-code에 넘긴 인수 원문. 코드 울타리 안에 한 글자도 고치지 않고 둔다
@@ -292,6 +293,30 @@ node scripts/harness/decision.mjs <n>
    - **이 세션에서 화면 코드를 열거나 `/ooee-harness:review-design`을 돌리지 않는다.** 4에서 부르는 generate-code는 같은 대화에서 돌므로, 여기서 읽은 앞 회차 코드가 맥락에 남아 generate-code의 「다른 화면의 코드 읽기」 금지를 우회한다. 사유가 규칙 위반을 말하는데 본문의 검수 결과로 가릴 수 없으면, 다른 세션에서 review-design을 돌려 위반 목록만 받아 오라고 묻고 멈춘다.
 4. 사유가 가리키는 화면만 다시 만든다. 0단계를 하고 3단계부터 8단계까지 돈다. 1·2단계는 다시 하지 않는다. generate-code 인수는 앞 회차 pull request 본문 `## 화면별 인수`에 있는 그 화면의 인수 뒤에 `개선: <사유 원문>`을 붙인 것이다. 본문에 인수가 없으면(그 절이 생기기 전의 pull request) 묻고 멈춘다. 인수를 찾으려고 `page.tsx`를 열지 않는다. 요청 문단은 고쳐 쓰지 않고, 사유가 정한 값은 머리말에 남아야 다음 검수가 근거로 읽는다. 이미 있는 key는 generate-code가 번호를 붙인 새 key로 만들므로 앞 회차 화면은 그대로 남는다. 그 화면은 요청이 승인되면 회차 기록으로 함께 `main`에 가고(D2의 4), 반려되면 함께 되돌린다(D3).
 5. 회차는 앞 회차 + 1이다. 가지 이름에 `-r<회차>`, 5단계 첫 화면에 `새 버전`을 쓴다. 8단계 `screens`에는 이 요청의 화면을 모두 넣는다. 다시 만든 것은 새 key로, 그대로 둔 것은 앞 회차 결과 댓글의 「화면」 표에서 옮긴다. `summary.pagesAdded`에는 다시 만든 것만 `screens[].name`과 같은 글자로 넣는다. 결과 댓글 머리의 샌드박스 링크가 그 화면을 건다.
+
+## 러너에서 돌 때
+
+인수 끝의 `러너`는 이 Mac 의 self-hosted runner(`.github/workflows/harness.yml` → `scripts/harness/runner.mjs`)가 부른 것이다. 저장소 주인이 `2026-09-22`에 이슈가 올라오면 바로 처리하고 결정은 10분마다 읽기로 정했다. 대화할 사람이 없고, `gh pr create`·`gh pr merge`는 공용 권한의 `ask`라 headless 세션에서 거부된다(ask 는 allow 보다 먼저 판정되어 러너가 풀 수 없다). 그래서 pull request 를 만들고 합치는 것은 러너가 하고, 이 명령은 그 앞에서 넘김 파일을 쓰고 멈춘다. 순서와 규칙은 위와 같고 아래만 다르다.
+
+- **묻고 멈춤은 그대로 멈춤이다.** 물을 사람이 없다. 보고는 러너의 실행 기록(job 요약)에 남고, 실행이 실패로 끝나 개발자에게 알림이 간다. 결과 댓글 말고 이슈에 댓글을 달지 않는 규칙도 그대로다.
+- **2단계의 목록은 확인받지 않고 쓴다.** 표를 대화에 내는 대신 pull request 본문에 그대로 두고, 8단계 `needsDecision`의 첫 줄을 「러너가 확인받지 않고 나눈 화면 목록: <key>·<key>…」로 한다. 「지어낸 것」을 화면마다 옮기는 것은 그대로다. 기획자는 결과 댓글에서 보고 개선이나 반려로 고친다.
+- **pull request 를 만들 자리에서 넘긴다.** 6단계, D2 의 4, D3 의 2 에서 `gh pr create`·`gh pr checks`·`gh pr merge`를 부르지 않는다. 본문 파일은 그 단계대로 쓰고, `.harness-work/issue-<n>/handoff.json`을 `Write`로 쓴 뒤 보고의 첫 제목을 「## 러너에 넘김」으로 하고 멈춘다.
+
+  ```json
+  { "issue": 12, "target": "dev", "branch": "feature/issue-12-shop", "title": "feat(sandbox): … (#12)", "bodyFile": ".harness-work/issue-12/pr-1.md", "resume": true }
+  ```
+
+  | 자리 | `target` | `branch` | 본문 첫 줄 | `resume` |
+  | --- | --- | --- | --- | --- |
+  | 6단계 (처음 · D4 개선 회차) | `dev` | push 한 가지 | `요청: #<n>` | `true` |
+  | D3 되돌리기 | `dev` | `feature/issue-<n>-revert` | `되돌림: #<n>` | `false` |
+  | D2 승인 | `main` | 적지 않는다(`dev`를 올린다) | `승인: #<n> …` | `false` |
+
+  러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지). 맞지 않으면 만들지 않는다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
+- **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 7단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 7단계(배포 확인)와 8단계(결과 댓글)를 하고 9단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
+- **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다.
+- 러너는 이 Mac 에 로그인한 gh·Claude·Figma 로 돌고, 모델은 머리말과 같은 `claude-sonnet-5`·`high`로 부른다. 0단계의 Figma MCP 확인에서 멈추면 이 Mac 의 Figma 로그인이 풀린 것이다.
+- 러너 쪽의 입출력과 이미 처리한 결정을 거르는 방법은 `scripts/harness/README.md`의 「러너」에 있다.
 
 ## 보고
 

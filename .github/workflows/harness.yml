@@ -1,0 +1,83 @@
+name: Harness
+
+# 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 처리한다. Figma MCP 는 OAuth 로그인만
+# 받아 GitHub 이 빌려 주는 컴퓨터에서는 쓸 수 없고, 로그인이 살아 있는 곳이 이 Mac 이다. Claude 도 이
+# Mac 에 로그인한 계정으로 돈다.
+#
+# issues · issue_comment · schedule 이벤트는 기본 branch(main)의 이 파일로 돈다. 처리하는 코드는 dev 를
+# 받아 쓴다 — 하네스가 자라는 자리가 dev 다.
+#
+# 러너가 하나라 job 은 하나씩 돈다. 이슈 둘이 한꺼번에 와도 차례로 처리한다(한 working tree 한 요청).
+on:
+  issues:
+    types: [opened]
+  # 「승인」·「반려: …」·「개선: …」 댓글은 바로 읽는다. 👍 👎 😕 반응은 이벤트가 없어 아래 10분 확인이 읽는다.
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 처리 · 결정 · 결과
+        type: choice
+        options: [처리, 결정, 결과]
+        default: 처리
+      issue:
+        description: 이슈 번호 (결정은 비우면 열린 화면 요청 전부)
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    name: 화면 요청 처리
+    if: >-
+      (github.event_name == 'issues' && startsWith(github.event.issue.title, '화면 요청')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode != '결정')
+    runs-on: [self-hosted, ooee-mac]
+    # 여러 장 요청은 화면마다 코드와 Figma 를 만들어 오래 걸린다.
+    timeout-minutes: 240
+    steps:
+      - name: dev 를 받는다
+        uses: actions/checkout@v6
+        with:
+          ref: dev
+          fetch-depth: 0
+          # GITHUB_TOKEN 으로 push·머지하면 Quality·Deploy 가 깨지 않는다. 이 Mac 의 gh 로그인을 쓴다.
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 처리한다
+        run: node scripts/harness/runner.mjs "$MODE" "$ISSUE"
+        env:
+          MODE: ${{ github.event_name == 'issues' && '처리' || inputs.mode }}
+          ISSUE: ${{ github.event.issue.number || inputs.issue }}
+
+  decide:
+    name: 결정 확인
+    if: >-
+      github.event_name == 'schedule' ||
+      (github.event_name == 'issue_comment' && !github.event.issue.pull_request && startsWith(github.event.issue.title, '화면 요청')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode == '결정')
+    runs-on: [self-hosted, ooee-mac]
+    timeout-minutes: 240
+    steps:
+      - name: dev 를 받는다
+        uses: actions/checkout@v6
+        with:
+          ref: dev
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 결정이 없으면 Claude 를 부르지 않고 끝난다. 판독은 gh 읽기뿐이다.
+      - name: 결정을 읽고 처리한다
+        run: node scripts/harness/runner.mjs 결정 $ISSUE
+        env:
+          ISSUE: ${{ github.event.issue.number || inputs.issue }}
