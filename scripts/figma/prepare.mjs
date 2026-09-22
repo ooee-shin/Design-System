@@ -160,7 +160,7 @@ function prep(node, nodePath, icons, primitives) {
   (node.k || []).forEach((kid, i) => prep(kid, `${nodePath}.${i}`, icons, primitives));
 }
 /**
- * 배치하는 곳만 Frame 으로 남긴다(2026-09-16 유진식 결정).
+ * 배치하는 곳만 Frame 으로 남긴다(2026-09-16 개발자 결정).
  * DOM 의 감싸개를 그대로 옮기면 모든 요소가 Frame 이 되어 Figma 에서 다루기 어렵다.
  * - 글자·아이콘 하나만 감싼 상자와 자식을 그대로 통과시키는 상자는 없애고 그 자식을 위로 올린다.
  *   자식은 제 크기를 그대로 지킨다. 감싸개의 상자를 글자에 씌우면 글꼴 대체(Noto Sans KR)가 더 넓어
@@ -189,7 +189,7 @@ function hoistComponents(node) {
 /**
  * `inComponent` 는 카탈로그 컴포넌트 **안쪽**이라는 뜻이다. 거기서는 `data-slot` 상자도 접는다.
  * 화면에서는 레이어 이름이 되짚기의 다리라 접지 않지만, 카탈로그는 Component Set 이름과 Variant 속성이
- * 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다(2026-09-18 유진식).
+ * 정체를 확정하므로 `button-label` 같은 상자를 남길 까닭이 없다(2026-09-18 개발자).
  */
 function fold(node, isRoot = false, inComponent = false) {
   const inside = inComponent || Boolean(node.component);
@@ -213,7 +213,7 @@ function fold(node, isRoot = false, inComponent = false) {
 }
 
 /**
- * flex 가 아니어도 자식이 한 방향으로 나란히 서 있으면 오토 레이아웃을 붙인다(2026-09-16 유진식 요청).
+ * flex 가 아니어도 자식이 한 방향으로 나란히 서 있으면 오토 레이아웃을 붙인다(2026-09-16 개발자 요청).
  * CSS 의 block 흐름은 세로로 쌓이므로 Figma 에서도 세로 오토 레이아웃과 같은 뜻이다.
  * 간격이 자리마다 다르면 붙이지 않는다. 억지로 붙이면 builder 의 settle 이 자식을 absolute 로 빼서
  * 오히려 오토 레이아웃이 아닌 것만 못하다.

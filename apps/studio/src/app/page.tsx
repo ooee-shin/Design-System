@@ -73,7 +73,7 @@ export default function Home() {
           title: "llms.txt",
           description: "AI 가 이 저장소를 처음 읽을 때 보는 색인입니다. 무엇을 어디서 읽으면 되는지만 적습니다.",
           status: `${llmsSections}개 절`,
-          href: "/llms",
+          href: "/llms-txt",
           icon: Robot,
         },
         {

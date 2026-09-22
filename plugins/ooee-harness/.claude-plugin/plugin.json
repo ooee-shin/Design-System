@@ -2,7 +2,7 @@
   "name": "ooee-harness",
   "description": "ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 명령 모음. /ooee-harness:generate-code 와 /ooee-harness:review-design 이다.",
   "version": "0.1.0",
-  "author": { "name": "유진식" },
+  "author": { "name": "bluekey" },
   "userConfig": {
     "screens_dir": {
       "type": "directory",

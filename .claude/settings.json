@@ -21,7 +21,11 @@
       "Bash(pnpm --filter @ooee/sandbox dev)",
       "Bash(gh pr view *)",
       "Bash(gh pr checks *)",
-      "Bash(gh run list *)"
+      "Bash(gh run list *)",
+      "Bash(node *lib/check-screens.mjs *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh issue comment *)"
     ],
     "ask": [
       "Bash(git stash)",
@@ -46,7 +50,9 @@
       "Edit(/apps/sandbox/src/screen-rules.test.tsx)",
       "Edit(/apps/sandbox/src/app/layout.tsx)",
       "Edit(/apps/sandbox/src/app/page.tsx)",
-      "Edit(/apps/sandbox/src/app/globals.css)"
+      "Edit(/apps/sandbox/src/app/globals.css)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)"
     ],
     "deny": [
       "Bash(git push origin main)",
@@ -59,7 +65,19 @@
       "Bash(git push --all*)",
       "Bash(git push * --all*)",
       "Bash(git push --mirror*)",
-      "Bash(git push * --mirror*)"
+      "Bash(git push * --mirror*)",
+      "Bash(gh issue edit *)",
+      "Bash(gh issue close *)",
+      "Bash(gh issue reopen *)",
+      "Bash(gh label *)",
+      "Bash(gh api * -X POST*)",
+      "Bash(gh api * -X PATCH*)",
+      "Bash(gh api * -X PUT*)",
+      "Bash(gh api * -X DELETE*)",
+      "Bash(gh api --method POST*)",
+      "Bash(gh api --method PATCH*)",
+      "Bash(gh api --method PUT*)",
+      "Bash(gh api --method DELETE*)"
     ]
   }
 }

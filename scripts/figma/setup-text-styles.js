@@ -1,7 +1,7 @@
 // Figma use_figma 에 넘겨 `oe/text-*/<weight>` 텍스트 스타일을 맞춘다. 있는 스타일은 값만 고친다.
 //
 // 원본 글꼴 oe-font-family-ko 는 Pretendard Variable 인데 Figma 에 없다. 그래서 Noto Sans KR 로 임시 대체하고,
-// Noto Sans KR 에 SemiBold 가 없어 semibold 는 Bold 로 둔다(2026-09-15 유진식 승인). Pretendard 가 Figma 에
+// Noto Sans KR 에 SemiBold 가 없어 semibold 는 Bold 로 둔다(2026-09-15 개발자 승인). Pretendard 가 Figma 에
 // 생기면 FAMILY 와 WEIGHT_STYLE 을 원본대로 바꾸고 다시 돌린다. 스타일 설명에 대체 사실을 적는다.
 const FAMILY = "Noto Sans KR";
 const WEIGHT_STYLE = { regular: "Regular", medium: "Medium", semibold: "Bold", bold: "Bold" };
@@ -36,7 +36,7 @@ for (const [token, size, lineHeight] of SCALE) {
     st.letterSpacing = { unit: "PERCENT", value: 0 };
     const substitutions = [`원본 글꼴 Pretendard Variable 이 Figma 에 없어 ${FAMILY}`];
     if (style !== ({ regular: "Regular", medium: "Medium", semibold: "SemiBold", bold: "Bold" })[weight]) substitutions.push(`${FAMILY} 에 ${weight} 굵기가 없어 ${style}`);
-    st.description = `${token} (${size}px / ${lineHeight}px) + font-weight ${WEIGHT_CSS[weight]}. 임시 대체: ${substitutions.join(", ")}(2026-09-15 유진식 승인).`;
+    st.description = `${token} (${size}px / ${lineHeight}px) + font-weight ${WEIGHT_CSS[weight]}. 임시 대체: ${substitutions.join(", ")}(2026-09-15 개발자 승인).`;
   }
 }
 return report;

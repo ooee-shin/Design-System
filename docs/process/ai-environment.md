@@ -1,6 +1,6 @@
 # AI 개발 환경 구축 계획
 
-유진식이 맡은 AI 개발 환경 트랙의 순서, 결정, 스파이크 결과와 `dev → main` 통합 검증 항목을 채워 가는 기록이다. AX 전환 단계의 정의는 [roadmap.md](roadmap.md), branch 절차는 [git-workflow.md](git-workflow.md), 현재 상태는 [working-context.md](working-context.md), 시스템 정의는 `docs/system/`이 소유하며 여기에 다시 적지 않는다. `AGENTS.md`·Skill·`.mcp.json`을 전달 자산으로 삼게 되면 이 문서의 이관 시 위치는 「이관 시 남기는 것」이 정한다.
+개발자가 맡은 AI 개발 환경 트랙의 순서, 결정, 스파이크 결과와 `dev → main` 통합 검증 항목을 채워 가는 기록이다. AX 전환 단계의 정의는 [roadmap.md](roadmap.md), branch 절차는 [git-workflow.md](git-workflow.md), 현재 상태는 [working-context.md](working-context.md), 시스템 정의는 `docs/system/`이 소유하며 여기에 다시 적지 않는다. `AGENTS.md`·Skill·`.mcp.json`을 전달 자산으로 삼게 되면 이 문서의 이관 시 위치는 「이관 시 남기는 것」이 정한다.
 
 ## 목표와 범위
 
@@ -19,7 +19,7 @@
 
 명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③, `/design-page`가 ②④다. `/design-page`는 ②부터 만들었고, ④는 순서 6의 매핑표가 생긴 뒤 같은 명령에 더한다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
 
-[roadmap.md](roadmap.md)의 5단계(이하 roadmap N단계)와 대응하면 ①⑤는 roadmap 3단계(스토리북 MCP), ②④는 roadmap 2단계(Figma MCP), 나머지는 roadmap 4·5단계(에이전트 룰, 자동화)다. roadmap.md는 4·5단계를 1차 제외로 두고 [working-context.md](working-context.md)의 「일정과 분담」은 `2026-09-20`부터 `2026-09-23`까지 그 테스트를 잡아 두었다. 이 문서는 roadmap 4·5단계를 **유진식 트랙의 검증용 실험 구현**으로 다룬다. roadmap.md와 루트 `README.md`의 1차 범위 문구를 고칠지는 「아직 정하지 않은 것」에 있다. 이 문서에서 「순서 N」은 「순서와 의존 관계」의 0~8 번호다.
+[roadmap.md](roadmap.md)의 5단계(이하 roadmap N단계)와 대응하면 ①⑤는 roadmap 3단계(스토리북 MCP), ②④는 roadmap 2단계(Figma MCP), 나머지는 roadmap 4·5단계(에이전트 룰, 자동화)다. roadmap.md는 4·5단계를 1차 제외로 두고 [working-context.md](working-context.md)의 「일정과 분담」은 `2026-09-20`부터 `2026-09-23`까지 그 테스트를 잡아 두었다. 이 문서는 roadmap 4·5단계를 **개발자 트랙의 검증용 실험 구현**으로 다룬다. roadmap.md와 루트 `README.md`의 1차 범위 문구를 고칠지는 「아직 정하지 않은 것」에 있다. 이 문서에서 「순서 N」은 「순서와 의존 관계」의 0~8 번호다.
 
 ## 지금 저장소에 있는 것
 
@@ -40,7 +40,7 @@
 
 - **Storybook MCP는 Studio가 아니다.** Studio는 MCP를 제공하지 않는다. Storybook MCP는 `@storybook/addon-mcp`가 Storybook 개발 서버의 `http://localhost:6006/mcp`로 제공한다. `build-storybook`으로 만든 정적 결과물은 `/mcp`를 제공하지 않으므로, 여러 사람이 공유하는 endpoint는 Chromatic 같은 호스팅이나 정적 결과물 위에 별도로 띄우는 `@storybook/mcp`가 필요하다. Studio에 MCP가 없다는 것은 저장소에서 확인했고, 나머지는 Storybook 공식 문서 기준이며 스파이크 R2에서 이 저장소로 확인한다.
 - **`docs-list`·`docs-show`는 `@storybook/addon-mcp`의 `docs` toolset에 드는 MCP 도구 이름이다.** 이 toolset은 components manifest가 있어야 켜지고, manifest는 `.storybook/main.ts`의 `features.componentsManifest: true`가 만든다. 역시 공식 문서 기준이며 스파이크 R2에서 확인한다.
-- **Figma MCP의 읽기와 쓰기는 다른 도구다.** 공식 문서 기준으로 노드를 읽는 `get_metadata` 같은 도구는 desktop·remote 서버 모두에 있고, 화면을 만드는 `generate_figma_design`과 `use_figma`는 remote 서버 전용이며 beta다. 도구 이름과 seat·플랜 조건은 스파이크 R1이 유진식 계정으로 확인했다(「스파이크 결과」). seat는 Figma 계정의 종류이고 `whoami`가 `Full`로 돌려준다. Code Connect는 Figma 컴포넌트를 코드 구현과 잇는 Figma 기능이며 bluekey의 Pro 플랜에서는 쓸 수 없다.
+- **Figma MCP의 읽기와 쓰기는 다른 도구다.** 공식 문서 기준으로 노드를 읽는 `get_metadata` 같은 도구는 desktop·remote 서버 모두에 있고, 화면을 만드는 `generate_figma_design`과 `use_figma`는 remote 서버 전용이며 beta다. 도구 이름과 seat·플랜 조건은 스파이크 R1이 개발자 계정으로 확인했다(「스파이크 결과」). seat는 Figma 계정의 종류이고 `whoami`가 `Full`로 돌려준다. Code Connect는 Figma 컴포넌트를 코드 구현과 잇는 Figma 기능이며 bluekey의 Pro 플랜에서는 쓸 수 없다.
 - **패키지 이름은 `@ooee/ui`다.** 저장소 밖의 초기 계획 메모에 적힌 `@repo/ui`는 이 이름을 가리키며, 저장소 안의 문서와 코드는 `@ooee/ui`만 쓴다.
 - **「Sonnet 수준의 모델」은 Claude Code를 `claude --model sonnet`으로 띄운 세션이다.** [roadmap.md](roadmap.md)의 「목표 품질은 Sonnet 수준의 낮은 모델로도」를 실행 방법으로 옮긴 것이다. `sonnet`은 그 시점의 최신 Sonnet을 가리키므로 순서 2의 결과 절과 A/B 결과에는 실제로 돈 모델의 전체 이름을 적는다.
 - **로컬 Storybook은 Studio의 브랜드 변수 주입에 기대지 못한다.** Brand 값이 `packages/tokens`가 아니라 Studio의 `BrandThemeProvider`와 `globals.css`에 있다는 사실은 [working-context.md](working-context.md)의 「현재 구현」이 적는다. `packages/ui`에서 Button·Badge·ToggleButton은 `var(--brand-{단계})`를, Chip·SelectBox·Combobox는 `var(--brand-alpha-*)`를 직접 쓰고, Checkbox·Radio의 선택 색과 Chip의 Active 글자, Combobox·Select의 선택 Check 표시는 `oe-brand-*`, `focus-visible` 색은 전부 `oe-focus-ring`이다. 그래서 Storybook이 Studio 없이 `@ooee/tokens/styles.css`만 불러오면 Brand tone뿐 아니라 Checkbox·Radio·Chip·Combobox·Select의 선택 표현과 모든 Focus ring이 비어서 나온다. 순서 3은 Storybook decorator가 `DEFAULT_BRAND_SEED`에서 Studio와 같은 값을 넣는 방식으로 시작하며 `packages/tokens`와 `apps/studio/src/app/globals.css`는 건드리지 않는다. 기본 브랜드 값을 `packages/tokens`로 옮길지는 「아직 정하지 않은 것」에 있다.
@@ -52,7 +52,7 @@
 1 Figma 확인 질문 + 스파이크 R1                   2와 독립. 질문은 비용이 없고 답을 기다린다
 2 Skill v0                                        docs/system/ + @ooee/ui만으로 /generate-code · /review-design
   ↓
-3 (하지 않기로 했다)                               Storybook·Storybook MCP. 2026-09-18 유진식 결정 — 아래 「스파이크 결과」
+3 (하지 않기로 했다)                               Storybook·Storybook MCP. 2026-09-18 개발자 결정 — 아래 「스파이크 결과」
   ↓
 4 Agent Rules                                     v0가 실제로 필요로 한 규칙만
   ↓
@@ -76,7 +76,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 0 | `docs/ai-environment-plan` | 이 문서, [figma-page-agent.md](figma-page-agent.md), [README.md](README.md) 색인 두 행, [working-context.md](working-context.md) 「현재 구현」 `packages/tokens` 항목의 Brand 변수 위치 수정, 새 절 하나, 「일정과 분담」의 `~9/4`·`9/14~` 두 행 | pull request가 `dev`에 합쳐진다 |
 | 1 | `docs/figma-spike-r1` | Figma 항목 답변과 스파이크 R1 결과를 담은 「스파이크 결과」 한 절 | 그 절이 적히고 「아직 정하지 않은 것」의 Figma 행이 답으로 바뀐다 |
 | 2 | `feature/skill-generate-code` | `.claude/skills/generate-code/SKILL.md`, `.claude/skills/review-design/SKILL.md`, `apps/sandbox`, v0가 틀린 사례를 적은 결과 절 | Sonnet 수준의 모델로 화면 둘을 만들어 `pnpm check`, `pnpm --filter @ooee/sandbox build`, `pnpm --filter @ooee/sandbox test` 통과, `/review-design` 위반 0건, 「pull request 준비 완료」까지 도달 |
-| 3 | `feature/storybook`, 그 뒤 `feature/storybook-mcp` | 순서 2의 결과 절에 `docs/system/`만으로 부족했던 것이 적힐 때만 진행한다. `feature/storybook`: `apps/storybook`, 확정 컴포넌트마다 `Default` Story 하나(「아직 정하지 않은 것」의 신주희 확인 뒤), 브랜드 변수 주입 decorator. `feature/storybook-mcp`: `.mcp.json`에 storybook 항목 추가(파일은 순서 6이 만들었다), `apps/storybook`에 `@storybook/addon-mcp`와 `features.componentsManifest` 추가 | `feature/storybook`: `pnpm build-storybook` 성공, Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 Studio 없이 보임. `feature/storybook-mcp`: `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있음(대조 방법은 「통합 검증 항목 채우기」) |
+| 3 | `feature/storybook`, 그 뒤 `feature/storybook-mcp` | 순서 2의 결과 절에 `docs/system/`만으로 부족했던 것이 적힐 때만 진행한다. `feature/storybook`: `apps/storybook`, 확정 컴포넌트마다 `Default` Story 하나(「아직 정하지 않은 것」의 기획자 확인 뒤), 브랜드 변수 주입 decorator. `feature/storybook-mcp`: `.mcp.json`에 storybook 항목 추가(파일은 순서 6이 만들었다), `apps/storybook`에 `@storybook/addon-mcp`와 `features.componentsManifest` 추가 | `feature/storybook`: `pnpm build-storybook` 성공, Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 Studio 없이 보임. `feature/storybook-mcp`: `docs-list` 응답에 `component-registry`의 `확정` 항목마다 대응 항목이 하나씩 있음(대조 방법은 「통합 검증 항목 채우기」) |
 | 4 | `feature/agent-rules` | `AGENTS.md` 한 절, `SKILL.md` 규칙, `.claude/settings.json` 공용 권한, `apps/sandbox/src/screen-rules.ts`와 그 테스트, 결과 절 | 순서 2의 결과 절에 적힌 틀린 사례가 규칙으로 막힌다 |
 | 5 | `feature/storybook-ci` | `.github/workflows/storybook.yml`, 호스팅 | pull request마다 `build-storybook` 검사, `dev`·`main`에 주소가 생긴다 |
 | 6 | `feature/figma-mcp` | `.mcp.json` Figma 항목, [figma-component-map.md](figma-component-map.md), 관련 문서 갱신 | 저장소 루트에서 연 세션이 `.mcp.json`의 figma 서버를 싣고, `get_metadata`가 `Iw2MXs9sfqtJFze7F9vGf5`의 「고객의 소리」 프레임을 돌려주며, 그 레이어 이름이 매핑표의 항목으로 풀린다(풀리지 않는 이름은 표의 「되짚지 않는 것」에 있다) |
@@ -91,11 +91,11 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **Storybook은 Skill의 전제가 아니다.** ①⑤는 `docs/system/`과 `packages/ui/package.json`의 exports를 직접 읽어 성립하고, 기획자와 개발자가 화면에서 컴포넌트를 보는 채널은 이미 Studio의 Playground와 Docs 메뉴가 맡는다. Storybook MCP가 더 주는 것은 TS 타입에서 뽑은 Property 목록과 Story 예시인데, 앞의 것은 컴포넌트 문서가 코드 문자열 그대로 갖고 있다. 그래서 순서 3은 순서 2의 결과 절에 「`docs/system/`만으로 부족했던 것」이 적힐 때만 진행한다. 부족한 것이 저장소 밖에서 조회할 endpoint뿐이면 Storybook 대신 Studio가 `component-registry`와 `docs/system/`을 JSON으로 내는 route와 그 위의 MCP를 먼저 검토한다. Storybook 자체를 만들지는 [roadmap.md](roadmap.md)의 결정이라 「아직 정하지 않은 것」에 있다.
 - **`.mcp.json`은 저장소 루트에 URL만 적어 commit한다.** secret과 기기별 값은 `.claude/settings.local.json`과 `.env.local`에 둔다. 첫 환경변수가 생기는 pull request에서 `.env.example`을 만든다.
 - **`build-storybook`은 `pnpm check`에 넣지 않는다.** `Quality`의 15분 제한 안에 두 빌드를 겹치지 않도록 별도 workflow로 검사한다.
-- **Skill이 만든 기획자 화면은 전달 범위 밖의 `apps/sandbox`에 둔다.** `apps/studio`는 그 자체가 전달 대상이고 그 안의 `/screens/*`는 신주희가 제품 화면을 한 건씩 만드는 작업장(단일 원본 `screen-registry`)이므로, 생성 결과를 거기에 두지 않는다. 생성 화면을 제품 화면으로 채택할지와 `/screens/*`로 옮기는 일은 신주희가 정한다. `apps/sandbox`는 Studio와 같은 Next.js 앱이며 Studio처럼 `typecheck` script를 두지 않는다. 루트 `typecheck`가 `pnpm -r typecheck`라서 workspace package에 그 script가 있으면 `pnpm check`에 자동으로 들어오고, `lint`·`build`·`test`는 `apps/sandbox`를 가리키지 않으므로, 이렇게 두면 `apps/sandbox`는 `pnpm check` 밖에 남는다. 검사는 `pnpm --filter @ooee/sandbox build`와, `apps/sandbox`의 `*.test.tsx`를 도는 자체 `test` script(`pnpm --filter @ooee/sandbox test`)로 한다. v0에서 ⑦의 테스트는 이 `*.test.tsx`다. 전달 시 `docs/process/`와 함께 제거한다.
+- **Skill이 만든 기획자 화면은 전달 범위 밖의 `apps/sandbox`에 둔다.** `apps/studio`는 그 자체가 전달 대상이고 그 안의 `/screens/*`는 기획자가 제품 화면을 한 건씩 만드는 작업장(단일 원본 `screen-registry`)이므로, 생성 결과를 거기에 두지 않는다. 생성 화면을 제품 화면으로 채택할지와 `/screens/*`로 옮기는 일은 기획자가 정한다. `apps/sandbox`는 Studio와 같은 Next.js 앱이며 Studio처럼 `typecheck` script를 두지 않는다. 루트 `typecheck`가 `pnpm -r typecheck`라서 workspace package에 그 script가 있으면 `pnpm check`에 자동으로 들어오고, `lint`·`build`·`test`는 `apps/sandbox`를 가리키지 않으므로, 이렇게 두면 `apps/sandbox`는 `pnpm check` 밖에 남는다. 검사는 `pnpm --filter @ooee/sandbox build`와, `apps/sandbox`의 `*.test.tsx`를 도는 자체 `test` script(`pnpm --filter @ooee/sandbox test`)로 한다. v0에서 ⑦의 테스트는 이 `*.test.tsx`다. 전달 시 `docs/process/`와 함께 제거한다.
 - **v0가 만드는 화면 둘은 정해 둔다.** 하나는 관리자 로그인으로, `apps/studio/src/app/screens/admin/login/page.tsx`가 원본이다. 그 파일의 머리말 주석과 [sources.md](sources.md)의 Auth split screen 설명만 프롬프트로 주어 다시 만들고, 원본과 `@ooee/ui` 재사용을 대조한다. 다른 하나는 STO 지원요청 화면으로, `/screens/*`에 원본도 없고 `screen-registry`에도 항목이 없으므로 원본이 없는 기획자 요청에 해당한다. 둘 다 `apps/sandbox`에 만들며 `/screens/*`에는 두지 않는다. A/B 검증은 같은 화면 둘로 비교한다.
 - **Figma는 디자인 원본이 아니라 검토용 캔버스로 시작한다.** 코드로 먼저 만든 화면을 Figma에 올리고, 사람이 고친 뒤 다시 읽어 코드로 돌아오는 순서다. roadmap.md의 「현재까지의 경험은 B안이 낫다」와 맞는 순서이며, A/B 검증에서 이 전제를 처음 확인한다.
 - **명령은 pull request를 만들지 않고 멈춘다.** `AGENTS.md`의 「화면 확정 검수」와 「여러 환경에서 이어서 작업할 때」가 정한 대로 commit·push·pull request 생성은 사용자의 명시적 요청이 필요하다. pull request는 순서 4에서 그 두 곳에 더했다. 명령은 「pull request 준비 완료」에서 멈추고 사용자가 요청하면 만든다.
-- **컴포넌트나 Story만 바뀐 pull request는 MCP·Skill 항목을 기다리지 않는다.** `dev → main`의 diff에 `apps/storybook/`, `.mcp.json`, `.claude/`, `AGENTS.md` 중 하나가 있을 때만 유진식이 「통합 검증 항목 채우기」의 명령을 실행하고 결과를 pull request 본문에 남긴다. [git-workflow.md](git-workflow.md)의 「dev에서 main으로 올릴 때」에 넣을 문구다.
+- **컴포넌트나 Story만 바뀐 pull request는 MCP·Skill 항목을 기다리지 않는다.** `dev → main`의 diff에 `apps/storybook/`, `.mcp.json`, `.claude/`, `AGENTS.md` 중 하나가 있을 때만 개발자가 「통합 검증 항목 채우기」의 명령을 실행하고 결과를 pull request 본문에 남긴다. [git-workflow.md](git-workflow.md)의 「dev에서 main으로 올릴 때」에 넣을 문구다.
 
 ## 스파이크
 
@@ -103,7 +103,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 | 번호 | 질문 | 비용 | 완료 기준 |
 | --- | --- | --- | --- |
-| R1 | Figma remote MCP의 `generate_figma_design`·`use_figma`가 유진식 계정과 seat에서 되는가. 결과가 라이브러리에 묶이는가. 대상 폴더는 [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더다 | 반나절 | 어느 서버에 어느 도구가 있는지, seat와 플랜 조건, 결과 frame의 상태가 적힌다 |
+| R1 | Figma remote MCP의 `generate_figma_design`·`use_figma`가 개발자 계정과 seat에서 되는가. 결과가 라이브러리에 묶이는가. 대상 폴더는 [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더다 | 반나절 | 어느 서버에 어느 도구가 있는지, seat와 플랜 조건, 결과 frame의 상태가 적힌다 |
 | R2 | Storybook과 `@storybook/addon-mcp`가 이 스택(Tailwind v4, `private: true` 소스 export, Node 22.22.1)에서 도는가. `features.componentsManifest`가 `docs` toolset을 켜는가. Studio 없이 Brand tone·`brand-alpha-*`와 `oe-brand-*`의 선택 표현·Focus ring이 보이는가 | 하루 | `pnpm build-storybook` 성공, `docs-list` 응답, Brand Button 배경·Checked Checkbox·Active Chip·Focus ring이 보이는 스크린샷 |
 | R3 | 이관 뒤 `AGENTS.md`·Skill·`.mcp.json`이 어디에 남는가 | 반나절 | 「이관 시 남기는 것」이 채워진다. `2026-09-16` 완료 |
 | R4 | 비공개 무료 플랜에서 Storybook을 어디에 올리는가 | 반나절 | 호스팅 하나가 정해지고 secret 이름이 정해진다 |
@@ -133,13 +133,13 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ## 요청 폼
 
-기획자가 화면을 요청하는 입구를 Slack 폼으로 둔다. 기획자는 GitHub 계정이 있지만 그 화면에 익숙하지 않아서, 요청을 issue 본문으로 직접 받으면 아래 네 절이 지켜지지 않는다. 폼이 칸을 강제하면 그 문제가 구조적으로 사라진다. 워크스페이스가 유료 플랜이라 폼과 이모지 리액션 트리거, 커넥터를 모두 쓸 수 있다.
+기획자가 화면을 요청하는 입구를 Slack 폼으로 둔다. 기획자는 GitHub 계정이 있지만 그 화면에 익숙하지 않아서, 요청을 issue 본문으로 직접 받으면 아래 칸들이 지켜지지 않는다. 폼이 칸을 강제하면 그 문제가 구조적으로 사라진다. 워크스페이스가 유료 플랜이라 폼과 이모지 리액션 트리거, 커넥터를 모두 쓸 수 있다.
 
 **요청 문단의 원본은 GitHub issue 본문이고 Slack은 입구와 알림만 맡는다.** 대조할 자리가 하나여야 요청서가 사본으로 검증되기 때문이다. Slack 메시지는 편집 이력이 남지 않고, 저장소 밖에서 읽으려면 봇 토큰이 필요하며, 무료 워크스페이스에서는 90일 뒤 숨겨지고 1년 뒤 지워진다.
 
 이 자리에 Claude를 넣지 않는다. Slack MCP는 사용자별 OAuth라 각자 자기 권한으로 스레드를 **읽어 오는** 데는 쓸 수 있지만, 세션이 살아 있을 때 당기는 도구여서 폼 제출도 리액션도 세션을 깨우지 못하고, 폼 제출 콜백은 앱의 URL로 가므로 MCP 서버가 그 자리에 설 수 없다. 옮겨 적는 일 자체를 모델에게 맡기지 않는 까닭은 따로 있다. 이 흐름의 검사가 바이트 대조라서 조립은 결정론적인 쪽이 맡아야 한다.
 
-### 네 칸
+### 다섯 칸
 
 | 칸 | 라벨 | 형식 |
 | --- | --- | --- |
@@ -147,8 +147,9 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 2 | 이 화면이 하는 일 (프롬프트) | 긴 답변 · 필수 |
 | 3 | 비슷한 기존 화면 | 한 줄 · 선택 |
 | 4 | 저장하거나 제출하면 무슨 일이 일어나야 하나요? | 긴 답변 · 선택 |
+| 5 | 프로젝트 | 라디오 버튼 `sto` · `sv` · `web` · 필수 |
 
-처음에는 여섯 칸이었고 「이번에 만들지 않는 것」과 「아직 안 정해진 것」이 필수로 있었다. `2026-09-21`에 유진식이 둘을 뺐다. 프롬프트 한 칸이 그 내용을 담는다는 판단이다. **대가는 빈 칸과 「없음」의 구분이 사라진 것이다.** 안 적힌 것이 「정해졌다」로 읽히면 만드는 쪽이 임의로 정하므로, 기획자에게 「안 정한 것은 안 정했다고 프롬프트에 쓴다」를 말로 전한다.
+처음에는 여섯 칸이었고 「이번에 만들지 않는 것」과 「아직 안 정해진 것」이 필수로 있었다. `2026-09-21`에 개발자가 둘을 뺐다. 프롬프트 한 칸이 그 내용을 담는다는 판단이다. **대가는 빈 칸과 「없음」의 구분이 사라진 것이다.** 안 적힌 것이 「정해졌다」로 읽히면 만드는 쪽이 임의로 정하므로, 기획자에게 「안 정한 것은 안 정했다고 프롬프트에 쓴다」를 말로 전한다.
 
 각 칸의 설명문은 아래를 그대로 넣는다. 폼 안내문은 「화면 하나를 요청하는 자리입니다. 여기 적은 문단이 그대로 개발과 검수의 기준이 됩니다.」로 둔다.
 
@@ -168,7 +169,13 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 4 · 저장하거나 제출하면 무슨 일이 일어나야 하나요?
 버튼을 눌렀을 때 값이 어디로 가고, 사람에게 다음에 무엇이 보여야 하는지 씁니다.
 기술 용어는 몰라도 됩니다. 해당 없으면 「없음」이라고 적어 주세요.
+
+5 · 프로젝트
+이 화면이 어느 것에 들어가는지 고릅니다.
+점주 앱은 sto, 슈퍼바이저 앱은 sv, 웹은 web 입니다.
 ```
+
+`sto` · `sv` · `web` 세 값은 `apps/sandbox/src/screens.ts` 의 `SANDBOX_PROJECTS` 가 가진 `id` 와 같다. 기획자가 고른 값이 이슈 본문에 그대로 실려 오고 화면을 만들 때 그 값을 목록에 적기 때문이다. **한쪽을 고치면 다른 쪽도 고친다.**
 
 ### 이슈 본문
 
@@ -176,6 +183,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ```md
 요청자: <양식을 제출한 사용자>
+프로젝트: <프로젝트>
 요구사항: <이 화면이 하는 일 (프롬프트)>
 비슷한 기존 화면: <비슷한 기존 화면>
 제출하면 일어나는 일: <저장하거나 제출하면 무슨 일이 일어나야 하나요?>
@@ -185,6 +193,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ```text
 요청자: <제출한 사람>
+프로젝트: <프로젝트>
 화면 이름: <화면 이름>
 요구사항: <프롬프트>
 비슷한 기존 화면: <비슷한 기존 화면>
@@ -212,17 +221,18 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **조건 분기(「브랜치 추가」)는 Business+ 전용이다.** 「리액션을 단 사람 == 요청자」 같은 검사를 워크플로 안에서 할 수 없다. 대조는 댓글에 남긴 이름으로 저장소 쪽에서 한다.
 - **워크플로가 실패하면 ⋮ → 「내 활동 로그」에 단계별로 보인다.** 어느 단계가 어떤 오류로 죽었는지 거기서 읽는다.
 - **커넥터는 사용자 OAuth로 돈다.** `/github` Slack 앱과 달리 저장소 소유자가 앱을 설치하지 않아도 된다. 다만 조직 저장소는 GitHub `Settings → Applications`에서 그 조직에 접근을 Grant 해야 목록에 나타난다.
+- **조직 소유 비공개 저장소는 GitHub Pages 를 못 쓴다.** 조직이 Free 플랜이면 Pages 설정 자체가 열리지 않는다. Team 이상이어야 한다. 그래서 배포는 Cloudflare Pages 로 간다.
 - **변수는 「마지막으로 클릭한 자리」에 들어간다.** 글자를 친 뒤에는 원하는 자리를 다시 클릭하고 `{ }`를 눌러야 한다. 설명 칸에서는 `cmd+A`가 페이지 전체를 선택하므로, 지울 때는 끝을 클릭하고 백스페이스로 지운다.
 
 ### 처리와 승인
 
-`2026-09-21`에 유진식이 정한 흐름이다. 확정된 이슈를 처리한 결과가 **눈으로 보이는 화면**을 지나 승인으로 가게 한다.
+`2026-09-21`에 개발자가 정한 흐름이다. 확정된 이슈를 처리한 결과가 **눈으로 보이는 화면**을 지나 승인으로 가게 한다.
 
 ```text
 확정 (이슈 댓글)
 → 화면 생성 · 검사
 → pull request → dev 머지
-→ Vercel 이 dev 를 배포
+→ Cloudflare Pages 가 dev 를 배포
 → 만들어진 페이지 URL 을 이슈 댓글로 보고 (채널로 따라온다)
 → 승인
 → pull request → main 머지
@@ -230,8 +240,49 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 - **dev 가 보는 자리다.** 기획자는 코드가 아니라 배포된 화면을 보고 판단한다. 화면이 도는 주소가 생기기 전에는 승인을 묻지 않는다.
 - **main 은 승인된 것만 담는다.** 승인 뒤의 `dev → main` pull request 가 그 기록이다. 누가 언제 무엇에 동의했는지가 머지 기록으로 남는다.
-- **Vercel 은 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. 페이지 주소는 `<배포 주소>/<화면 key>` 가 된다.
+- **Cloudflare Pages 가 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. 페이지 주소는 `<배포 주소>/<화면 key>` 가 된다. Vercel 도 GitHub Pages 도 아닌 까닭은 「만들면서 확인된 것」에 적었다.
+- **승인은 화면 확인까지다.** 기획자가 판단하는 것은 「요청한 화면이 요청대로 나왔는가」 하나다. 코드를 제품에 넣을지, 컴포넌트로 승격할지는 이 승인이 정하지 않는다. `dev → main` 머지는 그 확인을 남기는 기록이지 채택이 아니다. 채택은 `docs/process` 의 이관 절차가 따로 갖는다.
 - 배포가 실패하면 승인을 묻지 않는다. 그 경우는 반려가 아니라 처리 중 실패다.
+
+### Cloudflare Pages 설정값
+
+| 자리 | 값 |
+| --- | --- |
+| 프로젝트 이름 | `ooee-sandbox` (주소가 `https://ooee-sandbox.pages.dev` 가 된다) |
+| Production branch | `dev` |
+| Framework preset | None |
+| Build command | `corepack enable && pnpm install --frozen-lockfile && pnpm --filter @ooee/sandbox build` |
+| Build output directory | `apps/sandbox/out` |
+| Root directory | `/` |
+| 환경 변수 | `NODE_VERSION` = `22.22.1` |
+
+`apps/sandbox/next.config.ts` 가 `output: "export"` 라 빌드가 `apps/sandbox/out` 에 정적 파일을 떨군다. 이미지 최적화 서버가 없으므로 `images.unoptimized` 도 함께 켜 두었다. `dev` 를 그대로 빌드해 13개 라우트가 나오는 것은 `2026-09-21`에 확인했다.
+
+- **`corepack enable` 을 앞에 붙인다.** `package.json` 이 `packageManager: pnpm@10.32.0` 을 못 박고 있어서 빌드 이미지의 pnpm 이 다른 판이면 `--frozen-lockfile` 이 깨진다. `.github/workflows/quality.yml` 도 같은 이유로 같은 줄을 갖는다.
+- **`NODE_VERSION` 은 `.node-version` 과 같은 값이다.** 저장소에 `.node-version`(`22.22.1`)이 있어 Cloudflare 가 그것도 읽지만, 둘이 갈라지면 CI 와 배포가 다른 Node 로 도는 것이라 환경 변수로도 박아 둔다.
+- **`main` 은 미리보기 배포가 된다.** Production branch 가 `dev` 이므로 다른 가지는 전부 preview 주소를 받는다. 기획자가 보는 자리는 `dev` 하나라 그대로 둔다.
+
+### 배포는 wrangler 로 직접 올린다
+
+`2026-09-21`~`22`에 Cloudflare 의 Git 연동을 붙이려다 막혔고, `2026-09-22`에 개발자가 직접 올리는 쪽으로 정했다.
+
+```bash
+pnpm dlx wrangler@4.136.1 login                     # 한 번만
+pnpm dlx wrangler@4.136.1 pages project create ooee-sandbox --production-branch dev
+pnpm deploy:sandbox                                 # 빌드 + 올리기
+```
+
+`deploy:sandbox` 는 루트 `package.json` 이 갖는다. `--branch=dev` 를 주어 production branch 와 같은 이름으로 올리므로 그 배포가 `https://ooee-sandbox.pages.dev` 가 된다. wrangler 는 `dlx` 로 판을 박아 불러서 저장소 의존성을 늘리지 않는다.
+
+**대가는 자동 배포가 아니라는 것이다.** dev 에 머지해도 저절로 돌지 않는다. 당분간 사람이 `pnpm deploy:sandbox` 를 돌리고, 자동으로 만들려면 `.github/workflows/` 에 같은 명령을 넣고 Cloudflare API 토큰을 저장소 secret 으로 둔다.
+
+### Git 연동이 막힌 까닭
+
+같은 데서 헤매지 않게 적어 둔다. 나중에 다시 붙일 수도 있다.
+
+1. **조직에 GitHub 앱을 설치하는 것은 오너만 할 수 있다.** `YUJINSIK-momo` 는 `bluekey-kr` 의 member 라(`gh api /user/memberships/orgs/bluekey-kr` → `member`) 조직의 앱 설치를 보지도 못한다. 실제로는 `2026-09-21 18:49` 에 이미 설치돼 있었고 `Design-System-Harness` 하나만 골라져 있었는데, member 계정으로는 그게 안 보여서 설치가 안 된 줄 알았다. 오너 계정(`bluekey-hk`)으로 보니 나타났다.
+2. **앱이 이미 설치돼 있으면 Cloudflare 의 「Connect GitHub」이 끊긴다.** Cloudflare 는 GitHub 의 *새 설치* 화면(`installations/select_target?state=…`)으로 보내는데, 이미 설치된 계정을 고르면 GitHub 이 설치 대신 설정 페이지로 보내 버려서 `state` 를 들고 Cloudflare 로 돌아오지 못한다. 눌러도 제자리를 돈다.
+3. 다시 붙이려면 조직에서 앱을 **Uninstall 한 뒤 Cloudflare 의 흐름 안에서 새로 설치**해야 한다. 그때 설정값은 위 표를 쓰고 Root 는 `/` 다.
 
 ### 남은 것
 
@@ -243,36 +294,37 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 | 항목 | 담당 | 기한 |
 | --- | --- | --- |
-| `@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 신주희·유진식 | `2026-09-23` |
-| Story 파일 위치(`packages/ui/src/<component>.stories.tsx` 병치 또는 `apps/storybook/stories/`)와 폴더 구조. [working-context.md](working-context.md) 「남은 작업」 10번의 카테고리화와 함께 정한다 | 신주희·유진식 | `2026-09-16` |
-| 확정 컴포넌트 19개의 최소 `Default` Story(필수 prop만)를 유진식이 순서 3의 pull request에 한 번에 넣어도 되는가. 순서 3의 완료 기준이 컴포넌트마다 Story 하나를 전제하고 신주희는 `9/14~` 화면 개선 중이라 제안한다. Property를 나열하는 Story는 제안 밖이며 [open-questions.md](open-questions.md)의 Style·Size 이름 통일 뒤에 신주희가 쓴다 | 신주희 | `2026-09-16` |
-| 기본 브랜드 값의 자리: Storybook decorator에 두는 채로 갈지, `packages/tokens/src/styles.css`가 `DEFAULT_BRAND_SEED`의 `--brand-*`·`--oe-brand-*` 값을 갖게 할지. 후자는 브랜드만 런타임 주입으로 남겨 둔 tokens 구조와 전달 패키지가 싣는 값을 바꾸며, [open-questions.md](open-questions.md)의 「기본 ooee brand seed」가 Provisional인 채로 값이 공용 package에 들어간다 | 신주희 | `2026-09-16` |
-| Storybook을 만들지 여부. [roadmap.md](roadmap.md)의 「컴포넌트를 참고하는 채널」은 Storybook을 최종 표준 채널로 정했지만, Studio가 이미 문서와 Playground를 제공하고 Skill v0는 `docs/system/`만으로 돈다. 순서 2의 결과와 A/B 검증 뒤에 다시 정하며, 그때까지 순서 3과 통합 검증의 Storybook 항목 둘은 조건부다 | 신주희·유진식 | `2026-09-23` |
-| 저장소 밖에서 컴포넌트를 조회할 endpoint: Storybook MCP(개발자 로컬 서버 또는 공유 endpoint) 또는 Studio가 `component-registry`와 `docs/system/`을 JSON으로 내는 route 위의 MCP | 유진식 | `2026-09-19` |
-| 기획자가 명령을 돌리는 자리: 이 저장소를 clone해 Node 22.22.1·pnpm·Claude Code를 갖추는지, 개발자가 대신 돌리고 기획자는 프롬프트와 검수만 맡는지. ①~⑧ 중 기획자가 직접 수행하는 단계도 함께 정한다 | 유진식 | `2026-09-19` |
-| Storybook 호스팅: Chromatic, Cloudflare Pages, 저장소 공개 또는 GitHub 플랜 변경. 외부 서비스 사용 여부는 블루키에 묻는다 | 유진식 | `2026-09-19` |
-| ~~Figma의 역할: 디자인 원본 또는 검토용 캔버스~~ → **검토용 캔버스로 정했다**(`2026-09-16` A/B 검증. 「스파이크 결과」와 [roadmap.md](roadmap.md)) | 유진식 | 정해짐 |
-| roadmap.md 4·5단계의 「1차 범위: 제외」와 루트 `README.md`의 1차 범위 문구를 검증용 실험 구현으로 고칠지. 팀이 정한 프로젝트 범위라 유진식 혼자 고치지 않는다 | 신주희·유진식 | `2026-09-23` |
-| ~~이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치~~ → **`plugins/ooee-harness/` Claude Code Plugin으로 정했다**(`2026-09-16` 스파이크 R3. 「이관 시 남기는 것」). 별도 저장소는 열지 않되 나중에 뽑아낼 수 있게 둔다고 했으나, `2026-09-21`에 `bluekey-kr/Design-System-Harness`를 열어 `plugins/ooee-harness/`·`scripts/figma/`·`apps/sandbox/`와 이 문서를 **이력과 함께** 옮겼다. 원본 저장소에도 같은 파일이 남아 있고 어느 쪽이 정본인지는 아래 줄에 있다 | 유진식 | 정해짐 |
-| `AGENTS.md` 「코드 소유 경계」의 import 경계(`@ooee/ui`에서만 가져온다)를 `docs/system/quality.md`로 승격할지. 하네스가 이관 뒤에도 그 규칙을 읽어야 해서 원본의 자리가 필요하다. `data-slot` 승격과 같은 성격이라 함께 정한다 | 신주희 | `2026-09-23` |
-| 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 유진식 | `2026-09-25` |
-| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 신주희 | `2026-09-23` |
-| `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 신주희 | `2026-09-23` |
-| Slack 폼에서 issue를 만드는 수단: Workflow Builder의 GitHub 커넥터 스텝인지, 그 조각만 받는 작은 relay인지. 커넥터 목록에 GitHub이 있다고 Slack 도움말이 적지만 공개 레퍼런스는 Enterprise Server용만 있어 github.com용 「Create an issue」가 뜨는지 눈으로 확인해야 한다. 커넥터로 가면 인증 계정도 함께 정한다 — 기획자 GitHub 계정으로 붙여야 issue와 확정 댓글이 실제 사람 이름으로 남아 요청서의 「승인:」 줄이 성립한다 | 유진식 | 미정 |
-| 확정 권한을 어떻게 보는지. ✅는 누구나 달 수 있고 「리액션을 단 사람 == 요청자」 조건 분기는 Business+ 이상이다. Pro면 확정 댓글에 남긴 이름을 `harness-check`가 요청자와 대조하는 쪽으로 간다 | 유진식 | 미정 |
-| ~~트랙 파일의 정본이 어느 저장소인가~~ → **`bluekey-kr/Design-System-Harness`로 정했다**(`2026-09-21`). 저장소 문서와 스크립트는 여기서 관리한다. `ooee-shin/ooee-ui`는 디자인 시스템 원본으로 남고, 그쪽의 `docs/process/` 문서는 신주희가 계속 쓴다 | 유진식 | 정해짐 |
-| 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8에서는 Plugin의 배포 source 타입(상대 경로 또는 git 저장소)만 막는다 | 유진식 | 미정 |
+| `@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 기획자·개발자 | `2026-09-23` |
+| Story 파일 위치(`packages/ui/src/<component>.stories.tsx` 병치 또는 `apps/storybook/stories/`)와 폴더 구조. [working-context.md](working-context.md) 「남은 작업」 10번의 카테고리화와 함께 정한다 | 기획자·개발자 | `2026-09-16` |
+| 확정 컴포넌트 19개의 최소 `Default` Story(필수 prop만)를 개발자가 순서 3의 pull request에 한 번에 넣어도 되는가. 순서 3의 완료 기준이 컴포넌트마다 Story 하나를 전제하고 기획자는 `9/14~` 화면 개선 중이라 제안한다. Property를 나열하는 Story는 제안 밖이며 [open-questions.md](open-questions.md)의 Style·Size 이름 통일 뒤에 기획자가 쓴다 | 기획자 | `2026-09-16` |
+| 기본 브랜드 값의 자리: Storybook decorator에 두는 채로 갈지, `packages/tokens/src/styles.css`가 `DEFAULT_BRAND_SEED`의 `--brand-*`·`--oe-brand-*` 값을 갖게 할지. 후자는 브랜드만 런타임 주입으로 남겨 둔 tokens 구조와 전달 패키지가 싣는 값을 바꾸며, [open-questions.md](open-questions.md)의 「기본 ooee brand seed」가 Provisional인 채로 값이 공용 package에 들어간다 | 기획자 | `2026-09-16` |
+| Storybook을 만들지 여부. [roadmap.md](roadmap.md)의 「컴포넌트를 참고하는 채널」은 Storybook을 최종 표준 채널로 정했지만, Studio가 이미 문서와 Playground를 제공하고 Skill v0는 `docs/system/`만으로 돈다. 순서 2의 결과와 A/B 검증 뒤에 다시 정하며, 그때까지 순서 3과 통합 검증의 Storybook 항목 둘은 조건부다 | 기획자·개발자 | `2026-09-23` |
+| 저장소 밖에서 컴포넌트를 조회할 endpoint: Storybook MCP(개발자 로컬 서버 또는 공유 endpoint) 또는 Studio가 `component-registry`와 `docs/system/`을 JSON으로 내는 route 위의 MCP | 개발자 | `2026-09-19` |
+| 기획자가 명령을 돌리는 자리: 이 저장소를 clone해 Node 22.22.1·pnpm·Claude Code를 갖추는지, 개발자가 대신 돌리고 기획자는 프롬프트와 검수만 맡는지. ①~⑧ 중 기획자가 직접 수행하는 단계도 함께 정한다 | 개발자 | `2026-09-19` |
+| Storybook 호스팅: Chromatic, Cloudflare Pages, 저장소 공개 또는 GitHub 플랜 변경. 외부 서비스 사용 여부는 블루키에 묻는다 | 개발자 | `2026-09-19` |
+| ~~Figma의 역할: 디자인 원본 또는 검토용 캔버스~~ → **검토용 캔버스로 정했다**(`2026-09-16` A/B 검증. 「스파이크 결과」와 [roadmap.md](roadmap.md)) | 개발자 | 정해짐 |
+| roadmap.md 4·5단계의 「1차 범위: 제외」와 루트 `README.md`의 1차 범위 문구를 검증용 실험 구현으로 고칠지. 팀이 정한 프로젝트 범위라 개발자 혼자 고치지 않는다 | 기획자·개발자 | `2026-09-23` |
+| ~~이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치~~ → **`plugins/ooee-harness/` Claude Code Plugin으로 정했다**(`2026-09-16` 스파이크 R3. 「이관 시 남기는 것」). 별도 저장소는 열지 않되 나중에 뽑아낼 수 있게 둔다고 했으나, `2026-09-21`에 `bluekey-kr/Design-System-Harness`를 열어 `plugins/ooee-harness/`·`scripts/figma/`·`apps/sandbox/`와 이 문서를 **이력과 함께** 옮겼다. 원본 저장소에도 같은 파일이 남아 있고 어느 쪽이 정본인지는 아래 줄에 있다 | 개발자 | 정해짐 |
+| `AGENTS.md` 「코드 소유 경계」의 import 경계(`@ooee/ui`에서만 가져온다)를 `docs/system/quality.md`로 승격할지. 하네스가 이관 뒤에도 그 규칙을 읽어야 해서 원본의 자리가 필요하다. `data-slot` 승격과 같은 성격이라 함께 정한다 | 기획자 | `2026-09-23` |
+| 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 개발자 | `2026-09-25` |
+| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 기획자 | `2026-09-23` |
+| `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 기획자 | `2026-09-23` |
+| ~~Slack 폼에서 issue를 만드는 수단~~ → **Workflow Builder 의 GitHub 커넥터 「문제 생성」으로 정했다**(`2026-09-21`). github.com 용으로 뜨고 실제로 이슈 넷을 만들었다. 인증 계정은 기획자별로 붙이지 않고 `YUJINSIK-momo` 하나로 고정했다 — 기획자가 자기 GitHub 을 연결하지 않아도 돌아야 하기 때문이다. 대가로 이슈 작성자가 모두 같은 이름이 되므로, 요청자는 본문 첫 줄 `요청자:` 가 갖는다 | 개발자 | 정해짐 |
+| 확정 권한을 어떻게 보는지. ✅는 누구나 달 수 있고 「리액션을 단 사람 == 요청자」 조건 분기는 Business+ 이상이다. Pro면 확정 댓글에 남긴 이름을 `harness-check`가 요청자와 대조하는 쪽으로 간다 | 개발자 | 미정 |
+| ~~트랙 파일의 정본이 어느 저장소인가~~ → **`bluekey-kr/Design-System-Harness`로 정했다**(`2026-09-21`). 저장소 문서와 스크립트는 여기서 관리한다. `ooee-shin/ooee-ui`는 디자인 시스템 원본으로 남고, 그쪽의 `docs/process/` 문서는 기획자가 계속 쓴다 | 개발자 | 정해짐 |
+| `*.pages.dev` 주소의 공개 범위. 저장소는 조직 소유 비공개인데 배포된 화면은 주소를 아는 사람 누구나 본다. 만드는 화면이 실제 제품 기획이라 그대로 두어도 되는지, Cloudflare Access(Zero Trust)로 이메일 확인을 걸지 정한다. 거는 쪽이면 기획자 이메일을 허용 목록에 넣어야 하므로 배포를 붙이는 날 함께 한다 | 개발자 | `2026-09-22` |
+| 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8에서는 Plugin의 배포 source 타입(상대 경로 또는 git 저장소)만 막는다 | 개발자 | 미정 |
 
 ## 일정
 
-[working-context.md](working-context.md)의 「일정과 분담」에 있는 `9/14~`·`9/20~23`·`9/28~30` 행의 유진식 몫을 날짜별로 쪼갠 것이다.
+[working-context.md](working-context.md)의 「일정과 분담」에 있는 `9/14~`·`9/20~23`·`9/28~30` 행의 개발자 몫을 날짜별로 쪼갠 것이다.
 
 | 날짜 (2026) | 내용 |
 | --- | --- |
 | 9/14 | 이 문서, Figma 확인 질문 |
 | 9/15 | 스파이크 R1, Skill v0 시작 |
 | 9/16 | Skill v0 완료, Sonnet 수준의 모델로 화면 둘 |
-| 9/17~18 | 순서 2의 결과에 따라 Storybook 골격·Storybook MCP (R2)·최소 Story(신주희가 `9/16`까지 동의하면), 또는 Studio 조회 route 스파이크 |
+| 9/17~18 | 순서 2의 결과에 따라 Storybook 골격·Storybook MCP (R2)·최소 Story(기획자가 `9/16`까지 동의하면), 또는 Studio 조회 route 스파이크 |
 | 9/19 | Agent Rules, 호스팅 결정 (R4) |
 | 9/16 | Figma MCP 읽기와 매핑표 (순서 6). A/B의 A안이 매핑표를 입력으로 쓰므로 앞당겼다 |
 | 9/20~23 | A/B 검증. 그 전에 `/design-page`의 ④(순서 7)와 STO 지원요청 화면 옮기기 |
@@ -309,7 +361,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 | `.claude/settings.json` | 옮기지 못한다 | Plugin은 권한 규칙을 싣지 못한다. 받는 쪽 `.claude/settings.json`에 붙여 넣을 `permissions` 조각을 `plugins/ooee-harness/README.md`가 갖는다 |
 | `apps/sandbox/src/screen-rules.ts`와 그 테스트 | 옮긴다 | `plugins/ooee-harness/lib/`. 화면이 아니라 `/review-design` 검사 항목의 기계 판정이다. `docs/system/README.md` 경로와 저장소 루트를 상대 경로로 박지 않고 인수로 받게 고친다 |
 | `apps/sandbox`의 나머지 | 제거 | 화면을 쓸 자리는 설치한 저장소가 갖고, Plugin의 설정값이 그 자리를 가리킨다 |
-| `AGENTS.md`의 import 경계(「코드 소유 경계」) | 승격하거나 옮긴다 | `@ooee/ui`에서만 가져온다는 규칙은 작업 운영이 아니라 시스템 규칙이므로 `docs/system/quality.md`로 승격할지 신주희와 정한다. 승격하지 않으면 원본을 `plugins/ooee-harness/rules/`로 옮기고 `AGENTS.md`가 그 파일을 가리킨다 |
+| `AGENTS.md`의 import 경계(「코드 소유 경계」) | 승격하거나 옮긴다 | `@ooee/ui`에서만 가져온다는 규칙은 작업 운영이 아니라 시스템 규칙이므로 `docs/system/quality.md`로 승격할지 기획자와 정한다. 승격하지 않으면 원본을 `plugins/ooee-harness/rules/`로 옮기고 `AGENTS.md`가 그 파일을 가리킨다 |
 | `AGENTS.md`의 나머지 | 제거 | 작업 신호, branch 운영, 화면 확정 검수 |
 | `.mcp.json` | 옮긴다 | `plugins/ooee-harness/.mcp.json`. URL 한 줄뿐이라 secret이 없고 저장소 경로에도 기대지 않는다 |
 | `scripts/figma/`, `/design-page`, [figma-component-map.md](figma-component-map.md) | 나중에 옮긴다 | 순서 8에 넣지 않는다. `packages/tokens` 상대 import, `scripts/visual` 실행 위치, `node_modules/.pnpm/*` 탐색, 3001 포트 개발 서버에 동시에 기대므로 `data-slot` 승격 결정 뒤로 미룬다 |
@@ -336,7 +388,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 ### 2026-09-14 스파이크 R1: Figma 쓰기
 
 - **연결.** Figma remote MCP(`https://mcp.figma.com/mcp`)를 `claude mcp add --scope user`로 등록하고 OAuth 로그인은 브라우저에서 한 번 했다. 저장소에는 아무것도 넣지 않았다. 세션을 시작한 뒤 등록한 서버는 그 세션에 실리지 않으므로, 이 스파이크는 `claude -p --allowedTools mcp__figma`로 띄운 별도 headless 세션에서 돌렸다.
-- **계정과 플랜.** `whoami`가 돌려준 유진식 계정의 팀은 둘이다. bluekey(`team::1395716714983274137`, tier `pro`, seat `Full`)와 개인 팀(tier `starter`, seat `Full`). [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더는 bluekey 팀이다.
+- **계정과 플랜.** `whoami`가 돌려준 개발자 계정의 팀은 둘이다. bluekey(`team::1395716714983274137`, tier `pro`, seat `Full`)와 개인 팀(tier `starter`, seat `Full`). [figma-page-agent.md](figma-page-agent.md)의 결과물 폴더는 bluekey 팀이다.
 - **도구.** remote 서버 하나에 41개가 실린다. 읽기는 `get_metadata`·`get_design_context`·`get_screenshot`·`get_variable_defs`·`get_libraries`·`search_design_system`, 쓰기는 `create_new_file`·`use_figma`(plugin API 코드를 넘겨 실행)·`generate_figma_design`(`captureId`를 받는 브라우저 캡처 기반), 그 밖에 Code Connect 도구 일곱과 FigJam·shader·Weave 도구다. desktop 서버는 시험하지 않았다.
 - **라이브러리.** `@ooee/ui`를 반영한 Figma 라이브러리는 없다. `search_design_system("Button")`이 돌려준 것은 「🔵 BKDS 블루키 디자인 시스템」(button·iconButton·textButton·searchInput 등, `2026-09-09`까지 갱신)과 「[공차] 공차 ERP UI 디자인」뿐이다. 새 파일에는 Figma 기본 community 라이브러리(Material 3, Simple Design System, iOS 18)가 붙어 있다.
 - **Code Connect.** 쓸 수 없다. `list_file_components_for_code_connect`가 「You need a Dev or Full seat on an Organization or Enterprise plan」을 돌려준다. bluekey는 Pro다.
@@ -364,10 +416,10 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 ### 2026-09-15 고객의 소리: 코드에서 Figma 변수·텍스트 스타일로
 
-- **화면.** `/generate-code`로 관리자 웹 「고객의 소리」(`apps/sandbox/src/app/voc`)를 만들었다. 필터 줄·처리 상태 칩·표·상세 답변 패널·페이지 이동이다. 사람이 고친 자리는 하나다. 상세 패널이 열리면 표가 남은 폭(약 736px)보다 넓어져 상태·담당자 열이 가로 스크롤에 가려져서, 유진식의 결정으로 패널이 열린 동안 고객·담당자 열을 숨겼다. `/review-design` 위반 0건, 테스트 16건, `pnpm check` 통과.
+- **화면.** `/generate-code`로 관리자 웹 「고객의 소리」(`apps/sandbox/src/app/voc`)를 만들었다. 필터 줄·처리 상태 칩·표·상세 답변 패널·페이지 이동이다. 사람이 고친 자리는 하나다. 상세 패널이 열리면 표가 남은 폭(약 736px)보다 넓어져 상태·담당자 열이 가로 스크롤에 가려져서, 개발자의 결정으로 패널이 열린 동안 고객·담당자 열을 숨겼다. `/review-design` 위반 0건, 테스트 16건, `pnpm check` 통과.
 - **Figma 파일.** `ooee · 고객의 소리 · 2026-09-15`(file key `Iw2MXs9sfqtJFze7F9vGf5`)에 목록과 상세 열림 두 프레임을 만들었다. 칠 248개가 전부 변수에, 글자 146개가 전부 텍스트 스타일에 묶였다. auto-layout 프레임 100개, DOM 위치와 어긋나 absolute로 둔 자식 6개, 아이콘 14개(Remix SVG).
 - **변수.** `oe color`(Light·Dark) 61개와 `oe size` 17개는 `packages/tokens`에서 옮겨 적었다. Button·Badge처럼 코드가 primitive 단계를 직접 쓰는 자리(`bg-blue-100`, `bg-[var(--brand-600)]`, Chip의 `--brand-alpha-*`)는 `oe primitive` 컬렉션에 필요한 것만 만들어 묶었다. 이 자리는 코드가 `dark:` class로 따로 두므로 Figma에서 모드를 바꿔도 뒤집히지 않는다.
-- **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체했고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다. 유진식이 승인했고 텍스트 스타일 설명에 적었다. 글자 폭이 넓어져 「내보내기」 버튼의 마지막 글자가 조금 잘린다.
+- **글꼴.** Figma에 Pretendard Variable이 없어 Noto Sans KR로 임시 대체했고, Noto Sans KR에 SemiBold가 없어 `semibold` 스타일은 Bold다. 개발자가 승인했고 텍스트 스타일 설명에 적었다. 글자 폭이 넓어져 「내보내기」 버튼의 마지막 글자가 조금 잘린다.
 - **다시 읽기.** `get_design_context`가 `bg-[var(--oe-background-secondary,#f5f5f5)]`처럼 변수 이름을 먼저 내고 hex는 대체값으로만 붙인다. 스파이크 R1에서 hex만 나오던 것이 풀렸으므로, 순서 6의 매핑표는 레이어 이름이 아니라 이 변수 이름을 1차 근거로 삼는다. Code Connect는 여전히 없어 컴포넌트(`Button`·`Select`)는 레이어 이름(`button`, `select-trigger` 등 `data-slot`)으로만 알 수 있다.
 - **변환 도구.** `scripts/figma/`에 두었다. 브라우저에 뜬 화면을 `scripts/visual/inspect.mjs --eval`로 트리로 읽고, 조각으로 나눠 `use_figma`에 넘긴다. 만들며 부딪힌 것: Chrome이 Tailwind v4 색을 `lab()`·`oklab()`로 돌려줘 처음엔 테두리와 배지 배경이 빠졌다. 두 프레임의 조각 경로 이름이 같아 한쪽 요소가 다른 프레임에 들어갔다. Select의 숨은 1px input 값이 글자로 딸려 왔다. 모두 도구에서 고쳤다. `use_figma`는 50,000자 제한이 있고 `setPluginData` 대신 `setSharedPluginData`만 된다.
 - **판단이 필요한 것.** 처리 상태 칩이 「하나만 켜짐」인데 chip.md는 그 동작을 Tab의 역할로 규정하고 Tab 컴포넌트는 없다. 매장·유형 Select를 Field 없이 필터 줄에 단독으로 썼다. 기간은 요청대로 Trigger 하나인데 input-button.md는 둘로 나누라고 한다. Table 컴포넌트가 없어 native `table`이다.
@@ -392,7 +444,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
     - `/review-design`: 아이콘 `aria-hidden`과 label을 반복한 placeholder를 위반으로, 가운데 정렬을 판단으로 센다.
     - `/design-page`: audit에 `rootWithoutFill`을 더하고 `.figma-work/` 밖 쓰기를 막았다.
   - `tooling.md`의 `.next` 삭제 절차가 Skill의 캐시 삭제 금지와 부딪치던 것은, 삭제를 사람이 확인하고 하는 절차로 적어 풀었다.
-- **공용 권한 적용.** 자동 권한 검사가 에이전트 스스로의 `.claude/settings.json` 수정을 막아서, 초안을 유진식이 확인하고 반영하도록 요청해 반영했다.
+- **공용 권한 적용.** 자동 권한 검사가 에이전트 스스로의 `.claude/settings.json` 수정을 막아서, 초안을 개발자가 확인하고 반영하도록 요청해 반영했다.
 - **검증 방법.**
   - 저장소를 clone해 실행마다 따로 두고 세 조건을 만들었다. A는 지금 dev 그대로(v0 기록 포함), B는 지운 route를 가리키는 옛 `apps/studio/.next/dev/types` 파일로 `pnpm check`가 실패하는 상태, C는 옆 세션이 남긴 미커밋 화면이 있는 상태다. `self` 없는 옛 `test-setup.ts`는 지금 화면 셋이 등록된 상태에서 테스트를 실패시키지 않아 재현 조건에서 뺐다.
   - v0 요청 문단 둘을 이 세션의 Sonnet 에이전트(`claude-sonnet-5`)에게 주어 `SKILL.md` 절차대로 돌렸다. 에이전트가 끝난 뒤 검사 셋의 종료 코드와 `git status`를 따로 재고, 부른 명령을 transcript에서 뽑았다. 판정은 실행마다 `claude-opus-5` 에이전트 하나와 전체 비평 하나가 했다.
@@ -412,7 +464,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **아직 막히지 않은 것.**
   - 가운데 정렬. 제목 덩이의 글자 정렬은 재발하지 않았지만, 「폼은 남은 높이의 가운데」에서 384px 폼 상자를 가로로도 가운데 두고 보고하지 않은 것이 1차 3회 중 1회, 2차 2회 중 1회다. 1차의 그 실행은 v0 기록 화면을 열어 배치를 옮겼고, 그래서 다른 화면 코드 읽기를 막았다(2차 3/3 지킴). 요청의 뜻에 달린 값이라 기계로 막을 수 없고 `/review-design`의 판단 항목으로 남긴다.
   - 매핑표 「요구사항이 정한 값」 칸이 요청의 값을 빠짐없이 담지 못한다. 크기·배치 같은 시각 값에 `(시각)` 표시가 빠지고, 칸에서 빠진 값은 테스트도 빠진다.
-- **검증하지 못한 것.** 공용 권한의 실제 동작. 검증용 하위 세션을 `claude -p`로 띄우는 것이 자동 권한 검사에 막혔다(넓은 `--allowedTools`와 bypass 모드). 에이전트는 이 세션의 권한으로 돌아 `.claude/settings.json`을 거치지 않는다. 사람이 저장소 루트에서 Claude Code를 열어 `/permissions`에 규칙이 보이는지, `git stash`에 확인 창이 뜨고 `git push origin main`이 거부되는지 한 번 확인해야 한다. 신주희 기기에서는 「업무시작」「퇴근백업」 흐름에 새 확인 창이 늘지 않는지도 본다.
+- **검증하지 못한 것.** 공용 권한의 실제 동작. 검증용 하위 세션을 `claude -p`로 띄우는 것이 자동 권한 검사에 막혔다(넓은 `--allowedTools`와 bypass 모드). 에이전트는 이 세션의 권한으로 돌아 `.claude/settings.json`을 거치지 않는다. 사람이 저장소 루트에서 Claude Code를 열어 `/permissions`에 규칙이 보이는지, `git stash`에 확인 창이 뜨고 `git push origin main`이 거부되는지 한 번 확인해야 한다. 기획자 기기에서는 「업무시작」「퇴근백업」 흐름에 새 확인 창이 늘지 않는지도 본다.
 - **남은 것.**
   - 목적지나 동작이 정해지지 않은 버튼을 어떻게 둘지 문구가 없다. `onClick` 없는 `Button`, 빈 `onClick={() => {}}`가 섞여 나왔다.
   - 에이전트가 검사 로그를 `/tmp`에 쓴다.
@@ -463,7 +515,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 ### 2026-09-16 Figma 구조: 배치하는 곳만 Frame
 
-- **왜.** 옮긴 결과에서 모든 요소가 Frame이었다. DOM의 감싸개를 그대로 옮겼기 때문이다. 유진식이 「가장 바깥만 Frame으로 두고 오토 레이아웃을 쓰라」고 정했다. Figma에서 오토 레이아웃은 Frame에만 붙으므로, 「배치하는 곳만 Frame」으로 옮겨 적었다.
+- **왜.** 옮긴 결과에서 모든 요소가 Frame이었다. DOM의 감싸개를 그대로 옮겼기 때문이다. 개발자가 「가장 바깥만 Frame으로 두고 오토 레이아웃을 쓰라」고 정했다. Figma에서 오토 레이아웃은 Frame에만 붙으므로, 「배치하는 곳만 Frame」으로 옮겨 적었다.
 - **규칙.** 화면 루트와 자식을 배치하는 상자, 칠·테두리·모서리를 가진 상자, `data-slot`이 붙은 컴포넌트 노드는 Frame이다. 글자 하나만 감싼 상자는 없애고 글자가 그 자리를 차지하며(가운데 맞춤은 글자의 가로·세로 정렬로 옮긴다), 아이콘 하나만 감싼 상자와 그대로 통과시키는 상자도 없앤다. 자식 없이 칠·테두리만 있는 잎은 Rectangle이다.
 - **효과.** 「고객의 소리」 목록 프레임의 Frame이 124개에서 69개로 줄었다. `data-slot` 이름은 그대로 남아 되짚기의 근거가 유지된다. 접은 수는 manifest의 `folded`에 남고 보고에도 적는다.
 
@@ -474,7 +526,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 - **Plugin으로 확인한 것.** `skills/`·`.mcp.json`·`settings.json`은 Plugin 루트에 두고 `.claude-plugin/plugin.json`이 이름을 정한다. Skill 이름 앞에는 Plugin 이름이 붙어 `/ooee-harness:generate-code`가 된다. `${CLAUDE_PLUGIN_ROOT}`와 `${user_config.…}`는 Skill 본문에서도 치환되므로 화면 자리와 검사 명령을 설정값으로 뺄 수 있다. marketplace는 같은 저장소에 두고 `source`를 상대 경로로 적을 수 있으며, 개발 중에는 `claude --plugin-dir ./plugins/ooee-harness`와 `/reload-plugins`로 바로 시험한다. 비공개 저장소 설치는 기기의 git 자격 증명을 그대로 쓴다.
 - **Plugin이 못 하는 것.** 권한 규칙을 싣지 못한다. Plugin 루트의 `settings.json`은 `agent`와 `subagentStatusLine` 두 키만 받는다. 그래서 공용 권한은 설치하는 저장소의 `.claude/settings.json`이 계속 소유하고, 붙여 넣을 조각을 Plugin의 README가 갖는다.
 - **순서 8에 `/design-page`는 넣지 않는다.** `scripts/figma/`는 `packages/tokens` 상대 import, `scripts/visual` 실행 위치, `node_modules/.pnpm/*` 탐색, 3001 포트 개발 서버에 동시에 기댄다. `/generate-code`·`/review-design` 둘로 완료 기준을 채우고, Figma 쪽은 `data-slot` 승격 결정 뒤에 옮긴다.
-- **함께 정해야 하는 것 둘을 「아직 정하지 않은 것」에 더했다.** import 경계 문장을 `docs/system/quality.md`로 승격할지(신주희), 전달본 사본을 만드는 절차(유진식)다.
+- **함께 정해야 하는 것 둘을 「아직 정하지 않은 것」에 더했다.** import 경계 문장을 `docs/system/quality.md`로 승격할지(기획자), 전달본 사본을 만드는 절차(개발자)다.
 
 ### 2026-09-16 순서 8: 하네스를 Plugin 으로 묶었다
 
@@ -523,7 +575,7 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 ### 2026-09-18 순서 3·5 를 하지 않기로 했다
 
-**Storybook 과 Storybook MCP 를 설계에서 뺀다**(유진식 결정).
+**Storybook 과 Storybook MCP 를 설계에서 뺀다**(개발자 결정).
 
 순서 3 은 처음부터 조건부였다 — 「순서 2 의 결과 절에 `docs/system/` 만으로 부족했던 것이 적힐 때만
 진행한다」. 순서 2 부터 여기까지 화면 여덟과 카탈로그를 만들면서 그 자리에 적힌 것이 없다. 하네스는

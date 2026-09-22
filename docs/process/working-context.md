@@ -303,21 +303,21 @@
 
 ## 일정과 분담
 
-1차 컴포넌트는 신주희가 이 저장소에서 완성하고, 이후 유진식이 블루키 적용을 맡는다. 신주희는 그동안 2차 화면 개선을 병행한다. 전체 단계와 검증 계획은 [roadmap.md](roadmap.md)에 있다.
+1차 컴포넌트는 기획자가 이 저장소에서 완성하고, 이후 개발자가 블루키 적용을 맡는다. 기획자는 그동안 2차 화면 개선을 병행한다. 전체 단계와 검증 계획은 [roadmap.md](roadmap.md)에 있다.
 
 | 날짜 (2026) | 내용 | 담당 |
 | --- | --- | --- |
-| 9/3 | 기존 환경 공유 | 신주희 |
-| ~9/4 | 기존 리뷰, 배포 환경 세팅. GitHub Pages 호스팅은 성립하지 않았고 호스팅은 [ai-environment.md](ai-environment.md)의 스파이크 R4가 정한다 | 유진식 |
-| ~9/11 | shadcn + Panda CSS 동시 사용 시 번들 용량 확인 | 유진식 |
-| ~9/14 | 1차 컴포넌트 마무리 및 공유 | 신주희 |
+| 9/3 | 기존 환경 공유 | 기획자 |
+| ~9/4 | 기존 리뷰, 배포 환경 세팅. GitHub Pages 호스팅은 성립하지 않았고 호스팅은 [ai-environment.md](ai-environment.md)의 스파이크 R4가 정한다 | 개발자 |
+| ~9/11 | shadcn + Panda CSS 동시 사용 시 번들 용량 확인 | 개발자 |
+| ~9/14 | 1차 컴포넌트 마무리 및 공유 | 기획자 |
 | ~9/14 | 블루키 이관 테스트 | 공통 |
-| 9/14~ | AI 개발 환경 트랙. 순서와 일정은 [ai-environment.md](ai-environment.md)가 소유한다 | 유진식 |
-| 9/14~ | 화면 개선 작업 (약 1주) | 신주희 |
+| 9/14~ | AI 개발 환경 트랙. 순서와 일정은 [ai-environment.md](ai-environment.md)가 소유한다 | 개발자 |
+| 9/14~ | 화면 개선 작업 (약 1주) | 기획자 |
 | 9/20~23 | 4·5단계 에이전트 룰 테스트와 A/B 비교 검증 | 공통 |
 | 9/28~30 | 작업 마무리 | 공통 |
 
-통합 방식 검토(블루키 코드 직접 삽입 vs 별도 패키지 분리)는 유진식이 맡으며 결정 시점은 정해져 있지 않다. 1차 작업에 영향을 주지 않는다.
+통합 방식 검토(블루키 코드 직접 삽입 vs 별도 패키지 분리)는 개발자가 맡으며 결정 시점은 정해져 있지 않다. 1차 작업에 영향을 주지 않는다.
 
 ## 바로 다음 작업
 
@@ -386,15 +386,15 @@ pnpm visual --path /components/badge \
 
 개발자가 합류하면서 branch를 세 층으로 나눴다. `main` 아래에 통합 branch `dev`를 두고, 두 사람이 각자 `dev`에서 뻗은 `feature/*`에서 작업한다. `feature/*`는 pull request로 `dev`에 올리고, `dev`에 모인 결과를 통합 검증한 뒤 `main`으로 올린다. 규칙의 원본은 [git-workflow.md](git-workflow.md)이며 여기에 다시 적지 않는다.
 
-담당은 신주희가 Component·Variant 와 Token·UI 개선이고, 유진식이 Figma MCP, Agent Rules, `AGENTS.md`, Skill·Plugin, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
+담당은 기획자가 Component·Variant 와 Token·UI 개선이고, 개발자가 Figma MCP, Agent Rules, `AGENTS.md`, Skill·Plugin, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
 
-**통합 검증 항목은 넷이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), 대신 「Figma 라이브러리가 카탈로그와 어긋나지 않는가」가 들어왔다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 유진식의 작업이 들어오는 순서대로 채운다.
+**통합 검증 항목은 넷이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), 대신 「Figma 라이브러리가 카탈로그와 어긋나지 않는가」가 들어왔다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 개발자의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
 ### 2026-09-14 AI 개발 환경 트랙을 시작했다
 
-유진식 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 신주희 영역에 닿는 것은 Figma 확인이다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
+개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. 기획자 영역에 닿는 것은 Figma 확인이다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
