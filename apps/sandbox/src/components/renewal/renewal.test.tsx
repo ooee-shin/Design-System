@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import { screenRoots } from "./screen-registry";
 
-// `/renewal/*`(블루키 리뉴얼)는 제품 화면 자체를 구현하는 자리다. 2026-09-23 에 Studio 의 `/screens` 에서
+// `/renewal/*`(블루키 리뉴얼)는 제품 화면 자체를 구현하는 자리다. 2026-09-22 에 Studio 의 `/screens` 에서
 // 옮겨 왔다. 규칙은 같은 폴더의 README.md 가 갖고, 그 경계가 흐려지지 않게 여기서 고정한다.
 // sandbox 의 테스트는 `apps/sandbox` 에서 돌므로 경로는 그 자리 기준이다.
 

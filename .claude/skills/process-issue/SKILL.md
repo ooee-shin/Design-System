@@ -8,7 +8,7 @@ allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-
 
 # /process-issue
 
-화면 요청 이슈 하나를 `docs/process/ai-environment.md` 「처리와 승인」의 흐름대로 돌린다. 흐름과 승인 범위는 그 절이, 세 스크립트의 입출력은 `scripts/harness/README.md`가 소유한다. **이 명령은 차례를 잇기만 한다.** 화면을 만드는 규칙은 `plugins/ooee-harness/skills/generate-code/SKILL.md`, 검수 항목은 `plugins/ooee-harness/skills/review-design/SKILL.md`가 가지며 여기에 다시 적지 않는다. 그 둘이 멈추라고 하는 자리에서는 이 명령도 멈춘다. **요청 처리에서 Figma 는 만들지 않는다**(`2026-09-23` 결정, ai-environment.md 「처리와 승인」). 그 자리는 5단계 「sandbox 에서 띄워 보고 검사한다」가 대신한다.
+화면 요청 이슈 하나를 `docs/process/ai-environment.md` 「처리와 승인」의 흐름대로 돌린다. 흐름과 승인 범위는 그 절이, 세 스크립트의 입출력은 `scripts/harness/README.md`가 소유한다. **이 명령은 차례를 잇기만 한다.** 화면을 만드는 규칙은 `plugins/ooee-harness/skills/generate-code/SKILL.md`, 검수 항목은 `plugins/ooee-harness/skills/review-design/SKILL.md`가 가지며 여기에 다시 적지 않는다. 그 둘이 멈추라고 하는 자리에서는 이 명령도 멈춘다. **요청 처리에서 Figma 는 만들지 않는다**(`2026-09-22` 결정, ai-environment.md 「처리와 승인」). 그 자리는 5단계 「sandbox 에서 띄워 보고 검사한다」가 대신한다.
 
 `$ARGUMENTS`가 「결정」으로 시작하면 「결정 뒤」, 「결과」로 시작하면 「결과만 올리기」 절차이고, 아니면 「순서」다.
 
@@ -121,7 +121,7 @@ git switch -c feature/issue-<n>-<slug>
 
 ### 5. sandbox 에서 띄워 보고 검사한다
 
-Figma 로 옮기던 자리다(`2026-09-23`). 만든 화면을 실제로 띄워 눈으로 보고, 깨진 자리를 `dev` 에 올리기 전에 고친다. 사람의 눈은 `dev` 에 배포된 화면에서 한 번 더 본다 — 그것이 결정(개선이면 다음 회차, 반려면 되돌림, 승인이면 `main`)이다.
+Figma 로 옮기던 자리다(`2026-09-22`). 만든 화면을 실제로 띄워 눈으로 보고, 깨진 자리를 `dev` 에 올리기 전에 고친다. 사람의 눈은 `dev` 에 배포된 화면에서 한 번 더 본다 — 그것이 결정(개선이면 다음 회차, 반려면 되돌림, 승인이면 `main`)이다.
 
 ```bash
 pnpm --filter @ooee/sandbox build

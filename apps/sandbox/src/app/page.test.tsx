@@ -43,7 +43,7 @@ test("탭을 고르면 그 프로젝트에 등록된 화면마다 링크 하나�
   for (const project of SANDBOX_PROJECTS) {
     fireEvent.click(view.getAllByRole("tab").find((tab) => tab.textContent?.startsWith(project.name))!);
     const panel = view.getByRole("tabpanel");
-    const links = within(panel).queryAllByRole("link");
+    const links = within(panel).queryAllByRole("link").filter((link) => !link.closest('[aria-label="쓴 컴포넌트"]'));
     assert.deepEqual(
       links.map((link) => link.getAttribute("href")),
       inProject(project.id).map((screen) => screen.href),
@@ -63,4 +63,22 @@ test("블루키 리뉴얼 탭은 만든 화면만 링크로 두고 루트마다 
   const hrefs = within(panel).queryAllByRole("link").map((link) => link.getAttribute("href"));
   const expected = screenRoots.flatMap((root) => [`/renewal/${root.key}`, ...root.items.flatMap((item) => (item.href ? [item.href] : []))]);
   assert.deepEqual(hrefs, expected, "리뉴얼 탭의 링크가 작업 목록·만든 화면과 다르다");
+});
+
+test("화면 카드는 그 화면이 @ooee/ui 에서 가져온 컴포넌트를 Studio 문서 칩으로 보인다", () => {
+  const view = render(<SandboxIndexPage />);
+  const shop = SANDBOX_PROJECTS.find((project) => inProject(project.id).some((screen) => screen.key === "shop-cart"));
+  assert.ok(shop, "shop-cart 가 든 프로젝트가 없다");
+  fireEvent.click(view.getAllByRole("tab").find((tab) => tab.textContent?.startsWith(shop.name))!);
+
+  const card = view.getByRole("link", { name: "이커머스 장바구니" }).closest("li")!;
+  const chips = within(within(card).getByRole("list", { name: "쓴 컴포넌트" })).getAllByRole("listitem");
+  assert.deepEqual(
+    chips.map((chip) => chip.textContent),
+    ["Badge", "Button", "Checkbox", "CheckboxField", "Input", "NumberInput"],
+  );
+  assert.equal(
+    within(card).getByRole("link", { name: "NumberInput" }).getAttribute("href"),
+    "https://ooee-studio.pages.dev/components/number-input",
+  );
 });

@@ -33,7 +33,7 @@
   - `packages/fonts`: 공용 언어별 font
   - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
   - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
-  - 제품 화면 작업장(블루키 리뉴얼): `2026-09-23` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다(`apps/sandbox/src/app/(renewal)/renewal/`). 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. 규칙은 `apps/sandbox/src/components/renewal/README.md` 가 갖는다. sandbox 첫 화면의 「블루키 리뉴얼」 탭에서 연다
+  - 제품 화면 작업장(블루키 리뉴얼): `2026-09-22` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다(`apps/sandbox/src/app/(renewal)/renewal/`). 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. 규칙은 `apps/sandbox/src/components/renewal/README.md` 가 갖는다. sandbox 첫 화면의 「블루키 리뉴얼」 탭에서 연다
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - `apps/studio`의 `/llms.txt`: 저장소 루트 `llms.txt` 원본을 그대로 낸다. 빌드 끝에 `scripts/docs/mirror-llms-links.mjs`가 그 링크와 실은 문서의 링크를 따라 닿는 시스템 문서(`docs/system/` 아래와 `packages/ui/src/index.ts`, 허용 목록은 `scripts/docs/llms-links.mjs`의 `PUBLISHABLE`)만 `out/`의 같은 경로에 싣는다. 실리는 파일은 git이 추적하는 보통 파일이어야 한다. `out/llms.txt`는 웹판으로 바꾼다 — `localhost:3000`을 배포 주소로, 허용 목록 밖을 가리키는 링크는 「저장소 안에서만」 글자로 풀고 머리에 범위를 한 줄 적는다. 두 사이트 모두 공개로 두기로 했다(`2026-09-22`, [ai-environment.md](ai-environment.md) 「아직 정하지 않은 것」). 뷰어는 `/llms-txt`이고 상단 메뉴도 그 주소를 가리킨다
   - 검증이 끝나지 않은 자산도 실제 공용 자산이며, 확정은 package 이동이 아니라 검증 완료 상태를 뜻한다
@@ -43,7 +43,7 @@
   - `packages/ui`는 자체 `tsconfig.json`과 `typecheck` script를 소유하고 테스트 의존성도 직접 선언. 회귀 검사는 컴포넌트별 `<component>.test.tsx`, 교차 계약용 `selection-controls.test.tsx`와 공용 `test-setup.ts`로 구성하며 `pnpm check`가 lint → typecheck → test → build 순으로 실행
 
 - Studio navigation
-  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장은 `2026-09-23` 에 sandbox 로 옮겨 Studio 메뉴에 없다
+  - 메뉴 순서는 `Home → Foundations → Components → Docs → Presentation`. 기반에서 컴포넌트로 올라간 뒤 문서를 보고 마지막에 작업 의도를 본다. 제품 화면 작업장은 `2026-09-22` 에 sandbox 로 옮겨 Studio 메뉴에 없다
   - Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Presentation. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다
   - 모든 화면이 `max-w-6xl` 프레임과 `px-4 py-5 sm:px-8 sm:py-8` 여백을 공유한다. 목록의 `compact` 밀도는 카드 그리드에만 적용하고 페이지 여백과 헤더 간격은 바꾸지 않는다. 밀도가 페이지 틀을 건드리면 화면을 옮길 때 본문이 위아래로 밀린다
   - 우측 `On this page` 목차는 공용 `OnThisPage` 하나를 컴포넌트 상세와 Presentation이 함께 사용한다. 최대 높이를 뷰포트 안으로 제한하고 넘치면 목차 안에서 스크롤한다
@@ -389,7 +389,7 @@ pnpm visual --path /components/badge \
 
 담당은 기획자가 Component·Variant 와 Token·UI 개선이고, 개발자가 Agent Rules, `AGENTS.md`, Skill·Plugin, 요청 처리 하네스, `llms.txt` 다. Story 작성은 Storybook 을 두지 않기로 하면서 사라졌다(`2026-09-18`).
 
-**통합 검증 항목은 둘이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), Figma MCP 와 Figma 라이브러리 항목은 `2026-09-23` 에 요청 처리에서 Figma 를 뺐다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 개발자의 작업이 들어오는 순서대로 채운다.
+**통합 검증 항목은 둘이다.** Storybook 과 Storybook MCP 항목은 그 둘을 두지 않기로 하면서 걷어냈고(`2026-09-18`), Figma MCP 와 Figma 라이브러리 항목은 `2026-09-22` 에 요청 처리에서 Figma 를 뺐다. Skill 셋과 `.claude/settings.json` 공용 권한은 들어왔으며, 공용 권한은 저장소 루트에서 시작한 Claude Code 세션의 되돌리기·삭제 명령에 확인을 묻고 `main` 직접 push를 거부한다(`AGENTS.md` 「Claude Code 명령과 권한」). 개발자의 작업이 들어오는 순서대로 채운다.
 
 **`main` 보호 설정은 여전히 켤 수 없다.** 비공개 저장소의 무료 플랜에서 열리지 않아 API가 403과 `Upgrade to GitHub Pro or make this repository public`을 돌려준다. 규칙으로 강제되지 않으므로 사람이 순서를 지킨다. 대신 기본 branch를 `dev`로 바꿔서, `--base`를 빠뜨린 pull request가 `main`이 아니라 `dev`로 향하게 했다.
 
@@ -399,7 +399,7 @@ pnpm visual --path /components/badge \
 
 **화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
 
-**Figma 는 쓰지 않는다**(`2026-09-23`). 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해져 요청 처리에서 뺐다. 결과는 sandbox 에서만 본다. `/design-page`·`scripts/figma/`·Figma MCP·sandbox 의 Figma 카탈로그를 지웠고, 까닭과 남긴 것은 [ai-environment.md](ai-environment.md) 「2026-09-23 Figma 를 뺐다」가 갖는다. **다음은 sandbox 가 화면마다 어떤 컴포넌트를 썼는지 보여 주는 UI 다** — 디자인 시스템 → 요청 → sandbox.
+**Figma 는 쓰지 않는다**(`2026-09-22`). 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해져 요청 처리에서 뺐다. 결과는 sandbox 에서만 본다. `/design-page`·`scripts/figma/`·Figma MCP·sandbox 의 Figma 카탈로그를 지웠고, 까닭과 남긴 것은 [ai-environment.md](ai-environment.md) 「2026-09-22 Figma 를 뺐다」가 갖는다. **다음은 sandbox 가 화면마다 어떤 컴포넌트를 썼는지 보여 주는 UI 다** — 디자인 시스템 → 요청 → sandbox.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

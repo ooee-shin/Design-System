@@ -15,7 +15,7 @@ const example = () => JSON.parse(readFileSync(inputFile, "utf8"));
 const lines = (markdown) => markdown.split("\n");
 
 test("첫 네 줄에 요청 · 샌드박스 · 작업 요약이 있다", () => {
-  // 2026-09-23 에 요청 처리에서 Figma 를 뺐다. 결과는 샌드박스에서만 본다.
+  // 2026-09-22 에 요청 처리에서 Figma 를 뺐다. 결과는 샌드박스에서만 본다.
   const head = lines(renderResultComment(example())).slice(0, 4);
   assert.deepEqual(head, [
     "화면 요청 #9 결과 · 1회차 — 이커머스 구매 페이비 · 결정은 GitHub 댓글에 👍 👎 😕",

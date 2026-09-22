@@ -4,7 +4,7 @@
 
 ## 목표와 범위
 
-최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/review-design`, `/generate-code` 명령으로 다음 단계를 수행하는 Skill 또는 Plugin을 만든다. **②④ 는 `2026-09-23` 에 Figma 에서 sandbox 로 바꿨다** — ② 는 만든 화면을 sandbox 에서 띄워 보고 검사하는 것(`/process-issue` 5단계), ④ 는 `dev` 에 배포된 화면을 사람이 보고 개선 회차로 되돌리는 것이다(「2026-09-23 Figma 를 뺐다」).
+최종 목표는 기획자가 화면 구성을 프롬프트로 적으면 검수를 거쳐 개발자에게 전달되는 흐름이다. Claude Code에 설치하면 `/review-design`, `/generate-code` 명령으로 다음 단계를 수행하는 Skill 또는 Plugin을 만든다. **②④ 는 `2026-09-22` 에 Figma 에서 sandbox 로 바꿨다** — ② 는 만든 화면을 sandbox 에서 띄워 보고 검사하는 것(`/process-issue` 5단계), ④ 는 `dev` 에 배포된 화면을 사람이 보고 개선 회차로 되돌리는 것이다(「2026-09-22 Figma 를 뺐다」).
 
 ```text
 ① 디자인 시스템 검색
@@ -17,7 +17,7 @@
 ⑧ Pull request 준비
 ```
 
-명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③, `/process-issue`가 ②④다. ②④를 맡던 `/design-page`는 `2026-09-23` 에 지웠다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
+명령과 단계의 대응은 `/generate-code`가 ①⑤⑥⑦⑧, `/review-design`이 ③, `/process-issue`가 ②④다. ②④를 맡던 `/design-page`는 `2026-09-22` 에 지웠다. `/review-design`은 만든 화면 코드를 `docs/system/quality.md`의 항목에 하나씩 대조해 위반 목록을 내므로 Figma 없이 돈다. 순서 2의 완료 기준과 A/B 검증의 「위반 수」는 이 목록의 항목 수다. 「pull request 준비 완료」는 ⑧의 끝으로, `pnpm check`와 `apps/sandbox` 검사가 통과한 미커밋 working tree에서 `.github/pull_request_template.md` 양식으로 쓴 본문 초안을 대화에 제시한 상태다.
 
 [roadmap.md](roadmap.md)의 5단계(이하 roadmap N단계)와 대응하면 ①⑤는 roadmap 3단계(스토리북 MCP), ②④는 roadmap 2단계(Figma MCP), 나머지는 roadmap 4·5단계(에이전트 룰, 자동화)다. roadmap.md는 4·5단계를 1차 제외로 두고 [working-context.md](working-context.md)의 「일정과 분담」은 `2026-09-20`부터 `2026-09-23`까지 그 테스트를 잡아 두었다. 이 문서는 roadmap 4·5단계를 **개발자 트랙의 검증용 실험 구현**으로 다룬다. roadmap.md와 루트 `README.md`의 1차 범위 문구를 고칠지는 「아직 정하지 않은 것」에 있다. 이 문서에서 「순서 N」은 「순서와 의존 관계」의 0~8 번호다.
 
@@ -91,7 +91,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **Storybook은 Skill의 전제가 아니다.** ①⑤는 `docs/system/`과 `packages/ui/package.json`의 exports를 직접 읽어 성립하고, 기획자와 개발자가 화면에서 컴포넌트를 보는 채널은 이미 Studio의 Playground와 Docs 메뉴가 맡는다. Storybook MCP가 더 주는 것은 TS 타입에서 뽑은 Property 목록과 Story 예시인데, 앞의 것은 컴포넌트 문서가 코드 문자열 그대로 갖고 있다. 그래서 순서 3은 순서 2의 결과 절에 「`docs/system/`만으로 부족했던 것」이 적힐 때만 진행한다. 부족한 것이 저장소 밖에서 조회할 endpoint뿐이면 Storybook 대신 Studio가 `component-registry`와 `docs/system/`을 JSON으로 내는 route와 그 위의 MCP를 먼저 검토한다. Storybook 자체를 만들지는 [roadmap.md](roadmap.md)의 결정이라 「아직 정하지 않은 것」에 있다.
 - **`.mcp.json`은 저장소 루트에 URL만 적어 commit한다.** secret과 기기별 값은 `.claude/settings.local.json`과 `.env.local`에 둔다. 첫 환경변수가 생기는 pull request에서 `.env.example`을 만든다.
 - **`build-storybook`은 `pnpm check`에 넣지 않는다.** `Quality`의 15분 제한 안에 두 빌드를 겹치지 않도록 별도 workflow로 검사한다.
-- **Skill이 만든 기획자 화면은 전달 범위 밖의 `apps/sandbox`에 둔다.** `apps/studio`는 그 자체가 전달 대상이므로 생성 결과를 거기에 두지 않는다. 기획자가 제품 화면을 한 건씩 만드는 작업장(블루키 리뉴얼)도 `2026-09-23` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다. 생성 화면을 제품 화면으로 채택할지는 기획자가 정한다. `apps/sandbox`는 Studio와 같은 Next.js 앱이며 Studio처럼 `typecheck` script를 두지 않는다. 루트 `typecheck`가 `pnpm -r typecheck`라서 workspace package에 그 script가 있으면 `pnpm check`에 자동으로 들어오고, `lint`·`build`·`test`는 `apps/sandbox`를 가리키지 않으므로, 이렇게 두면 `apps/sandbox`는 `pnpm check` 밖에 남는다. 검사는 `pnpm --filter @ooee/sandbox build`와, `apps/sandbox`의 `*.test.tsx`를 도는 자체 `test` script(`pnpm --filter @ooee/sandbox test`)로 한다. v0에서 ⑦의 테스트는 이 `*.test.tsx`다. 전달 시 `docs/process/`와 함께 제거한다.
+- **Skill이 만든 기획자 화면은 전달 범위 밖의 `apps/sandbox`에 둔다.** `apps/studio`는 그 자체가 전달 대상이므로 생성 결과를 거기에 두지 않는다. 기획자가 제품 화면을 한 건씩 만드는 작업장(블루키 리뉴얼)도 `2026-09-22` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다. 생성 화면을 제품 화면으로 채택할지는 기획자가 정한다. `apps/sandbox`는 Studio와 같은 Next.js 앱이며 Studio처럼 `typecheck` script를 두지 않는다. 루트 `typecheck`가 `pnpm -r typecheck`라서 workspace package에 그 script가 있으면 `pnpm check`에 자동으로 들어오고, `lint`·`build`·`test`는 `apps/sandbox`를 가리키지 않으므로, 이렇게 두면 `apps/sandbox`는 `pnpm check` 밖에 남는다. 검사는 `pnpm --filter @ooee/sandbox build`와, `apps/sandbox`의 `*.test.tsx`를 도는 자체 `test` script(`pnpm --filter @ooee/sandbox test`)로 한다. v0에서 ⑦의 테스트는 이 `*.test.tsx`다. 전달 시 `docs/process/`와 함께 제거한다.
 - **v0가 만드는 화면 둘은 정해 둔다.** 하나는 관리자 로그인으로, `apps/studio/src/app/screens/admin/login/page.tsx`가 원본이다. 그 파일의 머리말 주석과 [sources.md](sources.md)의 Auth split screen 설명만 프롬프트로 주어 다시 만들고, 원본과 `@ooee/ui` 재사용을 대조한다. 다른 하나는 STO 지원요청 화면으로, `/screens/*`에 원본도 없고 `screen-registry`에도 항목이 없으므로 원본이 없는 기획자 요청에 해당한다. 둘 다 `apps/sandbox`에 만들며 `/screens/*`에는 두지 않는다. A/B 검증은 같은 화면 둘로 비교한다.
 - **Figma는 디자인 원본이 아니라 검토용 캔버스로 시작한다.** 코드로 먼저 만든 화면을 Figma에 올리고, 사람이 고친 뒤 다시 읽어 코드로 돌아오는 순서다. roadmap.md의 「현재까지의 경험은 B안이 낫다」와 맞는 순서이며, A/B 검증에서 이 전제를 처음 확인한다.
 - **명령은 pull request를 만들지 않고 멈춘다.** `AGENTS.md`의 「화면 확정 검수」와 「여러 환경에서 이어서 작업할 때」가 정한 대로 commit·push·pull request 생성은 사용자의 명시적 요청이 필요하다. pull request는 순서 4에서 그 두 곳에 더했다. 명령은 「pull request 준비 완료」에서 멈추고 사용자가 요청하면 만든다.
@@ -334,7 +334,7 @@ pnpm deploy:sandbox                                 # 빌드 + 올리기
 
 | 항목 | 담당 | 기한 |
 | --- | --- | --- |
-| ~~`@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당~~ → **Figma 를 뺐다**(`2026-09-23`, 「2026-09-23 Figma 를 뺐다」). 아래는 그때의 물음이다. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 기획자·개발자 | `2026-09-23` |
+| ~~`@ooee/ui`를 반영한 Figma 라이브러리를 만들지와 담당~~ → **Figma 를 뺐다**(`2026-09-22`, 「2026-09-22 Figma 를 뺐다」). 아래는 그때의 물음이다. 스파이크 R1에서 라이브러리가 없고 Code Connect는 플랜상 쓸 수 없음을 확인했다(「스파이크 결과」). 없는 채로 가면 순서 6·7은 변수 이름, 레이어 이름(`data-slot`)과 매핑표로 대신한다 | 개발자 | 정해짐 |
 | Story 파일 위치(`packages/ui/src/<component>.stories.tsx` 병치 또는 `apps/storybook/stories/`)와 폴더 구조. [working-context.md](working-context.md) 「남은 작업」 10번의 카테고리화와 함께 정한다 | 기획자·개발자 | `2026-09-16` |
 | 확정 컴포넌트 19개의 최소 `Default` Story(필수 prop만)를 개발자가 순서 3의 pull request에 한 번에 넣어도 되는가. 순서 3의 완료 기준이 컴포넌트마다 Story 하나를 전제하고 기획자는 `9/14~` 화면 개선 중이라 제안한다. Property를 나열하는 Story는 제안 밖이며 [open-questions.md](open-questions.md)의 Style·Size 이름 통일 뒤에 기획자가 쓴다 | 기획자 | `2026-09-16` |
 | 기본 브랜드 값의 자리: Storybook decorator에 두는 채로 갈지, `packages/tokens/src/styles.css`가 `DEFAULT_BRAND_SEED`의 `--brand-*`·`--oe-brand-*` 값을 갖게 할지. 후자는 브랜드만 런타임 주입으로 남겨 둔 tokens 구조와 전달 패키지가 싣는 값을 바꾸며, [open-questions.md](open-questions.md)의 「기본 ooee brand seed」가 Provisional인 채로 값이 공용 package에 들어간다 | 기획자 | `2026-09-16` |
@@ -347,7 +347,7 @@ pnpm deploy:sandbox                                 # 빌드 + 올리기
 | ~~이관 뒤 `AGENTS.md`·Skill·`.mcp.json`의 위치~~ → **`plugins/ooee-harness/` Claude Code Plugin으로 정했다**(`2026-09-16` 스파이크 R3. 「이관 시 남기는 것」). 별도 저장소는 열지 않되 나중에 뽑아낼 수 있게 둔다고 했으나, `2026-09-21`에 `bluekey-kr/Design-System-Harness`를 열어 `plugins/ooee-harness/`·`scripts/figma/`·`apps/sandbox/`와 이 문서를 **이력과 함께** 옮겼다. 원본 저장소에도 같은 파일이 남아 있고 어느 쪽이 정본인지는 아래 줄에 있다 | 개발자 | 정해짐 |
 | `AGENTS.md` 「코드 소유 경계」의 import 경계(`@ooee/ui`에서만 가져온다)를 `docs/system/quality.md`로 승격할지. 하네스가 이관 뒤에도 그 규칙을 읽어야 해서 원본의 자리가 필요하다. `data-slot` 승격과 같은 성격이라 함께 정한다 | 기획자 | `2026-09-23` |
 | 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 개발자 | `2026-09-25` |
-| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. sandbox 의 컴포넌트 표시·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 기획자 | `2026-09-23` |
+| `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 sandbox 의 `component-map.ts`(「컴포넌트 보기」)에만 있고 `docs/system/`에는 없다. sandbox 의 컴포넌트 표시·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 기획자 | `2026-09-23` |
 | `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 sandbox 가 어떤 컴포넌트인지 읽지 못한다 | 기획자 | `2026-09-23` |
 | ~~Slack 폼에서 issue를 만드는 수단~~ → **Workflow Builder 의 GitHub 커넥터 「문제 생성」으로 정했다**(`2026-09-21`). github.com 용으로 뜨고 실제로 이슈 넷을 만들었다. 인증 계정은 기획자별로 붙이지 않고 `YUJINSIK-momo` 하나로 고정했다 — 기획자가 자기 GitHub 을 연결하지 않아도 돌아야 하기 때문이다. 대가로 이슈 작성자가 모두 같은 이름이 되므로, 요청자는 본문 첫 줄 `요청자:` 가 갖는다 | 개발자 | 정해짐 |
 | 확정 권한을 어떻게 보는지. ✅는 누구나 달 수 있고 「리액션을 단 사람 == 요청자」 조건 분기는 Business+ 이상이다. Pro면 확정 댓글에 남긴 이름을 `harness-check`가 요청자와 대조하는 쪽으로 간다 | 개발자 | 미정 |
@@ -421,17 +421,17 @@ Skill 사용법과 MCP 설정은 `docs/system/` 바깥에 둔다. 규칙은 `doc
 
 `@ooee/ui` 에 없는 컴포넌트를 만드는 절차는 [new-component.md](new-component.md) 가 갖는다. 채워야 하는 다섯 자리(구현·export·문서·등록·Playground 와 카탈로그 축)와 shadcn 에서 옮겨 쓰는 방식, Playground 양식이 거기 있다.
 
-### 2026-09-23 Figma 를 뺐다
+### 2026-09-22 Figma 를 뺐다
 
 개발자 결정이다. **화면 요청 처리에서 Figma 를 뺐고, 결과는 sandbox 에서만 본다.**
 
 - **까닭.** 화면마다 Figma 로 옮기는 데 오래 걸렸다 — 이커머스 5장(#9)은 코드가 다 된 뒤에도 Figma 에 한 시간 넘게 걸렸다. 그것을 줄이려고 붙인 것(게시된 라이브러리의 인스턴스로 그리기, 라이브러리가 코드보다 낡았는지 보는 검사, 키를 지키는 제자리 갱신)이 도구를 더 크게 만들었다. 요청한 사람이 보는 것은 sandbox 의 화면이고, 채택 판단도 거기서 한다.
 - **지운 것.** `/design-page` Skill, `scripts/figma/`, `.mcp.json`(Figma remote MCP), sandbox 의 Figma 카탈로그(`/catalog`)와 개발 서버 지문 route, `docs/process/figma-component-map.md`·`figma-page-agent.md`. `/process-issue` 와 러너는 Figma 단계 없이 돈다. 결과 댓글은 첫 네 줄(제목·요청·샌드박스·작업)이다.
 - **대신하는 것.** Figma 로 옮기던 자리는 `/process-issue` 5단계 「sandbox 에서 띄워 보고 검사한다」다. 빌드한 sandbox 를 `scripts/visual/inspect.mjs --serve` 로 띄워 화면마다 캡처하고 `h1`·가로 넘침·컴포넌트 표식을 잰 뒤, 캡처를 눈으로 대조해 깨진 자리를 `dev` 에 올리기 전에 고친다. 사람은 `dev` 에 배포된 화면을 보고 결정한다 — 개선이면 다음 회차 PR 이 `dev` 로, 반려면 되돌림 PR 이 `dev` 로, 승인이면 `dev → main` 이다.
-- **남긴 것.** 컴포넌트가 DOM 에 남기는 `data-slot`·`data-*` 표식. sandbox 가 화면에 어떤 컴포넌트를 썼는지 보여 주는 데 쓴다(다음 작업). 버튼처럼 보이는 링크를 `<Button render={<a href="…" />} nativeButton={false} role="link">` 로 쓰는 generate-code 규칙도 같은 까닭으로 둔다 — Button 표식이 있어야 sandbox 가 그 자리를 Button 으로 읽는다.
+- **남긴 것.** 컴포넌트가 DOM 에 남기는 `data-slot`·`data-*` 표식. sandbox 가 화면에 어떤 컴포넌트를 썼는지 보여 주는 데 쓴다(아래 「컴포넌트 보기」). 버튼처럼 보이는 링크를 `<Button render={<a href="…" />} nativeButton={false} role="link">` 로 쓰는 generate-code 규칙도 같은 까닭으로 둔다 — Button 표식이 있어야 sandbox 가 그 자리를 Button 으로 읽는다.
 - **Figma 라이브러리.** `ooee · 컴포넌트 라이브러리` 파일은 Figma 에 남아 있지만 이 저장소는 더 갱신하지 않는다. `2026-09-22` 기준으로 코드보다 낡았다(Chip 켜짐 · Switch 켜짐 · SelectBox 선택).
 - 아래 「스파이크 결과」의 Figma 기록은 그때의 기록이다. 가리키는 파일은 지웠다.
-- **다음.** 디자인 시스템 → 요청 → sandbox. sandbox 에서 화면마다 어떤 컴포넌트를 썼는지 보고, 그 컴포넌트의 문서로 건너간다.
+- **컴포넌트 보기.** 디자인 시스템 › 요청 › sandbox. sandbox 의 화면마다 아래에 막대가 뜬다(`apps/sandbox/src/components/component-inspector/`, 루트 layout 이 얹고 화면 코드는 모른다). 「컴포넌트 보기」는 화면 위 컴포넌트마다 테두리와 이름표를 세우고 오른쪽에 「쓴 컴포넌트 N종 · M곳」 목록을 연다. 목록의 이름은 Studio 문서(`https://ooee-studio.pages.dev/components/<key>`)로 가고, 이름에 올리면 그 자리만 남는다. 맨 위 경로는 디자인 시스템 › 프로젝트 탭 › 화면이다. 「요청 보기」는 그 화면을 만든 요청 문장·날짜·원본을 보인다. 첫 화면의 카드에는 그 화면이 `@ooee/ui` 에서 가져온 컴포넌트가 칩으로 붙는다 — 칩은 빌드 때 화면 코드의 import 를 읽은 것이고, 막대는 그려진 DOM 의 표식을 읽은 것이다. 표식이 없는 컴포넌트(`MessageBubble` 등, 아래 「아직 정하지 않은 것」)는 막대에 잡히지 않는다.
 
 ## 스파이크 결과
 

@@ -66,7 +66,7 @@ Storybook이 주는 것과 같은 것을 여기서 얻는다.
 
 ## Figma 는 쓰지 않는다
 
-화면 요청의 결과는 **샌드박스에서만 본다.** `2026-09-23` 에 요청 처리에서 Figma 를 뺐다 — 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해졌다. Figma MCP 와 Figma 로 옮기던 명령·도구는 지웠다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md) 「2026-09-23 Figma 를 뺐다」에 있다.
+화면 요청의 결과는 **샌드박스에서만 본다.** `2026-09-22` 에 요청 처리에서 Figma 를 뺐다 — 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해졌다. Figma MCP 와 Figma 로 옮기던 명령·도구는 지웠다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md) 「2026-09-22 Figma 를 뺐다」에 있다.
 
 Storybook과 Storybook MCP는 **두지 않는다**(`2026-09-18` 결정). **Storybook이 하던 일은 이미 Studio의 Playground가 한다** — 위 「Playground」 절을 본다. 까닭은 [docs/process/ai-environment.md](docs/process/ai-environment.md)의 「2026-09-18 순서 3·5를 하지 않기로 했다」에 있다.
 

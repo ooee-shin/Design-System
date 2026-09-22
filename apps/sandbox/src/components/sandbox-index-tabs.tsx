@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/candidates/tabs";
+import { docKeyOf, studioDocUrl } from "@/components/component-inspector/component-map";
 import type { ScreenRoot } from "@/components/renewal/screen-registry";
 import type { SandboxScreen } from "@/screens";
 
@@ -12,9 +13,11 @@ type Project = { id: string; name: string; description: string };
 /** 블루키 리뉴얼 탭의 값. 프로젝트 id 와 겹치지 않게 둔다. */
 export const RENEWAL_TAB = "renewal";
 
+const CHIP = "inline-flex rounded-md border border-oe-border-secondary px-1.5 py-0.5 text-xs text-oe-foreground-secondary";
+
 /**
  * sandbox 첫 화면의 탭이다. 화면이 쌓일수록 한 줄로 늘어놓은 목록은 스크롤만 길어지므로, 프로젝트마다
- * 탭 하나로 나눠 「어느 프로젝트에 무엇이 들어 있는지」를 먼저 보이게 한다(2026-09-23 개발자).
+ * 탭 하나로 나눠 「어느 프로젝트에 무엇이 들어 있는지」를 먼저 보이게 한다(2026-09-22 개발자).
  *
  * 고른 탭은 주소의 `#<탭>` 에 남긴다. 링크로 건네면 받은 사람이 같은 탭을 열고, 화면을 보고 뒤로
  * 오면 보던 탭으로 돌아온다. 정적으로 내보낸 사이트라 쿼리 대신 해시를 쓴다.
@@ -23,10 +26,13 @@ export function SandboxIndexTabs({
   projects,
   screens,
   renewal,
+  uiImports = {},
 }: {
   projects: readonly Project[];
   screens: SandboxScreen[];
   renewal: ScreenRoot[];
+  /** 화면 key → 그 화면이 `@ooee/ui` 에서 가져온 컴포넌트 이름. 빌드 때 센다. */
+  uiImports?: Record<string, string[]>;
 }) {
   const tabs = [...projects.map((project) => project.id), RENEWAL_TAB];
   // 첫 탭은 화면이 있는 첫 프로젝트다. 빈 탭부터 열면 무엇이 있는지 모른 채 다른 탭을 눌러 봐야 한다.
@@ -85,6 +91,29 @@ export function SandboxIndexTabs({
                       {screen.name}
                     </Link>
                     <p className="mt-1 text-sm text-oe-foreground-secondary">{screen.prompt}</p>
+                    {uiImports[screen.key]?.length ? (
+                      <ul aria-label="쓴 컴포넌트" className="mt-2 flex flex-wrap gap-1.5">
+                        {uiImports[screen.key].map((name) => {
+                          const key = docKeyOf(name);
+                          return (
+                            <li key={name}>
+                              {key ? (
+                                <a
+                                  href={studioDocUrl(key)}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className={`${CHIP} hover:border-oe-border-primary hover:text-oe-foreground-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring`}
+                                >
+                                  {name}
+                                </a>
+                              ) : (
+                                <span className={CHIP}>{name}</span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : null}
                     <p className="mt-2 text-xs text-oe-foreground-tertiary">
                       {screen.createdAt}
                       {screen.source ? ` · 원본 ${screen.source}` : " · 원본 없음"}

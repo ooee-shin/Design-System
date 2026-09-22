@@ -1,6 +1,6 @@
 # Design-System-Harness
 
-블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin, 요청 처리 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다. 결과는 sandbox 에서만 본다 — Figma 는 쓰지 않는다(`2026-09-23`).
+블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin, 요청 처리 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다. 결과는 sandbox 에서만 본다 — Figma 는 쓰지 않는다(`2026-09-22`).
 
 `2026-09-21`에 `ooee-shin/ooee-ui`에서 이력과 함께 옮겨 왔다. 저장소 문서와 스크립트는 여기가 정본이다. 디자인 시스템 자체(`packages/*`, `docs/system/`, `apps/studio`)의 원본은 `ooee-ui`이고, 하네스가 그것을 읽어야 돌기 때문에 이 저장소에도 함께 있다. 그쪽을 여기서 고치면 `ooee-ui`에도 같은 변경을 내야 두 저장소가 갈라지지 않는다.
 
@@ -10,10 +10,11 @@
 Slack 요청 폼 → GitHub issue (요청서 원본)
 → 확정
 → /ooee-harness:generate-code 로 화면 생성 · 검사
+→ sandbox 에서 띄워 보고 검사 (빌드한 화면을 캡처해 눈으로 대조)
 → pull request → dev 머지
-→ Cloudflare Pages 에 자동 배포 → 화면 주소를 issue 댓글로 보고
-→ 기획자 승인
-→ pull request → main 머지
+→ Cloudflare Pages 에 자동 배포 → 화면 주소를 issue 댓글로 보고 (Slack 결과 채널이 구독)
+→ 기획자가 배포된 화면을 보고 승인 · 개선 · 반려 (개선·반려는 다음 회차가 다시 dev 로)
+→ 승인되면 pull request → main 머지
 ```
 
 요청 폼의 칸, issue 본문 양식과 승인 규칙은 [`docs/process/ai-environment.md`](docs/process/ai-environment.md)의 「요청 폼」과 「처리와 승인」이 갖는다.
@@ -25,9 +26,9 @@ Slack 요청 폼 → GitHub issue (요청서 원본)
 | `/ooee-harness:generate-code` | 요구사항 한 문단을 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다 | [SKILL.md](plugins/ooee-harness/skills/generate-code/SKILL.md) |
 | `/ooee-harness:review-design` | 화면 코드를 디자인 시스템 문서에 대조해 위반 목록을 낸다 | [SKILL.md](plugins/ooee-harness/skills/review-design/SKILL.md) |
 
-앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다. `/design-page`는 저장소 전용 Skill이라 설치 없이 보인다.
+앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다.
 
-세 명령과 이 셋을 잇는 `/process-issue`는 모두 `SKILL.md` 머리말에서 모델 `claude-sonnet-5`, effort `high`로 고정되어 있다. 세션이 다른 모델이어도 명령이 도는 동안만 이 값으로 바뀐다. 까닭은 Plugin README의 「모델과 effort」에 있다.
+두 명령과 이 둘을 잇는 `/process-issue`는 모두 `SKILL.md` 머리말에서 모델 `claude-sonnet-5`, effort `high`로 고정되어 있다. 세션이 다른 모델이어도 명령이 도는 동안만 이 값으로 바뀐다. 까닭은 Plugin README의 「모델과 effort」에 있다.
 
 ## 저장소 구조
 
@@ -38,7 +39,7 @@ plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과
 .github/workflows      Quality(pnpm check)와 Deploy(Cloudflare Pages)
 scripts/visual         브라우저에서 화면을 재는 도구
 scripts/docs           llms.txt 링크 시험, 배포본에 시스템 문서 원본을 싣는 빌드 단계
-apps/sandbox           요청으로 만든 화면 (3001 포트)
+apps/sandbox           요청으로 만든 화면과 블루키 리뉴얼 (3001 포트). 화면마다 「컴포넌트 보기」
 apps/studio            컴포넌트 문서와 Playground (3000 포트)
 packages/ui            공용 Component (@ooee/ui)
 packages/tokens        oe semantic token

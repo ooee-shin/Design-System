@@ -76,7 +76,7 @@ feat(badge)!: 색을 프리미티브 단계 규칙으로 정리하고 크기·�
 1. 컴포넌트가 서로 충돌하지 않는가
 2. Skill과 Agent가 동작하는가
 
-Storybook과 Storybook MCP 항목은 걷어냈다 — 그 둘을 두지 않기로 했다(`2026-09-18`, [ai-environment.md](ai-environment.md)). Figma MCP 조회와 Figma 라이브러리 항목도 걷어냈다 — `2026-09-23` 에 요청 처리에서 Figma 를 뺐다. 1번은 `pnpm check`가 맡는다. 2번의 대상인 Skill과 `.claude/settings.json` 공용 권한은 들어왔다. 2번은 `dev → main` diff에 `.claude/`나 `AGENTS.md`가 있을 때만 개발자가 [ai-environment.md](ai-environment.md)의 「통합 검증 항목 채우기」에 적힌 명령을 돌리고 결과를 pull request 본문에 남긴다. 컴포넌트만 바뀐 pull request는 이 항목을 기다리지 않는다. 대상이 생기는 순서대로 이 목록을 채워 간다.
+Storybook과 Storybook MCP 항목은 걷어냈다 — 그 둘을 두지 않기로 했다(`2026-09-18`, [ai-environment.md](ai-environment.md)). Figma MCP 조회와 Figma 라이브러리 항목도 걷어냈다 — `2026-09-22` 에 요청 처리에서 Figma 를 뺐다. 1번은 `pnpm check`가 맡는다. 2번의 대상인 Skill과 `.claude/settings.json` 공용 권한은 들어왔다. 2번은 `dev → main` diff에 `.claude/`나 `AGENTS.md`가 있을 때만 개발자가 [ai-environment.md](ai-environment.md)의 「통합 검증 항목 채우기」에 적힌 명령을 돌리고 결과를 pull request 본문에 남긴다. 컴포넌트만 바뀐 pull request는 이 항목을 기다리지 않는다. 대상이 생기는 순서대로 이 목록을 채워 간다.
 
 ## 자동 검사가 도는 자리
 

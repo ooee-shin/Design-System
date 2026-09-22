@@ -1,7 +1,7 @@
 import { BrandThemeProvider } from "@/components/brand-theme-provider";
 
 /**
- * 블루키 리뉴얼 — Studio 의 `/screens` 에서 옮겨 온 제품 화면 작업장이다(2026-09-23).
+ * 블루키 리뉴얼 — Studio 의 `/screens` 에서 옮겨 온 제품 화면 작업장이다(2026-09-22).
  *
  * route group `(renewal)` 로 둔 까닭은 둘이다. 주소는 `/renewal/…` 그대로 두면서, sandbox 의 화면 규칙
  * 검사(`plugins/ooee-harness/lib/check-screens.mjs`, `src/screen-rules.test.tsx`)가 이 화면들을

@@ -67,7 +67,7 @@ test("러너가 스스로 더 여는 것은 되돌리기뿐이다 — pull reque
 });
 
 test("하위 명령이 머리말에 적은 도구를 넘긴다 — 요청 처리는 Figma 를 부르지 않는다", () => {
-  // 2026-09-23 에 Figma 를 요청 처리에서 뺐다. 하위 명령은 화면 생성·검수 둘뿐이고 결과는 샌드박스로만 본다.
+  // 2026-09-22 에 Figma 를 요청 처리에서 뺐다. 하위 명령은 화면 생성·검수 둘뿐이고 결과는 샌드박스로만 본다.
   for (const file of CHAINED_SKILLS) assert.ok(existsSync(path.join(repoRoot, file)), `하위 명령 파일이 없다: ${file}`);
   const tools = chainedAllowedTools();
   const args = buildClaudeArgs("x");
