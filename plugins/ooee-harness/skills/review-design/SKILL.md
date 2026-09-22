@@ -1,6 +1,8 @@
 ---
 name: review-design
 description: 화면 코드를 디자인 시스템 문서(quality·tokens·interaction·icon·컴포넌트)에 대조해 위반 목록과 건수를 낸다. 화면 코드 검수 요청에 쓴다. 고치지 않고 보고만 한다. 인수는 검수할 파일 경로이며 비우면 화면 자리에서 바뀌거나 새로 생긴 .tsx 파일이다.
+model: claude-sonnet-5
+effort: high
 ---
 
 # /review-design

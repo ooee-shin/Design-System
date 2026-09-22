@@ -1,6 +1,8 @@
 ---
 name: process-issue
 description: Slack 폼으로 들어온 화면 요청 이슈 하나를 처음부터 결과 댓글까지 처리한다. 이슈를 읽고 /ooee-harness:generate-code 로 화면을, /design-page 로 Figma 프레임을 만든 뒤 dev 에 머지하고 배포된 주소를 확인해 결과를 이슈 댓글로 올리고 멈춘다. 「결정 <n>」으로 다시 부르면 그 댓글에 사람이 단 결정(승인·반려·개선)을 읽어 다음 일을 한다. 화면이 이미 dev 에 들어갔는데 결과 댓글이 없으면 「결과 <n>」으로 결과 댓글만 올린다. 「이슈 <n> 처리」, 「<n> 결정 봐 줘」, 「<n> 결과만 올려 줘」 요청에 쓴다. 인수는 「<이슈 번호>」, 「결정 <이슈 번호>」 또는 「결과 <이슈 번호>」이다.
+model: claude-sonnet-5
+effort: high
 allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-:*), Bash(git add apps/sandbox/:*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
 ---
 

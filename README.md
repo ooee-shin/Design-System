@@ -28,6 +28,8 @@ Slack 요청 폼 → GitHub issue (요청서 원본)
 
 앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다. `/design-page`는 저장소 전용 Skill이라 설치 없이 보인다.
 
+세 명령과 이 셋을 잇는 `/process-issue`는 모두 `SKILL.md` 머리말에서 모델 `claude-sonnet-5`, effort `high`로 고정되어 있다. 세션이 다른 모델이어도 명령이 도는 동안만 이 값으로 바뀐다. 까닭은 Plugin README의 「모델과 effort」에 있다.
+
 ## 저장소 구조
 
 ```text

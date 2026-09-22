@@ -1,6 +1,8 @@
 ---
 name: generate-code
 description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/ui만으로 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> [원본: <저장소 경로>]」이다.
+model: claude-sonnet-5
+effort: high
 ---
 
 # /generate-code

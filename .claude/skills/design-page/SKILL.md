@@ -1,6 +1,8 @@
 ---
 name: design-page
 description: apps/sandbox에 만든 화면을 Figma 프레임으로 옮기고(②), 사람이 Figma에서 고친 것을 다시 읽어 화면 코드로 되돌린다(④). 색은 oe 토큰 변수에, 글자는 oe 텍스트 스타일에 묶는다. 「<화면>을 Figma로」와 「Figma에서 고친 것을 코드로」 요청에 쓴다. 인수는 「<sandbox key> [상태: <이름>=<JS>]... [fileKey: <Figma file key>] [새 버전] [포트: <n>] [예외: #<이슈 번호>] [낡은 라이브러리 허용]」 또는 「되읽기 <sandbox key> fileKey: <key> [프레임: <이름>] [포트: <n>]」이다.
+model: claude-sonnet-5
+effort: high
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @ooee/sandbox dev:*), Bash(pnpm --filter @ooee/sandbox build:*), Bash(pnpm --filter @ooee/sandbox test:*), Bash(node scripts/figma/sandbox-server.mjs:*), Bash(node scripts/figma/prepare.mjs:*), Bash(node scripts/figma/reread.mjs:*), mcp__figma__create_new_file, mcp__figma__use_figma, mcp__figma__get_screenshot
 ---
 
