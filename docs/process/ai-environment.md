@@ -133,13 +133,13 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ## 요청 폼
 
-기획자가 화면을 요청하는 입구를 Slack 폼으로 둔다. 기획자는 GitHub 계정이 있지만 그 화면에 익숙하지 않아서, 요청을 issue 본문으로 직접 받으면 아래 네 절이 지켜지지 않는다. 폼이 칸을 강제하면 그 문제가 구조적으로 사라진다. 워크스페이스가 유료 플랜이라 폼과 이모지 리액션 트리거, 커넥터를 모두 쓸 수 있다.
+기획자가 화면을 요청하는 입구를 Slack 폼으로 둔다. 기획자는 GitHub 계정이 있지만 그 화면에 익숙하지 않아서, 요청을 issue 본문으로 직접 받으면 아래 칸들이 지켜지지 않는다. 폼이 칸을 강제하면 그 문제가 구조적으로 사라진다. 워크스페이스가 유료 플랜이라 폼과 이모지 리액션 트리거, 커넥터를 모두 쓸 수 있다.
 
 **요청 문단의 원본은 GitHub issue 본문이고 Slack은 입구와 알림만 맡는다.** 대조할 자리가 하나여야 요청서가 사본으로 검증되기 때문이다. Slack 메시지는 편집 이력이 남지 않고, 저장소 밖에서 읽으려면 봇 토큰이 필요하며, 무료 워크스페이스에서는 90일 뒤 숨겨지고 1년 뒤 지워진다.
 
 이 자리에 Claude를 넣지 않는다. Slack MCP는 사용자별 OAuth라 각자 자기 권한으로 스레드를 **읽어 오는** 데는 쓸 수 있지만, 세션이 살아 있을 때 당기는 도구여서 폼 제출도 리액션도 세션을 깨우지 못하고, 폼 제출 콜백은 앱의 URL로 가므로 MCP 서버가 그 자리에 설 수 없다. 옮겨 적는 일 자체를 모델에게 맡기지 않는 까닭은 따로 있다. 이 흐름의 검사가 바이트 대조라서 조립은 결정론적인 쪽이 맡아야 한다.
 
-### 네 칸
+### 다섯 칸
 
 | 칸 | 라벨 | 형식 |
 | --- | --- | --- |
@@ -147,6 +147,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 2 | 이 화면이 하는 일 (프롬프트) | 긴 답변 · 필수 |
 | 3 | 비슷한 기존 화면 | 한 줄 · 선택 |
 | 4 | 저장하거나 제출하면 무슨 일이 일어나야 하나요? | 긴 답변 · 선택 |
+| 5 | 프로젝트 | 라디오 버튼 `sto` · `sv` · `web` · 필수 |
 
 처음에는 여섯 칸이었고 「이번에 만들지 않는 것」과 「아직 안 정해진 것」이 필수로 있었다. `2026-09-21`에 유진식이 둘을 뺐다. 프롬프트 한 칸이 그 내용을 담는다는 판단이다. **대가는 빈 칸과 「없음」의 구분이 사라진 것이다.** 안 적힌 것이 「정해졌다」로 읽히면 만드는 쪽이 임의로 정하므로, 기획자에게 「안 정한 것은 안 정했다고 프롬프트에 쓴다」를 말로 전한다.
 
@@ -168,7 +169,13 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 4 · 저장하거나 제출하면 무슨 일이 일어나야 하나요?
 버튼을 눌렀을 때 값이 어디로 가고, 사람에게 다음에 무엇이 보여야 하는지 씁니다.
 기술 용어는 몰라도 됩니다. 해당 없으면 「없음」이라고 적어 주세요.
+
+5 · 프로젝트
+이 화면이 어느 것에 들어가는지 고릅니다.
+점주 앱은 sto, 슈퍼바이저 앱은 sv, 웹은 web 입니다.
 ```
+
+`sto` · `sv` · `web` 세 값은 `apps/sandbox/src/screens.ts` 의 `SANDBOX_PROJECTS` 가 가진 `id` 와 같다. 기획자가 고른 값이 이슈 본문에 그대로 실려 오고 화면을 만들 때 그 값을 목록에 적기 때문이다. **한쪽을 고치면 다른 쪽도 고친다.**
 
 ### 이슈 본문
 
@@ -176,6 +183,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ```md
 요청자: <양식을 제출한 사용자>
+프로젝트: <프로젝트>
 요구사항: <이 화면이 하는 일 (프롬프트)>
 비슷한 기존 화면: <비슷한 기존 화면>
 제출하면 일어나는 일: <저장하거나 제출하면 무슨 일이 일어나야 하나요?>
@@ -185,6 +193,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 ```text
 요청자: <제출한 사람>
+프로젝트: <프로젝트>
 화면 이름: <화면 이름>
 요구사항: <프롬프트>
 비슷한 기존 화면: <비슷한 기존 화면>
@@ -212,6 +221,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 - **조건 분기(「브랜치 추가」)는 Business+ 전용이다.** 「리액션을 단 사람 == 요청자」 같은 검사를 워크플로 안에서 할 수 없다. 대조는 댓글에 남긴 이름으로 저장소 쪽에서 한다.
 - **워크플로가 실패하면 ⋮ → 「내 활동 로그」에 단계별로 보인다.** 어느 단계가 어떤 오류로 죽었는지 거기서 읽는다.
 - **커넥터는 사용자 OAuth로 돈다.** `/github` Slack 앱과 달리 저장소 소유자가 앱을 설치하지 않아도 된다. 다만 조직 저장소는 GitHub `Settings → Applications`에서 그 조직에 접근을 Grant 해야 목록에 나타난다.
+- **조직 소유 비공개 저장소는 GitHub Pages 를 못 쓴다.** 조직이 Free 플랜이면 Pages 설정 자체가 열리지 않는다. Team 이상이어야 한다. 그래서 배포는 Cloudflare Pages 로 간다.
 - **변수는 「마지막으로 클릭한 자리」에 들어간다.** 글자를 친 뒤에는 원하는 자리를 다시 클릭하고 `{ }`를 눌러야 한다. 설명 칸에서는 `cmd+A`가 페이지 전체를 선택하므로, 지울 때는 끝을 클릭하고 백스페이스로 지운다.
 
 ### 처리와 승인
@@ -222,7 +232,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 확정 (이슈 댓글)
 → 화면 생성 · 검사
 → pull request → dev 머지
-→ Vercel 이 dev 를 배포
+→ Cloudflare Pages 가 dev 를 배포
 → 만들어진 페이지 URL 을 이슈 댓글로 보고 (채널로 따라온다)
 → 승인
 → pull request → main 머지
@@ -230,8 +240,49 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 
 - **dev 가 보는 자리다.** 기획자는 코드가 아니라 배포된 화면을 보고 판단한다. 화면이 도는 주소가 생기기 전에는 승인을 묻지 않는다.
 - **main 은 승인된 것만 담는다.** 승인 뒤의 `dev → main` pull request 가 그 기록이다. 누가 언제 무엇에 동의했는지가 머지 기록으로 남는다.
-- **Vercel 은 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. 페이지 주소는 `<배포 주소>/<화면 key>` 가 된다.
+- **Cloudflare Pages 가 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. 페이지 주소는 `<배포 주소>/<화면 key>` 가 된다. Vercel 도 GitHub Pages 도 아닌 까닭은 「만들면서 확인된 것」에 적었다.
+- **승인은 화면 확인까지다.** 기획자가 판단하는 것은 「요청한 화면이 요청대로 나왔는가」 하나다. 코드를 제품에 넣을지, 컴포넌트로 승격할지는 이 승인이 정하지 않는다. `dev → main` 머지는 그 확인을 남기는 기록이지 채택이 아니다. 채택은 `docs/process` 의 이관 절차가 따로 갖는다.
 - 배포가 실패하면 승인을 묻지 않는다. 그 경우는 반려가 아니라 처리 중 실패다.
+
+### Cloudflare Pages 설정값
+
+| 자리 | 값 |
+| --- | --- |
+| 프로젝트 이름 | `ooee-sandbox` (주소가 `https://ooee-sandbox.pages.dev` 가 된다) |
+| Production branch | `dev` |
+| Framework preset | None |
+| Build command | `corepack enable && pnpm install --frozen-lockfile && pnpm --filter @ooee/sandbox build` |
+| Build output directory | `apps/sandbox/out` |
+| Root directory | `/` |
+| 환경 변수 | `NODE_VERSION` = `22.22.1` |
+
+`apps/sandbox/next.config.ts` 가 `output: "export"` 라 빌드가 `apps/sandbox/out` 에 정적 파일을 떨군다. 이미지 최적화 서버가 없으므로 `images.unoptimized` 도 함께 켜 두었다. `dev` 를 그대로 빌드해 13개 라우트가 나오는 것은 `2026-09-21`에 확인했다.
+
+- **`corepack enable` 을 앞에 붙인다.** `package.json` 이 `packageManager: pnpm@10.32.0` 을 못 박고 있어서 빌드 이미지의 pnpm 이 다른 판이면 `--frozen-lockfile` 이 깨진다. `.github/workflows/quality.yml` 도 같은 이유로 같은 줄을 갖는다.
+- **`NODE_VERSION` 은 `.node-version` 과 같은 값이다.** 저장소에 `.node-version`(`22.22.1`)이 있어 Cloudflare 가 그것도 읽지만, 둘이 갈라지면 CI 와 배포가 다른 Node 로 도는 것이라 환경 변수로도 박아 둔다.
+- **`main` 은 미리보기 배포가 된다.** Production branch 가 `dev` 이므로 다른 가지는 전부 preview 주소를 받는다. 기획자가 보는 자리는 `dev` 하나라 그대로 둔다.
+
+### 배포는 wrangler 로 직접 올린다
+
+`2026-09-21`~`22`에 Cloudflare 의 Git 연동을 붙이려다 막혔고, `2026-09-22`에 유진식이 직접 올리는 쪽으로 정했다.
+
+```bash
+pnpm dlx wrangler@4.136.1 login                     # 한 번만
+pnpm dlx wrangler@4.136.1 pages project create ooee-sandbox --production-branch dev
+pnpm deploy:sandbox                                 # 빌드 + 올리기
+```
+
+`deploy:sandbox` 는 루트 `package.json` 이 갖는다. `--branch=dev` 를 주어 production branch 와 같은 이름으로 올리므로 그 배포가 `https://ooee-sandbox.pages.dev` 가 된다. wrangler 는 `dlx` 로 판을 박아 불러서 저장소 의존성을 늘리지 않는다.
+
+**대가는 자동 배포가 아니라는 것이다.** dev 에 머지해도 저절로 돌지 않는다. 당분간 사람이 `pnpm deploy:sandbox` 를 돌리고, 자동으로 만들려면 `.github/workflows/` 에 같은 명령을 넣고 Cloudflare API 토큰을 저장소 secret 으로 둔다.
+
+### Git 연동이 막힌 까닭
+
+같은 데서 헤매지 않게 적어 둔다. 나중에 다시 붙일 수도 있다.
+
+1. **조직에 GitHub 앱을 설치하는 것은 오너만 할 수 있다.** `YUJINSIK-momo` 는 `bluekey-kr` 의 member 라(`gh api /user/memberships/orgs/bluekey-kr` → `member`) 조직의 앱 설치를 보지도 못한다. 실제로는 `2026-09-21 18:49` 에 이미 설치돼 있었고 `Design-System-Harness` 하나만 골라져 있었는데, member 계정으로는 그게 안 보여서 설치가 안 된 줄 알았다. 오너 계정(`bluekey-hk`)으로 보니 나타났다.
+2. **앱이 이미 설치돼 있으면 Cloudflare 의 「Connect GitHub」이 끊긴다.** Cloudflare 는 GitHub 의 *새 설치* 화면(`installations/select_target?state=…`)으로 보내는데, 이미 설치된 계정을 고르면 GitHub 이 설치 대신 설정 페이지로 보내 버려서 `state` 를 들고 Cloudflare 로 돌아오지 못한다. 눌러도 제자리를 돈다.
+3. 다시 붙이려면 조직에서 앱을 **Uninstall 한 뒤 Cloudflare 의 흐름 안에서 새로 설치**해야 한다. 그때 설정값은 위 표를 쓰고 Root 는 `/` 다.
 
 ### 남은 것
 
@@ -258,9 +309,10 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 | 전달본 사본을 만드는 절차: 누가 어느 branch에서 어떤 명령으로 만드는지, 블루키에 이 저장소의 읽기 권한을 주는지 아니면 Plugin 디렉터리를 사본에 함께 복사해 로컬 marketplace로 설치하게 하는지 | 유진식 | `2026-09-25` |
 | `data-slot` 이름을 시스템 정의로 승격할지. 지금 이 이름은 `packages/ui`의 코드와 [figma-component-map.md](figma-component-map.md)에만 있고 `docs/system/`에는 없다. 매핑표가 전달 시 사라지므로, Figma·측정·자동화가 계속 쓸 이름이면 `docs/system/`이 소유해야 한다 | 신주희 | `2026-09-23` |
 | `확정`인데 `data-slot`이 없는 컴포넌트를 어떻게 할지. `MessageBubble`과 초안 둘(`MessageComposer`·`MessageFileAttachment`)이 그렇고, 그대로면 Figma로 옮겨도 이름이 `div`라 되짚을 수 없다 | 신주희 | `2026-09-23` |
-| Slack 폼에서 issue를 만드는 수단: Workflow Builder의 GitHub 커넥터 스텝인지, 그 조각만 받는 작은 relay인지. 커넥터 목록에 GitHub이 있다고 Slack 도움말이 적지만 공개 레퍼런스는 Enterprise Server용만 있어 github.com용 「Create an issue」가 뜨는지 눈으로 확인해야 한다. 커넥터로 가면 인증 계정도 함께 정한다 — 기획자 GitHub 계정으로 붙여야 issue와 확정 댓글이 실제 사람 이름으로 남아 요청서의 「승인:」 줄이 성립한다 | 유진식 | 미정 |
+| ~~Slack 폼에서 issue를 만드는 수단~~ → **Workflow Builder 의 GitHub 커넥터 「문제 생성」으로 정했다**(`2026-09-21`). github.com 용으로 뜨고 실제로 이슈 넷을 만들었다. 인증 계정은 기획자별로 붙이지 않고 `YUJINSIK-momo` 하나로 고정했다 — 기획자가 자기 GitHub 을 연결하지 않아도 돌아야 하기 때문이다. 대가로 이슈 작성자가 모두 같은 이름이 되므로, 요청자는 본문 첫 줄 `요청자:` 가 갖는다 | 유진식 | 정해짐 |
 | 확정 권한을 어떻게 보는지. ✅는 누구나 달 수 있고 「리액션을 단 사람 == 요청자」 조건 분기는 Business+ 이상이다. Pro면 확정 댓글에 남긴 이름을 `harness-check`가 요청자와 대조하는 쪽으로 간다 | 유진식 | 미정 |
 | ~~트랙 파일의 정본이 어느 저장소인가~~ → **`bluekey-kr/Design-System-Harness`로 정했다**(`2026-09-21`). 저장소 문서와 스크립트는 여기서 관리한다. `ooee-shin/ooee-ui`는 디자인 시스템 원본으로 남고, 그쪽의 `docs/process/` 문서는 신주희가 계속 쓴다 | 유진식 | 정해짐 |
+| `*.pages.dev` 주소의 공개 범위. 저장소는 조직 소유 비공개인데 배포된 화면은 주소를 아는 사람 누구나 본다. 만드는 화면이 실제 제품 기획이라 그대로 두어도 되는지, Cloudflare Access(Zero Trust)로 이메일 확인을 걸지 정한다. 거는 쪽이면 기획자 이메일을 허용 목록에 넣어야 하므로 배포를 붙이는 날 함께 한다 | 유진식 | `2026-09-22` |
 | 통합 방식(SaaS 패키지화 또는 저장소 연동). 순서 8에서는 Plugin의 배포 source 타입(상대 경로 또는 git 저장소)만 막는다 | 유진식 | 미정 |
 
 ## 일정
