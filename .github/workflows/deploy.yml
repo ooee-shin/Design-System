@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - dev
+  # 코드가 그대로여도 다시 올려야 할 때가 있다. 배포만 실패했거나 토큰을 새로 넣었을 때다.
+  workflow_dispatch:
 
 permissions:
   contents: read
