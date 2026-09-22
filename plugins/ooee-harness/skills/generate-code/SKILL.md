@@ -69,7 +69,7 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 
 - 컴포넌트가 있는 요소는 반드시 그 컴포넌트를 쓴다. 같은 역할을 native 요소와 클래스로 다시 만들지 않는다.
 - 컴포넌트가 없는 요소(제목, 문단, 레이아웃 상자, 링크, 로고 자리)는 native 요소에 `oe-*` 토큰 클래스를 쓴다.
-- **링크와 버튼은 요구사항의 낱말을 따른다.** 요구사항이 「링크」라 부르거나 페이지 이동을 뜻하는 요소(비밀번호 찾기, 약관·정책)는 `<a>`다. 목적지가 정해지지 않았어도 `<a href="#">`로 두고 `<button>`으로 바꾸지 않는다. 목적지는 머리말 주석의 비워 둔 자리에 적는다. 링크가 버튼처럼 보여야 하면 `buttonVariants`로 클래스를 만든다. `onClick`도 `type="submit"`도 없는 `<button>`은 만들지 않는다.
+- **링크와 버튼은 요구사항의 낱말을 따른다.** 요구사항이 「링크」라 부르거나 페이지 이동을 뜻하는 요소(비밀번호 찾기, 약관·정책)는 `<a>`다. 목적지가 정해지지 않았어도 `<a href="#">`로 두고 `<button>`으로 바꾸지 않는다. 목적지는 머리말 주석의 비워 둔 자리에 적는다. 링크가 버튼처럼 보여야 하면 `<Button render={<a href="…" />} nativeButton={false} role="link">`로 쓴다. `buttonVariants`로 `<a>`에 클래스만 입히지 않는다. 겉은 같아도 `data-slot`·`data-variant` 같은 Button 표식이 빠져 도구가 그 자리를 Button으로 읽지 못한다. `role="link"`는 빼지 않는다. Base UI가 버튼이 아닌 요소에 `role="button"`을 붙여 링크가 버튼으로 읽힌다. `onClick`도 `type="submit"`도 없는 `<button>`은 만들지 않는다.
 - **요구사항과 문서가 어긋날 때.** 요구사항이 컴포넌트를 이름으로 지정해도(「스위치」, 「체크박스」, 「드롭다운」) 그 컴포넌트 문서의 「역할과 경계」와 「Guidelines」를 화면의 실제 동작과 대조한다. 문서가 그 자리에 다른 컴포넌트를 가리키면 문서가 가리키는 컴포넌트를 쓰고, 근거 칸에 그 절 이름을 적고, 요구사항과 다르게 골랐다는 사실을 「판단이 필요한 것」에 적는다. 예: 「긴급 요청 여부(즉시 켜고 끄는 스위치)」라도 그 값이 「요청 보내기」를 눌러야 반영되면 switch.md 「역할과 경계」에 따라 `CheckboxField`를 쓴다.
 - **컴포넌트가 둘 이상 맞을 때.** 두 문서의 「역할과 경계」에서 둘을 가르는 문장을 찾아 근거에 그 문장을 적고, 문장이 가리키는 쪽을 쓴다. 가르는 문장이 어디에도 없으면 하나를 고르되 기준을 지어내지 않고, 고른 쪽·고르지 않은 쪽을 「판단이 필요한 것」에 `문서 공백:`으로 시작해 적는다.
 - 요구사항이 있는데 컴포넌트가 없고 native로도 규칙에 맞게 만들 수 없는 요소는 만들지 않고 「미확정 자산 후보」에 이름·쓰임·왜 못 만드는지를 적는다.
@@ -96,7 +96,7 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 
 - 경계가 없는 native `<a>`·`<button>`은 `interaction.md` 「Focus 선과 Ring」의 유형 3이다. `outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary`를 붙인다. `packages/ui/src/button.tsx`의 `DETACHED_FOCUS`와 같은 문자열이다. `ring-offset-2`가 빠지면 간격이 없어 유형 3이 아니다. `bg-oe-background-secondary` 위에 놓이면 `ring-offset-oe-background-secondary`로 바꾼다.
 - 예외: `Input`의 `trailingElement`처럼 컴포넌트 Container 안에 넣는 아이콘 버튼은 그 컴포넌트의 Clear button과 같이 offset 없이 `outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring`을 쓴다.
-- `buttonVariants`로 클래스를 받은 링크는 Focus 표시를 이미 갖고 있으므로 덧붙이지 않는다.
+- `Button`으로 그린 링크는 Focus 표시를 이미 갖고 있으므로 덧붙이지 않는다.
 
 **아이콘**
 

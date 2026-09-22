@@ -4,8 +4,10 @@
 // 그래서 여기서 쓰는 SCREEN·EXPECT·RUN 은 ARGS 로 들어온다.
 //
 // 색은 `oe color`·`oe primitive` 변수에, 모서리·높이·아이콘 크기는 `oe size` 변수에, 글자는 `oe/text-*` 텍스트 스타일에 묶고
-// 아이콘은 Remix SVG 로 넣는다. RUN 은 조각 배열이다. 조각은 { frameName, parentPath, parentBox, rootFrame, nodes, primitives, icons } 이고,
+// 아이콘은 Remix SVG 로 넣는다. RUN 은 조각 배열이다. 조각은 { frameName, parentPath, parentBox, rootFrame, nodes, primitives, lib, icons } 이고,
 // nodes 의 노드는 path 를 갖는다. 큰 노드는 stub:1 로 먼저 오고 그 자식은 뒤 조각에 온다.
+// `inst` 가 붙은 노드는 ooee 라이브러리(`ooee · 컴포넌트 라이브러리`)의 변형을 **키로 가져와** 인스턴스로 놓는다.
+// 키는 조각의 `lib`(세트 이름 → 세트 key)에 실려 온다. 이 파일에 로컬 사본을 만들지 않는다.
 const { SCREEN, EXPECT, RUN } = ARGS;
 
 // 모델이 코드를 옮겨 적다 숫자 하나를 바꿔도 문법은 그대로다. 조각 내용의 해시를 다시 재서 다르면 아무것도 그리지 않는다.
@@ -21,7 +23,22 @@ if (!page) {
 }
 await figma.setCurrentPageAsync(page);
 
-const report = { instanceMiss: [], unmappedColors: [], unmappedText: [], weightFallback: [], defaultTextColor: [], opacityOnToken: [], replacedFrames: [], absoluteFallback: 0, created: 0 };
+const report = { unmappedColors: [], unmappedText: [], weightFallback: [], defaultTextColor: [], opacityOnToken: [], replacedFrames: [], absoluteFallback: 0, created: 0, instances: 0, remoteInstances: 0, librarySets: [], sweptOrphans: [] };
+
+// createFrame·createText·createInstance 는 노드를 **현재 페이지 최상위**에 만든다. build() 는 성능 때문에 자식을
+// 다 그린 뒤에야 부모에 붙이므로(아래 주석), 그리다 멈추면 만들던 노드가 페이지 (0,0)에 고아로 남는다.
+// 2026-09-22 반박 시험에서 「라이브러리에 없는 변형」으로 멈춘 자리의 부모 「div」(668×49)가 그 안의 Checkbox
+// 인스턴스와 함께 남았고, 같은 단계를 다시 돌려도 지워지지 않았다. 그래서 이번 실행 앞의 최상위 노드를 적어 두고,
+// 끝날 때(멈췄을 때도) 그 뒤에 생긴 것 가운데 다 그린 루트가 아닌 것을 지운다.
+const topBefore = new Set(page.children.map((n) => n.id));
+const finishedRoots = new Set();
+function sweepOrphans() {
+  for (const n of [...page.children]) {
+    if (topBefore.has(n.id) || finishedRoots.has(n.id)) continue;
+    report.sweptOrphans.push(`${n.type} ${n.name}`);
+    n.remove();
+  }
+}
 
 // 변수는 oe 컬렉션 안에서만 찾는다. 다른 라이브러리(BKDS 등)에서 들어온 같은 이름 변수에 묶지 않는다.
 const collections = await figma.variables.getLocalVariableCollectionsAsync();
@@ -153,68 +170,85 @@ function existingComponentNames() {
   return componentNames;
 }
 
-// 카탈로그로 만들어 둔 컴포넌트를 이름으로 찾는다. 한 번 찾은 것은 기억한다.
-// 문서 전체를 뒤지면 모든 페이지를 불러오느라 한 단계가 몇십 분씩 걸린다. 「컴포넌트」 페이지만 본다.
-let componentIndex = null;
-async function componentNamed(name) {
-  if (!componentIndex) {
-    componentIndex = new Map();
-    const catalog = figma.root.children.find((p) => p.name === "컴포넌트");
-    if (catalog) {
-      await catalog.loadAsync();
-      // 변형으로 묶고 나면 컴포넌트 이름은 `variant=fill, tone=brand` 처럼 **축만** 남고 세트 이름은
-      // 부모 COMPONENT_SET 이 갖는다. 화면이 찾는 이름은 `Button/variant=fill, …` 꼴이므로 둘을 이어
-      // 색인한다. 아직 안 묶인 컴포넌트는 combine 전에 남겨 둔 `set` 플러그인 값을 쓴다.
-      for (const c of catalog.findAllWithCriteria({ types: ["COMPONENT"] })) {
-        const set = c.parent && c.parent.type === "COMPONENT_SET" ? c.parent.name : c.getSharedPluginData(TAG, "set");
-        for (const key of set ? [`${set}/${c.name}`, c.name] : [c.name]) if (!componentIndex.has(key)) componentIndex.set(key, c);
-      }
+// 라이브러리의 변형을 `세트/축=값, …` 이름으로 찾는다. 세트는 조각의 `lib` 에 실린 키로 한 번만 가져와 기억한다.
+// 화면 파일에 카탈로그를 올려 두고 이름으로 찾던 길(「컴포넌트」 페이지)은 지웠다. 그 길은 결과 파일마다
+// 로컬 사본을 만들었고, 새로 만든 파일에는 그 페이지가 없어 모든 자리가 조용히 프레임으로 떨어졌다(2026-09-22 조사).
+// **찾지 못하면 멈춘다.** prepare 가 library.json 에서 이미 확인한 이름이므로, 여기서 없으면 라이브러리가 키 표와
+// 어긋난 것이다. 프레임으로 대신 그리면 라이브러리를 쓰지 않은 화면이 완료로 보인다.
+const librarySets = new Map();
+async function libraryVariant(full) {
+  const at = full.indexOf("/");
+  const setName = full.slice(0, at);
+  const variantName = full.slice(at + 1);
+  if (!librarySets.has(setName)) {
+    const key = CHUNK.lib && CHUNK.lib[setName];
+    if (!key) throw new Error(`조각에 라이브러리 키가 없다: ${setName}. prepare.mjs 를 다시 돌린다`);
+    let set;
+    try {
+      set = await figma.importComponentSetByKeyAsync(key);
+    } catch (e) {
+      throw new Error(`라이브러리 세트를 가져오지 못했다: ${setName} (${key}) ${(e && e.message) || e}. 라이브러리가 게시돼 있는지, 이 파일의 팀에서 쓸 수 있는지 본다`);
     }
+    if (!set || set.name !== setName) throw new Error(`키가 다른 세트를 가리킨다: ${setName} → ${set ? set.name : "없음"}. library.json 을 다시 뽑는다`);
+    librarySets.set(setName, set);
+    report.librarySets.push(setName);
   }
-  return componentIndex.get(name) || null;
+  const variant = librarySets.get(setName).children.find((c) => c.type === "COMPONENT" && c.name === variantName);
+  if (!variant) throw new Error(`라이브러리에 없는 변형이다: ${full}. 카탈로그에 그 변형을 더해 라이브러리를 다시 올리고 library.json 을 다시 뽑는다`);
+  return variant;
 }
-// 인스턴스 안의 글자를 화면의 글자로 바꾼다. 수가 다르면 바꾸지 않고 프레임으로 돌아간다.
+// 인스턴스 안의 글자를 화면의 글자로 바꾼다. 차례는 화면 사양을 전위 순회한 차례다.
 function textsOf(spec, acc = []) {
   if (spec.t === "x") acc.push(spec);
   for (const kid of spec.k || []) textsOf(kid, acc);
   return acc;
 }
+// 인스턴스 안에서 보이는 아이콘 레이어 이름. prepare 가 library.json 의 서명으로 맞춰 본 것(spec.ic)과 견준다.
+function iconsOf(instance) {
+  const shown = (n) => { for (let p = n; p && p !== instance; p = p.parent) if (p.visible === false) return false; return true; };
+  return instance.findAll((n) => /^Ri[A-Z]/.test(n.name) && shown(n)).map((n) => n.name).sort().join("+");
+}
+// 경로 표식을 **만들자마자** 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾고, 붙이기 전에 멈춰 고아가
+// 되더라도 audit 가 이 도구가 만든 것임을 알아본다(루트 표식 `build` 없이 `p` 만 있는 최상위 노드 = strayNodes).
+function tag(node, spec) {
+  if (spec.path) node.setSharedPluginData(TAG, "p", spec.path);
+}
+// 글자 하나가 여러 글꼴을 섞어 쓰면 fontName 이 mixed 다. 쓰기 전에 모두 불러온다.
+function fontsOf(text) {
+  return text.fontName === figma.mixed ? text.getStyledTextSegments(["fontName"]).map((seg) => seg.fontName) : [text.fontName];
+}
 
 async function build(spec, parent, parentBox) {
   let node;
   let needsSettle = false;
-  // 인스턴스는 **최선 노력**이다. 라이브러리에 맞는 컴포넌트가 있고 글자 자리 수까지 같을 때만 놓고,
-  // 아니면 아래 갈래로 내려가 보통 프레임으로 그린다. 예전에는 여기서 멈췄는데, 카탈로그가 「버튼」
-  // 같은 고정 예시 글자를 쓰는 한 화면의 임의 내용과 자리 수가 어긋나는 일은 늘 생긴다
-  // (아이콘만 있는 버튼은 0 개, 줄바꿈이 난 배지는 2 개). 한 자리 때문에 화면 한 장을 통째로
-  // 잃지 않는다. 무엇이 인스턴스가 되지 못했는지는 report 가 남긴다.
+  // 인스턴스는 prepare 가 확정한 자리에만 온다(library.mjs 의 decideInstances). 여기서는 라이브러리에서 가져온
+  // 변형이 그 결정과 같은지만 보고, 다르면 **지우고 멈춘다.** 인스턴스는 한 번만 만든다 — 확인용으로 하나 만들고
+  // 쓸 것을 또 만들던 예전 코드는 첫 인스턴스를 페이지 (0,0)에 고아로 남겼다(2026-09-22 조사, 라이브러리 파일의 화면 페이지 다섯 곳).
   if (spec.inst) {
-    const component = await componentNamed(spec.inst);
-    const wanted = textsOf(spec);
-    const instance = component && component.createInstance();
-    const slots = instance ? instance.findAllWithCriteria({ types: ["TEXT"] }) : [];
-    if (!component || slots.length !== wanted.length) {
-      if (instance) instance.remove();
-      report.instanceMiss.push(!component ? `없는 컴포넌트: ${spec.inst}` : `글자 수가 다르다: ${spec.inst} 화면 ${wanted.length} ≠ 컴포넌트 ${slots.length}`);
-      spec.inst = undefined;
-    }
-  }
-  if (spec.inst) {
-    const component = await componentNamed(spec.inst);
-    const instance = component.createInstance();
+    const variant = await libraryVariant(spec.inst);
+    const instance = variant.createInstance();
+    tag(instance, spec);
     const slots = instance.findAllWithCriteria({ types: ["TEXT"] });
     const wanted = textsOf(spec);
+    const icons = iconsOf(instance);
+    const expected = (spec.ic || []).join("+");
+    if (slots.length !== wanted.length || icons !== expected) {
+      instance.remove();
+      throw new Error(`라이브러리가 library.json 과 다르다: ${spec.inst} 글자 ${wanted.length}→${slots.length}, 아이콘 ${expected || "없음"}→${icons || "없음"}. 라이브러리를 다시 올렸으면 library.json 을 다시 뽑는다`);
+    }
     for (const [i, text] of slots.entries()) {
-      await figma.loadFontAsync(text.fontName);
+      for (const font of fontsOf(text)) await figma.loadFontAsync(font);
       text.characters = wanted[i].s;
     }
     instance.name = spec.n;
     instance.resize(Math.max(1, spec.w), Math.max(1, spec.h));
-    // 인스턴스 안쪽은 카탈로그의 경로를 물고 온다. 지우지 않으면 되읽기가 화면의 자리로 착각한다.
-    for (const inner of instance.findAll(() => true)) inner.setSharedPluginData(TAG, "p", "");
-    report.instances = (report.instances || 0) + 1;
-    if (spec.path) instance.setSharedPluginData(TAG, "p", spec.path);
+    report.instances++;
+    if (variant.remote) report.remoteInstances++;
     parent.appendChild(instance);
+    // 라이브러리 변형에서 만든 인스턴스는 **처음부터 absolute** 로 나온다(카탈로그 프레임 안에서의 배치를 물고 온다).
+    // 그대로 두면 auto-layout 부모의 (0,0)에 겹치고, settle 은 absolute 자식을 건너뛰어 바로잡지 못한다.
+    // 흐름에 넣은 뒤 settle 이 DOM 과 어긋난 것만 다시 뺀다(2026-09-22 시험 파일에서 확인).
+    if (parent.layoutMode && parent.layoutMode !== "NONE" && instance.layoutPositioning === "ABSOLUTE") instance.layoutPositioning = "AUTO";
     place(instance, spec, parentBox, parent);
     return instance;
   }
@@ -223,6 +257,7 @@ async function build(spec, parent, parentBox) {
   // (2026-09-17 측정: 자식 500개 기준 9,558ms → 4,651ms).
   if (spec.t === "x") {
     node = figma.createText();
+    tag(node, spec);
     const where = spec.s.slice(0, 16);
     await node.setTextStyleIdAsync(styleFor(spec.fs, spec.fw, where).id);
     node.characters = spec.s;
@@ -237,6 +272,7 @@ async function build(spec, parent, parentBox) {
   } else if (spec.t === "rect") {
     // 자식 없이 칠·테두리만 있는 상자다. 배치할 것이 없으므로 Frame 이 아니라 Rectangle 로 둔다.
     node = figma.createRectangle();
+    tag(node, spec);
     node.name = spec.n;
     setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
@@ -253,6 +289,7 @@ async function build(spec, parent, parentBox) {
     bindSize(node, spec.sz, `rect:${spec.n}`);
   } else if (spec.t === "svg") {
     node = figma.createNodeFromSvg(CHUNK.icons[spec.icon] || spec.svg);
+    tag(node, spec);
     node.name = spec.icon || "icon";
     node.resize(spec.w, spec.h);
     node.fills = [];
@@ -261,6 +298,7 @@ async function build(spec, parent, parentBox) {
     bindSize(node, spec.sz, `icon:${node.name}`);
   } else {
     node = figma.createFrame();
+    tag(node, spec);
     node.name = spec.n;
     setPaints(node, "fills", spec.bg ? [paintFor(spec.bg, `bg:${spec.n}`)].filter(Boolean) : []);
     if (spec.bd) {
@@ -309,6 +347,7 @@ async function build(spec, parent, parentBox) {
       throw new Error(`같은 이름의 컴포넌트가 이 페이지에 이미 있다: ${name}. 예전 프레임을 지우고 다시 올린다`);
     }
     node = figma.createComponentFromNode(node);
+    tag(node, spec);
     // 이름은 축=값 짝만 둔다. Figma 는 Variant 를 묶을 때 이 이름에서 옵션을 읽는다.
     // 어느 세트에 들어갈지는 아래 plugin data 로 남기고, 마지막 combine 단계가 그것으로 묶는다.
     node.name = spec.component.props;
@@ -317,8 +356,6 @@ async function build(spec, parent, parentBox) {
     existingComponentNames().add(name);
     report.components = (report.components || 0) + 1;
   }
-  // 경로는 글자·아이콘까지 모든 노드에 남긴다. 되읽기(④)가 이 경로로 코드의 같은 자리를 찾는다.
-  if (spec.path) node.setSharedPluginData(TAG, "p", spec.path);
   if (parent.type !== "PAGE") place(node, spec, parentBox, parent);
   return node;
 }
@@ -348,7 +385,7 @@ for (CHUNK of RUN) {
     // COMPONENT 가 되므로 FRAME 만 찾으면 그 안쪽을 부모로 하는 뒤 조각이 부모를 잃는다(2026-09-18).
     const canHoldChildren = (n) => "children" in n;
     parent = root && (root.getSharedPluginData(TAG, "p") === CHUNK.parentPath ? root : root.findOne((n) => canHoldChildren(n) && n.getSharedPluginData(TAG, "p") === CHUNK.parentPath));
-    if (!parent) return { error: `부모를 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`, report };
+    if (!parent) throw new Error(`부모를 찾지 못했다: ${CHUNK.frameName} ${CHUNK.parentPath}`);
   }
   for (const item of CHUNK.nodes) {
     const node = await build(item, parent, CHUNK.parentBox || { x: 0, y: 0 });
@@ -358,13 +395,18 @@ for (CHUNK of RUN) {
       node.name = CHUNK.rootFrame.name;
       // 되읽기가 「이 프레임을 어느 코드로 그렸는지」를 알아야 색 규칙을 믿을 수 있다.
       node.setSharedPluginData(TAG, "build", CHUNK.rootFrame.build || "");
+      finishedRoots.add(node.id);
     }
   }
   if (CHUNK.lastForParent && parent.type === "FRAME") settle(parent);
 }
 } catch (e) {
-  // 여기까지 그린 것은 남는다. 무엇이 왜 멈췄는지 돌려주고 사람이 고친 뒤 이 단계부터 다시 돌린다.
+  // 루트 안에 다 그려 붙인 것은 남는다. 무엇이 왜 멈췄는지 돌려주고 사람이 고친 뒤 이 단계부터 다시 돌린다.
+  // 붙이기 전에 멈춘 노드(페이지 최상위의 고아)는 지운다. 다시 돌려도 그것은 지워지지 않기 때문이다.
+  sweepOrphans();
   return { error: (e && e.message) || String(e), report };
 }
-for (const key of ["instanceMiss", "unmappedColors", "unmappedText", "weightFallback", "defaultTextColor", "opacityOnToken"]) report[key] = [...new Set(report[key])].slice(0, 20);
+// 다 그렸으면 고아가 없어야 한다. 그래도 남은 것이 있으면 지우고 sweptOrphans 로 알린다.
+sweepOrphans();
+for (const key of ["unmappedColors", "unmappedText", "weightFallback", "defaultTextColor", "opacityOnToken"]) report[key] = [...new Set(report[key])].slice(0, 20);
 return report;

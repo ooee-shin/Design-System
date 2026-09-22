@@ -399,6 +399,8 @@ pnpm visual --path /components/badge \
 
 **화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·Figma·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
 
+**Figma 화면은 게시된 라이브러리의 인스턴스로만 그린다**(`2026-09-22`). `/design-page` 는 라이브러리가 화면을 다 덮지 못하면(없는 변형, 세트는 있는데 맞는 변형이 없는 자리) 멈추고, 화면이 쓰는 세트의 원본이 라이브러리를 올린 뒤 바뀌었어도 멈춘다. 규칙은 [ai-environment.md](ai-environment.md) 「Figma 화면은 라이브러리로 그린다」, 도구는 [`scripts/figma/README.md`](../../scripts/figma/README.md) 「라이브러리 인스턴스」가 갖는다. 개발자가 할 것이 둘 남았다. **라이브러리를 다시 올린다** — 지금 키 표(`builtFrom` `bac2207`·`da3a2bb`)로는 #9 의 상품 목록(Chip·Select)과 주문·결제(Select)가 「낡은 라이브러리」로 멈추고, outline Button 테두리처럼 파일로 잡히지 않는 차이도 남아 있다. 그리고 **Field·AppHeader·BottomNavigation·SelectBox·Calendar 를 인스턴스로 놓을 수 있게 라이브러리 쪽 변형을 바꾼다** — 지금은 이 다섯을 쓰는 화면이 #9 말고는 모두 멈춘다.
+
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 
 Badge의 `compoundVariants` 21개를 걷어내고, tone별 팔레트와 variant별 단계의 곱으로 색을 정하게 바꿨다. 결정과 단계표, 대비 수치는 [badge.md](../system/components/badge.md)의 「색」이 소유한다. 여기서는 다른 컴포넌트에도 걸리는 사항만 남긴다.

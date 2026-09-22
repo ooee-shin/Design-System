@@ -5,13 +5,24 @@
 //     --state '상세 열림=[...document.querySelectorAll("tbody tr")].find((r) => r.textContent.includes("주문이 자꾸 밀려요")).click()'
 //
 // 결과는 .figma-work/<key>/ 에 쌓인다. manifest.json 의 steps 를 순서대로 use_figma 에 넘기면 된다.
-// 개발 서버(pnpm --filter @ooee/sandbox dev)가 떠 있어야 한다. 기본 주소는 http://localhost:3001 이다.
+// **이 checkout 의** 개발 서버가 떠 있어야 한다. 기본 주소는 http://localhost:3001 이고, 다른 포트면 --base 로 준다.
+// 어느 포트를 쓸지는 `node scripts/figma/sandbox-server.mjs --key <key>` 가 알려 준다.
+//
+// 멈추는 자리. manifest.json 은 어느 경우에도 남긴다.
+//   exit 2 — 한 단계가 한도를 넘는다
+//   exit 3 — 라이브러리가 화면을 다 덮지 못한다. 없는 변형(missingInLibrary)이거나, 세트는 있는데 맞는 변형이 없는
+//            자리(unsupported)다. 뒤의 것은 저장소 주인이 예외로 정한 요청의 화면에서 --allow-frames <이슈 번호> 로만 푼다
+//   exit 4 — 이 화면이 인스턴스로 쓰는 세트의 원본이 라이브러리를 올린 뒤 모양이 바뀌었다. --allow-drift 로만 푼다
+//   exit 5 — --base 의 서버가 이 checkout 의 sandbox 가 아니거나 그 화면이 없다. 이때는 작업 폴더도 지우지 않는다
 // 모바일 화면은 --width 390 --height 844 로 돌린다. 프레임 이름의 기기 표기가 폭에 따라 Mobile·Desktop 으로 바뀐다.
 import { execFileSync } from "node:child_process";
 import { existsSync, globSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { libraryRule, nativeChunk } from "./instance-rules.mjs";
+import { collectNotInLibrary, coverageStop, decideInstances, driftAffects, framesException, instancesEnabled, LIBRARY, libraryKeys, readLibrary, stripMarks, visualText } from "./library.mjs";
+import { explain, probe } from "./sandbox-server.mjs";
 import { buildDriver, foldInstances, fnv, loaderSteps, stripComments } from "./step-payload.mjs";
 
 const args = process.argv.slice(2);
@@ -21,13 +32,22 @@ const all = (name) => args.flatMap((a, i) => (a === `--${name}` ? [args[i + 1]] 
 const key = opt("key");
 const screenName = opt("name");
 if (!key || !screenName) {
-  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--only <컴포넌트>]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version]');
+  console.error('사용: node scripts/figma/prepare.mjs --key <sandbox key> --name <화면 이름> [--state "이름=JS"]... [--only <컴포넌트>]... [--base http://localhost:3001] [--width 1440] [--height 900] [--version] [--no-instances] [--allow-frames <이슈 번호>] [--allow-drift]');
   process.exit(1);
 }
 const base = opt("base", "http://localhost:3001");
+// 라이브러리가 덮지 못하는 자리를 프레임으로 두어도 되는 요청인가. 저장소 주인이 정한 요청(library.mjs 의
+// FRAME_EXCEPTIONS)의 화면에만 듣는다. 등록되지 않은 번호거나 그 요청의 화면이 아니면 여기서 멈춘다.
+let framesAllowed = null;
+try { framesAllowed = framesException(args, key); } catch (error) { console.error(error.message); process.exit(1); }
+// 라이브러리가 코드보다 낡은 것을 알고도 옮긴다. 사람이 요청에 적었을 때만 준다(design-page SKILL 「입력」).
+const allowDrift = args.includes("--allow-drift");
 const width = Number(opt("width", "1440"));
-// 카탈로그 컴포넌트의 인스턴스로 그릴지. 기본은 끄고 둔다. 까닭은 아래 prep() 의 주석에 있다.
-const useInstances = args.includes("--instances");
+// 화면의 컴포넌트를 ooee 라이브러리의 인스턴스로 놓는다. **기본이다**(2026-09-22 개발자 결정: Figma 화면은 무조건
+// 우리 라이브러리를 쓴다). `--no-instances` 만 끈다. 끄는 자리는 library.mjs 의 instancesEnabled 주석에 있다.
+const useInstances = instancesEnabled(args);
+// 키 표. 인스턴스를 켠 실행은 이것 없이 돌지 않는다. 다시 뽑는 법은 README 「라이브러리 키 표」에 있다.
+const library = useInstances ? readLibrary() : null;
 const height = Number(opt("height", "900"));
 // 카탈로그를 컴포넌트 한 종류씩 옮길 때 쓴다. 그 종류가 없는 구역을 지우고 읽어 프레임이 작아진다.
 // 큰 오토 레이아웃 프레임에 노드를 붙이는 값은 이미 있는 자식 수에 비례해 커지므로(2026-09-17 측정:
@@ -50,6 +70,14 @@ const STEP_LIMIT = 12000;
 const LINE_LIMIT = 900; // 파일을 읽는 도구가 한 번에 읽는 줄 수(2,000)보다 넉넉히 적게
 const CHUNK_LIMIT = 3200; // 조각 하나의 노드 JSON 글자 수. 조각 여러 개를 한 단계에 담으므로 STEP_LIMIT 보다 작게 둔다
 const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, "..", "..");
+// 읽기 전에 서버를 본다. 작업 폴더를 지우기 전이라 멈춰도 앞 실행의 단계 파일이 남는다.
+// 3001 에 다른 저장소의 sandbox 가 떠 있어 그 저장소의 옛 화면이 200 으로 조용히 읽힌 적이 있다(2026-09-22).
+const server = await probe(base, key);
+if (!server.ok) {
+  console.error(explain(server, key));
+  process.exit(5);
+}
 const work = path.join(".figma-work", key);
 rmSync(work, { recursive: true, force: true });
 mkdirSync(path.join(work, "steps"), { recursive: true });
@@ -60,7 +88,13 @@ run(process.execPath, ["--import", "tsx", path.join(here, "token-export.ts"), pa
 const tokens = JSON.parse(readFileSync(path.join(work, "oe-tokens.json"), "utf8"));
 
 // 2. 화면 읽기. 루트는 <body> 의 첫 화면 요소다. 창 틀 높이만큼 뷰포트를 키워 실제 크기가 width×height 가 되게 한다.
-const extract = readFileSync(path.join(here, "dom-extract.js"), "utf8").split("\n").filter((l) => !l.startsWith("//")).join("\n");
+// 인스턴스 규칙은 instance-rules.mjs 한 벌이다. 브라우저에서 돌도록 두 함수의 소스를 그대로 끼워 넣는다.
+const extract = readFileSync(path.join(here, "dom-extract.js"), "utf8")
+  .split("\n")
+  .filter((l) => !l.startsWith("//"))
+  .join("\n")
+  .replace("__LIBRARY_RULE__", () => libraryRule.toString())
+  .replace("__NATIVE_CHUNK__", () => nativeChunk.toString());
 const trees = [];
 // 헤드리스 Chrome 창은 500px 보다 좁아지지 않는다. 그보다 좁은 화면은 창을 500 으로 두고 문서 폭을 줄여 읽는다.
 // Tailwind 의 가장 작은 break point(sm, 640px) 아래라 레이아웃은 같다.
@@ -143,10 +177,6 @@ const runs = [];
 const unknownIcons = [];
 function prep(node, nodePath, icons, primitives) {
   node.path = nodePath;
-  // 인스턴스는 --instances 를 줄 때만 쓴다. 느려서가 아니라(2026-09-17 측정: 하나에 0.2초),
-  // 카탈로그를 Figma 에 먼저 올려 둔 파일에서만 맞기 때문이다. 그 이름의 컴포넌트가 없으면
-  // 안쪽을 싣지 않은 탓에 대신 그릴 것이 없으므로 builder 가 error 로 멈춘다.
-  if (!useInstances) delete node.inst;
   const where = `${nodePath} ${node.n || node.s || ""}`.slice(0, 60);
   if (node.bg) node.bg = resolve(node.bg, `bg ${where}`) || undefined;
   if (node.c) node.c = resolve(node.c, `color ${where}`) || undefined;
@@ -248,7 +278,7 @@ function inferLayout(node) {
   inferred[d === "V" ? "v" : "h"]++;
 }
 
-// 조각이 실제로 쓰는 아이콘·primitive 만 싣는다.
+// 조각이 실제로 쓰는 아이콘·primitive·라이브러리 세트 키만 싣는다. 세트 키는 하나에 52자 남짓이다.
 function uses(nodes, all, acc = { icons: {}, primitives: {} }) {
   for (const n of nodes) {
     if (n.icon) acc.icons[n.icon] = all.icons[n.icon];
@@ -257,6 +287,7 @@ function uses(nodes, all, acc = { icons: {}, primitives: {} }) {
   }
   return acc;
 }
+const usesWithLibrary = (nodes, all) => ({ ...uses(nodes, all), lib: library ? libraryKeys(nodes, library) : {} });
 // 한 줄에 노드 하나를 쓴다. 파일을 읽는 도구가 긴 줄을 자르지 않게 하려는 것이다.
 function format(node) {
   const { k, ...rest } = node;
@@ -265,8 +296,10 @@ function format(node) {
   return `${head.slice(0, -1)},"k":[\n${k.map(format).join(",\n")}\n]}`;
 }
 const chunkText = (c) => {
-  const { nodes, icons, primitives, ...meta } = c;
-  return `${JSON.stringify(meta).slice(0, -1)},"primitives":${JSON.stringify(primitives)},\n"icons":{${Object.entries(icons).map(([n, s]) => `\n${JSON.stringify(n)}:${JSON.stringify(s)}`).join(",")}},\n"nodes":[\n${nodes.map(format).join(",\n")}\n]}`;
+  const { nodes, icons, primitives, lib, ...meta } = c;
+  // 인스턴스가 없는 조각은 `lib` 를 싣지 않는다. 조각마다 빈 자리 9자가 붙어 옮겨 적을 글자만 는다.
+  const libText = lib && Object.keys(lib).length ? `,"lib":${JSON.stringify(lib)}` : "";
+  return `${JSON.stringify(meta).slice(0, -1)},"primitives":${JSON.stringify(primitives)}${libText},\n"icons":{${Object.entries(icons).map(([n, s]) => `\n${JSON.stringify(n)}:${JSON.stringify(s)}`).join(",")}},\n"nodes":[\n${nodes.map(format).join(",\n")}\n]}`;
 };
 // 단계 파일에 실을 builder 는 주석과 빈 줄을 뺀다. 한 단계의 8할이 builder 이고, 모델이 그것을
 // 한 글자도 틀리지 않게 다시 쳐서 use_figma 에 넘긴다. 짧을수록 단계가 줄고 옮겨 적다 틀릴 자리도 준다.
@@ -287,9 +320,22 @@ let builtCommit = "unknown";
 try { builtCommit = run("git", ["rev-parse", "--short", "HEAD"]).trim(); } catch { /* 저장소 밖에서 돌릴 수도 있다 */ }
 const builtAt = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
 
+// 라이브러리 판정 결과. 상태마다 모아 manifest 에 싣는다.
+const libraryReport = { instances: [], unsupported: [], notInLibrary: [], missingInLibrary: [] };
 trees.forEach(({ state, tree }, i) => {
   const all = { icons: {}, primitives: {} };
+  // 카탈로그는 라이브러리의 **원본**이다. 그 안의 컴포넌트를 라이브러리 인스턴스로 그리면 제 꼬리를 문다.
+  const isCatalog = JSON.stringify(tree).includes('"component"');
   prep(tree, `${key}:s${i}`, all.icons, all.primitives);
+  if (useInstances && !isCatalog) {
+    const decided = decideInstances(tree, library);
+    const tag = (rows) => rows.map((row) => ({ state: state.label, ...row }));
+    libraryReport.instances.push(...tag(decided.instances));
+    libraryReport.unsupported.push(...tag(decided.unsupported));
+    libraryReport.missingInLibrary.push(...tag(decided.missing));
+  }
+  if (!isCatalog) libraryReport.notInLibrary.push(...collectNotInLibrary(tree).map((row) => ({ state: state.label, ...row })));
+  stripMarks(tree, { dropInstances: !useInstances || isCatalog });
   hoistComponents(tree);
   tree = fold(tree, true);
   inferLayout(tree);
@@ -299,7 +345,7 @@ trees.forEach(({ state, tree }, i) => {
   const frameName = `${screenName} / ${state.label} · ${device} ${width}`;
   frames.push({ name: frameName, state: state.label, script: state.script });
   const chunks = [];
-  const emit = (parentPath, parentBox, nodes, rootFrame = null) => chunks.push({ frameName, parentPath, parentBox, rootFrame, nodes, ...uses(nodes, all) });
+  const emit = (parentPath, parentBox, nodes, rootFrame = null) => chunks.push({ frameName, parentPath, parentBox, rootFrame, nodes, ...usesWithLibrary(nodes, all) });
   const split = (node, parentPath, parentBox, rootFrame = null) => {
     if (size(node) <= CHUNK_LIMIT) return emit(parentPath, parentBox, [node], rootFrame);
     const { k, ...stub } = node;
@@ -384,8 +430,73 @@ if (args.includes("--version") || madeFiles.some((f) => f.fileName === fileName)
   for (let v = 2; ; v++) { const candidate = `ooee · ${screenName} · ${today} · v${v}`; if (!madeFiles.some((f) => f.fileName === candidate)) { fileName = candidate; break; } }
 }
 
-const manifest = { key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, folded, inferredLayout: inferred, frames, specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons, steps };
+// 라이브러리를 올린 뒤 코드가 바뀌었는지. 이름은 카탈로그 시험이 CI 에서 지키지만(page.test.tsx) 모양(색·여백)은
+// Figma 를 다시 읽기 전에는 모른다. 그래서 라이브러리를 올린 커밋(builtFrom) 뒤로 바뀐 파일(changedSince)을 모으고,
+// 그 가운데 주석·공백·data-* 말고 무엇이 바뀐 것(visualChanges)이 **이 화면이 인스턴스로 쓰는 세트**의 원본에
+// 닿으면(affected) 멈춘다. 예전에는 알리기만 해서 인스턴스가 옛 모양을 그대로 실었다(2026-09-22 반박 시험:
+// 장바구니의 Checkbox 가 drift 목록에 들었는데 exit 0). 사람이 알고도 옮기려면 --allow-drift 를 준다.
+// 견주는 쪽은 작업 트리다. dev 서버가 그리는 것이 작업 트리이기 때문이다.
+// 파일로 잡히지 않는 낡음도 있다. outline Button 의 테두리는 button.tsx 가 그대로인데 라이브러리에서 100% 로
+// 들어 있다(2026-09-22). 그런 것은 design-page 7단계 눈 대조에서 찾는다.
+let libraryDrift = null;
+if (library) {
+  const changed = new Set();
+  const visual = new Set();
+  const unknown = [];
+  // 그 커밋에 없던 파일이면 git 이 stderr 에 fatal 을 쓴다. 없음(null)으로 읽으면 되므로 감춘다.
+  const then = (commit, file) => { try { return execFileSync("git", ["show", `${commit}:${file}`], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] }); } catch { return null; } };
+  const now = (file) => { try { return readFileSync(path.join(repoRoot, file), "utf8"); } catch { return null; } };
+  for (const commit of library.builtFrom || []) {
+    let files;
+    try {
+      files = run("git", ["diff", "--name-only", commit, "--", "packages/ui/src", "packages/tokens/src", "apps/sandbox/src/app/catalog"]).split("\n").filter((file) => file && !/\.test\.tsx?$/.test(file));
+    } catch { unknown.push(commit); continue; }
+    for (const file of files) {
+      changed.add(file);
+      const before = then(commit, file);
+      const after = now(file);
+      if (before === null || after === null || visualText(before) !== visualText(after)) visual.add(file);
+    }
+  }
+  const usedSets = libraryReport.instances.map((row) => row.name.slice(0, row.name.indexOf("/")));
+  // 라이브러리를 올린 커밋을 이 저장소에서 찾지 못하면 견줄 수 없다. 쓰는 세트를 모두 낡았다고 본다.
+  const affected = unknown.length
+    ? [...new Set(usedSets)].sort().map((set) => ({ set, files: unknown.map((commit) => `커밋 ${commit} 을 찾지 못했다`) }))
+    : driftAffects(usedSets, [...visual].sort(), now);
+  if (changed.size || unknown.length) libraryDrift = { builtFrom: library.builtFrom, changedSince: [...changed].sort(), visualChanges: [...visual].sort(), unknownCommits: unknown, affected, allowed: allowDrift };
+}
+const bySet = {};
+for (const row of libraryReport.instances) { const set = row.name.slice(0, row.name.indexOf("/")); bySet[set] = (bySet[set] || 0) + 1; }
+const libraryInfo = library ? { name: library.library, fileKey: library.fileKey, exportedAt: library.exportedAt, builtFrom: library.builtFrom } : { name: LIBRARY.name, fileKey: LIBRARY.fileKey, disabled: "--no-instances" };
+
+const manifest = {
+  key, screenName, fileName, filesJson: filesPath, builtCommit, builtAt, folded, inferredLayout: inferred, frames,
+  specs: trees.map((_, i) => path.join(work, `spec-${i}.json`)), browserScreenshots: trees.map((t) => t.screenshot), unresolvedColors: unresolved, unknownIcons,
+  library: libraryInfo,
+  // 인스턴스로 놓을 자리 · 라이브러리 세트가 있지만 모양이 맞지 않아 프레임으로 둔 자리 · 라이브러리와 상관없는 native 덩이 ·
+  // 라이브러리에 없는 이름(하나라도 있으면 멈춘다)
+  instances: { enabled: useInstances, total: libraryReport.instances.length, bySet, items: libraryReport.instances },
+  unsupported: libraryReport.unsupported,
+  notInLibrary: libraryReport.notInLibrary,
+  missingInLibrary: libraryReport.missingInLibrary,
+  // unsupported 를 프레임으로 두어도 되는 예외(FRAME_EXCEPTIONS). null 이면 unsupported 가 하나라도 있을 때 멈춘다.
+  framesAllowed,
+  libraryDrift,
+  steps,
+};
 writeFileSync(path.join(work, "manifest.json"), JSON.stringify(manifest, null, 2));
 const tooBig = steps.filter((s) => s.chars > STEP_LIMIT || s.lines > LINE_LIMIT).map((s) => s.file);
-console.log(JSON.stringify({ manifest: path.join(work, "manifest.json"), steps: steps.length, frames: frames.map((f) => f.name), fileName, unresolvedColors: unresolved.length, unknownIcons: unknownIcons.length, tooBig }, null, 2));
+const coverage = coverageStop(libraryReport, framesAllowed);
+const driftAffected = libraryDrift ? libraryDrift.affected : [];
+console.log(JSON.stringify({ manifest: path.join(work, "manifest.json"), base, steps: steps.length, frames: frames.map((f) => f.name), fileName, unresolvedColors: unresolved.length, unknownIcons: unknownIcons.length, instances: useInstances ? libraryReport.instances.length : "꺼짐(--no-instances)", unsupported: libraryReport.unsupported.length, framesAllowed: framesAllowed ? `#${framesAllowed.issue}` : null, notInLibrary: libraryReport.notInLibrary.length, missingInLibrary: libraryReport.missingInLibrary.map((row) => row.name), libraryDrift: libraryDrift ? libraryDrift.changedSince.length : 0, driftAffected: driftAffected.map((row) => `${row.set}: ${row.files.join(", ")}`), allowDrift, tooBig }, null, 2));
 if (tooBig.length) process.exit(2);
+// 라이브러리가 이 화면을 다 덮지 못한다. 조용히 프레임으로 그리지 않는다. 코드 → 카탈로그 → 라이브러리를 먼저 거친다.
+if (coverage) {
+  console.error(coverage);
+  process.exit(3);
+}
+// 이 화면이 인스턴스로 쓰는 세트가 라이브러리를 올린 뒤 모양이 바뀌었다. 그대로 그리면 인스턴스가 옛 모양을 싣는다.
+if (driftAffected.length && !allowDrift) {
+  console.error(`라이브러리가 코드보다 낡았다. 이 화면이 인스턴스로 쓰는 세트: ${driftAffected.map((row) => `${row.set}(${row.files.map((f) => path.basename(f)).join("·")})`).join(" · ")}\n카탈로그를 라이브러리에 다시 올려 Publish 하고 library.json 을 다시 뽑는다(scripts/figma/README.md 「라이브러리 키 표」). 낡은 모양을 알고도 옮기려면 사람이 요청에 적어 --allow-drift 를 준다`);
+  process.exit(4);
+}

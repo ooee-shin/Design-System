@@ -1,9 +1,14 @@
 /**
  * 카탈로그가 Figma 컴포넌트로 옮겨질 때 지켜야 하는 것을 브라우저 없이 확인한다.
  *
- * 둘 다 여기서 막지 않으면 Figma 에 올라간 뒤에야 드러난다.
+ * 여기서 막지 않으면 Figma 에 올라간 뒤에야 드러난다.
  * - 변형 이름이 겹치면 같은 이름의 컴포넌트가 둘 생기고 인스턴스가 어느 쪽에 붙을지 알 수 없다.
- * - 화면이 쓰는 인스턴스 이름이 카탈로그에 없으면 `--instances` 로 돌린 build 단계가 멈춘다.
+ * - 카탈로그와 게시된 라이브러리(`scripts/figma/library.json`)의 이름이 다르면, 화면이 쓰는 변형이 라이브러리에 없어
+ *   `/design-page` 가 멈추거나(없는 이름) 라이브러리가 코드에 없는 변형을 들고 있다.
+ * - 화면이 쓰는 인스턴스 이름이 라이브러리에 없으면 `prepare.mjs` 가 exit 3 으로 멈춘다.
+ *
+ * 인스턴스 이름을 만드는 규칙은 `scripts/figma/instance-rules.mjs` 한 벌이다. 예전에는 여기에 손으로 베낀 사본이
+ * 있었고, 그 사본에서 Button 규칙이 빠진 채 갈라져 있었다(2026-09-22). 이제 같은 함수를 불러 쓴다.
  */
 import "@/test-setup";
 
@@ -13,135 +18,21 @@ import test, { afterEach } from "node:test";
 import React from "react";
 import { cleanup, render } from "@testing-library/react";
 
-import AdminLoginPage from "../admin-login/page";
-import AnnualLeavePage from "../annual-leave/page";
-import AttendanceKioskPage from "../attendance-kiosk/page";
-import AttendancePayrollPage from "../attendance-payroll/page";
-import ExcelExportPage from "../excel-export/page";
-import StoMyPage from "../sto-my-page/page";
-import StoSupportRequestPage from "../sto-support-request/page";
-import TaxInvoicePage from "../tax-invoice/page";
-import VocPage from "../voc/page";
+import { libraryRule as rawLibraryRule } from "../../../../../scripts/figma/instance-rules.mjs";
+import { findVariant, readLibrary, variantNames } from "../../../../../scripts/figma/library.mjs";
+import { sandboxScreens } from "@/screens";
+
 import CatalogPage from "./page";
 
 afterEach(() => {
   cleanup();
 });
 
-/** 카탈로그가 Figma 에 만드는 컴포넌트 이름(`Button/fill·brand·regular` 꼴)을 모은다. */
-function catalogNames(container: HTMLElement): Set<string> {
-  const names = new Set<string>();
-  for (const el of container.querySelectorAll<HTMLElement>("[data-component]")) {
-    names.add(`${el.dataset.component}/${el.dataset.variantProps}`);
-  }
-  return names;
-}
+const library = readLibrary();
 
-/**
- * `scripts/figma/dom-extract.js` 가 화면에서 인스턴스 이름을 만드는 규칙과 **같은 규칙**이다.
- * 그쪽을 고치면 여기도 고쳐야 한다. 두 자리가 갈라지면 화면이 없는 컴포넌트를 찾게 된다.
- */
-function instanceNames(container: HTMLElement): Set<string> {
-  const names = new Set<string>();
-  for (const el of container.querySelectorAll<HTMLElement>("[data-slot]")) {
-    const slot = el.dataset.slot;
-    const attr = (name: string) => el.getAttribute(name);
-    // 값을 담는 컨트롤의 상태다. 카탈로그의 FIELD_STATES 와 값이 글자까지 같아야 한다.
-    const valueState = (el: Element, field: HTMLInputElement | HTMLTextAreaElement | null) =>
-      el.hasAttribute("data-disabled") || (field && field.disabled) ? "disabled"
-        : el.hasAttribute("data-invalid") || (field && field.getAttribute("aria-invalid") === "true") ? "invalid"
-          : field && field.value ? "값 있음" : "비어 있음";
-    // 켜고 끄는 컨트롤의 상태다. 카탈로그의 TOGGLE_STATES 와 같다.
-    const onOffState = (el: Element) => {
-      const on = el.hasAttribute("data-checked");
-      return el.hasAttribute("data-disabled") ? (on ? "disabled-on" : "disabled-off") : on ? "on" : "off";
-    };
-    const size = () => attr("data-size") || "regular";
-
-    // Input 과 NumberInput 은 컨테이너가 같다. 안쪽 input 의 data-controls 가 둘을 가른다.
-    if (slot === "input-container" && attr("data-variant")) {
-      const field = el.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
-      const controls = field && field.getAttribute("data-controls");
-      if (controls) names.add(`NumberInput/variant=${attr("data-variant")}, controlSize=${size()}, controls=${controls === "none" ? "없음" : controls}`);
-      else names.add(`Input/variant=${attr("data-variant")}, controlSize=${size()}, state=${valueState(el, field)}`);
-    }
-    if (slot === "textarea-container" && attr("data-variant")) {
-      names.add(`Textarea/variant=${attr("data-variant")}, state=${valueState(el, el.querySelector<HTMLTextAreaElement>("textarea"))}`);
-    }
-    if (slot === "input-button" && attr("data-variant")) {
-      const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-invalid") ? "invalid"
-          : attr("data-has-value") === "true" ? "값 있음" : "비어 있음";
-      names.add(`InputButton/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`);
-    }
-    // Select·Combobox 는 고른 값이 없으면 data-placeholder 가 선다. Multi 는 data-selection-mode 로 갈린다.
-    if ((slot === "select-trigger" || slot === "combobox-trigger") && attr("data-variant")) {
-      const set = (attr("data-selection-mode") === "multiple" ? "Multi" : "") + (slot === "select-trigger" ? "Select" : "Combobox");
-      const state = el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-invalid") ? "invalid"
-          : el.hasAttribute("data-placeholder") ? "비어 있음" : "값 있음";
-      names.add(`${set}/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`);
-    }
-    if (slot === "checkbox" && el.hasAttribute("data-shape")) {
-      const state = el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-indeterminate") ? "indeterminate"
-          : el.hasAttribute("data-checked") ? "on" : "off";
-      names.add(`Checkbox/shape=${attr("data-shape")}, state=${state}`);
-    }
-    if (slot === "checkbox-field") {
-      const box = el.querySelector("[data-slot=checkbox]");
-      const state = !box ? "off"
-        : box.hasAttribute("data-disabled") ? "disabled"
-          : box.hasAttribute("data-indeterminate") ? "indeterminate"
-            : box.hasAttribute("data-checked") ? "on" : "off";
-      names.add(`CheckboxField/shape=${attr("data-shape")}, state=${state}, description=${attr("data-description")}`);
-    }
-    if (slot === "radio") names.add(`Radio/state=${onOffState(el)}`);
-    if (slot === "radio-field") {
-      const dot = el.querySelector("[data-slot=radio]");
-      names.add(`RadioField/state=${dot ? onOffState(dot) : "off"}, description=${attr("data-description")}`);
-    }
-    if (slot === "switch" && attr("data-size")) names.add(`Switch/controlSize=${attr("data-size")}, state=${onOffState(el)}`);
-    if (slot === "switch-field") {
-      const sw = el.querySelector("[data-slot=switch]");
-      names.add(`SwitchField/controlSize=${attr("data-size")}, state=${sw ? onOffState(sw) : "off"}, labelPosition=${attr("data-label-position")}`);
-    }
-    if (slot === "chip" && el.hasAttribute("data-shape")) {
-      names.add(`Chip/shape=${attr("data-shape")}, controlSize=${size()}, state=${el.hasAttribute("data-active") ? "active" : "기본"}`);
-    }
-    if (slot === "badge" && attr("data-variant")) {
-      names.add(`Badge/variant=${attr("data-variant")}, tone=${attr("data-tone") || "neutral"}, size=${attr("data-size") || "small"}`);
-    }
-    if (slot === "notification-badge") {
-      names.add(`NotificationBadge/shape=${attr("data-shape")}, tone=${attr("data-tone")}, overflow=${attr("data-overflow")}`);
-    }
-    if (slot === "toggle-button" && attr("data-variant")) {
-      const tone = attr("data-tone") === "custom" ? attr("data-color") : attr("data-tone");
-      const count = el.querySelector("[data-slot=toggle-button-count]") ? "있음" : "없음";
-      if (tone) names.add(`ToggleButton/variant=${attr("data-variant")}, tone=${tone}, controlSize=${size()}, state=${el.hasAttribute("data-pressed") ? "pressed" : "기본"}, count=${count}`);
-    }
-    if (slot === "select-box" && attr("data-trailing-element")) {
-      const trailing = attr("data-trailing-element");
-      names.add(`SelectBox/selectionMode=${trailing === "checkbox" ? "multiple" : "single"}, trailingElement=${trailing}`);
-    }
-    // Field 는 어느 자식이 섰는지로 갈린다. 오류·필수·도움말은 그 상태에서만 생기는 전용 표식이다.
-    if (slot === "field") {
-      const has = (name: string) => !!el.querySelector(`[data-slot="${name}"]`);
-      const state = has("field-error-message") ? "error" : has("field-requirement") ? "required" : has("field-helper-text") ? "helper" : "기본";
-      names.add(`Field/state=${state}`);
-    }
-    if (slot === "app-header" && attr("data-sides")) {
-      // 카탈로그에 「오른쪽만」 변형이 없다. 없는 조합에 이름을 붙이면 build 가 멈추므로
-      // 그 자리는 이름을 만들지 않고 프레임으로 둔다 — 틀린 이름보다 없는 편이 낫다.
-      const sides = ({ none: "없음", leading: "왼쪽", both: "양옆" } as Record<string, string>)[attr("data-sides") ?? ""];
-      if (sides) names.add(`AppHeader/titleAlign=${attr("data-title-align")}, sides=${sides}`);
-    }
-    if (slot === "bottom-navigation" && attr("data-variant")) {
-      names.add(`BottomNavigation/variant=${attr("data-variant")}, labels=${attr("data-show-labels") === "true" ? "있음" : "없음"}`);
-    }
-  }
-  return names;
-}
+/** instance-rules.mjs 는 타입이 없는 JS 다. 돌려주는 세 모양(이름·까닭·없음)을 한 타입으로 읽는다. */
+type LibraryRule = { inst?: string; set?: string; why?: string } | null;
+const libraryRule = (el: Element): LibraryRule => rawLibraryRule(el);
 
 test("카탈로그의 변형 이름이 겹치지 않는다", () => {
   const view = render(<CatalogPage />);
@@ -204,28 +95,68 @@ test("카탈로그의 모든 항목이 컴포넌트 이름과 변형 이름을 �
   }
 });
 
-test("화면이 쓰는 인스턴스 이름이 카탈로그에 모두 있다", () => {
-  const catalog = catalogNames(render(<CatalogPage />).container);
-  cleanup();
+test("카탈로그의 변형 이름이 게시된 라이브러리(library.json)와 같다", () => {
+  const view = render(<CatalogPage />);
+  const catalog = new Set([...view.container.querySelectorAll<HTMLElement>("[data-component]")].map((el) => `${el.dataset.component}/${el.dataset.variantProps}`));
+  const published = new Set(variantNames(library));
+  const notPublished = [...catalog].filter((name) => !published.has(name));
+  const notInCatalog = [...published].filter((name) => !catalog.has(name));
+  assert.deepEqual(
+    { notPublished, notInCatalog },
+    { notPublished: [], notInCatalog: [] },
+    "카탈로그와 라이브러리가 다르다. 카탈로그를 라이브러리 파일에 다시 올려 Publish 하고, scripts/figma/README.md 「라이브러리 키 표」대로 library.json 을 다시 뽑는다",
+  );
+});
 
+/**
+ * 컴포넌트가 DOM 에 아무 표식도 남기지 않아 규칙이 가를 수 없는 변형과, 규칙이 대신 내는 짝이다.
+ * ghost Checkbox 는 disabled 를 Root 에 넘기지 않는다(checkbox.tsx). 그래서 카탈로그의 「ghost·disabled」와
+ * 「ghost·off」는 DOM 이 글자까지 같고, 짝의 인스턴스로 놓아도 모양이 틀리지 않는다. 아래 시험이 그것까지 본다.
+ */
+const SAME_AS: Record<string, string> = {
+  "Checkbox/shape=ghost, state=disabled": "Checkbox/shape=ghost, state=off",
+  "CheckboxField/shape=ghost, state=disabled, description=없음": "CheckboxField/shape=ghost, state=off, description=없음",
+  "CheckboxField/shape=ghost, state=disabled, description=있음": "CheckboxField/shape=ghost, state=off, description=있음",
+};
+
+test("규칙이 짝으로 돌리는 변형은 카탈로그 DOM 이 짝과 같다", () => {
+  const view = render(<CatalogPage />);
+  // 접근성 이름·id 는 항목마다 다르게 붙인 것이라 견주지 않는다.
+  const bare = (name: string) => {
+    const [component, props] = [name.slice(0, name.indexOf("/")), name.slice(name.indexOf("/") + 1)];
+    const item = view.container.querySelector(`[data-component="${component}"][data-variant-props="${props}"]`);
+    assert.ok(item, `카탈로그에 없다: ${name}`);
+    return item.innerHTML.replace(/ (aria-label|aria-labelledby|aria-describedby|id|for)="[^"]*"/g, "");
+  };
+  for (const [name, twin] of Object.entries(SAME_AS)) assert.equal(bare(name), bare(twin), `${name} 이 ${twin} 과 다르게 그려진다. SAME_AS 에서 빼고 규칙이 가르게 한다`);
+});
+
+test("카탈로그 항목마다 인스턴스 규칙이 그 항목의 이름을 낸다", () => {
+  // 화면에서 이름을 만드는 규칙(instance-rules.mjs)을 카탈로그의 실제 DOM 에 돌린다. 587 개가 모두 제 이름으로
+  // 돌아와야 화면의 같은 컴포넌트도 같은 변형으로 찾아간다. 라이브러리에 세트는 있지만 인스턴스로 놓지 않는
+  // 종류(Field·SelectBox·AppHeader·BottomNavigation·Calendar)는 이름 대신 그 세트의 까닭이 나와야 한다.
+  const view = render(<CatalogPage />);
+  const wrong: string[] = [];
+  for (const item of view.container.querySelectorAll<HTMLElement>("[data-component]")) {
+    const name = `${item.dataset.component}/${item.dataset.variantProps}`;
+    const expected = SAME_AS[name] ?? name;
+    const rule = [...item.querySelectorAll("*")].map((el) => libraryRule(el)).find(Boolean);
+    const got = !rule ? "규칙 없음" : rule.inst ? rule.inst : `${rule.set} (${rule.why})`;
+    if (rule && rule.inst ? rule.inst !== expected : !rule || rule.set !== item.dataset.component) wrong.push(`${name} → ${got}`);
+  }
+  assert.deepEqual(wrong, [], `규칙이 카탈로그와 다른 이름을 낸다:\n${wrong.slice(0, 30).join("\n")}`);
+});
+
+test("등록된 화면이 쓰는 인스턴스 이름이 라이브러리에 모두 있다", async () => {
   const missing: string[] = [];
-  for (const [label, Screen] of [
-    ["관리자 로그인", AdminLoginPage],
-    ["STO 지원요청", StoSupportRequestPage],
-    ["고객의 소리", VocPage],
-    ["출퇴근 키오스크", AttendanceKioskPage],
-    ["근태·급여 정산", AttendancePayrollPage],
-    ["STO 마이페이지", StoMyPage],
-    ["연차 관리", AnnualLeavePage],
-    ["세금계산서 발행", TaxInvoicePage],
-    ["엑셀 내려받기", ExcelExportPage],
-  ] as const) {
+  for (const screen of sandboxScreens) {
+    const { default: Screen } = await import(`../${screen.key}/page`);
     const view = render(<Screen />);
-    for (const name of instanceNames(view.container)) {
-      if (!catalog.has(name)) missing.push(`${label}: ${name}`);
+    for (const el of view.container.querySelectorAll("*")) {
+      const rule = libraryRule(el);
+      if (rule && rule.inst && !findVariant(library, rule.inst)) missing.push(`${screen.name}: ${rule.inst}`);
     }
     cleanup();
   }
-
-  assert.deepEqual(missing, [], `카탈로그에 없는 이름이다. 카탈로그에 그 변형을 더한다:\n${missing.join("\n")}`);
+  assert.deepEqual(missing, [], `라이브러리에 없는 이름이다. 카탈로그에 그 변형을 더하고 라이브러리를 다시 올린다:\n${missing.join("\n")}`);
 });

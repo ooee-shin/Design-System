@@ -39,27 +39,32 @@ export function stripComments(src) {
 /**
  * `builder.js` 가 인스턴스를 놓을 때 실제로 읽는 자리. 이 밖의 값은 조각에 실어도 쓰이지 않는다.
  * builder 를 고치면 이 목록도 함께 고쳐야 한다. step-payload.test.mjs 가 둘을 묶어 둔다.
+ * `ic` 는 prepare 가 라이브러리 서명과 맞춰 본 아이콘 이름이다. builder 가 가져온 변형과 한 번 더 견준다.
  */
-export const INSTANCE_FIELDS = ["t", "n", "x", "y", "w", "h", "path", "inst", "portal"];
+export const INSTANCE_FIELDS = ["t", "n", "x", "y", "w", "h", "path", "inst", "portal", "ic", "k"];
 
 /**
- * 인스턴스로 놓을 자리는 안쪽을 싣지 않는다. 그 안은 Figma 가 컴포넌트로 그리므로 화면에서 넘길 것은
- * 글자뿐이다(`builder.js` 의 `textsOf` 가 이 글자를 슬롯에 넣는다). 되읽기도 인스턴스 안쪽은 화면의
+ * 인스턴스로 놓을 자리는 안쪽을 싣지 않는다. 그 안은 라이브러리 컴포넌트가 그리므로 화면에서 넘길 것은
+ * **글자뿐**이다(`builder.js` 의 `textsOf` 가 이 글자를 슬롯에 넣는다). 되읽기도 인스턴스 안쪽은 화면의
  * 자리로 견주지 않으므로(`reread.mjs` 의 `flatten`) 사양에서 빼도 잃는 것이 없다.
  *
  * 노드 자신의 칠·테두리·모서리·오토 레이아웃도 뗀다. 그것은 컴포넌트가 가진 값이고 builder 의 인스턴스
- * 경로는 읽지 않는다. 컴포넌트를 찾지 못하면 builder 가 그리지 않고 멈추므로 대신 그릴 것도 없다.
+ * 경로는 읽지 않는다.
+ *
+ * 대신 그릴 것을 남기지 않는다. 인스턴스로 놓을지는 prepare 가 라이브러리 서명(`library.json`)과 맞춰 본 뒤에
+ * 확정하고(`library.mjs` 의 `decideInstances`), builder 는 그 결정과 라이브러리가 어긋나면 프레임으로 떨어지지
+ * 않고 멈춘다. 2026-09-21 의 「최선 노력」(맞지 않으면 builder 가 프레임으로 내려감)은 어긋남을 build 결과의
+ * `instanceMiss` 에만 남겨 보고에서 빠지기 쉬웠고, 그 때문에 안쪽을 통째로 실어야 했다.
  *
  * 글자의 **차례**는 그대로 둔다. builder 는 인스턴스 안 글자 노드를 찾은 차례대로 바꾸므로,
- * 차례가 틀어지면 값이 엉뚱한 자리에 들어간다.
+ * 차례가 틀어지면 값이 엉뚱한 자리에 들어간다. 빈 입력(`blank`)은 Placeholder 자리 하나를 빈 글자로 채운다.
  */
 export function foldInstances(node) {
   if (node.inst) {
-    // 안쪽을 **버리지 않는다.** builder 는 라이브러리에 맞는 컴포넌트가 없거나 글자 자리 수가
-    // 어긋나면 인스턴스를 포기하고 보통 프레임으로 내려가는데, 그때 그릴 것이 남아 있어야 한다.
-    // 예전에는 글자만 남기고 다 버려서 그 자리에서 멈췄다 — 한 자리 때문에 화면 한 장을 잃었다.
-    // 조각이 커지는 값을 치르고 화면이 통째로 날아가지 않는 쪽을 고른다.
-    (node.k || []).forEach(foldInstances);
+    const texts = node.blank ? [{ t: "x", s: "" }] : textsOf(node).map((text) => ({ t: "x", s: text.s }));
+    for (const key of Object.keys(node)) if (!INSTANCE_FIELDS.includes(key)) delete node[key];
+    if (texts.length) node.k = texts;
+    else delete node.k;
     return node;
   }
   (node.k || []).forEach(foldInstances);

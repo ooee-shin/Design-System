@@ -131,7 +131,7 @@ test("loader 가 실은 코드를 그대로 되돌려 준다", () => {
   assert.equal(fnv(joined), fnv(source));
 });
 
-test("인스턴스 자리도 안쪽을 그대로 남긴다", () => {
+test("인스턴스 자리는 안쪽을 글자만 남기고 칠·테두리·배치를 뗀다", () => {
   const tree = {
     t: "f",
     k: [
@@ -139,36 +139,50 @@ test("인스턴스 자리도 안쪽을 그대로 남긴다", () => {
         t: "f",
         n: "input-container",
         path: "admin:s0.1",
+        slot: 1,
         x: 40,
         y: 120,
         w: 320,
         h: 36,
-        inst: "Input/outline·regular",
+        inst: "Input/variant=outline, controlSize=regular, state=값 있음",
         bg: { token: "oe-background-primary" },
         bd: { c: { token: "oe-border-secondary" }, w: [1, 1, 1, 1] },
         r: 8,
         l: { d: "H", g: 8, p: [0, 12, 0, 12], j: "flex-start", a: "center", wr: 0 },
         k: [
-          { t: "f", n: "input-leading", k: [{ t: "x", s: "아이디", fs: 14, c: { token: "oe-foreground-primary" } }] },
+          { t: "f", n: "input", k: [{ t: "x", n: "Value", s: "admin", fs: 14, fw: 400, c: { token: "oe-foreground-primary" } }] },
           { t: "rect", n: "칸막이" },
         ],
       },
     ],
   };
   foldInstances(tree);
-  const folded = tree.k[0];
-  // 인스턴스가 되면 안쪽은 쓰이지 않지만, 컴포넌트가 없거나 글자 자리 수가 어긋나 포기하면
-  // builder 가 보통 프레임으로 내려가 이 값들로 그린다. 그래서 버리지 않는다.
-  assert.equal(folded.inst, "Input/outline·regular");
-  assert.equal(folded.bg.token, "oe-background-primary");
-  assert.equal(folded.k[0].n, "input-leading");
-  assert.equal(folded.k[1].n, "칸막이");
+  // 인스턴스로 놓을지는 prepare 가 library.json 과 맞춰 본 뒤 확정했다. builder 는 어긋나면 프레임으로 내려가지 않고
+  // 멈추므로, 대신 그릴 안쪽을 실을 까닭이 없다. 실으면 옮겨 적을 글자만 는다.
+  assert.deepEqual(tree.k[0], {
+    t: "f",
+    n: "input-container",
+    path: "admin:s0.1",
+    x: 40,
+    y: 120,
+    w: 320,
+    h: 36,
+    inst: "Input/variant=outline, controlSize=regular, state=값 있음",
+    k: [{ t: "x", s: "admin" }],
+  });
+});
+
+test("빈 입력은 Placeholder 자리 하나를 빈 글자로 싣는다", () => {
+  const node = { t: "f", inst: "Input/variant=outline, controlSize=regular, state=비어 있음", blank: 1, k: [{ t: "f", n: "input" }] };
+  foldInstances(node);
+  assert.deepEqual(node.k, [{ t: "x", s: "" }]);
+  assert.equal(node.blank, undefined);
 });
 
 test("접은 뒤에도 builder 의 textsOf 가 세는 글자 수와 차례가 같다", () => {
   const instance = () => ({
     t: "f",
-    inst: "Field/기본",
+    inst: "CheckboxField/shape=rounded, state=off, description=있음",
     k: [
       { t: "f", k: [{ t: "x", s: "첫째" }] },
       { t: "x", s: "둘째" },
@@ -191,18 +205,14 @@ test("접어서 남기는 자리가 builder 의 인스턴스 경로가 읽는 �
   read.add("y");
   read.add("portal"); // place() 가 absolute 로 뺄지 가른다
   for (const field of read) {
-    if (field === "k") continue; // 자식은 글자만 남기고 따로 다룬다
     assert.ok(INSTANCE_FIELDS.includes(field), `builder 는 spec.${field} 를 읽는데 접을 때 버린다`);
   }
 });
 
-test("글자가 없는 인스턴스도 안쪽과 칠을 잃지 않는다", () => {
-  // builder 가 인스턴스를 포기하고 프레임으로 내려갈 수 있어야 하므로 그릴 것을 남긴다.
-  const node = { t: "f", n: "checkbox", w: 16, h: 16, inst: "Checkbox/rounded·on", bg: { token: "oe-brand-background-bold-primary" }, k: [{ t: "f", n: "checkbox-indicator", k: [{ t: "svg", n: "RiCheckLine" }] }] };
+test("글자가 없는 인스턴스는 안쪽을 싣지 않고 prepare 가 맞춰 본 아이콘 이름만 남긴다", () => {
+  const node = { t: "f", n: "checkbox", w: 16, h: 16, inst: "Checkbox/shape=rounded, state=on", ic: ["RiCheckLine"], bg: { token: "oe-brand-background-bold-primary" }, k: [{ t: "f", n: "checkbox-indicator", k: [{ t: "svg", icon: "RiCheckLine" }] }] };
   foldInstances(node);
-  assert.equal(node.inst, "Checkbox/rounded·on");
-  assert.equal(node.bg.token, "oe-brand-background-bold-primary");
-  assert.equal(node.k[0].n, "checkbox-indicator");
+  assert.deepEqual(node, { t: "f", n: "checkbox", w: 16, h: 16, inst: "Checkbox/shape=rounded, state=on", ic: ["RiCheckLine"] });
 });
 
 test("인스턴스가 아닌 자리는 그대로 둔다", () => {
@@ -212,10 +222,9 @@ test("인스턴스가 아닌 자리는 그대로 둔다", () => {
   assert.deepEqual(tree, copy);
 });
 
-test("인스턴스 안의 인스턴스도 그대로 남는다", () => {
-  // 바깥이 인스턴스가 되면 안쪽은 쓰이지 않지만, 바깥이 포기하면 안쪽이 다시 기회를 갖는다.
-  const node = { t: "f", inst: "Field/기본", k: [{ t: "f", inst: "Input/outline·regular", k: [{ t: "x", s: "값" }] }] };
+test("인스턴스 안의 인스턴스는 싣지 않는다", () => {
+  // 바깥이 인스턴스면 안쪽은 라이브러리 컴포넌트가 그린다. 안쪽 인스턴스의 글자만 바깥의 글자 자리로 남는다.
+  const node = { t: "f", inst: "CheckboxField/shape=rounded, state=off, description=없음", k: [{ t: "f", inst: "Checkbox/shape=rounded, state=off" }, { t: "x", s: "품절 제외" }] };
   foldInstances(node);
-  assert.equal(node.k[0].inst, "Input/outline·regular");
-  assert.deepEqual(node.k[0].k, [{ t: "x", s: "값" }]);
+  assert.deepEqual(node.k, [{ t: "x", s: "품절 제외" }]);
 });

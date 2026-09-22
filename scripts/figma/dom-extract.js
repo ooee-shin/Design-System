@@ -1,6 +1,9 @@
 // scripts/visual/inspect.mjs --eval 로 실행한다. [data-figma-root] 요소 아래 DOM 을 Figma 로 옮길 트리(JSON 문자열)로 돌려준다.
 // 색은 class 이름에서 oe 토큰·primitive 후보를 모으고 계산된 색(raw)을 함께 넘긴다. 어느 후보인지는 prepare.mjs 가 정한다.
 (() => {
+  // prepare.mjs 가 instance-rules.mjs 의 두 함수 소스로 바꿔 넣는다. 이 파일만 따로 돌리면 문법 오류다.
+  const libraryRule = __LIBRARY_RULE__;
+  const nativeChunk = __NATIVE_CHUNK__;
   const PX = (v) => Math.round(parseFloat(v) || 0);
   const root = document.querySelector("[data-figma-root]") || document.body.firstElementChild;
   const rootBox = root.getBoundingClientRect();
@@ -171,112 +174,14 @@
     // 카탈로그 화면은 항목마다 어떤 컴포넌트의 어떤 변형인지를 적어 둔다. Figma 컴포넌트 이름이 된다.
     const component = el.getAttribute("data-component");
     if (component) node.component = { name: component, props: el.getAttribute("data-variant-props") || "기본" };
-    // 화면 쪽에서는 컴포넌트가 DOM 에 남긴 변형 속성으로 카탈로그의 어느 컴포넌트인지 찾는다.
-    // 이름이 맞는 컴포넌트가 Figma 에 있으면 builder 가 프레임 대신 인스턴스를 놓는다.
-    const slot = el.getAttribute("data-slot");
-    const attr = (name) => el.getAttribute(name);
-    // 이름은 `<Component Set>/<축=값, 축=값>` 꼴이다. 첫 `/` 앞이 Assets 에 서는 세트 이름이고
-    // 뒤가 그 안의 Variant 다. 카탈로그 화면의 data-variant-props 와 글자까지 같아야 한다.
-    // Base UI 는 상태를 **빈 문자열**로 찍는다(`data-disabled=""`, `data-checked=""`). 값을 `"true"` 와
-    // 견주면 언제나 거짓이므로 있고 없음만 본다. 일부 선택도 값이 아니라 `data-indeterminate` 라는
-    // 별도 속성이다. 확인한 실제 출력은 docs/process/working-context.md 에 적어 두었다.
-    if (slot === "button" && attr("data-variant")) {
-      const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled" : "기본";
-      node.inst = `Button/variant=${attr("data-variant")}, tone=${attr("data-tone") || "brand"}, controlSize=${attr("data-size") || "regular"}, state=${state}`;
-    }
-    // 값을 담는 컨트롤의 상태다. 카탈로그의 FIELD_STATES 와 값이 글자까지 같아야 한다.
-    const valueState = (el, field) =>
-      el.hasAttribute("data-disabled") || (field && field.disabled) ? "disabled"
-        : el.hasAttribute("data-invalid") || (field && field.getAttribute("aria-invalid") === "true") ? "invalid"
-          : field && field.value ? "값 있음" : "비어 있음";
-    // 켜고 끄는 컨트롤의 상태다. 카탈로그의 TOGGLE_STATES 와 같다.
-    const onOffState = (el) => {
-      const on = el.hasAttribute("data-checked");
-      return el.hasAttribute("data-disabled") ? (on ? "disabled-on" : "disabled-off") : on ? "on" : "off";
-    };
-    const size = () => attr("data-size") || "regular";
-
-    // Input 과 NumberInput 은 컨테이너가 같다. 안쪽 input 의 data-controls 가 둘을 가른다.
-    if (slot === "input-container" && attr("data-variant")) {
-      const field = el.querySelector("input, textarea");
-      const controls = field && field.getAttribute("data-controls");
-      if (controls) node.inst = `NumberInput/variant=${attr("data-variant")}, controlSize=${size()}, controls=${controls === "none" ? "없음" : controls}`;
-      else node.inst = `Input/variant=${attr("data-variant")}, controlSize=${size()}, state=${valueState(el, field)}`;
-    }
-    if (slot === "textarea-container" && attr("data-variant")) {
-      node.inst = `Textarea/variant=${attr("data-variant")}, state=${valueState(el, el.querySelector("textarea"))}`;
-    }
-    if (slot === "input-button" && attr("data-variant")) {
-      const state = el.hasAttribute("disabled") || el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-invalid") ? "invalid"
-          : attr("data-has-value") === "true" ? "값 있음" : "비어 있음";
-      node.inst = `InputButton/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`;
-    }
-    // Select·Combobox 는 고른 값이 없으면 data-placeholder 가 선다. Multi 는 data-selection-mode 로 갈린다.
-    if ((slot === "select-trigger" || slot === "combobox-trigger") && attr("data-variant")) {
-      const set = (attr("data-selection-mode") === "multiple" ? "Multi" : "") + (slot === "select-trigger" ? "Select" : "Combobox");
-      const state = el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-invalid") ? "invalid"
-          : el.hasAttribute("data-placeholder") ? "비어 있음" : "값 있음";
-      node.inst = `${set}/variant=${attr("data-variant")}, controlSize=${size()}, state=${state}`;
-    }
-    if (slot === "checkbox" && el.hasAttribute("data-shape")) {
-      const state = el.hasAttribute("data-disabled") ? "disabled"
-        : el.hasAttribute("data-indeterminate") ? "indeterminate"
-          : el.hasAttribute("data-checked") ? "on" : "off";
-      node.inst = `Checkbox/shape=${attr("data-shape")}, state=${state}`;
-    }
-    if (slot === "checkbox-field") {
-      const box = el.querySelector("[data-slot=checkbox]");
-      const state = !box ? "off"
-        : box.hasAttribute("data-disabled") ? "disabled"
-          : box.hasAttribute("data-indeterminate") ? "indeterminate"
-            : box.hasAttribute("data-checked") ? "on" : "off";
-      node.inst = `CheckboxField/shape=${attr("data-shape")}, state=${state}, description=${attr("data-description")}`;
-    }
-    if (slot === "radio") node.inst = `Radio/state=${onOffState(el)}`;
-    if (slot === "radio-field") {
-      const dot = el.querySelector("[data-slot=radio]");
-      node.inst = `RadioField/state=${dot ? onOffState(dot) : "off"}, description=${attr("data-description")}`;
-    }
-    if (slot === "switch" && attr("data-size")) node.inst = `Switch/controlSize=${attr("data-size")}, state=${onOffState(el)}`;
-    if (slot === "switch-field") {
-      const sw = el.querySelector("[data-slot=switch]");
-      node.inst = `SwitchField/controlSize=${attr("data-size")}, state=${sw ? onOffState(sw) : "off"}, labelPosition=${attr("data-label-position")}`;
-    }
-    if (slot === "chip" && el.hasAttribute("data-shape")) {
-      node.inst = `Chip/shape=${attr("data-shape")}, controlSize=${size()}, state=${el.hasAttribute("data-active") ? "active" : "기본"}`;
-    }
-    if (slot === "badge" && attr("data-variant")) {
-      node.inst = `Badge/variant=${attr("data-variant")}, tone=${attr("data-tone") || "neutral"}, size=${attr("data-size") || "small"}`;
-    }
-    if (slot === "notification-badge") {
-      node.inst = `NotificationBadge/shape=${attr("data-shape")}, tone=${attr("data-tone")}, overflow=${attr("data-overflow")}`;
-    }
-    if (slot === "toggle-button" && attr("data-variant")) {
-      const tone = attr("data-tone") === "custom" ? attr("data-color") : attr("data-tone");
-      const count = el.querySelector("[data-slot=toggle-button-count]") ? "있음" : "없음";
-      if (tone) node.inst = `ToggleButton/variant=${attr("data-variant")}, tone=${tone}, controlSize=${size()}, state=${el.hasAttribute("data-pressed") ? "pressed" : "기본"}, count=${count}`;
-    }
-    if (slot === "select-box" && attr("data-trailing-element")) {
-      const trailing = attr("data-trailing-element");
-      node.inst = `SelectBox/selectionMode=${trailing === "checkbox" ? "multiple" : "single"}, trailingElement=${trailing}`;
-    }
-    // Field 는 어느 자식이 섰는지로 갈린다. 오류·필수·도움말은 그 상태에서만 생기는 전용 표식이다.
-    if (slot === "field") {
-      const has = (name) => !!el.querySelector(`[data-slot="${name}"]`);
-      const state = has("field-error-message") ? "error" : has("field-requirement") ? "required" : has("field-helper-text") ? "helper" : "기본";
-      node.inst = `Field/state=${state}`;
-    }
-    if (slot === "app-header" && attr("data-sides")) {
-      // 카탈로그에 「오른쪽만」 변형이 없다. 없는 조합에 이름을 붙이면 build 가 멈추므로
-      // 그 자리는 이름을 만들지 않고 프레임으로 둔다 — 틀린 이름보다 없는 편이 낫다.
-      const sides = { none: "없음", leading: "왼쪽", both: "양옆" }[attr("data-sides")];
-      if (sides) node.inst = `AppHeader/titleAlign=${attr("data-title-align")}, sides=${sides}`;
-    }
-    if (slot === "bottom-navigation" && attr("data-variant")) {
-      node.inst = `BottomNavigation/variant=${attr("data-variant")}, labels=${attr("data-show-labels") === "true" ? "있음" : "없음"}`;
-    }
+    // 화면 쪽에서는 컴포넌트가 DOM 에 남긴 속성으로 **라이브러리의 어느 변형인지** 정한다.
+    // 규칙은 instance-rules.mjs 한 벌이고 prepare.mjs 가 그 소스를 이 파일 첫머리에 끼워 넣는다.
+    // - inst: 라이브러리 변형 이름(`Button/variant=fill, …`). builder 가 라이브러리에서 키로 가져와 인스턴스로 놓는다.
+    // - unsup: `@ooee/ui` 컴포넌트지만 인스턴스로 옮기면 모양이 틀리는 자리. 프레임으로 그리고 까닭을 남긴다.
+    // - nat: 라이브러리와 상관없는 native 덩이(머리글·링크·표 …). manifest 의 notInLibrary 가 모은다.
+    const rule = libraryRule(el);
+    if (rule && rule.inst) node.inst = rule.inst;
+    else if (rule) node.unsup = { set: rule.set, why: rule.why };
     if (el.tagName.toLowerCase() === "svg") {
       node.t = "svg";
       node.svg = el.outerHTML.replace(/ class="[^"]*"/g, "");
@@ -290,6 +195,11 @@
     const bw = [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].map(PX);
     const bcol = rgba(cs.borderTopColor) || rgba(cs.borderBottomColor);
     if (bw.some((v) => v > 0) && bcol && bcol.a > 0) node.bd = { w: bw, c: { cands: candidates(el, "border"), raw: bcol }, ds: cs.borderTopStyle === "dashed" ? 1 : 0 };
+    // native 덩이는 칠·테두리를 잰 뒤에 가른다. 목록의 칸은 제 모양이 있을 때만 덩이다(instance-rules.mjs).
+    if (!rule) {
+      const chunk = nativeChunk(el, Boolean(node.bg || node.bd));
+      if (chunk) node.nat = chunk;
+    }
     const r = PX(cs.borderTopLeftRadius);
     if (r) node.r = Math.min(r, Math.round(Math.min(b.width, b.height) / 2));
     const sz = sizeRef(el); if (sz) node.sz = sz;

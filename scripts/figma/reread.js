@@ -81,7 +81,12 @@ for (const frameName of FRAMES) {
     }
     // 인스턴스는 어느 컴포넌트인지가 곧 되짚기의 답이다. 안쪽으로는 내려가지 않는다.
     // `node.mainComponent` 는 dynamic-page 문서에서 던진다. 비동기로 읽는다.
-    if (node.type === "INSTANCE") { const main = await node.getMainComponentAsync(); item.st = main ? main.name : ""; }
+    // 변형의 이름은 축(`variant=fill, …`)뿐이고 세트 이름은 부모 Component Set 이 갖는다. 화면 사양의 `inst` 는
+    // `Button/variant=fill, …` 꼴이므로 둘을 이어 붙인다. 잇지 않으면 모든 인스턴스가 「컴포넌트가 바뀌었다」로 나온다.
+    if (node.type === "INSTANCE") {
+      const main = await node.getMainComponentAsync();
+      item.st = !main ? "" : main.parent && main.parent.type === "COMPONENT_SET" ? `${main.parent.name}/${main.name}` : main.name;
+    }
     // 자리를 아끼려고 줄로 싣는다. COLS 가 칸 이름이고, 빈 칸은 "" 또는 0 이다.
     info.rows.push([item.p, item.n, item.t, item.w, item.h, item.bg ? item.bg.v || item.bg.hex : "", item.c ? item.c.v || item.c.hex : "", item.bd ? item.bd.c.v || item.bd.c.hex : "", item.r || 0, item.s || "", item.fs || 0, item.st || ""]);
     if (isLeaf(node)) return;

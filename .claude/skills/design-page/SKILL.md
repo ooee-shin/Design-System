@@ -1,7 +1,7 @@
 ---
 name: design-page
-description: apps/sandbox에 만든 화면을 Figma 프레임으로 옮기고(②), 사람이 Figma에서 고친 것을 다시 읽어 화면 코드로 되돌린다(④). 색은 oe 토큰 변수에, 글자는 oe 텍스트 스타일에 묶는다. 「<화면>을 Figma로」와 「Figma에서 고친 것을 코드로」 요청에 쓴다. 인수는 「<sandbox key> [상태: <이름>=<JS>]... [fileKey: <Figma file key>] [새 버전]」 또는 「되읽기 <sandbox key> fileKey: <key> [프레임: <이름>]」이다.
-allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @ooee/sandbox dev:*), Bash(pnpm --filter @ooee/sandbox build:*), Bash(pnpm --filter @ooee/sandbox test:*), Bash(node scripts/figma/prepare.mjs:*), Bash(node scripts/figma/reread.mjs:*), mcp__figma__create_new_file, mcp__figma__use_figma, mcp__figma__get_screenshot
+description: apps/sandbox에 만든 화면을 Figma 프레임으로 옮기고(②), 사람이 Figma에서 고친 것을 다시 읽어 화면 코드로 되돌린다(④). 색은 oe 토큰 변수에, 글자는 oe 텍스트 스타일에 묶는다. 「<화면>을 Figma로」와 「Figma에서 고친 것을 코드로」 요청에 쓴다. 인수는 「<sandbox key> [상태: <이름>=<JS>]... [fileKey: <Figma file key>] [새 버전] [포트: <n>] [예외: #<이슈 번호>] [낡은 라이브러리 허용]」 또는 「되읽기 <sandbox key> fileKey: <key> [프레임: <이름>] [포트: <n>]」이다.
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @ooee/sandbox dev:*), Bash(pnpm --filter @ooee/sandbox build:*), Bash(pnpm --filter @ooee/sandbox test:*), Bash(node scripts/figma/sandbox-server.mjs:*), Bash(node scripts/figma/prepare.mjs:*), Bash(node scripts/figma/reread.mjs:*), mcp__figma__create_new_file, mcp__figma__use_figma, mcp__figma__get_screenshot
 ---
 
 # /design-page
@@ -10,7 +10,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @
 
 `$ARGUMENTS`가 「되읽기」로 시작하면 ④, 아니면 ②다.
 
-`figma-page-agent.md`의 규칙 1~3과 「제작과 검수」 1~3(컴포넌트 모음 읽기, 모음이 없으면 요청, 컴포넌트·토큰 대응 정리)은 이 명령보다 앞에서 채워진다. Figma에 `@ooee/ui`를 반영한 컴포넌트 모음은 카탈로그(`apps/sandbox/src/app/catalog`)로 만들어 두었지만 화면은 `--instances`로 돌린 자리만 그 인스턴스이고, 나머지 자리는 `docs/system/README.md`의 「Component」 표가 맡는다. 컴포넌트 선택은 `/generate-code`가, 재사용 검사는 `/review-design`이 이미 했다. 이 명령은 그 코드의 `data-slot`을 레이어 이름으로, class의 `oe-*` 이름을 변수로 옮길 뿐이므로 컴포넌트 모음을 다시 묻지 않는다.
+`figma-page-agent.md`의 규칙 1~3과 「제작과 검수」 1~3(컴포넌트 모음 읽기, 모음이 없으면 요청, 컴포넌트·토큰 대응 정리)은 이 명령보다 앞에서 채워진다. **컴포넌트 모음은 게시된 라이브러리 `ooee · 컴포넌트 라이브러리`(fileKey `4HKy8Gi4Hd4VefFFvlIolc`)이고, 화면의 `@ooee/ui` 컴포넌트는 기본으로 그 인스턴스로 놓인다**(2026-09-22 개발자 결정: Figma 화면은 무조건 우리 라이브러리를 쓴다). 키 표는 `scripts/figma/library.json`이고, `prepare.mjs`가 화면에 쓰인 세트의 키만 단계에 싣고 `builder.js`가 키로 가져온다. 어느 자리가 인스턴스가 되고 어느 자리가 왜 프레임으로 남는지는 `scripts/figma/README.md` 「라이브러리 인스턴스」가 갖는다. 컴포넌트 선택은 `/generate-code`가, 재사용 검사는 `/review-design`이 이미 했다. 이 명령은 그 코드를 라이브러리 인스턴스와, 인스턴스가 되지 않는 자리의 `data-slot` 레이어 이름·`oe-*` 변수로 옮길 뿐이므로 컴포넌트 모음을 다시 묻지 않는다.
 
 ## 입력
 
@@ -23,12 +23,17 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @
 - **`상태:`가 없으면** 기본 화면 하나만 옮기고 묻지 않는다. 화면 머리말 주석에 열리고 닫히는 부분(패널, 팝업)이 있으면 보고의 「알려진 차이」에 「옮기지 않은 상태: <이름>」으로 적는다.
 - **`fileKey:`** 가 있으면 그 파일에 이어서 그린다. 화면 이름과 같은 페이지를 쓰고(없으면 만든다), 그 페이지에서 이번에 그릴 프레임과 **이름이 정확히 같은** 프레임만 지우고 다시 그린다. 이름을 바꿔 둔 사람의 수정본(예: `… (수정안)`)과 다른 화면의 페이지는 건드리지 않는다. 지운 프레임 이름은 build 결과의 `replacedFrames`에 나오며 보고에 적는다.
 - **`새 버전`** 또는 「다른 시안」 요청이면 `fileKey:`가 있어도 쓰지 않고 새 파일을 만든다. 준비 명령에 `--version`을 붙인다.
+- **`포트:`** 는 이 checkout 의 sandbox 가 이미 떠 있는 포트다. 없으면 2단계가 찾거나 빈 포트에 띄운다.
+- **`예외: #<n>`** 는 라이브러리에 맞는 변형이 없는 자리(`unsupported`)를 프레임으로 두어도 된다는 저장소 주인의 예외다. 준비 명령에 `--allow-frames <n>`을 붙인다. `scripts/figma/library.mjs`의 `FRAME_EXCEPTIONS`에 적힌 요청의 화면에만 들으며(지금은 #9 이커머스 5장), 아니면 준비가 exit 1로 멈춘다. 인수에 없으면 붙이지 않는다.
+- **`낡은 라이브러리 허용`** 은 화면이 쓰는 세트의 원본이 라이브러리를 올린 뒤 바뀐 것을 알고도 옮기라는 사람의 요청이다. 준비 명령에 `--allow-drift`를 붙인다. 인수에 없으면 붙이지 않는다.
 
 ## 하지 않는 것
 
 - 저장소 코드 수정과 `.figma-work/` 밖에 파일 쓰기. 이 명령은 `.figma-work/`만 쓴다. 대조용 스크립트나 이미지를 `/tmp` 같은 다른 자리에 만들지 않는다. 화면이나 `scripts/figma/`가 틀렸으면 고치지 않고 보고에 적는다.
 - 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꿔 되풀이하지 않고 보고의 「확인이 필요한 것」에 명령과 거부 메시지를 적는다.
 - BKDS·공차 ERP 같은 다른 Figma 라이브러리의 컴포넌트·변수·스타일 사용. ooee-ui와 다른 시스템이다.
+- 인수에 없는 `--allow-frames`·`--allow-drift`를 스스로 붙이기. 준비가 exit 3·4로 멈추면 붙여서 다시 돌리지 않고 보고한다. 둘 다 사람이 정하는 예외다.
+- 라이브러리 파일(`4HKy8Gi4Hd4VefFFvlIolc`)에 쓰기, 화면 파일에 카탈로그 올리기, `--no-instances`로 준비하기. 라이브러리는 읽기만 하고, 다시 올리는 것은 사람이 한다(`scripts/figma/README.md` 「컴포넌트 카탈로그」·「라이브러리 키 표」). 화면 파일에 카탈로그 사본을 두면 라이브러리 대신 그 사본을 쓰게 된다.
 - 색이나 글자 크기를 Figma에서 직접 입력하기. 모든 칠은 `oe color`·`oe primitive` 변수, 모든 글자는 `oe/text-*` 스타일이다.
 - DOM의 감싸개를 그대로 Frame으로 옮기기. **배치하는 곳만 Frame이다.** 글자 하나만 감싼 상자와 그대로 통과시키는 상자는 `prepare.mjs`가 없애고, 칠·테두리만 있는 잎은 Rectangle로 만든다. `data-slot`이 붙은 컴포넌트 노드는 되짚기의 근거라 접지 않는다. 규칙은 `scripts/figma/README.md`의 「Figma에서 무엇이 Frame이 되나」에 있고, 접은 수는 manifest의 `folded`에 나온다. 보고의 「연결」에 그 수를 적는다.
 - Pretendard가 아닌 글꼴을 새로 고르기. 승인된 대체는 `scripts/figma/setup-text-styles.js`의 Noto Sans KR 하나뿐이다.
@@ -41,23 +46,33 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(curl:*), Bash(pnpm --filter @
 
 이 세션에 `mcp__figma__use_figma`, `mcp__figma__create_new_file`, `mcp__figma__get_screenshot`이 있는지 본다. 없으면 멈추고 알린다: 「Figma MCP가 이 세션에 없습니다. `claude mcp add --transport http --scope user figma https://mcp.figma.com/mcp`로 등록하고 `/mcp`에서 로그인한 뒤 Claude Code를 다시 여세요.」
 
-headless로 돌릴 때는 `claude -p "/design-page <key> …" --output-format text --model sonnet --allowedTools "Read" "Grep" "Glob" "Write" "Bash(curl*)" "Bash(pnpm --filter @ooee/sandbox dev*)" "Bash(node scripts/figma/prepare.mjs*)" "mcp__figma" < /dev/null`로 띄운다. `--allowedTools`는 뒤따르는 인수를 모두 먹으므로 프롬프트를 그 앞에 둔다.
+headless로 돌릴 때는 `claude -p "/design-page <key> …" --output-format text --model sonnet --allowedTools "Read" "Grep" "Glob" "Write" "Bash(curl*)" "Bash(pnpm --filter @ooee/sandbox dev*)" "Bash(node scripts/figma/sandbox-server.mjs*)" "Bash(node scripts/figma/prepare.mjs*)" "mcp__figma" < /dev/null`로 띄운다. `--allowedTools`는 뒤따르는 인수를 모두 먹으므로 프롬프트를 그 앞에 둔다.
 
 ### 2. 화면을 띄운다
 
-`curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/<key>`가 `200`이 아니면 `pnpm --filter @ooee/sandbox dev`를 background로 띄우고 200이 될 때까지 기다린다. 이 명령이 띄운 서버는 마지막에 끈다.
+**이 checkout 의** sandbox 여야 한다. 포트와 HTTP 코드만 보면 안 된다 — 같은 기기에 다른 저장소·worktree 의 sandbox 가 3001 에 떠 있어, 그 저장소의 옛 화면이 200 으로 조용히 읽히거나(voc) 404 인 화면을 띄우려다 포트가 차 끝나지 않고 기다린 적이 있다(2026-09-22). sandbox 의 `/sandbox-origin.json` 지문으로 가른다.
+
+1. `포트:`가 있으면 `node scripts/figma/sandbox-server.mjs --key <key> --port <n>`을 돌린다. `ok`가 `true`면 그 `base`를 쓴다. 아니면 `reason`을 보고하고 멈춘다.
+2. 없으면 `node scripts/figma/sandbox-server.mjs --key <key>`를 돌린다.
+   - `ready`가 `true`면 그 `base`를 쓴다. 이 checkout 의 서버가 이미 떠 있다.
+   - `start`가 있으면 그 `command`(`pnpm --filter @ooee/sandbox dev --port <빈 포트>`)를 background로 띄우고 `node scripts/figma/sandbox-server.mjs --key <key> --port <그 포트> --wait 120`으로 기다린다. exit 0이면 `start.base`를 쓴다. 1이면 출력과 dev 서버 로그 끝을 보고하고 멈춘다. `seen`에 나온 남의 서버(`origin: "other"`)는 건드리지 않는다.
+   - `error`가 있으면(이 checkout 의 서버인데 그 화면이 없다, 빈 포트가 없다) 보고하고 멈춘다.
+3. 이 명령이 띄운 서버는 마지막에 끈다. 띄우지 않은 서버는 끄지 않는다.
 
 ### 3. 준비한다
 
 ```bash
-node scripts/figma/prepare.mjs --key <key> --name "<screens.ts의 name>" [--state '<이름>'] [--state '<이름>=<JS>']... [--width 390 --height 844] [--version]
+node scripts/figma/prepare.mjs --key <key> --name "<screens.ts의 name>" --base <2단계의 base> [--state '<이름>'] [--state '<이름>=<JS>']... [--width 390 --height 844] [--version] [--allow-frames <n>] [--allow-drift]
 ```
 
 - `--state`를 하나라도 줄 때는 첫 `--state`에 기본 화면 이름(예: `목록`)만 JS 없이 둔다.
 - 화면 코드가 `max-w-[390px]` 모바일 뷰로 서 있으면(`plugins/ooee-harness/skills/generate-code/SKILL.md` 「화면 폭」) `--width 390 --height 844`를 준다. 그 밖에는 기본값 1440×900이다.
 - 명령이 0이 아닌 코드로 끝나면 멈추고, 돌린 명령과 오류 전문을 보고한다. `scripts/figma/`나 상태 JS를 고쳐 다시 돌리지 않고 단계 파일을 손으로 만들지 않는다.
 - 출력의 `unresolvedColors`·`unknownIcons`가 0이 아니면 멈추고 manifest의 `unresolvedColors`·`unknownIcons` 목록을 보고한다. 이름을 찾지 못한 색은 Figma에서 변수에 묶을 수 없다.
-- `.figma-work/<key>/manifest.json`을 읽는다.
+- **exit 3이면 라이브러리가 이 화면을 다 덮지 못한다.** 라이브러리에 없는 변형(`missingInLibrary`)을 썼거나, 세트는 있는데 맞는 변형이 없는 자리(`unsupported`: 앞 아이콘이 붙은 Input, 최솟값의 NumberInput, Field·AppHeader …)가 있다. 프레임으로 대신 그리지 않는다. 단계를 넘기지 않고 멈추고, manifest의 두 목록(경로·세트·까닭)을 보고한다. 보고의 첫 제목은 「## 라이브러리에 먼저 더할 것」이고, 세트마다 빠진 변형을 묶어 적은 뒤 그것을 `docs/process/new-component.md` 절차로 `@ooee/ui`에 만들거나 변형을 더하고 카탈로그 → 라이브러리 → `library.json` 순서로 올려야 한다고 적는다(`docs/process/ai-environment.md` 「새 컴포넌트를 만들 때」). `buttonVariants`로 칠한 링크는 컴포넌트가 없는 것이 아니라 화면 코드가 `<Button render={<a href="…" />} nativeButton={false} role="link">`로 쓰지 않은 것이라 따로 적는다.
+- **exit 4면 라이브러리가 코드보다 낡았다.** 이 화면이 인스턴스로 쓰는 세트의 원본이 라이브러리를 올린 뒤 모양이 바뀌었다. 멈추고 manifest `libraryDrift.affected`(세트·파일)를 보고한다. 카탈로그를 라이브러리 파일에 다시 올려 Publish 하고 `library.json`을 다시 뽑아야 한다(`scripts/figma/README.md` 「라이브러리가 코드보다 낡았을 때」). 사람이 알고도 옮기라고 하면 `낡은 라이브러리 허용`으로 다시 부른다.
+- **exit 5면 `--base`의 서버가 이 checkout 의 sandbox 가 아니거나 그 화면이 없다.** 2단계로 돌아가지 않고 멈춘 뒤 출력을 보고한다.
+- `.figma-work/<key>/manifest.json`을 읽는다. `instances`(인스턴스로 놓을 자리)·`unsupported`(예외로 프레임으로 둔 자리와 까닭)·`framesAllowed`(그 예외)·`notInLibrary`(라이브러리와 상관없는 native 덩이)·`libraryDrift`(라이브러리를 올린 뒤 바뀐 코드와 이 화면이 쓰는 세트 가운데 닿은 것)는 보고에 쓴다.
 
 ### 4. 파일을 정한다
 
@@ -75,30 +90,27 @@ manifest의 `steps`를 **순서대로** 하나씩 처리한다. 단계마다:
 3. 결과에 `error`가 있으면 멈추고 그 단계 이름과 결과 전문을 보고한다. 「조각 내용이 바뀌었다」·「옮기는 중 builder 가 바뀌었다」 오류만은 같은 단계를 1번부터 한 번 더 한다. 두 번째도 같으면 멈춘다.
 
 **단계를 건너뛰지 않는다.** 「builder 를 문서에 둔다」 단계가 뒤따르는 build 단계가 쓸 코드를 문서에 넣는다. 그것을 빼고 build 단계만 돌리면 「문서에 builder 가 없다」로 멈춘다.
-4. build 단계의 결과에서 `unmappedColors`·`unmappedText`·`weightFallback`·`defaultTextColor`·`opacityOnToken`·`replacedFrames`를 모아 둔다. 멈추지는 않는다.
+4. build 단계의 결과에서 `unmappedColors`·`unmappedText`·`weightFallback`·`defaultTextColor`·`opacityOnToken`·`replacedFrames`·`sweptOrphans`와 `instances`·`remoteInstances`·`librarySets`를 모아 둔다. 멈추지는 않는다. `sweptOrphans`는 build 가 멈추거나 끝날 때 페이지 최상위에서 지운 고아다. `error`와 함께 오면 그 단계가 붙이지 못한 덩이를 치운 것이다.
 
 ### 6. 검사한다
 
 마지막 audit 단계의 결과가 검사다. 다음을 모두 만족해야 완료다.
 
 - `missingFrames`가 비어 있다.
+- `strayNodes`가 비어 있다(페이지 최상위에 이 도구가 만들다 남긴 고아가 없다). 있으면 노드 id·이름을 보고한다. 지우는 것은 사람이다. `otherTopLevel`(사람이 둔 수정안·메모, 앞서 그린 다른 상태, 표식 없는 옛 노드)은 완료를 막지 않고 「확인이 필요한 것」에 적는다.
 - 모든 프레임에서 `unboundPaints`가 비어 있다(모든 칠이 변수에 묶였다).
 - 모든 프레임에서 `textsWithoutStyle`이 비어 있다(모든 글자가 텍스트 스타일이다).
 - 모든 프레임에서 `rootWithoutFill`이 `false`다(루트 프레임에 바탕 칠이 있다). 칠이 없는 루트는 `unboundPaints`에 잡히지 않는다.
 - 5단계에서 모은 `unmappedColors`·`unmappedText`·`defaultTextColor`가 비어 있다.
-`--instances`로 돌렸을 때 build 단계가 「컴포넌트를 찾지 못했다」 또는 「컴포넌트의 글자 수가 다르다」 `error`를 돌려주면, 그 파일에 카탈로그가 없거나 낡은 것이다. 3번의 「멈추고 보고한다」를 그대로 따르되, 사람에게 아래를 먼저 하도록 보고에 적는다. 카탈로그는 `screens.ts`의 화면이 아니므로 이 명령으로 부르지 않고 도구를 직접 돌린다.
+- 모든 프레임에서 `localInstances`가 비어 있다(인스턴스가 모두 라이브러리의 것이다). 프레임들의 `remoteInstances` 합이 manifest의 `instances.total`과 같다.
 
-```bash
-# 종류마다 `--only` 를 준다. 주지 않으면 모든 변형이 한 프레임에 들어가는데, 큰 auto-layout
-# 프레임에 붙이는 시간은 자식 수의 제곱으로 늘어 한 단계가 MCP 타임아웃을 낸다.
-# 까닭과 잰 값은 scripts/figma/README.md 의 「한 번에 다 옮기지 않는다」에 있다.
-node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
-  --only Button --only Badge --only Input --only Select --only Checkbox --only Chip \
-  --only Field --only Switch --only Radio --only Textarea --only InputButton \
-  --only NumberInput --only Combobox --only ToggleButton --only NotificationBadge \
-  --only SelectBox --only AppHeader --only BottomNavigation
-# manifest 의 steps 를 use_figma 에 fileKey 와 함께 순서대로 넘긴다
-```
+build 단계가 아래 `error` 가운데 하나를 돌려주면 3번의 「멈추고 보고한다」를 그대로 따른다. 대신 프레임으로 그리지 않고, 카탈로그를 그 파일에 올리지 않는다.
+
+- 「라이브러리에 없는 변형이다」·「조각에 라이브러리 키가 없다」: 준비가 exit 3 을 무시했거나 단계 파일이 낡았다. 이름을 보고한다.
+- 「라이브러리 세트를 가져오지 못했다」·「키가 다른 세트를 가리킨다」: 라이브러리가 게시되지 않았거나 이 파일의 팀에서 쓸 수 없거나, 라이브러리를 다시 올려 키가 바뀌었다.
+- 「라이브러리가 library.json 과 다르다」: 라이브러리를 `library.json`을 뽑은 뒤 다시 올렸다.
+
+뒤의 둘은 사람이 라이브러리를 확인하고 `scripts/figma/README.md` 「라이브러리 키 표」대로 `library.json`을 다시 뽑아야 풀린다고 보고에 적는다.
 
 하나라도 어기면 「완료」라고 쓰지 않고 「검사 실패」로 보고한다. `opacityOnToken`은 완료를 막지 않는다. 코드가 `border-[var(--brand-500)]/30`처럼 색에 투명도를 붙여 쓴 자리를 그대로 옮긴 것이지만 `figma-page-agent.md` 규칙 5(토큰에 임의 투명도 금지)와 부딪치므로 「확인이 필요한 것」에 적는다.
 
@@ -111,7 +123,8 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 - 글꼴 대체로 생긴 글자 폭 차이와 그 때문에 끝 글자가 조금 잘리는 자리
 - 그림자(`shadow-*`): 옮기지 않는다. oe 토큰에 그림자 색이 없다
 - 레이어 이름: `data-slot`, 없으면 role, 없으면 태그 이름이라 `div`·`td`·`span`이 많다
-- 컴포넌트는 기본적으로 인스턴스가 아니라 프레임이다(Code Connect 없음). `--instances`로 돌린 자리만 카탈로그 컴포넌트의 인스턴스다
+
+**라이브러리 인스턴스가 브라우저와 다르게 칠해진 자리(색·테두리)는 「알려진 차이」가 아니라 「확인이 필요한 것」에 적는다.** 인스턴스의 모양은 라이브러리를 올린 때의 것이라, 「무조건 라이브러리」에서는 그 차이가 결과물에 그대로 실린다. 자리와 세트를 적고, 그 세트가 manifest `libraryDrift.affected`에 있는지(`낡은 라이브러리 허용`으로 옮긴 것), 없는지(파일로는 잡히지 않는 낡음. 예: outline Button 테두리)를 함께 적는다. 위치·크기·글자가 다른 것은 「대조에서 찾은 것」이다.
 
 ### 8. 보고한다
 
@@ -124,6 +137,7 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 프레임:
 - <이름>: https://www.figma.com/design/<fileKey>?node-id=<id의 `:`를 `-`로 바꾼 값> · 미리보기 <image_url> (7일 뒤 만료)
 다시 그린 프레임: <replacedFrames 또는 없음>
+지운 고아: <sweptOrphans 또는 없음>
 상태 JS: <상태 이름>: <JS> (있을 때만)
 
 ## 연결
@@ -132,10 +146,13 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 - 쓴 텍스트 스타일: <textStyles>
 - auto-layout 프레임 <autoLayoutFrames>개, DOM 위치와 어긋나 absolute로 둔 자식 <absoluteChildren>개
 - 접은 감싸개: 글자 <folded.text>개, 아이콘 <folded.icon>개, 통과 <folded.pass>개, Rectangle로 바꾼 잎 <folded.rect>개
+- 라이브러리 인스턴스 <audit remoteInstances 합>/<manifest instances.total>개가 `ooee · 컴포넌트 라이브러리`에서 왔다(`mainComponent.remote`). 이 파일의 로컬 컴포넌트를 가리키는 인스턴스 <localInstances 수 — 0이어야 한다>개. 세트별: <manifest instances.bySet>
+- 라이브러리 세트가 있지만 예외 <framesAllowed.issue, 없으면 이 줄은 「없음」>로 프레임으로 둔 자리 <unsupported 수>곳: <세트 — 까닭, 같은 까닭은 묶어 수로. 예: Field 3곳 — 라이브러리 Field 는 속 컨트롤이 굳어 있다>
+- 라이브러리에 없어 프레임으로 둔 것: <notInLibrary 가운데 `in` 이 없는 줄의 what×count, 그 안의 줄은 괄호로. 예: header×1(nav 카테고리, a×3), section 상품 목록×1(a×8, nav 페이지 이동)>
 - 변수 값은 prepare.mjs를 돌린 시점의 `packages/tokens`에서 옮겨 적었고 원본과 자동 동기화되지 않는다. 색 매핑과 brand seed는 Provisional이다.
 
 ## 참조한 것
-- 컴포넌트 모음: 카탈로그(`apps/sandbox/src/app/catalog`)로 Figma에 만들어 둔 컴포넌트가 있지만, 화면은 `--instances`로 돌린 자리만 그 인스턴스다. 나머지는 `docs/system/README.md`의 「Component」 표와 화면 코드(`apps/sandbox/src/app/<key>`)가 대신한다.
+- 컴포넌트 모음: `ooee · 컴포넌트 라이브러리`(https://www.figma.com/design/4HKy8Gi4Hd4VefFFvlIolc), 키 표 `scripts/figma/library.json`(<library.exportedAt> 에 뽑음). 인스턴스가 되지 않은 자리는 `docs/system/README.md`의 「Component」 표와 화면 코드(`apps/sandbox/src/app/<key>`)가 대신한다.
 
 ## 승인된 예외
 - 글꼴: Pretendard Variable 대신 Noto Sans KR, semibold는 Bold (2026-09-15 개발자 승인)
@@ -143,6 +160,10 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 ## 확인이 필요한 것
 - 토큰에 투명도를 더한 칠: <opacityOnToken 또는 없음>
 - 가장 가까운 굵기로 옮긴 글자: <weightFallback 또는 없음>
+- 낡은 라이브러리로 옮긴 세트: <libraryDrift.affected 의 세트(파일) — `낡은 라이브러리 허용`으로 옮겼다, 또는 없음>
+- 라이브러리 인스턴스가 브라우저와 다르게 칠해진 자리: <7단계에서 찾은 것 또는 없음>
+- 라이브러리를 올린 뒤 바뀐 코드: 모양이 바뀐 파일 <libraryDrift.visualChanges 수>개(<목록>), 그 밖에 주석·data-* 만 바뀐 파일 <나머지 수>개
+- 페이지 최상위의 다른 노드: <otherTopLevel 또는 없음>
 
 ## 대조에서 찾은 것
 - <덩이>: …
@@ -160,7 +181,7 @@ node scripts/figma/prepare.mjs --key catalog --name "컴포넌트" \
 ### R1. 기준을 만든다
 
 1. 1·2단계와 같이 도구를 확인하고 개발 서버를 띄운다.
-2. `node scripts/figma/prepare.mjs --key <key> --name "<이름>" [--state …]`를 ②와 **같은 인수로** 돌린다. Figma에는 아무것도 그리지 않으며, `.figma-work/<key>/spec-<상태>.json`에 지금 코드가 그리는 사양이 남는다. 이것이 비교 기준이다.
+2. `node scripts/figma/prepare.mjs --key <key> --name "<이름>" --base <2단계의 base> [--state …]`를 ②와 **같은 인수로** 돌린다. Figma에는 아무것도 그리지 않으며, `.figma-work/<key>/spec-<상태>.json`에 지금 코드가 그리는 사양이 남는다. 이것이 비교 기준이다. 되읽기는 그리지 않으므로 exit 3·4(라이브러리가 덮지 못함·낡음)여도 spec 이 남아 있으면 이어 간다. exit 5(다른 checkout 의 서버)와 그 밖의 코드는 멈춘다 — 기준이 다른 코드에서 나온다.
 3. `--state`를 무엇으로 줬는지 모르면 `apps/sandbox/src/app/<key>/page.tsx`의 머리말과 ②의 보고를 보고 그대로 맞춘다. 상태가 다르면 비교가 어긋난다.
 
 ### R2. Figma에서 읽는다
