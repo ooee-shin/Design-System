@@ -24,13 +24,14 @@ import { pathToFileURL } from "node:url";
 export const resultMarker = (issue, round) => `<!-- harness:result issue=${issue} round=${round} -->`;
 export const RESULT_MARKER_RE = /^<!-- harness:result issue=(\d+) round=(\d+) -->$/;
 
-// 「이 댓글」이 Slack 에서는 카드를 가리키게 읽혀, 카드에 이모지를 달고 결정했다고 여기게 된다. 판독은
-// GitHub 의 반응만 읽으므로 자리를 못 박는다. 머리 첫 줄에도 짧은 꼴(`HEAD_DECISION_HINT`)을 둔다 —
+// 결정은 두 자리에서 받는다. GitHub 결과 댓글의 반응·댓글이 원본이고, Slack 결과 카드의 반응은
+// 이 Mac 의 다리(slack-bridge.mjs)가 같은 이슈의 댓글로 옮긴다(2026-09-23). 그래서 「이 댓글」이
+// 카드를 가리키게 읽혀도 틀리지 않는다. 머리 첫 줄에도 짧은 꼴(`HEAD_DECISION_HINT`)을 둔다 —
 // 이 안내가 있는 「결정」 절은 카드가 자르는 자리 아래다.
 // 사유는 「반려: …」·「개선: …」 꼴로 받는다. 꼴 없는 댓글도 사유로 짐작은 하지만(decision.mjs reasonSource),
 // 짐작한 사유로는 다시 만들지 않고 묻고 멈추므로 개선 회차가 돌지 않는다.
-export const DECISION_GUIDE = "GitHub 의 이 댓글에 👍 승인 · 👎 반려 · 😕 개선 — 사유는 「반려: 까닭」·「개선: 고칠 것」 꼴의 댓글로. Slack 카드에 단 이모지는 읽히지 않습니다";
-export const HEAD_DECISION_HINT = "결정은 GitHub 댓글에 👍 👎 😕";
+export const DECISION_GUIDE = "👍 승인 · 👎 반려 · 😕 개선 — Slack 결과 카드에 달아도 되고 GitHub 의 이 댓글에 달아도 됩니다. 사유는 「반려: 까닭」·「개선: 고칠 것」 꼴의 댓글로 남겨 주세요";
+export const HEAD_DECISION_HINT = "결정은 👍 👎 😕";
 
 const fail = (message) => {
   throw new Error(`결과 댓글을 만들지 않는다: ${message}`);

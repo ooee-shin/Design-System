@@ -18,7 +18,7 @@ test("첫 네 줄에 요청 · 샌드박스 · 작업 요약이 있다", () => {
   // 2026-09-22 에 요청 처리에서 Figma 를 뺐다. 결과는 샌드박스에서만 본다.
   const head = lines(renderResultComment(example())).slice(0, 4);
   assert.deepEqual(head, [
-    "화면 요청 #9 결과 · 1회차 — 이커머스 구매 페이비 · 결정은 GitHub 댓글에 👍 👎 😕",
+    "화면 요청 #9 결과 · 1회차 — 이커머스 구매 페이비 · 결정은 👍 👎 😕",
     "요청: @유진식 · 프로젝트 web, sto, sv",
     "샌드박스: https://ooee-sandbox.pages.dev/shop-product-list 외 4장 · 목록 https://ooee-sandbox.pages.dev/",
     "작업: 페이지 5장 추가(web) — 상품 목록·상품 상세·장바구니 외 2장 · 새 컴포넌트 없음 · PR #17",
@@ -143,13 +143,12 @@ test("가운데에 공백·제어 문자가 든 주소는 받지 않는다 — �
   }
 });
 
-test("결정은 GitHub 에서 단다는 것을 머리 첫 줄과 결정 절에 적는다", () => {
-  // 결정 절은 카드가 자르는 아래쪽이다. 「이 댓글에」만 있으면 Slack 에서 카드에 이모지를 단다.
+test("결정을 어디에 다는지 머리 첫 줄과 결정 절에 적는다", () => {
+  // 결정 절은 카드가 자르는 아래쪽이라 머리에도 짧은 꼴을 둔다. Slack 카드의 반응은 다리가 옮긴다(2026-09-23).
   const markdown = renderResultComment(example());
   assert.ok(lines(markdown)[0].endsWith(`· ${HEAD_DECISION_HINT}`));
-  assert.match(HEAD_DECISION_HINT, /GitHub/);
-  assert.match(DECISION_GUIDE, /^GitHub 의 이 댓글에/);
-  assert.match(DECISION_GUIDE, /Slack 카드에 단 이모지는 읽히지 않습니다/);
+  assert.match(HEAD_DECISION_HINT, /👍 👎 😕/);
+  assert.match(DECISION_GUIDE, /Slack 결과 카드에 달아도 되고 GitHub 의 이 댓글에 달아도 됩니다/);
   // 꼴 없는 사유 댓글은 짐작으로만 읽혀 개선 회차가 돌지 않는다(D4). 안내가 꼴을 알려 준다.
   assert.match(DECISION_GUIDE, /「반려: 까닭」·「개선: 고칠 것」/);
   // decision.mjs 가 받는 꼴만 적는다. 「…으로 시작하는 댓글」이라고 쓰면 「승인합니다」를 쓰게 된다.
