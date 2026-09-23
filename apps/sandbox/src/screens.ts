@@ -13,6 +13,7 @@
  */
 export const SANDBOX_PROJECTS = [
   { id: "harness-test", name: "하네스 시험", description: "요청에서 화면까지의 흐름을 시험하며 만든 화면입니다. 제품에 들어가지 않습니다." },
+  { id: "신주희-테스트", name: "신주희 테스트", description: "신주희 테스트 화면입니다." },
 ] as const;
 
 export type SandboxProject = (typeof SANDBOX_PROJECTS)[number]["id"];
@@ -233,6 +234,16 @@ export const sandboxScreens: SandboxScreen[] = [
     href: "/store-inventory-2",
     prompt:
       "매장 직원이 판매대에서 상품 재고를 확인하는 화면. 검색 칸·조회 버튼, 전체·품절·부족 거르기 칩, 상품명·규격·매장 재고·창고 재고·최근 입고일 표, 품절·부족 배지, 검색 전·결과 없음 안내. 개선: 데모 데이터도 넣어줘.",
+    createdAt: "2026-09-23",
+  },
+  {
+    key: "ai-work-assistant",
+    project: "신주희-테스트",
+    viewports: ["mobile", "tablet"],
+    name: "업무 데이터 AI 어시스턴트",
+    href: "/ai-work-assistant",
+    prompt:
+      "채팅창에 자연어로 질문하면 샘플 업무 데이터(점포·매출·계약·리뷰)로 답하는 AI 어시스턴트 프로토타입. 7가지 질문 유형별 응답 형태(수치·표·요약·데이터 없음·화면 이동 버튼), 텍스트 입력, 이미지 드래그앤드롭, 파일 첨부.",
     createdAt: "2026-09-23",
   },
 ];
