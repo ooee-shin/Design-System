@@ -23,6 +23,7 @@ import {
   pickActionable,
   pickUnreadLookalikes,
   staleBranches,
+  stopNotice,
   validateHandoff,
 } from "./runner.mjs";
 
@@ -237,4 +238,15 @@ test("이미 main 에 있는 승인은 commit 목록으로 넘긴다 — pull re
   assert.ok(wrongTarget.some((p) => p.includes("main 넘김")), "dev 넘김에 already 를 받았다");
   const junk = validateHandoff({ issue: 12, target: "main", already: true, commits: ["not a sha"] }, 12, root);
   assert.ok(junk.some((p) => p.includes("commits")), "sha 가 아닌 것을 받았다");
+});
+
+test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기획자가 무엇을 다시 낼지 보면 된다", () => {
+  const report = "앞말\n\n## 묻고 멈춤\n\n**멈춘 단계:** 1단계\n\n- 화면 유형이 2개(모바일, 태블릿)다 — 하나를 묻는다\n- 새 프로젝트 「신주희 테스트」\n\n## 막힌 명령\n- 없음";
+  const text = stopNotice(60, report, { title: "챗봇 채팅 화면", url: "https://github.com/x/y/issues/60" });
+  assert.match(text, /^⚠️ 화면 요청 #60 「챗봇 채팅 화면」 — 묻고 멈춤\n/);
+  assert.match(text, /· 화면 유형이 2개/);
+  assert.match(text, /요청을 고쳐 다시 내거나/);
+  assert.match(text, /자세히: https:\/\/github\.com\/x\/y\/issues\/60$/);
+  assert.doesNotMatch(text, /막힌 명령/, "보고 전체를 옮기면 카드가 길어진다");
+  assert.match(stopNotice(1, "제목 없는 보고"), /처리가 멈췄다/);
 });

@@ -18,6 +18,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { postCard, slackTarget } from "./slack-card.mjs";
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../..");
 
@@ -131,6 +133,22 @@ export function validateHandoff(handoff, issue, root = repoRoot) {
 export function closingComment(kind, detail) {
   const what = { 승인: "승인되어 main 에 반영됐습니다", 반려: "반려되어 dev 에서 되돌렸습니다" }[kind];
   return `처리를 마쳐 닫습니다 — ${what}${detail ? ` (${detail})` : ""}. 다시 요청하려면 Slack 폼으로 새 요청을 냅니다.`;
+}
+
+/**
+ * 멈췄을 때 결과 채널에 올릴 글. 보고의 첫 제목과 그 아래 문제 줄만 뽑는다 — 기획자가 무엇을 다시 내야
+ * 하는지만 보면 된다. 러너가 멈추면 job 로그에만 남아 요청한 사람은 알 길이 없었다(#60).
+ */
+export function stopNotice(issue, report, { title = "", url = "" } = {}) {
+  const lines = String(report ?? "").split("\n");
+  const at = lines.findIndex((line) => /^## /.test(line));
+  const heading = at >= 0 ? lines[at].replace(/^## /, "") : "처리가 멈췄다";
+  const rest = (at >= 0 ? lines.slice(at + 1) : lines).map((line) => line.trim()).filter(Boolean);
+  const problems = rest.filter((line) => /^[-*] |^\d+\. /.test(line)).slice(0, 4);
+  const detail = (problems.length ? problems : rest.slice(0, 3)).map((line) => line.replace(/^[-*] /, "· ")).join("\n");
+  const head = `⚠️ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
+  const where = url ? `\n자세히: ${url}` : "";
+  return `${head}\n${detail}\n\n요청을 고쳐 다시 내거나 개발자에게 알려 주세요.${where}`;
 }
 
 /** 같은 결정을 두 번 처리하지 않게 하는 열쇠. 사람이 새 신호를 남기면 `at` 이 바뀌어 다시 처리한다. */
@@ -300,6 +318,23 @@ function postedResult(issue, before) {
   return false;
 }
 
+/** 멈춘 것을 결과 채널에 알린다. 카드가 실패해도 러너의 결과는 바뀌지 않는다. */
+async function notifyStop(issue, report) {
+  const target = slackTarget();
+  if (!target) return;
+  let meta = {};
+  try {
+    const view = JSON.parse(sh("gh", ["issue", "view", String(issue), "--json", "title,url"]));
+    meta = { title: view.title.replace(/^화면\s*요청\s*[:：]\s*/, ""), url: view.url };
+  } catch {
+    meta = {};
+  }
+  await postCard(stopNotice(issue, report, meta), target).then(
+    () => log("- 멈춘 것을 결과 채널에 알렸다"),
+    (error) => log(`- 결과 채널에 알리지 못했다: ${error.message}`),
+  );
+}
+
 async function runChain(issue, argument) {
   rmSync(handoffPath(issue), { force: true });
   dropStaleBranches(issue);
@@ -308,6 +343,7 @@ async function runChain(issue, argument) {
   const landed = await landHandoff(issue);
   if (!landed) {
     log("- 넘김 파일이 없다. 처리가 멈춘 자리는 위 보고에 있다.");
+    await notifyStop(issue, first.result);
     return false;
   }
   if (!landed.handoff.resume) return true;

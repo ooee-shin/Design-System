@@ -7,7 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { loadSandboxProjectIds, parseIssue, parseSandboxProjectIds, splitProjects } from "./issue.mjs";
+import { loadSandboxProjectIds, parseIssue, parseSandboxProjectIds, splitChoices, splitProjects } from "./issue.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (n) => JSON.parse(readFileSync(path.join(here, "fixtures", `issue-${n}.json`), "utf8"));
@@ -113,7 +113,7 @@ test("화면 유형이 없거나 모르는 값이면 만들지 않고 묻는다"
 });
 
 test("화면 유형은 한글과 영문을 함께 받는다", () => {
-  const of = (value) => parseIssue(now(`프로젝트: harness-test\n화면 유형: ${value}\n요구사항: 목록을 본다`), { projects: NOW }).viewport;
+  const of = (value) => parseIssue(now(`프로젝트: harness-test\n화면 유형: ${value}\n요구사항: 목록을 본다`), { projects: NOW }).viewports[0];
   assert.deepEqual([of("웹"), of("태블릿"), of("테블릿"), of("모바일"), of("web"), of("Mobile")], ["web", "tablet", "tablet", "mobile", "web", "mobile"]);
 });
 
@@ -225,4 +225,24 @@ test("보통 요청은 그대로다 — mode 는 생성이고 fix 는 없다", (
   assert.equal(read.mode, "생성");
   assert.equal(read.fix, null);
   assert.match(read.generateArgs, /^공지사항 목록\. 공지 목록을 보여 준다 프로젝트: sto 유형: mobile$/);
+});
+
+test("Slack 의 여러 선택 칸은 JSON 배열로 온다 — 벗겨서 읽는다", () => {
+  assert.deepEqual(splitChoices('["모바일","태블릿"]'), ["모바일", "태블릿"]);
+  assert.deepEqual(splitChoices("모바일"), ["모바일"]);
+  assert.deepEqual(splitChoices('["하네스 시험"]'), ["하네스 시험"], "이름의 공백에서 잘렸다");
+  assert.deepEqual(splitChoices(""), []);
+});
+
+test("화면 유형은 여러 개를 고를 수 있다 — 한 화면이 여러 폭으로 선다", () => {
+  // #60: 기획자가 「모바일·태블릿」을 함께 골랐다. Slack 은 그것을 JSON 배열로, 한글은 이스케이프해 보낸다.
+  const both = parseIssue(now('프로젝트: 하네스 시험\n화면 유형: ["\\uc6f9","\\ubaa8\\ubc14\\uc77c"]\n요구사항: 채팅 화면'), { projects: NOW });
+  assert.deepEqual(both.viewports, ["web", "mobile"], "이스케이프된 한글을 풀지 못했다");
+  assert.deepEqual(both.problems, []);
+  assert.match(both.generateArgs, / 유형: web, mobile$/);
+  const one = parseIssue(now('프로젝트: ["하네스 시험"]\n화면 유형: ["모바일"]\n요구사항: 채팅 화면'), { projects: NOW });
+  assert.deepEqual(one.viewports, ["mobile"]);
+  assert.equal(one.project.id, "harness-test", "배열로 온 프로젝트를 읽지 못했다");
+  const mixed = parseIssue(now('프로젝트: 하네스 시험\n화면 유형: 웹, 워치\n요구사항: 채팅 화면'), { projects: NOW });
+  assert.match(mixed.problems.join("\n"), /모르는 화면 유형: 「워치」/);
 });

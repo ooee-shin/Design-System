@@ -83,7 +83,7 @@ export const loadSandboxProjectIds = (file = SCREENS_TS) => loadSandboxProjects(
  * 기대지 않는다. 이름에 공백이 있으므로(「하네스 시험」) 쉼표로만 가른다.
  */
 export function matchProject(value, projects) {
-  const parts = String(value ?? "").split(/[,，、/]+/).map((part) => part.trim()).filter(Boolean);
+  const parts = splitChoices(value);
   const matched = [];
   const unknown = [];
   for (const part of parts) {
@@ -93,6 +93,28 @@ export function matchProject(value, projects) {
     } else unknown.push(part);
   }
   return { matched, unknown };
+}
+
+/**
+ * 폼이 여러 값을 보낼 때의 꼴을 푼다. Slack 의 여러 선택 칸은 `["모바일","태블릿"]` 처럼 JSON 배열로 오고
+ * (#60), 옛 양식은 `web,sto,sv` 다. 대괄호·따옴표를 벗기고 쉼표로 가른다. 하나만 왔으면 그 하나다.
+ */
+export function splitChoices(value) {
+  const text = String(value ?? "").trim();
+  // Slack 은 여러 선택 값을 JSON 배열로 넣고 한글을 `\uc6f9` 처럼 이스케이프한다. JSON 으로 풀리면 그대로 쓴다.
+  if (text.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(text);
+      if (Array.isArray(parsed)) return parsed.map((part) => String(part).trim()).filter(Boolean);
+    } catch {
+      // 대괄호만 흉내 낸 글이면 아래로 내려가 글자로 가른다.
+    }
+  }
+  return text
+    .replace(/^\[|\]$/g, "")
+    .split(/[,，、/]+/)
+    .map((part) => part.trim().replace(/^["']|["']$/g, "").trim())
+    .filter(Boolean);
 }
 
 /** 옛 양식(#6·#9)의 `web,sto,sv` 를 나눈다. 지금 폼은 한 프로젝트만 보낸다. */
@@ -218,18 +240,21 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
   }
 
   // 유형은 폭이다. 프로젝트와 섞지 않는다 — 한 프로젝트에 웹 화면과 모바일 화면이 함께 있다.
+  // 한 화면이 여러 폭으로 설 수 있다(2026-09-23 개발자) — 폼에서 고른 만큼 받는다.
   const viewportRaw = (values.viewport ?? "").trim();
-  const viewport = VIEWPORTS[viewportRaw.toLowerCase()] ?? null;
+  const viewportChoices = splitChoices(viewportRaw);
+  const viewports = [...new Set(viewportChoices.map((part) => VIEWPORTS[part.toLowerCase()]).filter(Boolean))];
+  const unknownViewports = viewportChoices.filter((part) => !VIEWPORTS[part.toLowerCase()]);
   if (mode === "생성") {
     if (!viewportRaw) problems.push("본문에 「화면 유형:」 칸이 없다 — 웹·태블릿·모바일 가운데 무엇인지 요청자에게 묻는다");
-    else if (!viewport) problems.push(`모르는 화면 유형: 「${oneLine(viewportRaw)}」 — 웹·태블릿·모바일 가운데 하나다`);
+    else if (unknownViewports.length) problems.push(`모르는 화면 유형: 「${unknownViewports.join(", ")}」 — 웹·태블릿·모바일 가운데서 고른다`);
   }
 
   const paragraph = requirement.replace(/\s+/g, " ").trim();
   const generateArgs =
     problems.length || mode === "수정"
       ? null
-      : `${screenName}. ${paragraph} 프로젝트: ${chosen}${isNewProject ? ` 새 프로젝트 이름: ${newProjectName}` : ""} 유형: ${viewport}`;
+      : `${screenName}. ${paragraph} 프로젝트: ${chosen}${isNewProject ? ` 새 프로젝트 이름: ${newProjectName}` : ""} 유형: ${viewports.join(", ")}`;
 
   return {
     number,
@@ -238,7 +263,7 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
     mode,
     fix: mode === "수정" ? { target: Number.isInteger(fixTarget) ? fixTarget : null, screenKey, instruction: problems.length ? null : paragraph } : null,
     project: chosen ? { id: chosen, name: newProjectName || null, isNew: isNewProject } : null,
-    viewport,
+    viewports,
     fields: {
       projects: chosen ? [chosen] : [],
       requester: values.requester ?? "",
