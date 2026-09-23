@@ -51,12 +51,18 @@ export function runnerArgs(mode, issue) {
 }
 
 /**
- * 돌기 전에 사본을 맞춘다. actions/checkout 이 하던 일이다 — 가지는 `dev` 로, 남은 파일은 지우고, 의존성을
- * 맞춘다. 앞 실행이 만든 `feature/issue-*` 가지에 서 있어도 `-B` 가 `dev` 로 돌려세운다.
+ * 돌기 전에 사본을 맞춘다. actions/checkout 이 하던 일이다 — 가지는 `dev` 로, 고친 것과 남은 파일은 지우고,
+ * 의존성을 맞춘다. 앞 실행이 만든 `feature/issue-*` 가지에 서 있어도 `-B` 가 `dev` 로 돌려세운다.
+ *
+ * **`reset --hard` 가 있어야 하는 까닭.** 앞 실행이 화면을 쓰다 멈추면 고친 파일이 사본에 남는다. 그러면
+ * 다음 실행의 0단계가 「남의 변경이 섞였다」로 보고 시작조차 하지 않는다 — `2026-09-24` 에 #75 가 15초 만에
+ * 그렇게 멈췄다. `clean` 은 새로 생긴 파일만 지우고 고친 파일은 그대로 둔다. 이 사본은 사람이 일하는
+ * 자리가 아니라 실행마다 새로 맞추는 자리이므로, 남은 것은 버리는 것이 맞다.
  */
 export const PREPARE = [
   ["git", ["fetch", "-q", "origin", "dev"]],
   ["git", ["checkout", "-q", "-B", "dev", "origin/dev"]],
+  ["git", ["reset", "-q", "--hard", "origin/dev"]],
   ["git", ["clean", "-qfd"]],
   ["pnpm", ["install", "--frozen-lockfile"]],
 ];

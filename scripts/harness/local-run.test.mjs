@@ -27,8 +27,16 @@ test("러너 인수는 모드 셋과 숫자 이슈만 받는다", () => {
 
 test("돌기 전에 dev 로 맞추고 남은 파일을 지우고 의존성을 맞춘다 — actions/checkout 이 하던 일이다", () => {
   const lines = PREPARE.map(([cmd, args]) => `${cmd} ${args.join(" ")}`);
-  assert.deepEqual(lines, ["git fetch -q origin dev", "git checkout -q -B dev origin/dev", "git clean -qfd", "pnpm install --frozen-lockfile"]);
+  assert.deepEqual(lines, [
+    "git fetch -q origin dev",
+    "git checkout -q -B dev origin/dev",
+    "git reset -q --hard origin/dev",
+    "git clean -qfd",
+    "pnpm install --frozen-lockfile",
+  ]);
   assert.ok(!lines.some((line) => line.includes("-x")), "node_modules 까지 지우면 매번 처음부터 설치한다");
+  // 2026-09-24 #75: 앞 실행이 남긴 고친 파일 때문에 0단계가 「남의 변경이 섞였다」로 보고 시작하지 않았다.
+  assert.ok(lines.some((line) => line.startsWith("git reset")), "고친 파일이 남으면 다음 실행이 시작조차 못 한다");
 });
 
 test("작업 사본이 없으면 돌리지 않고 설치 안내로 던진다", () => {
