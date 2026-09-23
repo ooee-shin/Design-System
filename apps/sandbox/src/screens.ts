@@ -246,4 +246,13 @@ export const sandboxScreens: SandboxScreen[] = [
       "채팅창에 자연어로 질문하면 샘플 업무 데이터(점포·매출·계약·리뷰)로 답하는 AI 어시스턴트 프로토타입. 7가지 질문 유형별 응답 형태(수치·표·요약·데이터 없음·화면 이동 버튼), 텍스트 입력, 이미지 드래그앤드롭, 파일 첨부.",
     createdAt: "2026-09-23",
   },
+  {
+    key: "kakao-message-dashboard",
+    project: "harness-test",
+    viewports: ["web", "mobile"],
+    name: "카카오톡 api 연동 메인 대시보드",
+    href: "/kakao-message-dashboard",
+    prompt: "카카오톡 api 연동해서 메시지를 대시보드에서 이력 관리 하는 페이지.",
+    createdAt: "2026-09-23",
+  },
 ];
