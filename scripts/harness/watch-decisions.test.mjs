@@ -1,5 +1,6 @@
 // 무엇을 깨울지만 본다. gh 는 부르지 않는다.
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
@@ -34,4 +35,13 @@ test("한 번 처리한 요청은 멈췄어도 다시 처리하지 않는다 —
 test("깨운 기록은 러너의 상태와 같은 폴더에 다른 파일로 둔다", () => {
   const file = watchStateFile({ HARNESS_STATE_DIR: "/tmp/ooee" });
   assert.equal(file, path.join("/tmp/ooee", "dispatched.json"));
+});
+
+test("tick 은 러너가 도는 동안 사본을 건드리지 않고, reset 대신 checkout 으로 맞춘다", () => {
+  // 2026-09-24: 손으로 돌린 실행의 가지가 tick 마다 origin/dev 로 밀렸다(reflog 에 `reset: moving to
+  // origin/dev`). commit 하기 전이라 잃은 것은 없었지만, 한 번만 늦었어도 그 회차의 화면이 날아갔다.
+  const tick = readFileSync(new URL("watch-tick.sh", import.meta.url), "utf8");
+  assert.match(tick, /pgrep -f "scripts\/harness\/runner\.mjs"/, "러너가 도는지 보지 않는다");
+  assert.match(tick, /git checkout -q -B dev origin\/dev/, "가지를 checkout -B 로 맞추지 않는다");
+  assert.ok(!/reset\s+-q?\s*--hard/.test(tick), "reset --hard 가 남아 있다 — feature 가지를 밀어 버린다");
 });

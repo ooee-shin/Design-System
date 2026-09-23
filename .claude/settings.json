@@ -24,6 +24,7 @@
       "Bash(gh run list *)",
       "Bash(node *lib/check-screens.mjs *)",
       "Bash(node --import tsx --test *)",
+      "Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *)",
       "Bash(node scripts/*)",
       "Bash(node plugins/ooee-harness/lib/*)",
       "Bash(gh issue view *)",
