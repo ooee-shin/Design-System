@@ -22,6 +22,7 @@ import {
   decisionKey,
   lookalikeKey,
   outsideScreenFiles,
+  screenKeys,
   pickActionable,
   pickUnreadLookalikes,
   resultMissing,
@@ -121,6 +122,29 @@ test("이어 받는 말은 스킬의 「러너에서 돌 때」가 기다리는 
   assert.match(prompt, /^러너: pull request #31 가 dev 에 squash 로 머지되었다\(머지 commit abc123\)/);
   const skill = readFileSync(path.join(repoRoot, ".claude/skills/process-issue/SKILL.md"), "utf8");
   assert.ok(skill.includes("러너: pull request #<번호> 가 dev 에 squash 로 머지되었다"), "스킬이 이 말을 모른다");
+});
+
+test("배포를 러너가 확인했으면 그 결과를 넘기고 8단계부터 시키다", () => {
+  // #60 은 「알림이 올 것이므로 기다린다」, #62 는 「백그라운드로 넘어갔다」 하고 턴을 끝내 결과 댓글이
+  // 없었다. 기다림은 deploy-check.mjs 의 일이라, 모델에게는 끝난 결과만 준다.
+  const prompt = continuationPrompt(72, "abc123", { ok: true, keys: ["kakao-message-dashboard"] });
+  assert.match(prompt, /8단계\(결과 댓글\)부터 이어 간다/);
+  assert.match(prompt, /배포를 다시 확인하지 말고/);
+  assert.match(prompt, /"kakao-message-dashboard"/);
+  assert.match(continuationPrompt(72, "abc"), /7단계부터 이어 간다/, "확인 결과가 없으면 예전처럼 7단계부터다");
+});
+
+test("머지된 화면 key 를 바뀐 파일에서 뽑는다 — 러너가 무엇을 확인할지 안다", () => {
+  assert.deepEqual(
+    screenKeys([
+      "apps/sandbox/src/app/shop-cart/page.tsx",
+      "apps/sandbox/src/app/shop-cart/page.test.tsx",
+      "apps/sandbox/src/app/voc/page.tsx",
+      "apps/sandbox/src/screens.ts",
+    ]),
+    ["shop-cart", "voc"],
+  );
+  assert.deepEqual(screenKeys(["apps/sandbox/src/screens.ts"]), []);
 });
 
 test("이 요청의 dev 넘김은 따른다", () => {

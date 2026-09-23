@@ -86,8 +86,12 @@ export function buildClaudeArgs(prompt, { resume } = {}) {
 }
 
 /** 합친 뒤 세션을 이어 받게 하는 말. 스킬의 「러너에서 돌 때」가 이 꼴을 기다린다. */
-export function continuationPrompt(pr, mergeCommit) {
-  return `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}). 「러너에서 돌 때」대로 7단계부터 이어 간다.`;
+export function continuationPrompt(pr, mergeCommit, deploy = null) {
+  const head = `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}).`;
+  // 7단계는 러너가 이미 했다. 모델에게 「기다리라」고 시키면 기다리는 도구를 부르거나 배경으로 돌리고 턴을
+  // 끝낸다 — #60·#62 가 잇달아 그렇게 결과 댓글 없이 끝났다. 확인은 스크립트가 하고 결과만 넘긴다.
+  if (!deploy) return `${head} 「러너에서 돌 때」대로 7단계부터 이어 간다.`;
+  return `${head}\n\n러너가 7단계(배포 확인)를 이미 마쳤다. 결과는 아래 JSON 이다. 배포를 다시 확인하지 말고, 이것을 8단계 \`checks\` 의 「배포 주소 <N>장 200」 근거로 삼아 8단계(결과 댓글)부터 이어 간다.\n\n\`\`\`json\n${JSON.stringify(deploy)}\n\`\`\``;
 }
 
 /**
@@ -204,6 +208,16 @@ export function pickUnreadLookalikes(reads, done) {
  * 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌게 되므로,
  * 이 밖을 건드린 pull request 는 합치지 않고 열어 둔 채 멈춘다. `(renewal)` 같은 route group 은 화면 자리가 아니다.
  */
+/**
+ * 그 pull request 가 더한 화면 key. `apps/sandbox/src/app/<key>/…` 의 `<key>` 다.
+ *
+ * 러너가 배포를 직접 확인하려면 무엇을 확인할지 알아야 하는데, 그것이 바뀐 파일에 그대로 있다.
+ */
+export function screenKeys(files) {
+  const keys = files.map((file) => file.match(/^apps\/sandbox\/src\/app\/([^/()]+)\//)?.[1]).filter(Boolean);
+  return [...new Set(keys)];
+}
+
 export function outsideScreenFiles(files) {
   return files.filter((file) => !/^apps\/sandbox\/src\/app\/[^/()]+\/[^/]+$/.test(file) && file !== "apps/sandbox/src/screens.ts");
 }
@@ -288,12 +302,32 @@ async function landHandoff(issue) {
   sh("gh", ["pr", "merge", String(pr), ...method]);
   const { mergeCommit } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "mergeCommit"]));
   log(`- #${pr} 머지 ${mergeCommit.oid}`);
+  const deploy = handoff.target === "dev" && handoff.resume ? checkDeploy(mergeCommit.oid, screenKeys(files.map((file) => file.path))) : null;
   // 결정이 끝까지 간 자리에서 이슈를 닫는다(2026-09-23 개발자). 승인은 main 에 반영된 때, 반려는 되돌림이
   // dev 에 합쳐진 때다. 개선 회차와 첫 회차의 dev 머지는 아직 결정을 기다리므로 닫지 않는다.
   const firstLine = readFileSync(path.resolve(repoRoot, handoff.bodyFile), "utf8").split("\n")[0].trim();
   if (handoff.target === "main") closeIssue(issue, closingComment("승인", `PR #${pr}`));
   else if (firstLine.startsWith("되돌림:")) closeIssue(issue, closingComment("반려", `되돌림 PR #${pr}`));
-  return { handoff, pr, mergeCommit: mergeCommit.oid };
+  return { handoff, pr, mergeCommit: mergeCommit.oid, deploy };
+}
+
+/**
+ * 배포가 끝나고 화면 주소가 열리는지 본다(7단계). 기다리는 일은 `deploy-check.mjs` 가 맡는다.
+ *
+ * 모델에게 맡겼더니 「알림이 올 것이므로 기다린다」(#60) · 「백그라운드로 넘어갔다」(#62) 하고 턴을 끝내
+ * 결과 댓글이 올라가지 않았다. 기다림은 스크립트의 일이고 모델의 일이 아니다.
+ */
+function checkDeploy(sha, keys) {
+  if (!keys.length) return null;
+  const args = ["scripts/harness/deploy-check.mjs", "--sha", sha, ...keys.flatMap((key) => ["--key", key])];
+  try {
+    const out = JSON.parse(sh("node", args));
+    log(`- 배포 확인: ${out.ok ? `화면 ${keys.length}장 200` : `실패 — ${out.reason ?? "까닭 없음"}`}`);
+    return out;
+  } catch (error) {
+    log(`- 배포를 확인하지 못했다: ${error.message.split("\n")[0]}`);
+    return { ok: false, keys, reason: error.message.split("\n")[0] };
+  }
 }
 
 /** 이슈를 닫는다. 에이전트는 `gh issue close` 를 못 쓰고(공용 권한 deny) 러너 스크립트만 이 자리에서 쓴다. */
@@ -370,7 +404,7 @@ async function runChain(issue, argument) {
     return false;
   }
   if (!landed.handoff.resume) return true;
-  runClaude(continuationPrompt(landed.pr, landed.mergeCommit), { resume: first.session_id });
+  runClaude(continuationPrompt(landed.pr, landed.mergeCommit, landed.deploy), { resume: first.session_id });
   if (postedResult(issue, before)) return true;
   // 화면은 합쳐졌는데 결과만 빠진 자리다. 넘김이 없을 때와 달리 여기는 알림 밖이었다 — #60 에서 이어 받은
   // 세션이 배포 확인을 부르지 않고 「알림이 올 것」이라며 끝냈고, 기획자에게는 아무 일도 없던 것이 됐다.
