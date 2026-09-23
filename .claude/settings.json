@@ -68,6 +68,7 @@
       "Edit(/scripts/harness/slack-card.mjs)",
       "Edit(/scripts/harness/deploy-check.mjs)",
       "Edit(/scripts/harness/watch-decisions.mjs)",
+      "Edit(/scripts/harness/local-run.mjs)",
       "Edit(/.github/workflows/harness.yml)"
     ],
     "deny": [

@@ -8,13 +8,13 @@
 
 ```text
 Slack 폼(화면 요청 · 화면 수정 요청) → GitHub issue (요청서 원본)
-→ 이 Mac 의 러너가 바로 집는다 (harness.yml → runner.mjs → /process-issue)
+→ 이 Mac 의 1분 감시가 집는다 (watch-decisions → local-run → runner.mjs → /process-issue)
 → /ooee-harness:generate-code 로 화면 생성 · 검사
 → sandbox 에서 띄워 보고 검사 (빌드한 화면을 캡처해 눈으로 대조)
 → pull request → dev 머지 (러너가 합친다) → Cloudflare Pages 에 자동 배포 (deploy-check 가 기다린다)
 → 결과 댓글을 issue 에 달고, 봇이 결과 채널에 카드 한 장을 올린다 (slack-card)
 → 카드의 버튼으로 결정: 👍 승인 · 👎 반려(한 번 더 묻는다) · 😕 개선 — 까닭은 카드 스레드에 (slack-bridge 가 GitHub 댓글로 옮긴다)
-→ 결정이 달리면 러너가 이어 간다 (댓글은 바로, 반응은 1분 감시가 깨운다)
+→ 결정이 달리면 러너가 이어 간다 (반응도 댓글도 1분 감시가 읽는다)
     승인 → dev → main 머지 → issue 닫힘
     개선 → 다음 회차 → 새 결과 카드
     반려 → dev 에서 되돌림 → issue 닫힘

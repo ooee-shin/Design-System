@@ -1,22 +1,17 @@
 name: Harness
 
-# 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 처리한다. Claude 와 gh 가 이 Mac 에
-# 로그인한 계정으로 돈다 — GitHub 이 빌려 주는 컴퓨터에는 그 로그인이 없다.
+# 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 **손으로** 돌리는 자리다. Claude 와 gh 가
+# 이 Mac 에 로그인한 계정으로 돈다 — GitHub 이 빌려 주는 컴퓨터에는 그 로그인이 없다.
 #
-# issues · issue_comment · schedule 이벤트는 기본 branch(main)의 이 파일로 돈다. 처리하는 코드는 dev 를
-# 받아 쓴다 — 하네스가 자라는 자리가 dev 다.
+# **저절로 도는 길은 이 파일이 아니다**(`2026-09-23` 개발자: 「로컬에서 돌리는 걸로, 항상 켜두는 컴퓨터라
+# 괜찮다」). 새 요청과 결정은 이 Mac 의 1분 감시(scripts/harness/watch-decisions.mjs, launchd)가 읽고
+# `scripts/harness/local-run.mjs` 로 러너를 job 밖에서 돌린다. job 안에서 돌리면 러너가 1분마다 GitHub 에
+# 살아 있다고 알려야 하는데, 이 Mac 의 연결이 15~25분마다 끊겨 그 갱신이 실패했고 GitHub 가 job 을 버리는
+# 순간 claude 가 강제로 끝났다 — #60 이 네 번 연속 그렇게 죽었다.
 #
-# 러너가 하나라 job 은 하나씩 돈다. 이슈 둘이 한꺼번에 와도 차례로 처리한다(한 working tree 한 요청).
+# 그래서 여기 남는 것은 `workflow_dispatch` 하나다. Actions 화면에서 손으로 부를 때, 또는 이 Mac 의 감시가
+# 멈췄을 때 쓴다. 감시가 이미 돌린 것을 또 돌리지 않게, 부르기 전에 `~/.ooee-harness/runs/` 를 본다.
 on:
-  issues:
-    types: [opened]
-  # 「승인」·「반려: …」·「개선: …」 댓글은 바로 읽는다. 👍 👎 😕 반응은 이벤트가 없어 이 Mac 의 1분 감시
-  # (scripts/harness/watch-decisions.mjs, launchd)가 읽고 workflow_dispatch 로 깨운다.
-  issue_comment:
-    types: [created]
-  # 예비다. GitHub 의 예약은 몇 시간씩 밀리므로 결정을 읽는 길로 삼지 않는다 — 이 Mac 이 꺼져 있을 때의 뒷받침이다.
-  schedule:
-    - cron: "*/10 * * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -34,9 +29,7 @@ permissions:
 jobs:
   process:
     name: 화면 요청 처리
-    if: >-
-      (github.event_name == 'issues' && startsWith(github.event.issue.title, '화면 요청')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.mode != '결정')
+    if: inputs.mode != '결정'
     runs-on: [self-hosted, ooee-mac]
     # 여러 장 요청은 화면마다 코드와 검사를 돌려 오래 걸린다.
     timeout-minutes: 240
@@ -55,15 +48,12 @@ jobs:
       - name: 처리한다
         run: node scripts/harness/runner.mjs "$MODE" "$ISSUE"
         env:
-          MODE: ${{ github.event_name == 'issues' && '처리' || inputs.mode }}
-          ISSUE: ${{ github.event.issue.number || inputs.issue }}
+          MODE: ${{ inputs.mode }}
+          ISSUE: ${{ inputs.issue }}
 
   decide:
     name: 결정 확인
-    if: >-
-      github.event_name == 'schedule' ||
-      (github.event_name == 'issue_comment' && !github.event.issue.pull_request && startsWith(github.event.issue.title, '화면 요청')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.mode == '결정')
+    if: inputs.mode == '결정'
     runs-on: [self-hosted, ooee-mac]
     timeout-minutes: 240
     steps:
@@ -81,4 +71,4 @@ jobs:
       - name: 결정을 읽고 처리한다
         run: node scripts/harness/runner.mjs 결정 $ISSUE
         env:
-          ISSUE: ${{ github.event.issue.number || inputs.issue }}
+          ISSUE: ${{ inputs.issue }}

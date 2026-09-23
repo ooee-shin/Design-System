@@ -322,9 +322,9 @@ node scripts/harness/decision.mjs <n>
 
 ## 러너에서 돌 때
 
-인수 끝의 `러너`는 이 Mac 의 self-hosted runner(`.github/workflows/harness.yml` → `scripts/harness/runner.mjs`)가 부른 것이다. 저장소 주인이 `2026-09-22`에 이슈가 올라오면 바로 처리하고 결정은 곧바로 읽기로 정했다(댓글은 이벤트로, 반응은 이 Mac 의 1분 감시로). 대화할 사람이 없고, `gh pr create`·`gh pr merge`는 공용 권한의 `ask`라 headless 세션에서 거부된다(ask 는 allow 보다 먼저 판정되어 러너가 풀 수 없다). 그래서 pull request 를 만들고 합치는 것은 러너가 하고, 이 명령은 그 앞에서 넘김 파일을 쓰고 멈춘다. 순서와 규칙은 위와 같고 아래만 다르다.
+인수 끝의 `러너`는 이 Mac 의 1분 감시(`scripts/harness/watch-decisions.mjs` → `local-run.mjs` → `runner.mjs`)가 부른 것이다. Actions job 밖에서 돈다(`2026-09-23`, 연결이 끊기면 GitHub 가 job 을 버려 claude 가 강제로 끝났다). 저장소 주인이 `2026-09-22`에 이슈가 올라오면 바로 처리하고 결정은 곧바로 읽기로 정했다(댓글은 이벤트로, 반응은 이 Mac 의 1분 감시로). 대화할 사람이 없고, `gh pr create`·`gh pr merge`는 공용 권한의 `ask`라 headless 세션에서 거부된다(ask 는 allow 보다 먼저 판정되어 러너가 풀 수 없다). 그래서 pull request 를 만들고 합치는 것은 러너가 하고, 이 명령은 그 앞에서 넘김 파일을 쓰고 멈춘다. 순서와 규칙은 위와 같고 아래만 다르다.
 
-- **묻고 멈춤은 그대로 멈춤이다.** 물을 사람이 없다. 보고는 러너의 실행 기록(job 요약)에 남고, 실행이 실패로 끝나 개발자에게 알림이 간다. 결과 댓글 말고 이슈에 댓글을 달지 않는 규칙도 그대로다.
+- **묻고 멈춤은 그대로 멈춤이다.** 물을 사람이 없다. 보고는 그 실행의 기록 파일(`~/.ooee-harness/runs/`)에 남고, 첫 제목과 문제 줄이 결과 채널 카드로 기획자에게 간다(러너의 `stopNotice`). 결과 댓글 말고 이슈에 댓글을 달지 않는 규칙도 그대로다.
 - **2단계의 목록은 확인받지 않고 쓴다.** 표를 대화에 내는 대신 pull request 본문에 그대로 두고, 8단계 `needsDecision`의 첫 줄을 「러너가 확인받지 않고 나눈 화면 목록: <key>·<key>…」로 한다. 「지어낸 것」을 화면마다 옮기는 것은 그대로다. 기획자는 결과 댓글에서 보고 개선이나 반려로 고친다.
 - **pull request 를 만들 자리에서 넘긴다.** 6단계, D2 의 4, D3 의 2 에서 `gh pr create`·`gh pr checks`·`gh pr merge`를 부르지 않는다. 본문 파일은 그 단계대로 쓰고, `.harness-work/issue-<n>/handoff.json`을 `Write`로 쓴 뒤 보고의 첫 제목을 「## 러너에 넘김」으로 하고 멈춘다.
 

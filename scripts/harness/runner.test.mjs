@@ -161,13 +161,15 @@ test("CLI 는 인수가 틀리면 claude 를 부르지 않고 종료 코드 2 �
   }
 });
 
-test("workflow 는 이 Mac 의 러너에서 dev 를 받아 이 스크립트를 부른다", () => {
+test("workflow 는 손으로 부르는 예비다 — 저절로 도는 길은 이 Mac 의 1분 감시다", () => {
+  // 2026-09-23: job 안에서 돌면 연결이 끊길 때 GitHub 이 job 을 버리고 claude 가 강제로 끝난다(#60).
   const workflow = readFileSync(path.join(repoRoot, ".github/workflows/harness.yml"), "utf8");
   assert.match(workflow, /runs-on: \[self-hosted, ooee-mac\]/, "이 Mac 이 아닌 곳에서 돈다 — Claude·gh 로그인이 없다");
   assert.match(workflow, /ref: dev/, "처리 코드를 dev 에서 받지 않는다");
   assert.match(workflow, /persist-credentials: false/, "GITHUB_TOKEN 으로 push 하면 Quality·Deploy 가 깨지 않는다");
-  assert.match(workflow, /cron: "\*\/10 \* \* \* \*"/, "결정 확인 간격이 10분이 아니다");
   assert.ok(workflow.includes("scripts/harness/runner.mjs"), "이 스크립트를 부르지 않는다");
+  const on = workflow.slice(workflow.indexOf("\non:"), workflow.indexOf("permissions:"));
+  assert.deepEqual([...on.matchAll(/^ {2}(\w+):/gm)].map((hit) => hit[1]), ["workflow_dispatch"], "저절로 깨우는 이벤트가 남아 있다 — 감시와 둘이 같은 요청을 처리한다");
 });
 
 test("이어 받는 차례에도 배포 확인과 결과 댓글에 쓰는 도구를 넘긴다", () => {
