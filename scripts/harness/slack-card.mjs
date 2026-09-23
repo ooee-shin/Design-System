@@ -9,7 +9,7 @@
 //
 // 토큰은 `~/.ooee-harness/slack.env` 의 `SLACK_BOT_TOKEN`, 채널은 `SLACK_RESULT_CHANNEL` 이다. 둘 중
 // 하나라도 없으면 **조용히 건너뛴다** — 카드가 없다고 처리가 실패하지는 않는다. 결과의 원본은 이슈다.
-import { loadEnv } from "./slack-bridge.mjs";
+import { loadEnv } from "./slack-env.mjs";
 
 /** 결과 댓글에서 카드에 실을 머리를 뗀다. 첫 빈 줄까지다. */
 export function headLines(body) {
@@ -28,8 +28,19 @@ export function buildCard({ body, commentUrl }) {
   return `${head}\n\n아래 버튼으로 결정해 주세요(이 카드에 👍 👎 😕 를 달아도 됩니다). 반려·개선은 버튼을 누른 뒤 이 카드의 스레드에 까닭을 한 줄 적어 주세요.${where}`;
 }
 
-/** 버튼의 `action_id`. 다리가 이 꼴로 결정을 읽는다. */
+/** 카드 버튼의 `action_id`. 다리가 이 꼴로 결정을 읽는다. */
 export const decideAction = (decision) => `decide:${decision}`;
+
+/** 되묻는 버튼의 `action_id`. 반려를 한 번 더 고르는 자리다. */
+export const confirmAction = (decision) => `confirm:${decision}`;
+
+const button = (text, actionId, issue, style) => ({
+  type: "button",
+  text: { type: "plain_text", text, emoji: true },
+  action_id: actionId,
+  value: String(issue),
+  ...(style ? { style } : {}),
+});
 
 /**
  * 카드의 블록. 결정 버튼 셋을 카드 아래에 둔다.
@@ -39,17 +50,44 @@ export const decideAction = (decision) => `decide:${decision}`;
  * 받는다 — 이모지 하나로는 무엇을 고칠지 알 수 없다(D3·D4).
  */
 export function buildBlocks({ text, issue, commentUrl }) {
-  const button = (decision, emoji, style) => ({
-    type: "button",
-    text: { type: "plain_text", text: `${emoji} ${decision}`, emoji: true },
-    action_id: decideAction(decision),
-    value: String(issue),
-    ...(style ? { style } : {}),
-  });
   return [
     { type: "section", text: { type: "mrkdwn", text } },
-    { type: "actions", elements: [button("승인", "👍", "primary"), button("반려", "👎", "danger"), button("개선", "😕")] },
+    {
+      type: "actions",
+      elements: [
+        button("👍 승인", decideAction("승인"), issue, "primary"),
+        button("👎 반려", decideAction("반려"), issue, "danger"),
+        button("😕 개선", decideAction("개선"), issue),
+      ],
+    },
     ...(commentUrl ? [{ type: "context", elements: [{ type: "mrkdwn", text: `결정과 까닭은 <${commentUrl}|이슈>에 그대로 남습니다.` }] }] : []),
+  ];
+}
+
+/**
+ * 반려를 고르면 스레드에서 한 번 더 묻는다.
+ *
+ * **까닭.** 반려는 이 요청의 화면을 `dev` 에서 되돌린다 — 되돌림 pull request 가 만들어져 합쳐진다.
+ * 승인(`dev → main`)이나 개선(다음 회차)과 달리 되돌리는 일이라, 잘못 눌렀을 때 되돌릴 값이 크다.
+ * 그래서 세 갈래를 다시 주고, 반려를 또 골랐을 때만 까닭을 받아 되돌린다.
+ */
+export function buildConfirmBlocks({ issue, by }) {
+  return [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `${by} 님이 *반려*를 골랐습니다. 반려하면 이 요청의 화면을 \`dev\` 에서 되돌립니다(되돌림 pull request). 정말 반려할까요?`,
+      },
+    },
+    {
+      type: "actions",
+      elements: [
+        button("👎 정말 반려", confirmAction("반려"), issue, "danger"),
+        button("👍 승인으로", confirmAction("승인"), issue, "primary"),
+        button("😕 개선으로", confirmAction("개선"), issue),
+      ],
+    },
   ];
 }
 

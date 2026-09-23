@@ -43,6 +43,11 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { buildConfirmBlocks } from "./slack-card.mjs";
+import { HOME_ENV, loadEnv } from "./slack-env.mjs";
+
+export { loadEnv };
+
 /** 반응 → 결정. decision.mjs 의 표와 같아야 한다. */
 export const REACTION_DECISIONS = { "+1": "승인", thumbsup: "승인", "-1": "반려", thumbsdown: "반려", confused: "개선" };
 
@@ -71,10 +76,26 @@ export function buildComment({ decision, by, permalink, how = "반응을 달아"
   return `> ${who} Slack 결과 카드에서 ${how} 남긴 결정입니다.${where}\n\n${body}`;
 }
 
-/** 버튼의 `action_id` 에서 결정을 읽는다. 다른 버튼은 null 이다. */
+/**
+ * 버튼의 `action_id` 에서 결정을 읽는다. 카드의 버튼(`decide:`)과 되묻는 버튼(`confirm:`)을 가른다.
+ * 다른 버튼은 null 이다.
+ */
 export function readAction(actionId) {
-  const match = /^decide:(승인|반려|개선)$/.exec(String(actionId ?? ""));
-  return match ? match[1] : null;
+  const match = /^(decide|confirm):(승인|반려|개선)$/.exec(String(actionId ?? ""));
+  return match ? { decision: match[2], confirmed: match[1] === "confirm" } : null;
+}
+
+/**
+ * 버튼을 눌렀을 때 다음에 할 일.
+ *
+ * - 승인: 바로 올린다. 되돌릴 일이 없고 까닭도 필요 없다.
+ * - 반려(처음): 되묻는다. 되돌리는 일이라 잘못 눌렀을 때 값이 크다.
+ * - 반려(다시 고름)·개선: 까닭을 스레드로 받는다. 까닭이 없으면 D3·D4 가 멈춘다.
+ */
+export function nextStep({ decision, confirmed }) {
+  if (decision === "승인") return "댓글";
+  if (decision === "반려" && !confirmed) return "되묻기";
+  return "까닭 받기";
 }
 
 /** 까닭을 기다리는 자리. 카드 하나에 하나다. */
@@ -96,24 +117,6 @@ export function shouldRelay(event, { botUserId } = {}) {
   if (!Object.hasOwn(REACTION_DECISIONS, event.reaction)) return false;
   if (botUserId && event.user === botUserId) return false;
   return true;
-}
-
-const HOME_ENV = path.join(os.homedir(), ".ooee-harness", "slack.env");
-
-/** `KEY=값` 파일을 읽는다. 없으면 환경변수만 쓴다. */
-export function loadEnv(file = HOME_ENV, env = process.env) {
-  let text = "";
-  try {
-    text = readFileSync(file, "utf8");
-  } catch {
-    return { ...env };
-  }
-  const out = { ...env };
-  for (const line of text.split("\n")) {
-    const match = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/);
-    if (match && !out[match[1]]) out[match[1]] = match[2].replace(/^["']|["']$/g, "");
-  }
-  return out;
 }
 
 const log = (line) => process.stdout.write(`${new Date().toISOString()} ${line}\n`);
@@ -193,8 +196,8 @@ function comment(issue, body, { dryRun }) {
 }
 
 /** 카드의 스레드에 한 줄 남긴다. 사람이 누른 자리에서 다음에 무엇을 해야 하는지 보이게 한다. */
-async function replyInThread(token, { channel, ts, text }) {
-  await slack("chat.postMessage", token, { channel, thread_ts: ts, text }).catch((error) => log(`스레드에 적지 못했다: ${error.message}`));
+async function replyInThread(token, { channel, ts, text, blocks }) {
+  await slack("chat.postMessage", token, { channel, thread_ts: ts, text, blocks }).catch((error) => log(`스레드에 적지 못했다: ${error.message}`));
 }
 
 /** 까닭을 기다리는 카드들. 다리가 다시 떠도 이어지게 파일에 둔다. */
@@ -216,31 +219,39 @@ const writePending = (all) => {
  * 버튼 하나로는 무엇을 고칠지 알 수 없어 D3·D4 가 멈추기 때문이다.
  */
 export async function handleAction(payload, { token, dryRun, channel }) {
-  const decision = readAction(payload?.actions?.[0]?.action_id);
-  if (!decision) return null;
+  const action = readAction(payload?.actions?.[0]?.action_id);
+  if (!action) return null;
   const channelId = payload.channel?.id;
-  const ts = payload.message?.ts;
+  // 되묻는 버튼은 스레드 안에 있다. 기다리는 자리와 안내는 카드(스레드의 뿌리)에 맞춘다.
+  const cardTs = payload.message?.thread_ts ?? payload.message?.ts;
   if (channel && channelId !== channel) return null;
   const issue = Number(payload.actions[0].value) || readIssueNumber(messageText(payload.message ?? {}));
-  if (!issue) return log(`버튼 ${decision} — 어느 요청인지 읽지 못했다(${ts})`);
+  if (!issue) return log(`버튼 ${action.decision} — 어느 요청인지 읽지 못했다(${cardTs})`);
   const by = await userName(token, payload.user?.id);
-  const { permalink } = await slack("chat.getPermalink", token, { channel: channelId, message_ts: ts }).catch(() => ({ permalink: null }));
+  const { permalink } = await slack("chat.getPermalink", token, { channel: channelId, message_ts: cardTs }).catch(() => ({ permalink: null }));
+  const step = nextStep(action);
 
-  if (decision === "승인") {
-    comment(issue, buildComment({ decision, by, permalink, how: "승인 버튼을 눌러" }), { dryRun });
-    await replyInThread(token, { channel: channelId, ts, text: `${by} 님이 승인했습니다. GitHub #${issue} 에 남겼습니다.` });
-    return { issue, decision, by };
+  if (step === "되묻기") {
+    await replyInThread(token, { channel: channelId, ts: cardTs, text: `${by} 님이 반려를 골랐습니다. 정말 반려할까요?`, blocks: buildConfirmBlocks({ issue, by }) });
+    return { issue, decision: action.decision, asked: true };
+  }
+
+  if (step === "댓글") {
+    comment(issue, buildComment({ decision: "승인", by, permalink, how: "승인 버튼을 눌러" }), { dryRun });
+    await replyInThread(token, { channel: channelId, ts: cardTs, text: `${by} 님이 승인했습니다. GitHub #${issue} 에 남겼습니다.` });
+    return { issue, decision: "승인", by };
   }
 
   const all = readPending();
-  all[pendingKey(channelId, ts)] = { issue, decision, user: payload.user?.id, by, permalink, at: new Date().toISOString() };
+  all[pendingKey(channelId, cardTs)] = { issue, decision: action.decision, user: payload.user?.id, by, permalink, at: new Date().toISOString() };
   writePending(all);
+  const what = action.decision === "반려" ? "왜 반려하는지" : "무엇을 고칠지";
   await replyInThread(token, {
     channel: channelId,
-    ts,
-    text: `${by} 님이 ${decision}을 골랐습니다. **이 스레드에 까닭을 한 줄 적어 주세요.** 적으면 GitHub #${issue} 에 「${decision}: …」으로 남깁니다.`,
+    ts: cardTs,
+    text: `${by} 님이 ${action.decision}을 골랐습니다. 이 스레드에 ${what} 한 줄 적어 주세요. 적으면 GitHub #${issue} 에 「${action.decision}: …」으로 남기고 그때 처리가 시작됩니다.`,
   });
-  return { issue, decision, by, pending: true };
+  return { issue, decision: action.decision, by, pending: true };
 }
 
 /** 까닭을 기다리던 스레드에 사람이 적으면 그 글을 결정 댓글로 올린다. */

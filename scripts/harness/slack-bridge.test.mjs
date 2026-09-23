@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { readCommentDecision } from "./decision.mjs";
-import { buildComment, isReason, loadEnv, messageText, pendingKey, pickMessage, readAction, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
+import { buildComment, isReason, loadEnv, messageText, nextStep, pendingKey, pickMessage, readAction, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
 
 const card = "화면 요청 #39 결과 · 1회차 — 공지사항 목록 · 결정은 GitHub 댓글에 👍 👎 😕\n요청: @기획자 · 프로젝트 하네스 시험";
 
@@ -49,11 +49,20 @@ test("까닭이 있으면 「개선: 까닭」 꼴로 적는다 — D4 가 그 �
   assert.equal(readCommentDecision(body).reason, "조회 버튼을 채움으로");
 });
 
-test("버튼의 action_id 에서 결정을 읽는다", () => {
-  assert.equal(readAction("decide:승인"), "승인");
-  assert.equal(readAction("decide:개선"), "개선");
+test("버튼의 action_id 에서 결정과 되물음 여부를 읽는다", () => {
+  assert.deepEqual(readAction("decide:승인"), { decision: "승인", confirmed: false });
+  assert.deepEqual(readAction("confirm:반려"), { decision: "반려", confirmed: true });
   assert.equal(readAction("decide:머시기"), null);
   assert.equal(readAction(undefined), null);
+});
+
+test("반려는 한 번 더 묻고, 그때 다시 골라야 까닭을 받는다", () => {
+  // 반려는 dev 에 올라간 화면을 되돌린다. 잘못 눌렀을 때 되돌릴 값이 커서 되묻는다.
+  assert.equal(nextStep({ decision: "반려", confirmed: false }), "되묻기");
+  assert.equal(nextStep({ decision: "반려", confirmed: true }), "까닭 받기");
+  assert.equal(nextStep({ decision: "개선", confirmed: false }), "까닭 받기", "개선은 바로 까닭을 받는다");
+  assert.equal(nextStep({ decision: "승인", confirmed: false }), "댓글", "승인은 되돌릴 일이 없어 바로 올린다");
+  assert.equal(nextStep({ decision: "승인", confirmed: true }), "댓글");
 });
 
 test("까닭은 누른 사람이 그 스레드에 적은 사람 글만 받는다", () => {

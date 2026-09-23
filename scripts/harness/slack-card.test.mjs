@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import { renderResultComment } from "./result-comment.mjs";
 import { readIssueNumber } from "./slack-bridge.mjs";
-import { buildBlocks, buildCard, decideAction, headLines, slackTarget } from "./slack-card.mjs";
+import { buildBlocks, buildCard, buildConfirmBlocks, confirmAction, decideAction, headLines, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const example = () => JSON.parse(readFileSync(path.join(here, "fixtures", "result-input.example.json"), "utf8"));
@@ -52,4 +52,19 @@ test("토큰이나 채널이 없으면 올릴 자리가 없다 — 처리는 그
   assert.equal(slackTarget({}), null);
   assert.equal(slackTarget({ SLACK_BOT_TOKEN: "xoxb-1" }), null);
   assert.deepEqual(slackTarget({ SLACK_BOT_TOKEN: "xoxb-1", SLACK_RESULT_CHANNEL: "C1" }), { token: "xoxb-1", channel: "C1" });
+});
+
+test("반려를 고르면 스레드에서 세 갈래를 다시 준다", () => {
+  const blocks = buildConfirmBlocks({ issue: 9, by: "기획자" });
+  assert.match(blocks[0].text.text, /정말 반려할까요\?/);
+  assert.match(blocks[0].text.text, /되돌립니다/, "무엇이 일어나는지 적지 않으면 되묻는 뜻이 없다");
+  assert.deepEqual(
+    blocks[1].elements.map((el) => [el.text.text, el.action_id]),
+    [
+      ["👎 정말 반려", confirmAction("반려")],
+      ["👍 승인으로", confirmAction("승인")],
+      ["😕 개선으로", confirmAction("개선")],
+    ],
+  );
+  assert.equal(blocks[1].elements[0].value, "9");
 });
