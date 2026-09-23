@@ -265,7 +265,9 @@ node scripts/harness/decision.mjs <n>
 
 승인은 화면 확인까지다. 제품에 넣을지는 이 승인이 정하지 않는다(ai-environment.md 「처리와 승인」).
 
-1. `git fetch origin` 뒤 `git log --oneline origin/main..origin/dev`에서 이 요청의 pull request를 찾는다. squash commit 제목 끝의 `(#<번호>)`가 pull request 번호이고, `gh pr view <번호> --json body,files`의 본문에 `요청: #<n>` 줄(뒤에 숫자가 이어지지 않는 것)이 있으면 이 요청의 것이다. 첫 줄이 아니어도 된다. 없으면 이미 `main`에 있거나 아직 `dev`에 없다. 멈추고 보고한다.
+1. `git fetch origin` 뒤 `git log --oneline origin/main..origin/dev`에서 이 요청의 pull request를 찾는다. squash commit 제목 끝의 `(#<번호>)`가 pull request 번호이고, `gh pr view <번호> --json body,files`의 본문에 `요청: #<n>` 줄(뒤에 숫자가 이어지지 않는 것)이 있으면 이 요청의 것이다. 첫 줄이 아니어도 된다.
+   - 없으면 **이미 `main`에 있는지 본다**: `git log --oneline origin/main --grep '(#<n>)' --fixed-strings`로 이 요청의 squash commit(회차마다 하나)을 찾는다. 있으면 개발자가 `dev → main`을 한꺼번에 올린 뒤에 승인이 난 것이다(2026-09-23 #48). 만들 pull request 가 없으니 그 commit 들을 적어 「처리 끝」으로 넘긴다 — 러너에서는 넘김 파일에 `"already": true, "commits": [<sha>…]`를 써서 러너가 이슈를 닫게 하고(「러너에서 돌 때」), 사람이 연 세션에서는 그 사실을 보고하고 멈춘다.
+   - `main`에도 `dev`에도 없으면 아직 만들지 않은 요청이다. 멈추고 보고한다.
 2. **`main`은 승인된 요청만 담는다.** 같은 목록의 pull request를 하나씩 가른다.
    - 본문에 `요청: #<m>` 줄이 있으면 요청 #<m>의 화면이다. `node scripts/harness/decision.mjs <m>`이 승인이어야 한다. 반려면 D3의 되돌리기 pull request(본문에 `되돌림: #<m>` 줄)가 같은 목록에 있어야 하고, 있으면 그 요청은 빠진 것으로 친다. 그 밖(대기·개선·결과 없음, 되돌리지 않은 반려)은 섞인 것이다.
    - 본문에 `되돌림: #<m>` 줄이 있으면 D3의 되돌리기다. 막지 않는다.
@@ -299,7 +301,7 @@ node scripts/harness/decision.mjs <n>
    - 본문 첫 줄은 `되돌림: #<n>`이다. `요청: #<n>` 줄은 쓰지 않는다. 1단계와 D2가 이 요청의 화면 pull request로 읽는다. 그 아래에 결과 댓글 주소, 반려한 사람·시각, 사유를 둔다.
    - `Quality`를 본 뒤 6단계처럼 squash로 합친다.
    - `git revert`가 충돌하면 손으로 풀지 않는다. `git revert --abort`로 이 명령이 시작한 되돌리기만 거두고 멈춘다. 다른 요청의 화면이 `screens.ts`의 같은 자리를 고친 것이다.
-3. 기록은 결과 댓글과 git 이력(squash commit과 되돌린 commit)에 남는다. 이슈를 닫는 것과 다시 요청받는 것은 사람이 한다.
+3. 기록은 결과 댓글과 git 이력(squash commit과 되돌린 commit)에 남는다. 되돌림이 `dev`에 합쳐지면 러너가 이슈를 닫는다(「러너에서 돌 때」). 사람이 연 세션에서는 사람이 닫는다. 다시 요청받는 것은 폼이다.
 
 ### D4. 개선 — 다시 만들어 다음 회차를 올린다
 
@@ -330,8 +332,10 @@ node scripts/harness/decision.mjs <n>
   | 6단계 (처음 · D4 개선 회차) | `dev` | push 한 가지 | `요청: #<n>` | `true` |
   | D3 되돌리기 | `dev` | `feature/issue-<n>-revert` | `되돌림: #<n>` | `false` |
   | D2 승인 | `main` | 적지 않는다(`dev`를 올린다) | `승인: #<n> …` | `false` |
+  | D2 승인, 이미 `main`에 있음 | `main` | 적지 않는다 | (본문 없음 — `"already": true, "commits": [<sha>…]`) | `false` |
 
-  러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지). 맞지 않으면 만들지 않는다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
+  러너는 이 파일을 다시 검사한다(이 요청의 가지인지, 본문 파일이 이 요청의 작업 자리 안에 있고 첫 줄이 표와 맞는지, `already`면 그 commit 이 정말 `origin/main`의 조상인지). 맞지 않으면 만들지 않는다.
+- **이슈는 러너가 닫는다**(2026-09-23 개발자). 승인이 `main`에 합쳐진 때(이미 `main`에 있었으면 그 확인 뒤), 반려의 되돌림이 `dev`에 합쳐진 때다. 첫 회차와 개선 회차의 `dev` 머지는 결정을 기다리므로 닫지 않는다. 이 명령은 여전히 `gh issue close`를 쓰지 않는다 — 닫는 글은 결정으로 읽히지 않는 꼴로 러너가 단다. `dev` 넘김은 Quality 를 본 뒤 squash 로, `main` 넘김은 Quality 를 본 뒤 머지 commit 으로 합친다. **승인된 요청의 `main` 머지는 러너가 한다** — 저장소 주인이 `2026-09-22`에 승인이 곧 `main` 반영이라고 정했다. D2 의 섞임 검사는 그대로 하고, 섞였으면 넘기지 않고 멈춘다. 사람이 연 세션에서는 D2 의 「머지는 사람이 한다」가 그대로다.
 - **이어 받기.** `resume`이 `true`면 러너가 합친 뒤 같은 세션에 「러너: pull request #<번호> 가 dev 에 squash 로 머지되었다(머지 commit <sha>). 「러너에서 돌 때」대로 7단계부터 이어 간다.」를 보낸다. 그 번호와 머지 commit 으로 7단계(배포 확인)와 8단계(결과 댓글)를 하고 9단계에서 멈춘다. 결과 댓글의 `pullRequest`는 그 번호다.
 - **D3 의 `git revert`** 는 러너가 이 명령에만 연다(`git revert --no-edit …`, `git revert --abort`). 확인을 묻지 않고 돈다.
 - **머리말의 allowed-tools 는 러너가 CLI 로 넘긴다.** generate-code·review-design 을 Skill 로 부를 때 그 머리말은 이 명령 안에서 적용되지 않고, 이어 받는 차례(7·8단계)는 이 명령 밖이라 이 머리말도 적용되지 않는다. 러너가 셋의 머리말을 읽어 넘기므로, 새 명령을 쓰게 되면 그 명령을 쓰는 Skill 의 머리말에 적는다.

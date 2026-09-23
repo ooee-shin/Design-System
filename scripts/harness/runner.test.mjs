@@ -7,9 +7,12 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
+import { looksLikeDecision, readCommentDecision } from "./decision.mjs";
+
 import {
   CHAINED_SKILLS,
   EXTRA_ALLOWED,
+  closingComment,
   MODEL,
   buildClaudeArgs,
   chainedAllowedTools,
@@ -212,4 +215,26 @@ test("결정 없이 결정처럼 보이는 댓글만 있으면 한 번 알린다
   assert.deepEqual(pickUnreadLookalikes([waiting], { [lookalikeKey(waiting)]: {} }), [], "같은 댓글을 10분마다 다시 알린다");
   const newer = { ...waiting, lookalikes: [...waiting.lookalikes, { url: "u3", at: "2026-09-22T11:00:00Z", text: "개선 요청: 버튼" }] };
   assert.deepEqual(pickUnreadLookalikes([newer], { [lookalikeKey(waiting)]: {} }), [newer], "새로 단 댓글을 알리지 않는다");
+});
+
+test("닫는 글은 결정으로 읽히지 않는다 — 러너가 남긴 글이 다음 판독에 잡히면 안 된다", () => {
+  for (const kind of ["승인", "반려"]) {
+    const body = closingComment(kind, "PR #58");
+    assert.equal(readCommentDecision(body), null, `${kind} 닫는 글이 결정으로 읽혔다`);
+    assert.equal(looksLikeDecision(body), false, `${kind} 닫는 글이 결정처럼 보인다`);
+    assert.match(body, /Slack 폼으로 새 요청/);
+  }
+  assert.match(closingComment("승인", "PR #58"), /main 에 반영/);
+  assert.match(closingComment("반려", "되돌림 PR #59"), /dev 에서 되돌렸/);
+});
+
+test("이미 main 에 있는 승인은 commit 목록으로 넘긴다 — pull request 없이 이슈만 닫는다", () => {
+  const root = fakeRoot(12, "요청: #12");
+  assert.deepEqual(validateHandoff({ issue: 12, target: "main", already: true, commits: ["abc1234", "def5678"] }, 12, root), []);
+  const noCommits = validateHandoff({ issue: 12, target: "main", already: true, commits: [] }, 12, root);
+  assert.ok(noCommits.some((p) => p.includes("commits")), "commit 이 없는데 받았다");
+  const wrongTarget = validateHandoff({ issue: 12, target: "dev", already: true, commits: ["abc1234"] }, 12, root);
+  assert.ok(wrongTarget.some((p) => p.includes("main 넘김")), "dev 넘김에 already 를 받았다");
+  const junk = validateHandoff({ issue: 12, target: "main", already: true, commits: ["not a sha"] }, 12, root);
+  assert.ok(junk.some((p) => p.includes("commits")), "sha 가 아닌 것을 받았다");
 });

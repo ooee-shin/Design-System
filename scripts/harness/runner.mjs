@@ -95,7 +95,17 @@ export function validateHandoff(handoff, issue, root = repoRoot) {
   if (!handoff || typeof handoff !== "object") return ["넘김 파일이 JSON 객체가 아니다"];
   if (handoff.issue !== n) problems.push(`issue 가 ${n} 이 아니다(${handoff.issue})`);
   if (!["dev", "main"].includes(handoff.target)) problems.push(`target 이 dev·main 이 아니다(${handoff.target})`);
-  if (typeof handoff.title !== "string" || !handoff.title.trim()) problems.push("title 이 없다");
+  // pull request 를 만들지 않는 넘김(already)에는 제목이 없다.
+  if (handoff.already !== true && (typeof handoff.title !== "string" || !handoff.title.trim())) problems.push("title 이 없다");
+  // 이미 main 에 있는 요청의 승인: pull request 를 만들지 않고 이슈만 닫는다. 화면 commit 이 무엇인지는 모델이
+  // 적어 주지만 그대로 믿지 않는다 — 러너가 origin/main 의 조상인지 다시 본다(landHandoff).
+  if (handoff.already === true) {
+    if (handoff.target !== "main") problems.push("already 는 main 넘김에서만 쓴다");
+    if (!Array.isArray(handoff.commits) || !handoff.commits.length || !handoff.commits.every((sha) => /^[0-9a-f]{7,40}$/.test(sha))) {
+      problems.push("already 넘김에는 이 요청의 화면 commit(commits) 이 하나 이상 있어야 한다");
+    }
+    return problems;
+  }
   const bodyFile = typeof handoff.bodyFile === "string" ? path.resolve(root, handoff.bodyFile) : null;
   const workDir = path.join(root, ".harness-work", `issue-${n}`) + path.sep;
   if (!bodyFile || !bodyFile.startsWith(workDir)) problems.push(`bodyFile 이 .harness-work/issue-${n}/ 안이 아니다`);
@@ -112,6 +122,15 @@ export function validateHandoff(handoff, issue, root = repoRoot) {
     problems.push(`본문 첫 줄이 「승인: #${n}」이 아니다`);
   }
   return problems;
+}
+
+/**
+ * 처리가 끝난 이슈를 닫을 때 다는 글. 결정 낱말로 시작하지 않는다 — decision.mjs 는 「승인」·「반려: …」로
+ * 시작하는 댓글을 결정으로 읽으므로, 러너가 남기는 글이 다음 판독에 결정으로 잡히면 안 된다.
+ */
+export function closingComment(kind, detail) {
+  const what = { 승인: "승인되어 main 에 반영됐습니다", 반려: "반려되어 dev 에서 되돌렸습니다" }[kind];
+  return `처리를 마쳐 닫습니다 — ${what}${detail ? ` (${detail})` : ""}. 다시 요청하려면 Slack 폼으로 새 요청을 냅니다.`;
 }
 
 /** 같은 결정을 두 번 처리하지 않게 하는 열쇠. 사람이 새 신호를 남기면 `at` 이 바뀌어 다시 처리한다. */
@@ -200,6 +219,19 @@ async function landHandoff(issue) {
   const problems = validateHandoff(handoff, issue);
   if (problems.length) throw new Error(`넘김 파일을 따르지 않는다: ${problems.join(" · ")}`);
 
+  if (handoff.already) {
+    sh("git", ["fetch", "origin", "main"]);
+    for (const sha of handoff.commits) {
+      try {
+        sh("git", ["merge-base", "--is-ancestor", sha, "origin/main"]);
+      } catch {
+        throw new Error(`${sha} 는 origin/main 에 없다 — 이미 main 에 있다는 넘김을 따르지 않는다`);
+      }
+    }
+    closeIssue(issue, closingComment("승인", `화면 commit ${handoff.commits.map((sha) => sha.slice(0, 7)).join(", ")} 이 이미 main 에 있음`));
+    return { handoff, pr: null, mergeCommit: null };
+  }
+
   const head = handoff.target === "dev" ? handoff.branch : "dev";
   const url = sh("gh", ["pr", "create", "--base", handoff.target, "--head", head, "--title", handoff.title, "--body-file", handoff.bodyFile]).trim();
   const pr = Number(url.split("/").pop());
@@ -215,7 +247,18 @@ async function landHandoff(issue) {
   sh("gh", ["pr", "merge", String(pr), ...method]);
   const { mergeCommit } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "mergeCommit"]));
   log(`- #${pr} 머지 ${mergeCommit.oid}`);
+  // 결정이 끝까지 간 자리에서 이슈를 닫는다(2026-09-23 개발자). 승인은 main 에 반영된 때, 반려는 되돌림이
+  // dev 에 합쳐진 때다. 개선 회차와 첫 회차의 dev 머지는 아직 결정을 기다리므로 닫지 않는다.
+  const firstLine = readFileSync(path.resolve(repoRoot, handoff.bodyFile), "utf8").split("\n")[0].trim();
+  if (handoff.target === "main") closeIssue(issue, closingComment("승인", `PR #${pr}`));
+  else if (firstLine.startsWith("되돌림:")) closeIssue(issue, closingComment("반려", `되돌림 PR #${pr}`));
   return { handoff, pr, mergeCommit: mergeCommit.oid };
+}
+
+/** 이슈를 닫는다. 에이전트는 `gh issue close` 를 못 쓰고(공용 권한 deny) 러너 스크립트만 이 자리에서 쓴다. */
+function closeIssue(issue, body) {
+  sh("gh", ["issue", "close", String(issue), "--comment", body]);
+  log(`- #${issue} 를 닫았다`);
 }
 
 /** 한 번의 `/process-issue` 호출과, 넘김이 있으면 합치기·이어 받기까지. */

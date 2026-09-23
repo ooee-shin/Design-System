@@ -276,6 +276,7 @@ Storybook보다 Skill v0를 앞에 둔 이유는 둘이다. 첫째, ①⑥⑧과
 ```
 
 - **처리를 부르는 것은 이 Mac 의 러너다**(`2026-09-22` 저장소 주인 결정). `.github/workflows/harness.yml`이 이 Mac(self-hosted runner, 라벨 `ooee-mac`)에서 `scripts/harness/runner.mjs`를 돌린다. 제목이 「화면 요청」인 이슈가 열리면 바로 처리하고, 결정은 10분마다와 댓글이 달릴 때 읽는다. 결과 댓글의 반응은 GitHub Actions 이벤트가 없어 10분 확인이 읽는다. GitHub 이 빌려 주는 컴퓨터가 아니라 이 Mac 인 까닭은 처음에는 Figma MCP 가 OAuth 로그인만 받아서였고, Figma 를 뺀 지금은 Claude 와 gh 가 이 Mac 에 로그인한 계정으로 돌기 때문이다. 이 Mac 이 꺼져 있거나 잠들면 처리가 밀린다. 요청 채널 카드의 ✅는 여전히 아무것도 깨우지 않는다 — 요청 이슈가 열리는 순간이 시작이다.
+- **이슈는 러너가 닫는다**(`2026-09-23`). 승인이 `main`에 합쳐진 때와 반려의 되돌림이 `dev`에 합쳐진 때다. 닫는 글은 「처리를 마쳐 닫습니다 — …」로 시작해 판독이 결정으로 읽지 않는다. 에이전트는 여전히 `gh issue close`를 못 쓴다(공용 권한 deny). 개발자가 `dev → main`을 한꺼번에 올린 뒤에 승인이 나면(#48) 만들 pull request 가 없으므로 러너가 그 요청의 commit 이 `main`의 조상인지 확인하고 닫는다.
 - **pull request 를 만들고 합치는 것은 러너 스크립트다.** `gh pr create`·`gh pr merge`는 공용 권한의 `ask`이고 ask 는 allow 보다 먼저 판정되어 headless 세션에서 풀 수 없다. Claude 는 push 뒤 넘김 파일을 쓰고 멈추고, 스크립트가 Quality 를 본 뒤 합친 다음 같은 세션을 이어 받게 한다. 승인된 요청은 러너가 `main`까지 합친다 — 승인이 곧 `main` 반영이다. 사람이 연 세션에서는 전처럼 사람이 확인하고 `main` 머지도 사람이 한다. 절차는 Skill 의 「러너에서 돌 때」에 있다.
 - **dev 가 보는 자리다.** 기획자는 코드가 아니라 배포된 화면을 보고 판단한다. 화면이 도는 주소가 생기기 전에는 승인을 묻지 않는다.
 - **Cloudflare Pages 가 `apps/sandbox` 를 배포한다.** 생성 화면이 앉는 자리가 거기다. `dev`에 머지될 때마다 `.github/workflows/deploy.yml`이 올리고, 페이지 주소는 `https://ooee-sandbox.pages.dev/<화면 key>` 가 된다. Vercel 도 GitHub Pages 도 아닌 까닭은 「만들면서 확인된 것」에 적었다.
