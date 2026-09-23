@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { readCommentDecision } from "./decision.mjs";
-import { buildComment, loadEnv, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
+import { buildComment, loadEnv, messageText, pickMessage, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
 
 const card = "화면 요청 #39 결과 · 1회차 — 공지사항 목록 · 결정은 GitHub 댓글에 👍 👎 😕\n요청: @기획자 · 프로젝트 하네스 시험";
 
@@ -64,4 +64,27 @@ test("토큰은 홈의 파일에서 읽고 저장소에 두지 않는다", () =>
   assert.equal(env.SLACK_APP_TOKEN, "xapp-1");
   assert.equal(env.SLACK_BOT_TOKEN, "xoxb-2", "따옴표를 벗기지 못했다");
   assert.deepEqual(loadEnv(path.join(dir, "없는파일"), { A: "1" }), { A: "1" });
+});
+
+test("스레드 답글의 카드도 그 시각의 메시지로 고른다", () => {
+  // GitHub for Slack 은 이슈 카드를 채널에 두고 댓글을 그 스레드에 단다. 결과 카드는 답글이라
+  // conversations.history 에 없고 conversations.replies 에만 있다(#48 의 😕 가 그래서 읽히지 않았다).
+  const thread = [
+    { ts: "1.0", text: "Issue created by …" },
+    { ts: "2.0", text: "Comment on issue …" },
+  ];
+  assert.equal(pickMessage(thread, "2.0").text, "Comment on issue …");
+  assert.equal(pickMessage(thread, "9.9"), null);
+  assert.equal(pickMessage(undefined, "1.0"), null);
+});
+
+test("카드의 글은 본문·첨부·블록에서 모두 모은다", () => {
+  const message = {
+    text: "Comment on issue by YUJINSIK-momo",
+    attachments: [{ title: "#48 화면 요청: 매장 재고 조회", text: "화면 요청 #48 결과 · 1회차 — 매장 재고 조회" }],
+    blocks: [{ text: { text: "샌드박스: https://ooee-sandbox.pages.dev/store-inventory" } }],
+  };
+  const text = messageText(message);
+  assert.equal(readIssueNumber(text), 48);
+  assert.match(text, /샌드박스/);
 });

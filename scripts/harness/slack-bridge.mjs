@@ -102,18 +102,35 @@ async function slack(method, token, body) {
   return json;
 }
 
-/** 반응이 달린 메시지의 글과 주소. 카드는 첨부(attachments)나 블록에 글을 담는다. */
-async function readMessage(token, { channel, ts }) {
-  const { messages } = await slack("conversations.history", token, { channel, latest: ts, oldest: ts, inclusive: true, limit: 1 });
-  const message = messages?.[0];
-  if (!message) return null;
-  const parts = [
+/** 메시지 목록에서 그 시각의 것을 고른다. */
+export const pickMessage = (messages, ts) => (messages ?? []).find((message) => message.ts === ts) ?? null;
+
+/** 카드의 글은 본문·첨부·블록에 흩어져 있다. 한 덩이로 모은다. */
+export function messageText(message) {
+  return [
     message.text ?? "",
     ...(message.attachments ?? []).flatMap((item) => [item.title ?? "", item.text ?? "", item.fallback ?? "", item.title_link ?? ""]),
     ...(message.blocks ?? []).flatMap((block) => [block.text?.text ?? "", ...(block.elements ?? []).map((el) => el.text ?? "")]),
-  ];
+  ].join("\n");
+}
+
+/**
+ * 반응이 달린 메시지의 글과 주소.
+ *
+ * **결과 카드는 스레드 답글로 온다.** GitHub for Slack 은 이슈 카드를 채널에 두고 그 이슈의 댓글을 그
+ * 카드의 스레드에 단다. `conversations.history` 는 스레드 답글을 돌려주지 않으므로(#48 의 😕 가 그래서
+ * 읽히지 않았다) 없으면 `conversations.replies` 로 다시 찾는다 — 스레드 안의 어느 ts 로도 그 스레드를 준다.
+ */
+async function readMessage(token, { channel, ts }) {
+  const inChannel = await slack("conversations.history", token, { channel, latest: ts, oldest: ts, inclusive: true, limit: 1 });
+  let message = pickMessage(inChannel.messages, ts);
+  if (!message) {
+    const inThread = await slack("conversations.replies", token, { channel, ts, limit: 200 }).catch(() => ({ messages: [] }));
+    message = pickMessage(inThread.messages, ts);
+  }
+  if (!message) return null;
   const { permalink } = await slack("chat.getPermalink", token, { channel, message_ts: ts }).catch(() => ({ permalink: null }));
-  return { text: parts.join("\n"), permalink };
+  return { text: messageText(message), permalink };
 }
 
 async function userName(token, id) {
