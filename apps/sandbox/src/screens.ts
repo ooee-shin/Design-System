@@ -177,4 +177,12 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "자율 요청(#37). 내용을 정하지 않아 이름·이메일·언어·알림 수신과 저장으로 계정 설정 화면 한 장을 자유롭게 구성함.",
     createdAt: "2026-09-22",
   },
+  {
+    key: "sto-notice-list",
+    project: "sto",
+    name: "공지사항 목록",
+    href: "/sto-notice-list",
+    prompt: "STO 사장님 앱의 공지사항 목록. 전체·필독·일반 거르기 칩, 새 글·필독 배지, 더 보기로 20건씩 이어 붙는 목록.",
+    createdAt: "2026-09-23",
+  },
 ];
