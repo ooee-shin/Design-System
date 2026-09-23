@@ -55,6 +55,7 @@ node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 | 10분마다 | 결정 확인 | `결정` — 열린 「화면 요청」 이슈를 모두 판독한다. 👍 👎 😕 반응은 이벤트가 없어 여기서만 읽힌다 |
 | Actions 에서 손으로(workflow_dispatch) | 모드에 따라 | `처리`·`결정`·`결과` |
 
+- **수정 요청도 같은 길로 온다.** 본문에 `수정 대상: #<n>` 이 있으면 `issue.mjs` 가 `mode: "수정"` 으로 읽고, 처리하는 쪽이 그 요청의 화면을 제자리에서 고친다(ai-environment.md 「두 번째 폼」).
 - **Claude 는 push 까지, 합치기는 스크립트가.** `claude -p "/process-issue <인수> 러너"`는 pull request 를 만들 자리에서 `.harness-work/issue-<n>/handoff.json`을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(이 요청의 `feature/issue-<n>-` 가지인지, 본문이 이 요청의 작업 자리 안에 있고 첫 줄이 `요청:`·`되돌림:`·`승인: #<n>`인지) `gh pr create --base <dev|main>` → 그 head commit 의 Quality 실행을 기다려 `gh run watch` → `dev`는 squash, `main`은 머지 commit 으로 합친다. `resume`이 `true`면 같은 세션을 `-r`로 이어 받아 7·8단계를 맡긴다. `dev`로 합칠 pull request 는 생성 화면의 자리(`apps/sandbox/src/app/<key>/` 바로 아래와 `apps/sandbox/src/screens.ts`)만 바꿔야 한다. 그 밖을 건드렸으면 합치지 않고 열어 둔 채 멈춘다 — 모델이 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌기 때문이다.
 - **모델은 `claude-sonnet-5`·`high`로 박는다.** 명령 머리말과 같은 값이다. 이어 받는 차례는 명령 밖이라 CLI 인수로도 준다. 실행 기록에 쓴 모델이 찍힌다.
 - **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **`/process-issue` 와 하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아 #29 에서 하위 명령이 적어 둔 명령이 거부됐고, 이어 받는 차례(7·8단계)는 `/process-issue` 밖이라 그 머리말도 적용되지 않는다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다. MCP 서버는 싣지 않는다.

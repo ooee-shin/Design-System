@@ -27,6 +27,8 @@ const TITLE_PREFIX_RE = /^화면\s*요청\s*[:：]\s*/;
  */
 export const LABELS = [
   { key: "projects", label: "프로젝트" },
+  { key: "fixTarget", label: "수정 대상" },
+  { key: "screenKey", label: "화면 key" },
   { key: "requester", label: "요청자" },
   { key: "requirement", label: "요구사항" },
   { key: "similar", label: "비슷한 기존 화면" },
@@ -125,6 +127,11 @@ function sliceByLabels(body) {
  * 표시다. 요구사항은 한 문단이라야 해서(폼 안내: 목록으로 끊지 말고 한 문단으로) 줄바꿈을 공백으로 편다.
  * `fields.requirement` 는 원문 줄바꿈을 그대로 둔다.
  *
+ * 본문에 「수정 대상: #<n>」이 있으면 **수정 요청**이다(`mode: "수정"`). 승인되어 `main` 에 들어간 화면을
+ * 제자리에서 고치는 입구이고, Slack 의 「화면 수정 요청」 폼이 만든다. 이때 프로젝트·화면 key·앞 요구사항은
+ * 대상 요청에서 물려받으므로 이 스크립트는 `fix` 만 내고 `generateArgs` 는 null 이다 — 고칠 화면의 key 와
+ * 앞 인수는 대상 요청의 머지된 pull request 본문 「화면별 인수」에서 처리하는 쪽이 찾는다(process-issue 2단계).
+ *
  * `problems` 가 하나라도 있으면 `generateArgs` 는 null 이다. generate-code 는 판단이 서지 않으면 만들지
  * 않고 묻는다(SKILL.md 3단계 `project`, 「입력」의 빈 요구사항). 막지 않는 것은 `notes` 에 적는다.
  */
@@ -147,30 +154,45 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
   if (!("requirement" in values)) problems.push("본문에 「요구사항:」 칸이 없다 — generate-code 는 요구사항이 없으면 무엇을 만들지 묻고 멈춘다");
   else if (!requirement) problems.push("요구사항이 비었다 — generate-code 는 요구사항이 없으면 무엇을 만들지 묻고 멈춘다");
 
+  // 수정 요청은 고칠 화면이 이미 있다. 프로젝트는 그 화면의 것을 그대로 쓴다.
+  const fixTargetRaw = (values.fixTarget ?? "").trim();
+  const mode = fixTargetRaw ? "수정" : "생성";
+  const fixTarget = Number(fixTargetRaw.match(/#?\s*(\d+)/)?.[1] ?? NaN);
+  const screenKey = (values.screenKey ?? "").trim() || null;
+  if (mode === "수정") {
+    if (!Number.isInteger(fixTarget)) problems.push(`「수정 대상:」 에서 이슈 번호를 읽지 못했다: 「${oneLine(fixTargetRaw)}」 — 「#39」처럼 적는다`);
+    else if (number !== null && fixTarget === number) problems.push("수정 대상이 이 요청 자신이다 — 고칠 화면을 만든 요청의 번호를 적는다");
+    if (screenKey && !/^[a-z0-9-]+$/.test(screenKey)) problems.push(`화면 key 가 소문자·숫자·붙임표가 아니다: 「${oneLine(screenKey)}」`);
+  }
+
   const picked = splitProjects(values.projects ?? "");
   const projects = picked.filter((id) => allowed.includes(id));
   const unknownProjects = picked.filter((id) => !allowed.includes(id));
   if (unknownProjects.length) {
     problems.push(`모르는 프로젝트 값: ${unknownProjects.join(", ")} — apps/sandbox/src/screens.ts 의 SANDBOX_PROJECTS(${allowed.join(", ")})에 없다. 폼과 목록 가운데 한쪽만 고쳤을 수 있다`);
   }
-  if (!projects.length) problems.push(`프로젝트가 없다 — ${allowed.join("·")} 가운데 하나를 요청자에게 묻는다`);
-  if (projects.length > 1) {
+  if (!projects.length && mode === "생성") problems.push(`프로젝트가 없다 — ${allowed.join("·")} 가운데 하나를 요청자에게 묻는다`);
+  if (projects.length > 1 && mode === "생성") {
     problems.push(`프로젝트가 ${projects.length}개(${projects.join(", ")})다 — 한 번에 화면 하나를 한 프로젝트에 만든다. 어느 것으로 만들지 요청자에게 묻는다`);
   }
 
   const paragraph = requirement.replace(/\s+/g, " ").trim();
-  const generateArgs = problems.length ? null : `${screenName}. ${paragraph} 프로젝트: ${projects[0]}`;
+  const generateArgs = problems.length || mode === "수정" ? null : `${screenName}. ${paragraph} 프로젝트: ${projects[0]}`;
 
   return {
     number,
     url,
     screenName,
+    mode,
+    fix: mode === "수정" ? { target: Number.isInteger(fixTarget) ? fixTarget : null, screenKey, instruction: problems.length ? null : paragraph } : null,
     fields: {
       projects,
       requester: values.requester ?? "",
       requirement,
       similar: values.similar ?? "",
       onSubmit: values.onSubmit ?? "",
+      fixTarget: fixTargetRaw,
+      screenKey: screenKey ?? "",
     },
     unknownProjects,
     problems,

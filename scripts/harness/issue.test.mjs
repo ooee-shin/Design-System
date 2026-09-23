@@ -156,3 +156,33 @@ test("CLI: --body-file 과 --title 로 gh 없이 돈다", () => {
   assert.equal(parsed.number, 9);
   assert.equal(parsed.generateArgs, "이커머스 구매 페이비. 자율 4-5페이지 정도의 시나리오 프로젝트: web");
 });
+
+test("「수정 대상」이 있으면 승인된 화면을 제자리에서 고치는 요청이다", () => {
+  // Slack 「화면 수정 요청」 폼. 프로젝트·앞 요구사항은 대상 요청에서 물려받으므로 여기서 묻지 않는다.
+  const body = "요청자: @기획자\n수정 대상: #39\n화면 key: sto-notice-list\n요구사항: 필독 배지를 빼고 제목을 한 줄로 줄인다";
+  const read = parseIssue({ number: 44, title: "화면 요청: 공지사항 목록 수정", body }, { allowedProjects: ["sto", "sv", "web"] });
+  assert.equal(read.mode, "수정");
+  assert.deepEqual(read.fix, { target: 39, screenKey: "sto-notice-list", instruction: "필독 배지를 빼고 제목을 한 줄로 줄인다" });
+  assert.deepEqual(read.problems, [], "프로젝트가 없다고 막았다 — 수정 요청은 대상 화면의 프로젝트를 쓴다");
+  assert.equal(read.generateArgs, null, "수정 요청의 인수는 대상 pull request 의 앞 인수에 붙여 만든다");
+});
+
+test("화면 key 를 적지 않은 수정 요청도 받는다 — 어느 화면인지는 처리하는 쪽이 찾는다", () => {
+  const read = parseIssue({ number: 44, title: "화면 요청: 계정 설정 수정", body: "수정 대상: #37\n요구사항: 저장 버튼을 아래로 내린다" }, { allowedProjects: ["web"] });
+  assert.deepEqual(read.fix, { target: 37, screenKey: null, instruction: "저장 버튼을 아래로 내린다" });
+  assert.deepEqual(read.problems, []);
+});
+
+test("수정 대상이 번호가 아니거나 자기 자신이면 묻는다", () => {
+  const bad = parseIssue({ number: 44, title: "화면 요청: 수정", body: "수정 대상: 저번에 만든 거\n요구사항: 고쳐 줘" }, { allowedProjects: ["web"] });
+  assert.match(bad.problems.join(" "), /이슈 번호를 읽지 못했다/);
+  const self = parseIssue({ number: 44, title: "화면 요청: 수정", body: "수정 대상: #44\n요구사항: 고쳐 줘" }, { allowedProjects: ["web"] });
+  assert.match(self.problems.join(" "), /이 요청 자신이다/);
+});
+
+test("보통 요청은 그대로다 — mode 는 생성이고 fix 는 없다", () => {
+  const read = parseIssue({ number: 45, title: "화면 요청: 공지사항 목록", body: "[프로젝트: sto]\n요청자: @기획자\n요구사항: 공지 목록을 보여 준다" }, { allowedProjects: ["sto"] });
+  assert.equal(read.mode, "생성");
+  assert.equal(read.fix, null);
+  assert.match(read.generateArgs, /^공지사항 목록\. 공지 목록을 보여 준다 프로젝트: sto$/);
+});

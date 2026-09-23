@@ -13,6 +13,7 @@ effort: high
 
 `$ARGUMENTS`가 화면 이름과 요구사항이다. 예: `관리자 로그인. 왼쪽에 로그인 폼, 오른쪽에 브랜드 패널… 원본: apps/sandbox/src/app/(renewal)/renewal/admin/login/page.tsx`. 대조할 원본 코드가 있으면 요청 끝에 `원본: <저장소 경로>`로 적는다. 요구사항이 비어 있으면 무엇을 만들지 묻고 멈춘다.
 
+- **끝에 `고칠 화면: <key>`가 있으면 그 화면을 제자리에서 고친다.** 새 화면을 만드는 것이 아니라 이미 있는 세 파일(`page.tsx`·`page.test.tsx`·`screens.ts` 한 줄)을 고치는 일이다. 승인되어 제품으로 간 화면을 고치는 입구이고, 주소(key)가 그대로여야 공유된 링크가 살아 있다. 아래 「파일과 등록」의 key 규칙과 「하지 않는 것」의 코드 읽기 금지에 이 경우의 예외가 있다.
 - 요구사항에 없는 것은 지어내지 않고 「판단이 필요한 것」에 적는다. 정렬·글자 크기·간격처럼 코드를 쓰려면 정해야만 하는 값은 3단계의 「정렬과 간격」을 따른다.
 - 요구사항이 적은 것이 `${user_config.docs_root}`의 기준과 어긋나면 2단계의 「요구사항과 문서가 어긋날 때」를 따른다.
 
@@ -23,7 +24,7 @@ effort: high
 - 빌드 캐시 삭제(`rm -rf .next` 등)와 working tree를 되돌리는 명령(`git stash`, `git checkout`, `git reset`, `git clean`). `docs/process/tooling.md`가 적은 `apps/studio/.next` 삭제는 사람이 확인하고 하는 절차이며 이 명령은 하지 않는다.
 - 막힌 명령 다시 시도하기. 권한 규칙이나 확인 요청에 막힌 명령은 경로·옵션·도구를 바꾸거나(`./` 경로, `rm -fr`, `node -e`, `dangerouslyDisableSandbox`) 같은 일을 하는 다른 명령으로 되풀이하지 않는다. 막힌 명령과 거부 메시지를 7단계 보고의 「막힌 명령」에 그대로 적는다.
 - 원본 파일 읽기. `원본:` 경로는 3단계에서 `screens.ts`의 `source`에 적기만 하고 열지 않는다. `${user_config.screens_dir}/(renewal)/` 아래(블루키 리뉴얼 작업장)는 언제나 읽지 않는다. 원본과의 대조는 사람이 한다.
-- 다른 화면의 코드 읽기. `${user_config.screens_dir}/<다른 key>/` 아래 파일은 열지 않는다. 이미 있는 화면은 고치지 않고 둔 기록일 수 있어, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `${user_config.docs_root}`과 `@ooee/ui`의 소스에서만 찾는다.
+- 다른 화면의 코드 읽기. `${user_config.screens_dir}/<다른 key>/` 아래 파일은 열지 않는다. **`고칠 화면: <key>`로 받은 그 화면은 예외다** — 고치려면 지금 무엇이 있는지 읽어야 한다. 그 화면의 세 파일만 열고 다른 key 는 그대로 닫아 둔다. 이미 있는 화면은 고치지 않고 둔 기록일 수 있어, 참고하면 그 사례를 그대로 옮기게 된다. 예시는 `${user_config.docs_root}`과 `@ooee/ui`의 소스에서만 찾는다.
 - Tailwind primitive 색(`bg-blue-700`, `text-neutral-500`, `text-white`, `bg-black`), hex 값, shadcn 토큰(`bg-background`, `text-muted-foreground`, `bg-primary`). 색은 `oe-*` semantic token 클래스만 쓴다.
 - 서버 호출, 실제 제출 동작, 라우팅 로직. 제출은 `<form onSubmit={(event) => event.preventDefault()}>`까지, 목적지가 정해지지 않은 링크는 `<a href="#">`까지만 둔다. 목적지 없는 `<a href="#">`는 라우팅 로직이 아니다.
 
@@ -82,6 +83,8 @@ git status --porcelain --untracked-files=all ${user_config.screens_dir}
 
 - 위치는 `${user_config.screens_dir}/<key>/page.tsx`. `<key>`는 소문자 kebab-case 영문이다. 예: `admin-login`, `sto-support-request`.
 - 고른 key가 `screens.ts`에 이미 있거나 `${user_config.screens_dir}/<key>/`가 이미 있으면 그 화면을 덮어쓰지 않고 `admin-login-2`처럼 끝에 번호를 붙인 새 key를 쓴다. `name`은 요청의 화면 이름 그대로 두고, 「판단이 필요한 것」에 「key `admin-login`이 이미 있어 `admin-login-2`로 만듦」을 적는다.
+- **`고칠 화면: <key>`를 받았으면 그 key 를 그대로 쓴다.** 번호를 붙이지 않고 그 화면의 `page.tsx`·`page.test.tsx`를 고친다. `screens.ts`에는 줄을 더하지 않고 그 화면의 줄에서 `prompt`(이번 요구사항의 한 줄 요약)와 `createdAt`(오늘)만 고친다. `key`·`name`·`project`는 그대로 둔다. 그 key 가 `screens.ts`에 없으면 고칠 화면이 아니므로 만들지 않고 묻는다(「## 묻고 멈춤」).
+- 제자리 수정이면 머리말 주석의 요구사항 문단도 이번 인수의 요구사항으로 **다시 쓴다.** 앞 문단을 남기고 덧붙이면 다음 검수가 어느 것을 기준으로 읽을지 알 수 없다. 고치지 않기로 한 자리는 앞 문단의 말을 그대로 옮겨 이번 문단에 담는다.
 - 상태(`useState`)를 쓰면 첫 줄에 `"use client"`를 둔다. `@ooee/ui`의 Control은 소비자 쪽 `"use client"`를 전제한다.
 - import는 `react`(hook), `@ooee/ui`(컴포넌트), `@remixicon/react`(아이콘, Line variant 우선), `@/lib/utils`(`cn`)만 쓴다. `next/link`·`next/navigation`은 쓰지 않는다.
 - 파일 머리말 주석에 「입력」의 요구사항 문단을 **그대로** 붙여 넣는다. 줄이거나 고쳐 쓰지 않으며 선택지 목록·placeholder·기본값·Label 문구를 하나도 빠뜨리지 않는다. 그 아래에 정하지 않아 비워 둔 자리를 적는다. 단독 `/review-design`은 요청을 받지 않으므로 이 주석이 근거다.
