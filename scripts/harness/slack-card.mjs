@@ -60,13 +60,19 @@ export function slackTarget(env = loadEnv()) {
   return token && channel ? { token, channel } : null;
 }
 
-/** 카드를 올린다. 올린 카드의 ts 를 돌려준다. */
+/**
+ * 카드를 올린다. 올린 카드의 ts 를 돌려준다.
+ *
+ * 글자 인수는 폼으로 보낸다 — Slack 의 읽는 메서드가 JSON 본문을 받지 않아 다리도 폼을 쓴다(한 가지로
+ * 맞춘다). 블록은 구조가 있으므로 JSON 으로 감싸 한 칸에 넣는다.
+ */
 export async function postCard(text, { token, channel, blocks }) {
+  const form = new URLSearchParams({ channel, text, unfurl_links: "false", unfurl_media: "false" });
+  if (blocks) form.set("blocks", JSON.stringify(blocks));
   const response = await fetch("https://slack.com/api/chat.postMessage", {
     method: "POST",
-    headers: { "content-type": "application/json; charset=utf-8", authorization: `Bearer ${token}` },
-    // 링크 미리보기를 끈다. 샌드박스와 이슈 주소가 카드 아래에 크게 펼쳐지면 네 줄 요약이 묻힌다.
-    body: JSON.stringify({ channel, text, blocks, unfurl_links: false, unfurl_media: false }),
+    headers: { "content-type": "application/x-www-form-urlencoded; charset=utf-8", authorization: `Bearer ${token}` },
+    body: form,
   });
   const json = await response.json();
   if (!json.ok) throw new Error(`chat.postMessage: ${json.error}`);

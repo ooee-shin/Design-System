@@ -118,11 +118,23 @@ export function loadEnv(file = HOME_ENV, env = process.env) {
 
 const log = (line) => process.stdout.write(`${new Date().toISOString()} ${line}\n`);
 
+/**
+ * Slack Web API 한 번.
+ *
+ * **읽는 메서드는 JSON 본문을 받지 않는다.** `conversations.history` 에 JSON 을 보내면 인수가 통째로
+ * 버려져 `invalid_arguments` 나 빈 결과가 온다 — 그래서 카드에 단 반응이 「결과 카드가 아니라」로 버려졌다.
+ * 글자 인수만 보내므로 폼으로 보낸다. 블록처럼 구조가 있는 것은 JSON 으로 감싸 한 칸에 넣는다.
+ */
 async function slack(method, token, body) {
+  const form = new URLSearchParams();
+  for (const [key, value] of Object.entries(body ?? {})) {
+    if (value === undefined || value === null) continue;
+    form.set(key, typeof value === "object" ? JSON.stringify(value) : String(value));
+  }
   const response = await fetch(`https://slack.com/api/${method}`, {
     method: "POST",
-    headers: { "content-type": "application/json; charset=utf-8", authorization: `Bearer ${token}` },
-    body: JSON.stringify(body ?? {}),
+    headers: { "content-type": "application/x-www-form-urlencoded; charset=utf-8", authorization: `Bearer ${token}` },
+    body: form,
   });
   const json = await response.json();
   if (!json.ok) throw new Error(`${method}: ${json.error}`);
