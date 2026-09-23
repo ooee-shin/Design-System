@@ -70,7 +70,7 @@ node scripts/harness/issue.mjs <n>
   - 2단계에 해당하는 요청이면 그 목록도 같은 물음에 함께 낸다. 두 번 나눠 묻지 않는다.
 - `fields.requester`가 비었으면 누구의 요청인지 묻는다. 결과 댓글은 요청자 없이 만들어지지 않는다.
 - `notes`는 막지 않지만 보고에 옮긴다. 버린 앞 글(옛 양식)이 요구사항이었는지는 사람이 본다.
-- `fields.onSubmit`·`fields.similar`는 `generateArgs`에 들지 않는다. 비어 있지 않으면 8단계 `needsDecision`에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다.
+- `fields.similar`·`fields.onSubmit`은 `generateArgs`에 들지 않는다. 비어 있지 않으면 8단계 `needsDecision`에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다. 「제출하면 일어나는 일」은 `2026-09-23`에 폼에서 뺐지만(요구사항 문단이 담는다) 그 칸이 있는 옛 이슈가 남아 있어 계속 읽는다.
 
 **수정 요청(`mode`가 `수정`)은 고칠 화면을 먼저 찾는다.** `fix.target`이 그 화면을 만든 요청의 번호다.
 
