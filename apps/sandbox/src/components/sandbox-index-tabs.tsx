@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/candidates/tabs";
 import { docKeyOf, studioDocUrl } from "@/components/component-inspector/component-map";
 import type { ScreenRoot } from "@/components/renewal/screen-registry";
-import type { SandboxScreen } from "@/screens";
+import { SANDBOX_VIEWPORTS, type SandboxScreen } from "@/screens";
 
 type Project = { id: string; name: string; description: string };
 
@@ -14,6 +14,9 @@ type Project = { id: string; name: string; description: string };
 export const RENEWAL_TAB = "renewal";
 
 const CHIP = "inline-flex rounded-md border border-oe-border-secondary px-1.5 py-0.5 text-xs text-oe-foreground-secondary";
+
+/** 화면이 선 폭. 같은 프로젝트에 웹과 모바일이 섞여 있어 카드에서 가른다. */
+const viewportName = (id: SandboxScreen["viewport"]) => SANDBOX_VIEWPORTS.find((item) => item.id === id)?.name ?? id;
 
 /**
  * sandbox 첫 화면의 탭이다. 화면이 쌓일수록 한 줄로 늘어놓은 목록은 스크롤만 길어지므로, 프로젝트마다
@@ -91,6 +94,7 @@ export function SandboxIndexTabs({
                       {screen.name}
                     </Link>
                     <p className="mt-1 text-sm text-oe-foreground-secondary">{screen.prompt}</p>
+                    <p className="mt-1 text-xs text-oe-foreground-tertiary">{viewportName(screen.viewport)}</p>
                     {uiImports[screen.key]?.length ? (
                       <ul aria-label="쓴 컴포넌트" className="mt-2 flex flex-wrap gap-1.5">
                         {uiImports[screen.key].map((name) => {

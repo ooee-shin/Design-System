@@ -66,7 +66,7 @@ node scripts/harness/issue.mjs <n>
 - **`mode`가 `수정`이면 승인된 화면을 제자리에서 고치는 요청이다.** Slack 의 「화면 수정 요청」 폼이 만든다. 이때 `generateArgs`는 `null`이지만 멈추지 않는다 — 아래 「수정 요청」으로 간다. `problems`가 있으면 그때만 묻고 멈춘다.
 - **`generateArgs`가 `null`이면(`mode`가 `생성`일 때) `problems`를 원문 그대로 보고하고 묻고 멈춘다.** 보고의 첫 제목은 「## 묻고 멈춤」이다.
   - 요구사항이 없거나 빈 것은 대화의 답으로 채우지 않는다. 요청 문단의 원본은 이슈 본문이다(ai-environment.md 「요청 폼」). 폼으로 다시 요청하도록 보고한다.
-  - 프로젝트를 하나 고르는 것처럼 답 하나로 풀리는 것은 답을 받은 뒤 이어 간다. 인수는 `issue.mjs`가 만드는 꼴(「<화면 이름>. <요구사항을 한 문단으로 편 것> 프로젝트: <id>」) 그대로 조립하고, 답으로 정한 것은 8단계 `needsDecision`에 남긴다. 예: 「프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv」.
+  - 프로젝트나 화면 유형을 하나 고르는 것처럼 답 하나로 풀리는 것은 답을 받은 뒤 이어 간다. 인수는 `issue.mjs`가 만드는 꼴(「<화면 이름>. <요구사항을 한 문단으로 편 것> 프로젝트: <id> 유형: <web|tablet|mobile>」) 그대로 조립하고, 답으로 정한 것은 8단계 `needsDecision`에 남긴다. 예: 「프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv」.
   - 2단계에 해당하는 요청이면 그 목록도 같은 물음에 함께 낸다. 두 번 나눠 묻지 않는다.
 - `fields.requester`가 비었으면 누구의 요청인지 묻는다. 결과 댓글은 요청자 없이 만들어지지 않는다.
 - `notes`는 막지 않지만 보고에 옮긴다. 버린 앞 글(옛 양식)이 요구사항이었는지는 사람이 본다.
@@ -102,7 +102,7 @@ generate-code는 한 번에 화면 하나를 만든다. 요구사항이 화면 �
 
 - key의 꼴은 generate-code 3단계 「파일과 등록」이 정한다. 이미 있는 key면 generate-code가 번호를 붙이므로 여기서 미리 피하지 않는다.
 - 「요청 원문에서 온 것」에는 이슈 본문에 있는 말만 옮긴다. 「지어낸 것」에는 화면에 보일 항목·버튼 문구·기본값 가운데 요청에 없는 것을 한 문단으로 적는다.
-- 확인받은 표의 줄마다 「<화면 이름>. <요청 원문에서 온 것> 지어냄(요청에 없어 처리하는 쪽이 정함): <지어낸 것> 프로젝트: <id>」가 generate-code 인수다. generate-code는 인수의 요구사항 문단을 `page.tsx` 머리말에 그대로 붙이므로(그 SKILL.md 3단계 「파일과 등록」) 머리말에서도 원문과 지어낸 것이 갈린다. 단독 `/review-design`과 다음 회차의 대조가 그 머리말과 pull request 본문을 근거로 읽는다.
+- 확인받은 표의 줄마다 「<화면 이름>. <요청 원문에서 온 것> 지어냄(요청에 없어 처리하는 쪽이 정함): <지어낸 것> 프로젝트: <id> 유형: <유형>」가 generate-code 인수다. 프로젝트와 유형은 요청이 준 값 그대로이고, 새 프로젝트면 `새 프로젝트 이름: <이름>`도 함께 붙인다. generate-code는 인수의 요구사항 문단을 `page.tsx` 머리말에 그대로 붙이므로(그 SKILL.md 3단계 「파일과 등록」) 머리말에서도 원문과 지어낸 것이 갈린다. 단독 `/review-design`과 다음 회차의 대조가 그 머리말과 pull request 본문을 근거로 읽는다.
 - 표와 줄마다의 인수는 6단계 pull request 본문에 그대로 옮기고, 「지어낸 것」은 8단계 `needsDecision`에 **반드시** 옮긴다. 대화는 남지 않고 저장소와 GitHub만 남는다.
 - 한 장 요청이면 이 단계를 건너뛰고 `generateArgs`를 그대로 쓴다. 그때 요청에 없어 정한 값은 generate-code 보고의 「판단이 필요한 것」으로 온다.
 
@@ -140,7 +140,7 @@ node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewpor
 ```
 
 - **빌드한 정적 사이트를 잰다.** `--serve` 가 `apps/sandbox/out` 을 빈 포트에 잠깐 띄우고 끝나면 닫는다. 개발 서버를 띄우지 않는다 — 무인 러너에 프로세스가 남거나, 3001 을 다른 checkout 의 서버가 잡고 있으면 옛 화면을 읽는다. 배포되는 것과 같은 빌드를 본다.
-- 모바일 뷰(`max-w-[390px]`)로 선 화면은 `--viewport 390x844` 로 잰다(generate-code 「화면 폭」).
+- **뷰포트는 화면 유형이 정한다.** `screens.ts` 의 `SANDBOX_VIEWPORTS` 가 짝을 갖는다 — 웹 `1440x900`, 태블릿 `1024x768`, 모바일 `390x844`.
 - `--eval` 은 셋을 돌려준다: 첫 `h1` 글자, 가로 넘침, 화면에 놓인 컴포넌트 표식.
 
   ```js
@@ -204,7 +204,7 @@ node scripts/harness/decision.mjs <n> --round <회차>   # decision 이 「결�
 
 | 입력 | 값 |
 | --- | --- |
-| `issue` | `number`, `issue.mjs`의 `screenName`, `fields.requester`, `fields.projects`(요청한 그대로) |
+| `issue` | `number`, `issue.mjs`의 `screenName`, `fields.requester`, `fields.projects`(고른 프로젝트) |
 | `round` | 처음이면 `1`, 개선이면 앞 회차 + 1 |
 | `screens[]` | key, `apps/sandbox/src/screens.ts`에 등록된 `name`, 만든 프로젝트, `https://ooee-sandbox.pages.dev/<key>` |
 | `pullRequest` | 6단계의 번호와 주소 |

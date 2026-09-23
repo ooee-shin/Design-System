@@ -27,6 +27,8 @@ const TITLE_PREFIX_RE = /^화면\s*요청\s*[:：]\s*/;
  */
 export const LABELS = [
   { key: "projects", label: "프로젝트" },
+  { key: "viewport", label: "화면 유형" },
+  { key: "newProject", label: "새 프로젝트" },
   { key: "fixTarget", label: "수정 대상" },
   { key: "screenKey", label: "화면 key" },
   { key: "requester", label: "요청자" },
@@ -43,28 +45,57 @@ const LABEL_RE = new RegExp(
 );
 const labelKey = (text) => LABELS.find(({ label }) => label === text.replace(/[ \t]+/g, " "))?.key;
 
+/** 폼의 화면 유형 값 → `screens.ts` 의 `viewport`. 한글과 영문을 함께 받는다. */
+export const VIEWPORTS = { web: "web", 웹: "web", tablet: "tablet", 태블릿: "tablet", 테블릿: "tablet", mobile: "mobile", 모바일: "mobile" };
+
+/** 새 프로젝트 이름을 id 로 만든다. 한글 이름은 그대로 두고 공백만 붙임표로 바꾼다. */
+export function projectId(name) {
+  return name.trim().toLowerCase().replace(/[\s/·,]+/g, "-").replace(/[^0-9a-z가-힣-]/g, "").replace(/^-+|-+$/g, "");
+}
+
 /**
  * `screens.ts` 원문에서 `SANDBOX_PROJECTS` 의 `id` 를 뽑는다. 손으로 목록을 따로 두면 폼·화면 목록과
  * 어긋나므로(ai-environment.md 「다섯 칸」: 한쪽을 고치면 다른 쪽도 고친다) 원본을 읽는다.
  * TypeScript 를 불러오지 않고 글자로 읽는 것은 CLI 가 tsx 없이 맨 node 로 돌게 하려는 것이다.
  */
-export function parseSandboxProjectIds(source) {
+export function parseSandboxProjects(source) {
   const block = source.match(/export const SANDBOX_PROJECTS\s*=\s*\[([\s\S]*?)\]\s*as const/);
   if (!block) throw new Error("screens.ts 에서 `export const SANDBOX_PROJECTS = [ … ] as const` 를 찾지 못했다. 모양이 바뀌었으면 issue.mjs 도 고친다");
-  const ids = [...block[1].matchAll(/\bid:\s*["']([^"']+)["']/g)].map((m) => m[1]);
-  if (!ids.length) throw new Error("SANDBOX_PROJECTS 에 id 가 하나도 없다");
-  return ids;
+  const rows = [...block[1].matchAll(/\bid:\s*["']([^"']+)["']\s*,\s*name:\s*["']([^"']+)["']/g)].map((m) => ({ id: m[1], name: m[2] }));
+  if (!rows.length) throw new Error("SANDBOX_PROJECTS 에 id·name 짝이 하나도 없다");
+  return rows;
 }
 
-let cachedProjectIds;
+export const parseSandboxProjectIds = (source) => parseSandboxProjects(source).map((row) => row.id);
+
+let cachedProjects;
 /** 저장소의 `apps/sandbox/src/screens.ts` 를 읽는다. 한 번 읽으면 기억해 둔다. */
-export function loadSandboxProjectIds(file = SCREENS_TS) {
-  if (file !== SCREENS_TS) return parseSandboxProjectIds(readFileSync(file, "utf8"));
-  cachedProjectIds ??= parseSandboxProjectIds(readFileSync(SCREENS_TS, "utf8"));
-  return cachedProjectIds;
+export function loadSandboxProjects(file = SCREENS_TS) {
+  if (file !== SCREENS_TS) return parseSandboxProjects(readFileSync(file, "utf8"));
+  cachedProjects ??= parseSandboxProjects(readFileSync(SCREENS_TS, "utf8"));
+  return cachedProjects;
 }
 
-/** 프로젝트 칸을 쉼표·공백으로 나눈다. 폼이 주는 값은 소문자 id 라 대소문자는 맞춰 준다. */
+export const loadSandboxProjectIds = (file = SCREENS_TS) => loadSandboxProjects(file).map((row) => row.id);
+
+/**
+ * 폼이 보낸 프로젝트 값을 있는 프로젝트에 맞춰 본다. id 로도 이름으로도 받는다 — 목록이 무엇을 보내는지에
+ * 기대지 않는다. 이름에 공백이 있으므로(「하네스 시험」) 쉼표로만 가른다.
+ */
+export function matchProject(value, projects) {
+  const parts = String(value ?? "").split(/[,，、/]+/).map((part) => part.trim()).filter(Boolean);
+  const matched = [];
+  const unknown = [];
+  for (const part of parts) {
+    const hit = projects.find((row) => row.id === part.toLowerCase() || row.name === part || projectId(row.name) === projectId(part));
+    if (hit) {
+      if (!matched.includes(hit.id)) matched.push(hit.id);
+    } else unknown.push(part);
+  }
+  return { matched, unknown };
+}
+
+/** 옛 양식(#6·#9)의 `web,sto,sv` 를 나눈다. 지금 폼은 한 프로젝트만 보낸다. */
 export function splitProjects(value) {
   const out = [];
   for (const part of value.split(/[\s,，、/]+/)) {
@@ -135,8 +166,9 @@ function sliceByLabels(body) {
  * `problems` 가 하나라도 있으면 `generateArgs` 는 null 이다. generate-code 는 판단이 서지 않으면 만들지
  * 않고 묻는다(SKILL.md 3단계 `project`, 「입력」의 빈 요구사항). 막지 않는 것은 `notes` 에 적는다.
  */
-export function parseIssue({ number = null, title = "", body = "", url = null }, { allowedProjects } = {}) {
-  const allowed = allowedProjects ?? loadSandboxProjectIds();
+export function parseIssue({ number = null, title = "", body = "", url = null }, { allowedProjects, projects: knownProjects } = {}) {
+  const known = knownProjects ?? (allowedProjects ? allowedProjects.map((id) => ({ id, name: id })) : loadSandboxProjects());
+  const allowed = known.map((row) => row.id);
   const text = String(body ?? "").replace(/\r\n?/g, "\n");
   const problems = [];
 
@@ -165,19 +197,39 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
     if (screenKey && !/^[a-z0-9-]+$/.test(screenKey)) problems.push(`화면 key 가 소문자·숫자·붙임표가 아니다: 「${oneLine(screenKey)}」`);
   }
 
-  const picked = splitProjects(values.projects ?? "");
-  const projects = picked.filter((id) => allowed.includes(id));
-  const unknownProjects = picked.filter((id) => !allowed.includes(id));
-  if (unknownProjects.length) {
-    problems.push(`모르는 프로젝트 값: ${unknownProjects.join(", ")} — apps/sandbox/src/screens.ts 의 SANDBOX_PROJECTS(${allowed.join(", ")})에 없다. 폼과 목록 가운데 한쪽만 고쳤을 수 있다`);
+  const { matched, unknown: unknownProjects } = matchProject(values.projects ?? "", known);
+  const newProjectName = (values.newProject ?? "").trim();
+  // 폼은 있는 프로젝트를 목록에서 고르거나 「새 프로젝트」 칸에 이름을 적게 한다. 적은 이름이 이미 있는
+  // 프로젝트면 새로 만들지 않고 그리로 간다 — 오타 하나로 프로젝트가 둘로 갈라지는 것을 막는다.
+  const namedMatch = newProjectName ? matchProject(newProjectName, known).matched[0] : null;
+  const chosen = namedMatch ?? (newProjectName ? projectId(newProjectName) : null) ?? matched[0] ?? null;
+  const isNewProject = Boolean(chosen) && !allowed.includes(chosen);
+
+  if (mode === "생성") {
+    if (!chosen) problems.push(`프로젝트가 없다 — 있는 프로젝트(${known.map((row) => row.name).join("·")}) 가운데 하나를 고르거나 「새 프로젝트」 이름을 요청자에게 묻는다`);
+    if (!newProjectName && unknownProjects.length) {
+      problems.push(`모르는 프로젝트 값: ${unknownProjects.join(", ")} — apps/sandbox/src/screens.ts 의 SANDBOX_PROJECTS(${allowed.join(", ")})에 없다. 새 프로젝트면 「새 프로젝트:」 칸에 이름을 적는다`);
+    }
+    if (!newProjectName && matched.length > 1) {
+      problems.push(`프로젝트가 ${matched.length}개(${matched.join(", ")})다 — 한 번에 화면 하나를 한 프로젝트에 만든다. 어느 것으로 만들지 요청자에게 묻는다`);
+    }
+    if (isNewProject && chosen) notes.push(`새 프로젝트 「${newProjectName}」(id \`${chosen}\`) 다 — 화면을 만들 때 SANDBOX_PROJECTS 에 한 줄이 는다`);
+    if (namedMatch) notes.push(`「새 프로젝트: ${newProjectName}」 가 이미 있는 프로젝트라 그리로 넣는다(id \`${namedMatch}\`)`);
   }
-  if (!projects.length && mode === "생성") problems.push(`프로젝트가 없다 — ${allowed.join("·")} 가운데 하나를 요청자에게 묻는다`);
-  if (projects.length > 1 && mode === "생성") {
-    problems.push(`프로젝트가 ${projects.length}개(${projects.join(", ")})다 — 한 번에 화면 하나를 한 프로젝트에 만든다. 어느 것으로 만들지 요청자에게 묻는다`);
+
+  // 유형은 폭이다. 프로젝트와 섞지 않는다 — 한 프로젝트에 웹 화면과 모바일 화면이 함께 있다.
+  const viewportRaw = (values.viewport ?? "").trim();
+  const viewport = VIEWPORTS[viewportRaw.toLowerCase()] ?? null;
+  if (mode === "생성") {
+    if (!viewportRaw) problems.push("본문에 「화면 유형:」 칸이 없다 — 웹·태블릿·모바일 가운데 무엇인지 요청자에게 묻는다");
+    else if (!viewport) problems.push(`모르는 화면 유형: 「${oneLine(viewportRaw)}」 — 웹·태블릿·모바일 가운데 하나다`);
   }
 
   const paragraph = requirement.replace(/\s+/g, " ").trim();
-  const generateArgs = problems.length || mode === "수정" ? null : `${screenName}. ${paragraph} 프로젝트: ${projects[0]}`;
+  const generateArgs =
+    problems.length || mode === "수정"
+      ? null
+      : `${screenName}. ${paragraph} 프로젝트: ${chosen}${isNewProject ? ` 새 프로젝트 이름: ${newProjectName}` : ""} 유형: ${viewport}`;
 
   return {
     number,
@@ -185,8 +237,10 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
     screenName,
     mode,
     fix: mode === "수정" ? { target: Number.isInteger(fixTarget) ? fixTarget : null, screenKey, instruction: problems.length ? null : paragraph } : null,
+    project: chosen ? { id: chosen, name: newProjectName || null, isNew: isNewProject } : null,
+    viewport,
     fields: {
-      projects,
+      projects: chosen ? [chosen] : [],
       requester: values.requester ?? "",
       requirement,
       similar: values.similar ?? "",

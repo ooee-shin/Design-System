@@ -5,25 +5,36 @@
  * `source` 는 대조할 원본이 있으면 그 경로다. 원본이 없는 기획자 요청은 `source` 를 두지 않는다.
  */
 /**
- * 화면을 묶는 자리다. 화면이 늘수록 목록이 길어져 스크롤만 하게 되므로 프로젝트로 나눈다.
- * 새 화면을 만들 때 어느 것인지 판단이 서지 않으면 **짐작하지 말고 묻는다** — 잘못 묶으면
- * 되돌리는 값이 크다. 규칙은 plugins/ooee-harness/skills/generate-code/SKILL.md 가 갖는다.
+ * 화면을 묶는 자리다. 프로젝트 단위로 나눈다 — 「블루키 리뉴얼」처럼 실제로 굴러가는 일의 이름이다.
+ * 화면이 늘수록 목록이 길어져 스크롤만 하게 되므로 첫 화면이 이 값으로 탭을 만든다.
  *
- * `id` 는 Slack 「화면 요청」 폼의 프로젝트 라디오가 주는 값과 같아야 한다. 기획자가 고른 값이
- * 이슈 본문에 그대로 실려 오고, 화면을 만들 때 그 값을 여기에 적기 때문이다.
+ * **요청이 없는 프로젝트를 만들면 그 탭은 빈 채로 남는다.** 새 프로젝트는 요청이 처음 올 때 한 줄이
+ * 늘어난다(generate-code 「파일과 등록」). `id` 는 소문자·붙임표이고 Slack 폼이 보내는 값과 같아야 한다.
  */
 export const SANDBOX_PROJECTS = [
-  { id: "sto", name: "점주 앱", description: "점주와 매장 직원이 쓰는 앱입니다." },
-  { id: "sv", name: "슈퍼바이저 앱", description: "여러 매장을 도는 슈퍼바이저가 쓰는 앱입니다." },
-  { id: "web", name: "웹", description: "본사 담당자가 쓰는 웹입니다." },
+  { id: "harness-test", name: "하네스 시험", description: "요청에서 화면까지의 흐름을 시험하며 만든 화면입니다. 제품에 들어가지 않습니다." },
 ] as const;
 
 export type SandboxProject = (typeof SANDBOX_PROJECTS)[number]["id"];
 
+/**
+ * 화면이 어느 폭으로 서는가. 프로젝트와 섞지 않는다 — 같은 프로젝트에 웹 화면과 모바일 화면이 함께 있다.
+ * `inspect` 는 `/process-issue` 5단계가 띄워 보는 뷰포트이고, 모바일만 화면 코드가 `max-w-[390px]` 상자를 두른다.
+ */
+export const SANDBOX_VIEWPORTS = [
+  { id: "web", name: "웹", inspect: "1440x900" },
+  { id: "tablet", name: "태블릿", inspect: "1024x768" },
+  { id: "mobile", name: "모바일", inspect: "390x844" },
+] as const;
+
+export type SandboxViewport = (typeof SANDBOX_VIEWPORTS)[number]["id"];
+
 export type SandboxScreen = {
   key: string;
-  /** 어느 프로젝트의 화면인가. 첫 화면이 이 값으로 묶어 보인다. */
+  /** 어느 프로젝트의 화면인가. 첫 화면이 이 값으로 탭을 나눈다. */
   project: SandboxProject;
+  /** 어느 폭으로 서는 화면인가. 웹·태블릿·모바일. */
+  viewport: SandboxViewport;
   name: string;
   href: `/${string}`;
   /** 화면을 만들 때 준 요청을 한 줄로. */
@@ -37,7 +48,8 @@ export type SandboxScreen = {
 export const sandboxScreens: SandboxScreen[] = [
   {
     key: "admin-login",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "관리자 로그인",
     href: "/admin-login",
     prompt:
@@ -47,7 +59,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "sto-support-request",
-    project: "sto",
+    project: "harness-test",
+    viewport: "mobile",
     name: "STO 지원요청",
     href: "/sto-support-request",
     prompt: "STO 사장님 앱의 지원요청 폼 한 장. 요청 유형·매장·제목·내용·사진 첨부·연락 가능 시간·긴급 요청 여부.",
@@ -55,7 +68,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "voc",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "고객의 소리",
     href: "/voc",
     prompt: "블루키 관리자 웹의 고객의 소리 화면. 필터·상태 칩·표·상세 답변 패널·페이지 이동.",
@@ -63,7 +77,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "sto-my-page",
-    project: "sto",
+    project: "harness-test",
+    viewport: "mobile",
     name: "사용자 마이페이지",
     href: "/sto-my-page",
     prompt:
@@ -72,7 +87,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "attendance-kiosk",
-    project: "sto",
+    project: "harness-test",
+    viewport: "tablet",
     name: "출퇴근 찍기",
     href: "/attendance-kiosk",
     prompt:
@@ -81,7 +97,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "attendance-payroll",
-    project: "web",
+    project: "harness-test",
+    viewport: "tablet",
     name: "근태·급여 정산",
     href: "/attendance-payroll",
     prompt:
@@ -90,7 +107,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "annual-leave",
-    project: "sto",
+    project: "harness-test",
+    viewport: "tablet",
     name: "연차 관리",
     href: "/annual-leave",
     prompt:
@@ -99,7 +117,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "tax-invoice",
-    project: "web",
+    project: "harness-test",
+    viewport: "tablet",
     name: "세금계산서 발행",
     href: "/tax-invoice",
     prompt:
@@ -108,7 +127,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "excel-export",
-    project: "web",
+    project: "harness-test",
+    viewport: "tablet",
     name: "엑셀 내려받기",
     href: "/excel-export",
     prompt:
@@ -117,7 +137,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "weekly-schedule",
-    project: "sto",
+    project: "harness-test",
+    viewport: "tablet",
     name: "스케줄 관리",
     href: "/weekly-schedule",
     prompt:
@@ -126,7 +147,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "shop-product-list",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "이커머스 상품 목록",
     href: "/shop-product-list",
     prompt:
@@ -135,7 +157,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "shop-product-detail",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "이커머스 상품 상세",
     href: "/shop-product-detail",
     prompt:
@@ -144,7 +167,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "shop-cart",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "이커머스 장바구니",
     href: "/shop-cart",
     prompt:
@@ -153,7 +177,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "shop-checkout",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "이커머스 주문·결제",
     href: "/shop-checkout",
     prompt:
@@ -162,7 +187,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "shop-order-complete",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "이커머스 주문 완료",
     href: "/shop-order-complete",
     prompt:
@@ -171,7 +197,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "account-settings",
-    project: "web",
+    project: "harness-test",
+    viewport: "web",
     name: "계정 설정",
     href: "/account-settings",
     prompt: "자율 요청(#37). 내용을 정하지 않아 이름·이메일·언어·알림 수신과 저장으로 계정 설정 화면 한 장을 자유롭게 구성함.",
@@ -179,7 +206,8 @@ export const sandboxScreens: SandboxScreen[] = [
   },
   {
     key: "sto-notice-list",
-    project: "sto",
+    project: "harness-test",
+    viewport: "mobile",
     name: "공지사항 목록",
     href: "/sto-notice-list",
     prompt: "STO 사장님 앱의 공지사항 목록. 전체·필독·일반 거르기 칩, 새 글·필독 배지, 더 보기로 20건씩 이어 붙는 목록.",
