@@ -90,3 +90,11 @@ test("하위 명령의 보고로 끝내지 않는다 — 이 명령의 보고는
     assert.ok(skill.includes(heading), `보고의 첫 제목 ${heading} 이 없다`);
   }
 });
+
+test("하위 명령은 오래 걸리는 검사를 배경으로 밀지 않는다 — 러너 세션은 그 뒤를 받을 수 없다", () => {
+  // 2026-09-23 #75: `pnpm check` 가 10분을 넘겨 배경으로 넘어갔고, 기다리려 한 Monitor 가 거부되어 멈췄다.
+  // 도구 제한이 10분이라 앞에서 끝나지 않는 명령은 이 세션이 결과를 볼 길이 없다.
+  const generate = readFileSync(path.join(root, "plugins/ooee-harness/skills/generate-code/SKILL.md"), "utf8");
+  assert.match(generate, /배경으로 밀어 두고 기다리지 않는다/, "오래 걸리는 검사를 어떻게 할지 적혀 있지 않다");
+  assert.match(generate, /한 줄에 명령을 여러 개 묶지 않는다/, "묶은 명령이 거부된다는 것이 적혀 있지 않다");
+});
