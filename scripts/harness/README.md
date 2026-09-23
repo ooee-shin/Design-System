@@ -1,6 +1,6 @@
 # 화면 요청 이슈를 돌리는 도구
 
-Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 이슈 댓글 한 장으로 만들고, 그 댓글에 사람이 내린 결정을 읽는 세 스크립트다. 흐름과 승인 범위는 `docs/process/ai-environment.md` 「처리와 승인」이 소유한다. 전달 시 `docs/process/`와 함께 제거한다.
+Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 이슈 댓글과 Slack 카드로 내고, 사람이 내린 결정을 읽어 러너를 잇는 스크립트들이다. 흐름과 승인 범위는 `docs/process/ai-environment.md` 「처리와 승인」이 소유한다. 전달 시 `docs/process/`와 함께 제거한다.
 
 `issue`·`result-comment`·`decision` 셋은 **읽기와 글 만들기만 한다.** 이슈에 글을 다는 것은 `post-result.mjs` 하나이고, 그것도 양식이 만든 결과 댓글 한 장만 단다. 반응·라벨·이슈 상태는 어느 스크립트도 바꾸지 않는다.
 
@@ -10,6 +10,13 @@ Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 �
 | --- | --- |
 | `issue.mjs` | 이슈 본문을 칸별로 읽어 `/ooee-harness:generate-code` 인수(`generateArgs`)를 만든다. 만들 수 없으면 `null`과 까닭(`problems`)을 낸다 |
 | `result-comment.mjs` | 처리 결과를 결과 댓글 markdown 으로 만든다. 빠진 링크나 실패한 검사가 있으면 만들지 않고 던진다 |
+| `post-result.mjs` | 결과 댓글을 이슈에 단다(에이전트가 이슈에 글을 다는 유일한 길). 단 뒤 `slack-card.mjs` 로 결과 채널에 카드를 올린다 |
+| `slack-card.mjs` | 결과 댓글의 머리 네 줄과 결정 버튼(👍 👎 😕)을 결과 채널에 카드 한 장으로 올린다. 반려를 되묻는 블록도 여기 있다 |
+| `slack-bridge.mjs` | 이 Mac 에서 소켓 모드로 상시 돈다. 카드의 버튼·반응·스레드에 적은 까닭을 GitHub 결정 댓글로 옮긴다. 반려는 한 번 더 묻는다 |
+| `slack-env.mjs` | `~/.ooee-harness/slack.env` 의 토큰·채널을 읽는다. 다리와 카드가 함께 쓴다 |
+| `deploy-check.mjs` | 머지 commit 의 Deploy 실행이 끝나기를 기다렸다가 화면 주소가 200 인지 본다(7단계). 내 실행이 취소되면 그 뒤의 실행을 본다 |
+| `watch-decisions.mjs` · `watch-tick.sh` | 이 Mac 이 60초마다 결정을 읽고, 처리할 것이 있을 때만 러너를 깨운다. launchd 가 `watch-tick.sh` 를 부른다 |
+| `com.ooee.harness.*.plist` | launchd 정의 둘(다리 · 감시). 설치는 아래 「launchd」 |
 | `decision.mjs` | 결과 댓글의 반응과 뒤따른 댓글에서 승인·반려·개선을 읽는다. `gh api` GET 만 쓴다 |
 | `post-result.mjs` | 결과 댓글 한 장을 이슈에 단다. 에이전트가 이슈에 글을 다는 유일한 길이다 — 아래 「알아 둘 것」 |
 | `runner.mjs` | 이 Mac 의 러너가 부른다. `/process-issue … 러너`를 돌리고, 넘김 파일대로 pull request 를 만들어 Quality 를 본 뒤 합치고, 세션을 이어 받게 한다. 아래 「러너」 |
@@ -44,7 +51,7 @@ node scripts/harness/decision.mjs 9 [--round 1]          # 결과 없음 · 대�
 
 ```bash
 node scripts/harness/runner.mjs 처리 12      # 이슈가 열릴 때
-node scripts/harness/runner.mjs 결정         # 10분마다 · 결정 댓글이 달릴 때(그 이슈만)
+node scripts/harness/runner.mjs 결정         # 결정 댓글이 달릴 때(그 이슈만) · 이 Mac 의 1분 감시가 깨울 때 · GitHub 예비 예약
 node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 ```
 
@@ -52,7 +59,8 @@ node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 | --- | --- | --- |
 | 제목이 「화면 요청」인 이슈가 열림 | 화면 요청 처리 | `처리 <n>` |
 | 「화면 요청」 이슈에 댓글 | 결정 확인 | `결정 <n>` — 결정이 없으면 Claude 를 부르지 않고 끝난다 |
-| 10분마다 | 결정 확인 | `결정` — 열린 「화면 요청」 이슈를 모두 판독한다. 👍 👎 😕 반응은 이벤트가 없어 여기서만 읽힌다 |
+| 이 Mac 의 1분 감시(`watch-decisions.mjs`)가 깨울 때 | 결정 확인 | `결정 <n>` — 그 요청의 결정을 처리한다. 반응은 이벤트가 없어 이 길로만 읽힌다 |
+| GitHub 예약(`*/10`, 실제로는 몇 시간씩 밀린다) | 결정 확인 | `결정` — 이 Mac 이 꺼져 있을 때의 뒷받침이다 |
 | Actions 에서 손으로(workflow_dispatch) | 모드에 따라 | `처리`·`결정`·`결과` |
 
 - **수정 요청도 같은 길로 온다.** 본문에 `수정 대상: #<n>` 이 있으면 `issue.mjs` 가 `mode: "수정"` 으로 읽고, 처리하는 쪽이 그 요청의 화면을 제자리에서 고친다(ai-environment.md 「두 번째 폼」).
@@ -60,16 +68,34 @@ node scripts/harness/runner.mjs 결과 9       # 손으로 돌릴 때만
 - **모델은 `claude-sonnet-5`·`high`로 박는다.** 명령 머리말과 같은 값이다. 이어 받는 차례는 명령 밖이라 CLI 인수로도 준다. 실행 기록에 쓴 모델이 찍힌다.
 - **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **`/process-issue` 와 하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아 #29 에서 하위 명령이 적어 둔 명령이 거부됐고, 이어 받는 차례(7·8단계)는 `/process-issue` 밖이라 그 머리말도 적용되지 않는다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다. MCP 서버는 싣지 않는다.
 - **gh·git 은 이 Mac 의 로그인이다.** checkout 은 `persist-credentials: false`로 받아 GITHUB_TOKEN 을 남기지 않는다. GITHUB_TOKEN 으로 만든 pull request 와 머지는 다른 workflow 를 깨우지 않아 Quality 와 Deploy 가 돌지 않는다.
-- **같은 결정은 한 번만 처리한다.** 처리하기 **전에** `~/.ooee-harness/decisions.json`에 `<이슈>:<회차>:<결정>:<신호 시각>`을 적는다. 멈추거나 실패한 결정을 10분마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 기획자가 새 신호를 남기거나(시각이 바뀐다) 개발자가 그 줄을 지운다. `HARNESS_STATE_DIR`로 자리를 옮길 수 있다.
+- **같은 결정은 한 번만 처리한다.** 처리하기 **전에** `~/.ooee-harness/decisions.json`에 `<이슈>:<회차>:<결정>:<신호 시각>`을 적는다. 멈추거나 실패한 결정을 감시가 돌 때마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 기획자가 새 신호를 남기거나(시각이 바뀐다) 개발자가 그 줄을 지운다. `HARNESS_STATE_DIR`로 자리를 옮길 수 있다.
 - **기다리는 일은 스크립트가 맡는다.** 배포가 끝나기를 기다리는 `gh run watch`·`sleep` 은 허용 목록 밖이라 세션이 직접 기다리면 거부된다. 7단계는 `deploy-check.mjs` 하나로 「실행이 끝날 때까지 기다렸다가 주소가 200 인지」를 받는다.
 - **멈추면 실패로 끝난다.** 묻고 멈춤·섞임·검사 실패처럼 넘김 파일이 없거나 Quality 가 실패하면 job 이 빨갛게 끝나고, 보고 전문이 job 요약에 남는다. 이슈에는 아무것도 달지 않는다. 이어 받은 차례나 `결과 <n>`이 끝났는데 새 결과 댓글이 없어도(`decision.mjs`의 `resultCommentId`가 그대로) 실패다 — `claude -p` 는 멈춰도 성공으로 끝나므로 이것을 보지 않으면 dev 에는 합쳐졌는데 결과가 없는 채 초록으로 끝난다.
 - **결과 카드는 우리가 올린다.** `post-result.mjs` 가 이슈에 댓글을 단 뒤 `slack-card.mjs` 로 머리 네 줄을 결과 채널에 한 장으로 올린다. GitHub for Slack 은 댓글을 이슈 카드의 스레드에 달아 채널 본문에 보이지 않았다. 토큰(`SLACK_BOT_TOKEN`)이나 채널(`SLACK_RESULT_CHANNEL`)이 없으면 건너뛴다.
 - **카드의 버튼이 결정의 입구다.** 승인은 바로 올라가고, 개선은 스레드에서 까닭을 받고, 반려는 한 번 더 물은 뒤(되돌리는 일이라) 까닭을 받는다. 까닭이 올라가야 처리가 시작된다.
 - **Slack 카드의 반응도 결정이 된다.** `slack-bridge.mjs` 가 결과 채널의 👍 👎 😕 를 듣고 그 카드가 가리키는 이슈에 「승인」·「반려」·「개선」 댓글을 단다(누른 사람과 Slack 링크를 달고). Workflow Builder 의 GitHub 커넥터에는 「이슈 만들기」만 있고 댓글 단계가 없어 코드로 둔 것이다. 결정의 원본은 그래도 GitHub 댓글이다 — 다리가 꺼져 있어도 GitHub 쪽 반응·댓글은 1분 타이머가 읽는다. 토큰은 `~/.ooee-harness/slack.env` 에 사람이 넣고 저장소에 두지 않는다.
-- **결정처럼 보이지만 읽지 않은 댓글은 한 번 알린다.** 결정이 없는 요청에 「승인합니다」·「개선 요청: …」처럼 꼴이 맞지 않는 댓글만 있으면 사람은 결정했다고 여기는데 할 일이 없다. 10분 확인이 그 댓글을 job 요약에 적고 실패로 끝낸다. 같은 댓글로는 다시 알리지 않는다(`<이슈>:<회차>:읽지 않은 댓글:<가장 늦은 시각>`).
-- **10분 확인은 결정만 본다.** 결과 댓글이 없는 요청(#9 처럼 이 흐름 전에 처리한 것)을 저절로 올리지 않는다. 올리려면 `결과 <n>`을 손으로 돌린다.
+- **결정처럼 보이지만 읽지 않은 댓글은 한 번 알린다.** 결정이 없는 요청에 「승인합니다」·「개선 요청: …」처럼 꼴이 맞지 않는 댓글만 있으면 사람은 결정했다고 여기는데 할 일이 없다. 결정 확인이 그 댓글을 job 요약에 적고 실패로 끝낸다. 같은 댓글로는 다시 알리지 않는다(`<이슈>:<회차>:읽지 않은 댓글:<가장 늦은 시각>`).
+- **결정 확인은 결정만 본다.** 결과 댓글이 없는 요청(#9 처럼 이 흐름 전에 처리한 것)을 저절로 올리지 않는다. 올리려면 `결과 <n>`을 손으로 돌린다.
 
 ## 알아 둘 것
 
 - 판독은 계정으로 거르지 않는다. 지금은 처리 계정과 요청자 계정이 같아서, 거르면 어떤 결정도 읽히지 않는다. 그래서 판독은 「에이전트가 반응이나 결정 댓글을 달지 않는다」에 기대고, 그것을 `.claude/settings.json`이 막는다. `gh api`는 통째로 `deny`(필드를 붙인 암묵 POST 까지), `gh issue comment`는 `ask`, 네 스크립트를 고치는 것도 `ask`다. 에이전트가 쓸 수 있는 글은 `post-result.mjs`가 양식으로 만든 결과 댓글뿐이고, 그 첫 줄은 「화면 요청 #<n> 결과」라 결정으로 읽히지 않는다. 규칙은 명령 문자열을 대조할 뿐이라 GitHub 의 보호가 아니다(AGENTS.md 「Claude Code 명령과 권한」).
-- 세 스크립트는 gh 를 node 의 `execFileSync`로 부른다. Bash 권한 규칙은 `node scripts/harness/…` 명령만 보고 그 안의 gh 호출은 보지 않으므로, `gh api`를 Bash 에서 통째로 막아도 `decision.mjs`는 그대로 돈다. `decision.mjs`가 `--method GET`을 적어 두는 것은 필드를 붙여도 쓰기 요청이 되지 않게 하려는 것이고, 테스트가 가짜 gh 로 그것을 본다.
+- 이 스크립트들은 gh 를 node 의 `execFileSync`로 부른다. Bash 권한 규칙은 `node scripts/harness/…` 명령만 보고 그 안의 gh 호출은 보지 않으므로, `gh api`를 Bash 에서 통째로 막아도 `decision.mjs`는 그대로 돈다. `decision.mjs`가 `--method GET`을 적어 두는 것은 필드를 붙여도 쓰기 요청이 되지 않게 하려는 것이고, 테스트가 가짜 gh 로 그것을 본다.
+
+## launchd — 이 Mac 에 상시로 두는 둘
+
+plist 둘은 기기별 경로를 `__HOME__` 로 두었다(저장소에 절대경로를 적지 않는다). 설치할 때 `sed` 로 채운다. launchd 가 띄운 프로그램은 `~/Desktop` 을 읽지 못하므로(macOS TCC) 보호 밖의 사본 `~/.ooee-harness/harness` 에서 돈다.
+
+```sh
+git clone --depth 1 -b dev https://github.com/bluekey-kr/Design-System-Harness.git ~/.ooee-harness/harness
+for name in decisions slack; do
+  sed "s#__HOME__#$HOME#g" ~/.ooee-harness/harness/scripts/harness/com.ooee.harness.$name.plist > ~/Library/LaunchAgents/com.ooee.harness.$name.plist
+  launchctl load ~/Library/LaunchAgents/com.ooee.harness.$name.plist
+done
+launchctl list | grep ooee.harness          # 둘 다 보여야 한다
+tail -f ~/.ooee-harness/watch.log ~/.ooee-harness/slack.log
+```
+
+- `com.ooee.harness.decisions` — 60초마다 `watch-tick.sh`. 사본을 `origin/dev` 로 맞춘 뒤 결정을 읽는다.
+- `com.ooee.harness.slack` — 다리(`slack-bridge.mjs`)를 상시로. 끊기면 launchd 가 되살린다. 토큰은 `~/.ooee-harness/slack.env`(「slack-bridge.mjs」 머리말 「설치」).
+- 코드가 바뀌면 사본이 다음 감시 때 스스로 맞춰지지만, 다리는 `launchctl kickstart -k gui/$(id -u)/com.ooee.harness.slack` 로 다시 띄워야 새 코드를 탄다.

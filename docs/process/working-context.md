@@ -8,7 +8,7 @@
 
 ## Git 작업 기준
 
-- Remote: `https://github.com/ooee-shin/ooee-ui.git` (private)
+- Remote: `https://github.com/bluekey-kr/Design-System-Harness.git` (private). 디자인 시스템 자체의 원본은 `ooee-shin/ooee-ui`(`2026-09-21` 이관, [ai-environment.md](ai-environment.md))
 - 공식 기준 branch: `main` (초기 작업 branch에서 전환)
 - 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
 - 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
@@ -397,7 +397,7 @@ pnpm visual --path /components/badge \
 
 개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
 
-**화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결정을 Slack 카드가 아니라 GitHub 의 결과 댓글에 단다는 것 하나다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
+**화면 요청은 `/process-issue`가 처리한다**(`2026-09-22`). Slack 폼으로 들어온 이슈 하나를 화면·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올린 뒤 멈추며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 `/process-issue 결정 <n>`이 읽는다. 기획자에게 닿는 것은 결과 채널의 카드 한 장과 그 아래 버튼(👍 승인 · 👎 반려 · 😕 개선)이다 — 반려·개선의 까닭은 카드 스레드에 적으면 다리가 GitHub 로 옮긴다(`2026-09-23`)다. 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. `/process-issue 결과 9`가 그 자리다. 개발자가 확인할 것이 둘 남았다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
 
 **Figma 는 쓰지 않는다**(`2026-09-22`). 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해져 요청 처리에서 뺐다. 결과는 sandbox 에서만 본다. `/design-page`·`scripts/figma/`·Figma MCP·sandbox 의 Figma 카탈로그를 지웠고, 까닭과 남긴 것은 [ai-environment.md](ai-environment.md) 「2026-09-22 Figma 를 뺐다」가 갖는다. **다음은 sandbox 가 화면마다 어떤 컴포넌트를 썼는지 보여 주는 UI 다** — 디자인 시스템 → 요청 → sandbox.
 

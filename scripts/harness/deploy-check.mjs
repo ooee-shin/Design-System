@@ -27,6 +27,18 @@ export function pickRun(runs, sha) {
   return mine.length ? mine[0] : null;
 }
 
+/**
+ * 내 실행이 취소됐을 때 대신 볼 실행. `deploy.yml` 은 `cancel-in-progress` 라, 확인하는 사이 다른 dev push 가
+ * 오면 내 sha 의 실행이 취소되고 그 push 의 실행이 내 화면까지 함께 올린다. 그 뒤의 실행 가운데 취소되지
+ * 않은 가장 늦은 것을 고른다. 목록은 늦은 것부터다.
+ */
+export function pickReplacement(runs, mine) {
+  const list = runs ?? [];
+  const at = list.findIndex((run) => run.id === mine.id);
+  const later = at < 0 ? list : list.slice(0, at);
+  return later.find((run) => run.conclusion !== "cancelled") ?? null;
+}
+
 /** 화면마다의 응답 코드를 읽고 한 줄 판정을 만든다. */
 export function summarize({ run, screens }) {
   const notOk = screens.filter((screen) => screen.status !== 200);
@@ -72,6 +84,12 @@ async function waitDeploy(sha) {
     run = { ...run, ...now };
   }
   if (run.status !== "completed") throw new Error(`Deploy 실행 ${run.id} 이 끝나지 않는다`);
+  if (run.conclusion === "cancelled") {
+    // 다른 dev push 가 내 실행을 밀어냈다. 그 push 의 실행이 내 화면도 올리므로 그것을 기다린다.
+    const runs = gh(["run", "list", "--workflow", "deploy.yml", "--branch", "dev", "--limit", "20", "--json", "databaseId,headSha,status,conclusion"]).map((item) => ({ ...item, id: item.databaseId }));
+    const next = pickReplacement(runs, run);
+    if (next) return waitDeploy(next.headSha);
+  }
   return { id: run.id, status: run.status, conclusion: run.conclusion };
 }
 

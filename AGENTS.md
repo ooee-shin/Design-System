@@ -14,7 +14,7 @@
 | `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/process-issue` Skill. 화면을 만들고 검수하는 두 명령은 `plugins/ooee-harness/`로 옮겼다. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거한다 |
 | `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 기획자가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
 | `plugins/ooee-harness/` | `/ooee-harness:generate-code`·`/ooee-harness:review-design` 을 싣는 Claude Code Plugin. **전달 대상이다.** 설치·설정·권한 조각은 그 안의 `README.md`가 갖는다 |
-| `scripts/harness/` | `/process-issue`가 화면 요청 이슈를 읽고, 결과 댓글을 만들고, 결정을 읽는 도구. 결과 댓글 입력 같은 중간 산출물은 `.harness-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/harness/README.md` |
+| `scripts/harness/` | 화면 요청을 돌리는 도구: 러너(`runner.mjs`, 이 Mac 의 self-hosted runner 가 부른다), 이슈 읽기, 배포 확인, 결과 댓글과 Slack 카드, 결정 읽기, Slack 다리와 1분 감시(launchd). 중간 산출물은 `.harness-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/harness/README.md` |
 
 `docs/process/`와 이 파일은 1차 컴포넌트를 완성하는 동안에만 필요한 작업 규칙을 담는다. `ㄱ`, `업무시작`, `퇴근백업` 같은 신호와 제작 절차는 시스템이 무엇인지 설명하지 않으므로 블루키 자산화 대상에서 제외한다. 반대로 시스템 정의를 이쪽에 두면 전달본에서 함께 사라지므로, 어느 쪽에 속하는지 먼저 판단한 뒤 기록한다.
 

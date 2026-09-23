@@ -291,7 +291,7 @@ function latestResultId(issue) {
 
 /**
  * 결과 댓글이 새로 올라갔는지 본다. 세션이 7·8단계에서 멈춰도 `claude -p` 는 성공으로 끝나므로, 보지 않으면
- * dev 에는 합쳐졌는데 결과가 없는 채 job 이 초록으로 끝나고 10분 확인도 「결과 없음」을 건너뛴다.
+ * dev 에는 합쳐졌는데 결과가 없는 채 job 이 초록으로 끝나고 결정 확인도 「결과 없음」을 건너뛴다.
  */
 function postedResult(issue, before) {
   const after = latestResultId(issue);
@@ -347,7 +347,7 @@ async function decideAll(only) {
     writeFileSync(file, `${JSON.stringify(done, null, 2)}\n`);
   }
   for (const read of todo) {
-    // 처리하기 전에 적는다. 멈추거나 실패한 결정을 10분마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 사람이 새 신호를 남긴다.
+    // 처리하기 전에 적는다. 멈추거나 실패한 결정을 감시가 돌 때마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 사람이 새 신호를 남긴다.
     done[decisionKey(read)] = { startedAt: new Date().toISOString() };
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, `${JSON.stringify(done, null, 2)}\n`);

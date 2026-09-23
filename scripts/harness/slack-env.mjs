@@ -18,8 +18,9 @@ export function loadEnv(file = HOME_ENV, env = process.env) {
   }
   const out = { ...env };
   for (const line of text.split("\n")) {
-    const match = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)\s*$/);
-    if (match && !out[match[1]]) out[match[1]] = match[2].replace(/^["']|["']$/g, "");
+    const match = line.match(/^\s*([A-Z_]+)\s*=\s*(.*)$/);
+    // 값 끝의 공백을 벗긴다. `xoxb-… ` 처럼 한 칸 붙어 오면 Slack 이 invalid_auth 를 돌려준다.
+    if (match && !out[match[1]]) out[match[1]] = match[2].trim().replace(/^["']|["']$/g, "");
   }
   return out;
 }

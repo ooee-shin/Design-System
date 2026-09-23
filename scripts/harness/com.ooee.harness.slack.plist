@@ -7,18 +7,18 @@
   <key>Label</key><string>com.ooee.harness.slack</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/yujinsik/.local/node/bin/node</string>
-    <string>/Users/yujinsik/.ooee-harness/harness/scripts/harness/slack-bridge.mjs</string>
+    <string>__HOME__/.local/node/bin/node</string>
+    <string>__HOME__/.ooee-harness/harness/scripts/harness/slack-bridge.mjs</string>
   </array>
-  <key>WorkingDirectory</key><string>/Users/yujinsik/.ooee-harness/harness</string>
+  <key>WorkingDirectory</key><string>__HOME__/.ooee-harness/harness</string>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>PATH</key><string>/Users/yujinsik/.local/node/bin:/Users/yujinsik/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PATH</key><string>__HOME__/.local/node/bin:__HOME__/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
   </dict>
   <key>KeepAlive</key><true/>
   <key>ThrottleInterval</key><integer>30</integer>
   <key>RunAtLoad</key><true/>
-  <key>StandardOutPath</key><string>/Users/yujinsik/.ooee-harness/slack.log</string>
-  <key>StandardErrorPath</key><string>/Users/yujinsik/.ooee-harness/slack.log</string>
+  <key>StandardOutPath</key><string>__HOME__/.ooee-harness/slack.log</string>
+  <key>StandardErrorPath</key><string>__HOME__/.ooee-harness/slack.log</string>
 </dict>
 </plist>

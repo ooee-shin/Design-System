@@ -10,9 +10,11 @@ name: Harness
 on:
   issues:
     types: [opened]
-  # 「승인」·「반려: …」·「개선: …」 댓글은 바로 읽는다. 👍 👎 😕 반응은 이벤트가 없어 아래 10분 확인이 읽는다.
+  # 「승인」·「반려: …」·「개선: …」 댓글은 바로 읽는다. 👍 👎 😕 반응은 이벤트가 없어 이 Mac 의 1분 감시
+  # (scripts/harness/watch-decisions.mjs, launchd)가 읽고 workflow_dispatch 로 깨운다.
   issue_comment:
     types: [created]
+  # 예비다. GitHub 의 예약은 몇 시간씩 밀리므로 결정을 읽는 길로 삼지 않는다 — 이 Mac 이 꺼져 있을 때의 뒷받침이다.
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:

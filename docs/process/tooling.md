@@ -5,7 +5,7 @@
 초기 환경은 shadcn CLI v4 관련 워크플로우를 참고해 구성한다.
 
 - 프로젝트 설정을 읽는 shadcn Skill
-- 최신 문서와 registry를 조회하는 MCP
+- 최신 문서와 registry를 조회하는 길 — Studio 와 `llms.txt`(MCP 는 두지 않기로 했다, `2026-09-18`·`2026-09-22`)
 - `components.json`
 - `shadcn info`
 - 변경 전 `--view`, `--dry-run`, `--diff`

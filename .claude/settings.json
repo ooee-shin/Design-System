@@ -62,7 +62,13 @@
       "Edit(/scripts/harness/issue.mjs)",
       "Edit(/scripts/harness/result-comment.mjs)",
       "Edit(/scripts/harness/decision.mjs)",
-      "Edit(/scripts/harness/post-result.mjs)"
+      "Edit(/scripts/harness/post-result.mjs)",
+      "Edit(/scripts/harness/runner.mjs)",
+      "Edit(/scripts/harness/slack-bridge.mjs)",
+      "Edit(/scripts/harness/slack-card.mjs)",
+      "Edit(/scripts/harness/deploy-check.mjs)",
+      "Edit(/scripts/harness/watch-decisions.mjs)",
+      "Edit(/.github/workflows/harness.yml)"
     ],
     "deny": [
       "Bash(git push origin main)",

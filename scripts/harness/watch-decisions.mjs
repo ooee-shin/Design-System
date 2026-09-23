@@ -16,12 +16,7 @@
 // launchd 가 띄운 프로그램은 `~/Desktop` 아래를 읽지 못한다(macOS TCC, EPERM). 그래서 보호 밖에 사본을
 // 하나 두고 그것이 돈다. 사본은 돌 때마다 `origin/dev` 로 맞춰진다(watch-tick.sh).
 //
-//   git clone --depth 1 -b dev https://github.com/bluekey-kr/Design-System-Harness.git ~/.ooee-harness/harness
-//   cp ~/.ooee-harness/harness/scripts/harness/com.ooee.harness.decisions.plist ~/Library/LaunchAgents/
-//   launchctl load ~/Library/LaunchAgents/com.ooee.harness.decisions.plist
-//   launchctl list | grep ooee            # 돌고 있는지
-//   tail -f ~/.ooee-harness/watch.log     # 무엇을 보았는지
-//
+// 설치 절차는 scripts/harness/README.md 「launchd」에 있다(plist 의 `__HOME__` 을 sed 로 채운다).
 // 멈추려면 `launchctl unload ~/Library/LaunchAgents/com.ooee.harness.decisions.plist` 다.
 
 import { execFileSync } from "node:child_process";

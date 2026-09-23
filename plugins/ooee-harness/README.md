@@ -71,6 +71,8 @@ ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 Claude
 }
 ```
 
+이 조각은 Plugin 의 두 명령(generate-code · review-design)에 필요한 것만이다. 이 저장소의 루트 `.claude/settings.json` 은 화면 요청 하네스(러너 · 결정 판독 · Slack 다리) 때문에 더 막는다 — `gh api`·`gh issue edit/close/reopen`·`gh label` 은 `deny`, `gh pr create/merge`·`gh issue comment` 와 하네스 스크립트 편집은 `ask`. 하네스를 함께 옮길 때는 그쪽을 본다.
+
 ## 안에 무엇이 있나
 
 | 자리 | 내용 |

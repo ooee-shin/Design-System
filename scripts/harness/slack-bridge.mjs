@@ -33,8 +33,8 @@
 //    SLACK_RESULT_CHANNEL=C0C3LKRKJCU
 //    ```
 //
-// 8. `cp scripts/harness/com.ooee.harness.slack.plist ~/Library/LaunchAgents/` 뒤
-//    `launchctl load ~/Library/LaunchAgents/com.ooee.harness.slack.plist`. 로그는 `~/.ooee-harness/slack.log` 다.
+// 8. launchd 에 올린다 — scripts/harness/README.md 「launchd」(plist 의 `__HOME__` 을 sed 로 채운다). 로그는
+//    `~/.ooee-harness/slack.log` 다.
 //
 // 토큰은 사람이 넣는다. 이 저장소에도 이 스크립트에도 두지 않는다.
 import { execFileSync } from "node:child_process";

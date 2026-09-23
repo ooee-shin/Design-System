@@ -7,14 +7,17 @@
 ## 흐름
 
 ```text
-Slack 요청 폼 → GitHub issue (요청서 원본)
-→ 확정
+Slack 폼(화면 요청 · 화면 수정 요청) → GitHub issue (요청서 원본)
+→ 이 Mac 의 러너가 바로 집는다 (harness.yml → runner.mjs → /process-issue)
 → /ooee-harness:generate-code 로 화면 생성 · 검사
 → sandbox 에서 띄워 보고 검사 (빌드한 화면을 캡처해 눈으로 대조)
-→ pull request → dev 머지
-→ Cloudflare Pages 에 자동 배포 → 화면 주소를 issue 댓글로 보고 (Slack 결과 채널이 구독)
-→ 기획자가 배포된 화면을 보고 승인 · 개선 · 반려 (개선·반려는 다음 회차가 다시 dev 로)
-→ 승인되면 pull request → main 머지
+→ pull request → dev 머지 (러너가 합친다) → Cloudflare Pages 에 자동 배포 (deploy-check 가 기다린다)
+→ 결과 댓글을 issue 에 달고, 봇이 결과 채널에 카드 한 장을 올린다 (slack-card)
+→ 카드의 버튼으로 결정: 👍 승인 · 👎 반려(한 번 더 묻는다) · 😕 개선 — 까닭은 카드 스레드에 (slack-bridge 가 GitHub 댓글로 옮긴다)
+→ 결정이 달리면 러너가 이어 간다 (댓글은 바로, 반응은 1분 감시가 깨운다)
+    승인 → dev → main 머지 → issue 닫힘
+    개선 → 다음 회차 → 새 결과 카드
+    반려 → dev 에서 되돌림 → issue 닫힘
 ```
 
 요청 폼의 칸, issue 본문 양식과 승인 규칙은 [`docs/process/ai-environment.md`](docs/process/ai-environment.md)의 「요청 폼」과 「처리와 승인」이 갖는다.
@@ -36,7 +39,8 @@ Slack 요청 폼 → GitHub issue (요청서 원본)
 plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과 화면 규칙 검사(lib/)
 .claude-plugin/        Plugin marketplace 정의(ooee)
 .claude/               /process-issue Skill과 공용 권한(settings.json)
-.github/workflows      Quality(pnpm check)와 Deploy(Cloudflare Pages)
+.github/workflows      Quality(pnpm check) · Deploy(Cloudflare Pages) · Harness(이 Mac 의 러너)
+scripts/harness        요청 처리 도구: runner · issue · deploy-check · result-comment · post-result · slack-card · slack-bridge · decision · watch-decisions (README 참조)
 scripts/visual         브라우저에서 화면을 재는 도구
 scripts/docs           llms.txt 링크 시험, 배포본에 시스템 문서 원본을 싣는 빌드 단계
 apps/sandbox           요청으로 만든 화면과 블루키 리뉴얼 (3001 포트). 화면마다 「컴포넌트 보기」

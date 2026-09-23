@@ -5,9 +5,10 @@
 // 입력 모양은 `renderResultComment` 의 설명과 fixtures/result-input.example.json 에 있다. 이슈에 다는 것은
 // post-result.mjs 다. 처리하는 세션은 `gh issue comment` 를 직접 부르지 않는다(공용 권한의 ask).
 //
-// 결과 채널(#디자인시스템-화면-요청-결과물)은 GitHub for Slack 앱으로 이 저장소의 댓글을 받아 카드로
-// 띄운다. 카드는 댓글 앞부분만 보여 주므로, 기획자가 Slack 만 보고도 「어느 요청의 결과이고 어디서
-// 보는가」를 알 수 있게 첫 네 줄에 요청 · 샌드박스 · 작업 요약을 몰아 둔다. 결과는 샌드박스에서 본다 —
+// 결과 채널(#디자인시스템-화면-요청-결과물)에는 slack-card.mjs 가 이 댓글의 **머리 네 줄**을 카드로 올린다
+// (2026-09-23 부터. 그 전에는 GitHub for Slack 앱이 댓글을 스레드에 달아 채널에 보이지 않았다). 그래서
+// 기획자가 Slack 만 보고도 「어느 요청의 결과이고 어디서 보는가」를 알 수 있게 첫 네 줄에 요청 · 샌드박스 ·
+// 작업 요약을 몰아 둔다. 결과는 샌드박스에서 본다 —
 // 2026-09-22 에 요청 처리에서 Figma 를 뺐다.
 import { readFileSync } from "node:fs";
 import path from "node:path";

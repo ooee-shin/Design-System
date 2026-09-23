@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseArgs, pickRun, screenUrl, summarize } from "./deploy-check.mjs";
+import { parseArgs, pickReplacement, pickRun, screenUrl, summarize } from "./deploy-check.mjs";
 
 test("화면 주소는 배포된 sandbox 의 key 자리다", () => {
   assert.equal(screenUrl("shop-cart"), "https://ooee-sandbox.pages.dev/shop-cart");
@@ -43,4 +43,18 @@ test("인수는 key 하나 이상이고 sha 는 선택이다", () => {
   assert.deepEqual(parseArgs(["--key", "a"]), { keys: ["a"], sha: null });
   assert.match(parseArgs([]).error, /--key/);
   assert.match(parseArgs(["--what", "x"]).error, /모르는 인수/);
+});
+
+test("내 실행이 취소되면 그 뒤의 취소되지 않은 실행을 대신 본다", () => {
+  // deploy.yml 은 cancel-in-progress 다. 확인하는 사이 다른 dev push 가 오면 내 실행이 취소되고
+  // 그 push 의 실행이 내 화면도 올린다. 목록은 늦은 것부터다.
+  const mine = { id: 2, headSha: "abc", conclusion: "cancelled" };
+  const runs = [
+    { id: 4, headSha: "ghi", conclusion: "cancelled" },
+    { id: 3, headSha: "def", conclusion: "success" },
+    mine,
+    { id: 1, headSha: "old", conclusion: "success" },
+  ];
+  assert.equal(pickReplacement(runs, mine).id, 3, "취소된 것을 골랐거나 내 앞의 옛 실행을 골랐다");
+  assert.equal(pickReplacement([mine], mine), null, "뒤에 실행이 없는데 무엇을 골랐다");
 });
