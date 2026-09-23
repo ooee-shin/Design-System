@@ -7,11 +7,10 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { loadSandboxProjectIds, parseIssue, parseSandboxProjectIds, splitChoices, splitProjects } from "./issue.mjs";
+import { loadSandboxProjectIds, loadSandboxProjects, parseIssue, parseSandboxProjectIds, projectId, splitChoices, splitProjects } from "./issue.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (n) => JSON.parse(readFileSync(path.join(here, "fixtures", `issue-${n}.json`), "utf8"));
-const ALLOWED = ["harness-test"];
 /** 옛 이슈 픽스처(#1~#9)가 쓰던 프로젝트다. 그 본문을 읽는 시험은 그때의 목록으로 본다. */
 const LEGACY = [
   { id: "sto", name: "점주 앱" },
@@ -29,7 +28,14 @@ const nineWith = (projectLine) => {
 };
 
 test("허용 프로젝트는 screens.ts 의 SANDBOX_PROJECTS 에서 읽는다", () => {
-  assert.deepEqual(loadSandboxProjectIds(), ALLOWED, "screens.ts 의 프로젝트가 바뀌었다. Slack 폼의 프로젝트 목록도 함께 고쳐야 한다");
+  // 목록을 고정하지 않는다 — 폼의 「새 프로젝트」 칸으로 생긴 프로젝트를 러너가 screens.ts 에 더한다(#60).
+  // 폼의 프로젝트 선택지는 자주 쓰는 것만 두는 편의라 여기서 맞추지 않는다.
+  const ids = loadSandboxProjectIds();
+  assert.ok(ids.includes("harness-test"), "기본 프로젝트 「하네스 시험」이 없다");
+  for (const project of loadSandboxProjects()) {
+    assert.equal(project.id, projectId(project.id), `프로젝트 id 「${project.id}」 가 projectId 꼴이 아니다`);
+    assert.ok(project.name, `프로젝트 「${project.id}」 에 이름이 없다`);
+  }
 });
 
 test("SANDBOX_PROJECTS 를 찾지 못하면 조용히 넘어가지 않고 던진다", () => {
