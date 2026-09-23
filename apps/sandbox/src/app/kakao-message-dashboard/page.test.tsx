@@ -41,7 +41,7 @@ test("전체 필터가 기본으로 눌린 상태다", () => {
 test("메시지 이력 표의 열 제목이 보인다", () => {
   render(<KakaoMessageDashboardPage />);
   const table = within(screen.getByRole("table"));
-  for (const label of ["구분", "수신자", "메시지 내용", "발송 시각", "상태"]) {
+  for (const label of ["수신자", "메시지 내용", "발송 시각", "상태"]) {
     assert.ok(table.getByText(label), `${label} 열 제목을 찾지 못했다`);
   }
 });
@@ -49,37 +49,8 @@ test("메시지 이력 표의 열 제목이 보인다", () => {
 test("예시 메시지 이력이 렌더된다", () => {
   render(<KakaoMessageDashboardPage />);
   const table = within(screen.getByRole("table"));
-  assert.ok(table.getAllByText("김서연").length > 0, "예시 수신자를 찾지 못했다");
+  assert.ok(table.getByText("김서연"), "예시 수신자를 찾지 못했다");
   assert.ok(table.getByText("주문하신 상품이 발송되었습니다."), "예시 메시지 내용을 찾지 못했다");
-});
-
-test("방향 필터 칩 셋을 찾을 수 있고 모든 방향이 기본으로 눌려 있다", () => {
-  render(<KakaoMessageDashboardPage />);
-  for (const label of ["모든 방향", "보낸 메시지", "받은 메시지"]) {
-    assert.ok(screen.getByRole("button", { name: label }), `${label} 칩을 찾지 못했다`);
-  }
-  assert.equal(screen.getByRole("button", { name: "모든 방향" }).getAttribute("aria-pressed"), "true", "모든 방향 칩이 기본으로 눌려 있지 않다");
-});
-
-test("받은 메시지 이력이 예시로 렌더된다", () => {
-  render(<KakaoMessageDashboardPage />);
-  const table = within(screen.getByRole("table"));
-  assert.ok(table.getByText("배송 언제 도착하나요?"), "받은 메시지를 찾지 못했다");
-});
-
-test("받은 메시지 필터를 누르면 보낸 메시지가 사라진다", () => {
-  render(<KakaoMessageDashboardPage />);
-  fireEvent.click(screen.getByRole("button", { name: "받은 메시지" }));
-  const table = within(screen.getByRole("table"));
-  assert.ok(table.getByText("배송 언제 도착하나요?"), "받은 메시지가 남아 있지 않다");
-  assert.equal(table.queryByText("주문하신 상품이 발송되었습니다."), null, "보낸 메시지가 걸러지지 않았다");
-});
-
-test("보낸 메시지 필터를 누르면 받은 메시지가 사라진다", () => {
-  render(<KakaoMessageDashboardPage />);
-  fireEvent.click(screen.getByRole("button", { name: "보낸 메시지" }));
-  const table = within(screen.getByRole("table"));
-  assert.equal(table.queryByText("배송 언제 도착하나요?"), null, "받은 메시지가 걸러지지 않았다");
 });
 
 test("발송 상태 필터를 누르면 다른 상태의 메시지가 사라진다", () => {

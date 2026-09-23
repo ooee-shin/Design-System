@@ -252,7 +252,7 @@ export const sandboxScreens: SandboxScreen[] = [
     viewports: ["web", "mobile"],
     name: "카카오톡 api 연동 메인 대시보드",
     href: "/kakao-message-dashboard",
-    prompt: "카카오톡 api 연동해서 메시지를 대시보드에서 이력 관리 하는 페이지. 수정: 메시지 주고 받은 이력도 남겨야함(보낸·받은 방향 구분).",
-    createdAt: "2026-09-24",
+    prompt: "카카오톡 api 연동해서 메시지를 대시보드에서 이력 관리 하는 페이지.",
+    createdAt: "2026-09-23",
   },
 ];
