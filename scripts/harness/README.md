@@ -84,7 +84,7 @@ node scripts/harness/runner.mjs 결과 9       # 결과 댓글만
 ## 알아 둘 것
 
 - 판독은 계정으로 거르지 않는다. 지금은 처리 계정과 요청자 계정이 같아서, 거르면 어떤 결정도 읽히지 않는다. 그래서 판독은 「에이전트가 반응이나 결정 댓글을 달지 않는다」에 기대고, 그것을 `.claude/settings.json`이 막는다. `gh api`는 통째로 `deny`(필드를 붙인 암묵 POST 까지), `gh issue comment`는 `ask`, 네 스크립트를 고치는 것도 `ask`다. 에이전트가 쓸 수 있는 글은 `post-result.mjs`가 양식으로 만든 결과 댓글뿐이고, 그 첫 줄은 「화면 요청 #<n> 결과」라 결정으로 읽히지 않는다. 규칙은 명령 문자열을 대조할 뿐이라 GitHub 의 보호가 아니다(AGENTS.md 「Claude Code 명령과 권한」).
-- **`2026-09-23`부터 `node -e` 가 `allow` 다(저장소 주인 결정).** 그래서 위 `deny`·`ask` 는 실수를 막는 표시이지 에이전트를 막는 울타리가 아니다. `node -e` 는 임의 코드 실행이라 `child_process` 로 `gh pr merge`·`gh api` 쓰기·`git push origin main` 을 그대로 돌 수 있다. 「스스로 승인하지 않는다」·「스스로 머지하지 않는다」는 이제 규칙이 아니라 Skill 이 지키는 약속이다. 울타리가 필요하면 GitHub 쪽(branch 보호·토큰 범위)에 둔다.
+- **`node -e` 는 열지 않는다.** `2026-09-23` 에 잠깐 `allow` 에 들었다가 같은 날 저장소 주인이 되돌렸다. 임의 코드 실행이라 `child_process` 로 `gh pr merge`·`gh api` 쓰기·`git push origin main` 을 그대로 돌 수 있고, 그러면 위 `deny`·`ask` 쉰네 줄이 한꺼번에 뜻을 잃는다. 즉석으로 무엇을 확인해야 하면 `Read`·`Grep` 이나 저장소에 있는 스크립트로 한다. 규칙이 명령 문자열을 대조하는 방식인 한, 임의 실행을 여는 순간 그것은 울타리가 아니게 된다.
 - 이 스크립트들은 gh 를 node 의 `execFileSync`로 부른다. Bash 권한 규칙은 `node scripts/harness/…` 명령만 보고 그 안의 gh 호출은 보지 않으므로, `gh api`를 Bash 에서 통째로 막아도 `decision.mjs`는 그대로 돈다. `decision.mjs`가 `--method GET`을 적어 두는 것은 필드를 붙여도 쓰기 요청이 되지 않게 하려는 것이고, 테스트가 가짜 gh 로 그것을 본다.
 
 ## launchd — 이 Mac 에 상시로 두는 둘
