@@ -19,10 +19,14 @@
  * 동작하는지 비고 샘플 데이터는 고정값이며, 실 서비스 적용 시 동일한 질의 흐름을 실제 DB 조회로
  * 교체하는 것을 전제로 한다.
  *
+ * 개선: 상세보기 눌렀는데 아무런 효과가 없음 확인해줘
+ *
  * 비워 둔 자리: 뒤로가기 버튼을 눌렀을 때의 이동 경로, 관련 화면 이동 버튼이 실제로 여는 상세
- * 페이지 주소, 샘플 매장·매출·권리금·계약일·리뷰 값 자체(요청은 "미리 준비한 샘플 데이터"라고만
- * 말함), 질문을 해석하는 실제 자연어 처리 로직(여기서는 매장명·키워드 매칭으로 대신함), 첨부한
- * 이미지·파일을 실제로 서버에 올리는 동작.
+ * 페이지 주소(이 저장소에 매장 상세 화면이 아직 없어 여전히 만들지 않음 — 대신 클릭하면 대화에
+ * "아직 준비되지 않았다"는 답을 추가해 클릭이 반응했다는 것을 보여 줌), 샘플 매장·매출·권리금·
+ * 계약일·리뷰 값 자체(요청은 "미리 준비한 샘플 데이터"라고만 말함), 질문을 해석하는 실제 자연어
+ * 처리 로직(여기서는 매장명·키워드 매칭으로 대신함), 첨부한 이미지·파일을 실제로 서버에 올리는
+ * 동작.
  */
 
 import { useRef, useState } from "react";
@@ -110,7 +114,7 @@ function findStore(text: string): Store | undefined {
   return STORES.find((store) => text.includes(store.name));
 }
 
-function answerQuery(rawText: string): React.ReactNode {
+function answerQuery(rawText: string, onOpenDetail: (store: Store) => void): React.ReactNode {
   const text = rawText.trim();
 
   if (/상세\s*(정보|페이지)/.test(text)) {
@@ -129,6 +133,10 @@ function answerQuery(rawText: string): React.ReactNode {
           variant="tonal"
           controlSize="small"
           trailingIcon={<RiArrowRightLine aria-hidden="true" />}
+          onClick={(event) => {
+            event.preventDefault();
+            onOpenDetail(store);
+          }}
         >
           {store.name} 상세보기
         </Button>
@@ -279,10 +287,15 @@ type ChatMessage = {
   content: React.ReactNode;
 };
 
-function buildSeedMessages(): ChatMessage[] {
+function buildSeedMessages(onOpenDetail: (store: Store) => void): ChatMessage[] {
   return SEED_QUESTIONS.flatMap((question, index) => [
     { id: `seed-${index}-q`, direction: "outgoing" as const, time: SEED_TIMES[index], content: <p>{question}</p> },
-    { id: `seed-${index}-a`, direction: "incoming" as const, time: SEED_TIMES[index], content: answerQuery(question) },
+    {
+      id: `seed-${index}-a`,
+      direction: "incoming" as const,
+      time: SEED_TIMES[index],
+      content: answerQuery(question, onOpenDetail),
+    },
   ]);
 }
 
@@ -293,13 +306,27 @@ type Attachment = {
 };
 
 export default function AiWorkAssistantPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => buildSeedMessages());
+  const detailNoticeRef = useRef<(store: Store) => void>(() => {});
+  const openDetail = useRef((store: Store) => detailNoticeRef.current(store)).current;
+  const [messages, setMessages] = useState<ChatMessage[]>(() => buildSeedMessages(openDetail));
   const [draft, setDraft] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const nextId = useRef(SEED_QUESTIONS.length);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  detailNoticeRef.current = (store: Store) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `notice-${nextId.current++}`,
+        direction: "incoming",
+        time: "방금",
+        content: <p>{store.name} 상세 페이지는 아직 만들지 않았어요. 화면이 준비되면 이 버튼에서 연결할게요.</p>,
+      },
+    ]);
+  };
 
   function addAttachments(files: FileList | null, kind: Attachment["kind"]) {
     if (!files || files.length === 0) return;
@@ -362,7 +389,7 @@ export default function AiWorkAssistantPage() {
       id: `message-${nextId.current++}`,
       direction: "incoming",
       time: "방금",
-      content: question ? answerQuery(question) : <p>첨부를 확인했어요. 궁금한 점을 함께 입력해 주세요.</p>,
+      content: question ? answerQuery(question, openDetail) : <p>첨부를 확인했어요. 궁금한 점을 함께 입력해 주세요.</p>,
     };
 
     setMessages((prev) => [...prev, outgoing, incoming]);

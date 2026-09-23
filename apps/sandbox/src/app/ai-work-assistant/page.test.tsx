@@ -58,6 +58,14 @@ test("7가지 질문 유형과 데이터 없음 안내가 예시 대화로 렌�
   assert.ok(view.getByText("신촌점 데이터를 찾을 수 없어요. 등록된 매장: 강남점, 홍대점, 잠실점"));
 });
 
+test("상세보기 버튼을 누르면 아직 준비되지 않았다는 안내가 대화에 추가된다", () => {
+  const view = render(<AiWorkAssistantPage />);
+
+  fireEvent.click(view.getByRole("link", { name: "강남점 상세보기" }));
+
+  assert.ok(view.getByText("강남점 상세 페이지는 아직 만들지 않았어요. 화면이 준비되면 이 버튼에서 연결할게요."));
+});
+
 test("새 질문을 입력해 전송하면 답변이 대화에 추가된다", () => {
   const view = render(<AiWorkAssistantPage />);
 
