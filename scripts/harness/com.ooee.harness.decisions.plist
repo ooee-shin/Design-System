@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 결정을 60초마다 읽고 처리할 것이 있을 때만 러너를 깨운다(scripts/harness/watch-decisions.mjs 머리말 「설치」).
+     이 Mac 의 gh 로그인으로 돈다. PATH 는 launchd 가 기본으로 주지 않으므로 적어 둔다.
+     Desktop 은 launchd 가 읽지 못해(TCC) 보호 밖의 사본에서 돈다. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ooee.harness.decisions</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>/Users/yujinsik/.ooee-harness/harness/scripts/harness/watch-tick.sh</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/yujinsik/.ooee-harness/harness</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/Users/yujinsik/.local/node/bin:/Users/yujinsik/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartInterval</key><integer>60</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/yujinsik/.ooee-harness/watch.log</string>
+  <key>StandardErrorPath</key><string>/Users/yujinsik/.ooee-harness/watch.log</string>
+</dict>
+</plist>

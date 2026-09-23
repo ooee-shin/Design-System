@@ -129,7 +129,7 @@ export function InspectorBar({ pathname }: { pathname: string }) {
       {open ? (
         <aside
           aria-label={open === "components" ? "쓴 컴포넌트" : "요청"}
-          className="fixed right-4 top-4 bottom-20 z-[60] flex w-72 flex-col overflow-hidden rounded-xl border border-oe-border-secondary bg-oe-background-primary shadow-lg"
+          className="fixed right-4 top-4 bottom-20 z-[60] flex w-[min(18rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-oe-border-secondary bg-oe-background-primary shadow-lg"
         >
           <nav aria-label="경로" className="border-b border-oe-border-secondary px-4 py-3 text-xs text-oe-foreground-tertiary">
             <a href={STUDIO_ORIGIN} target="_blank" rel="noreferrer" className="rounded-sm hover:text-oe-foreground-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
@@ -210,7 +210,7 @@ export function InspectorBar({ pathname }: { pathname: string }) {
             type="button"
             aria-pressed={open === "request"}
             onClick={() => setOpen(open === "request" ? null : "request")}
-            className={`rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${open === "request" ? "bg-oe-background-bold-primary text-oe-foreground-inverse" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}
+            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${open === "request" ? "bg-oe-background-bold-primary text-oe-foreground-inverse" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}
           >
             요청 보기
           </button>
@@ -219,7 +219,7 @@ export function InspectorBar({ pathname }: { pathname: string }) {
           type="button"
           aria-pressed={open === "components"}
           onClick={() => setOpen(open === "components" ? null : "components")}
-          className={`rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${open === "components" ? "bg-oe-background-bold-primary text-oe-foreground-inverse" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}
+          className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring ${open === "components" ? "bg-oe-background-bold-primary text-oe-foreground-inverse" : "text-oe-foreground-secondary hover:bg-oe-interaction-hover"}`}
         >
           컴포넌트 보기 <span className={open === "components" ? "" : "text-oe-foreground-tertiary"}>{rows.length}</span>
         </button>
