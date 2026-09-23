@@ -68,9 +68,9 @@ test("#4: 프로젝트 칸이 없는 옛 양식 — 여러 줄 요구사항은 �
   assert.equal(out.fields.similar, "TOSS 증권");
   assert.equal(out.fields.onSubmit, "");
   assert.deepEqual(out.fields.projects, []);
-  assert.equal(out.generateArgs, null);
-  assert.match(out.problems.join("\n"), /프로젝트가 없다/);
-  assert.deepEqual(out.notes, [], "옛 양식이어도 라벨이 모두 줄 처음에 있으면 적을 것이 없다");
+  assert.equal(out.generateArgs, null, "화면 유형이 없어 만들지 않는다");
+  assert.deepEqual(out.problems, ["본문에 「화면 유형:」 칸이 없다 — 웹·태블릿·모바일 가운데 무엇인지 요청자에게 묻는다"], "프로젝트가 없다고는 묻지 않는다 — 처리하는 쪽이 정한다");
+  assert.ok(out.notes.some((note) => note.includes("프로젝트를 요청이 정하지 않았다")), "정해야 한다는 것을 알려야 한다");
 });
 
 test("#3: 앞 글에 붙은 「요청자:」 도 라벨로 읽고, 라벨 없는 앞 글은 버렸다고 적는다", () => {
@@ -90,7 +90,7 @@ test("#1·#2: 라벨이 하나도 없는 첫 양식은 요구사항을 짐작하
     assert.equal(out.fields.requester, "");
     assert.equal(out.generateArgs, null);
     assert.match(out.problems.join("\n"), /「요구사항:」 칸이 없다/);
-    assert.match(out.problems.join("\n"), /프로젝트가 없다/);
+    assert.ok(out.problems.every((problem) => !problem.includes("프로젝트가 없다")), "프로젝트는 묻지 않고 처리하는 쪽이 정한다");
     assert.ok(out.notes.some((note) => note.includes("라벨 없이 앞에 놓인 글")));
   }
   assert.equal(parseIssueLegacy(fixture(1)).screenName, "주식 매매 화면 시스템");
@@ -125,13 +125,27 @@ test("화면 유형은 한글과 영문을 함께 받는다", () => {
 
 test("프로젝트는 id 로도 이름으로도 고를 수 있다", () => {
   const of = (value) => parseIssue(now(`프로젝트: ${value}\n화면 유형: 웹\n요구사항: 목록을 본다`), { projects: NOW }).project;
-  assert.deepEqual(of("harness-test"), { id: "harness-test", name: null, isNew: false });
-  assert.deepEqual(of("하네스 시험"), { id: "harness-test", name: null, isNew: false }, "이름에 든 공백에서 잘리면 안 된다");
+  assert.deepEqual(of("harness-test"), { id: "harness-test", name: null, isNew: false, undecided: false });
+  assert.deepEqual(of("하네스 시험"), { id: "harness-test", name: null, isNew: false, undecided: false }, "이름에 든 공백에서 잘리면 안 된다");
+});
+
+test("「새 프로젝트」만 고르고 이름을 비우면 처리하는 쪽이 정한다 — 있는 곳에 넣거나 새로 만든다", () => {
+  // 2026-09-23 개발자: 「새 프로젝트라고 하면 그냥 프롬프트 보고 알맞는 페이지에 넣거나 알아서 탭을 만드는 것도 방법」
+  const read = parseIssue(now("프로젝트: 새 프로젝트\n새 프로젝트: \n화면 유형: 웹\n요구사항: 지표를 본다"), { projects: NOW });
+  assert.deepEqual(read.problems, []);
+  assert.deepEqual(read.project, { id: null, name: null, isNew: null, undecided: true });
+  assert.match(read.generateArgs, /프로젝트: <정한다> 유형: web$/);
+  assert.match(read.notes.join("\n"), /「새 프로젝트」만 골랐다/);
+  const bare = parseIssue(now('프로젝트: ["새 프로젝트"]\n화면 유형: 웹\n요구사항: 지표를 본다'), { projects: NOW });
+  assert.deepEqual(bare.problems, [], "배열로 온 「새 프로젝트」도 표식이다");
+  assert.equal(bare.project.undecided, true);
+  const typo = parseIssue(now("프로젝트: 하네스시험2\n화면 유형: 웹\n요구사항: 지표를 본다"), { projects: NOW });
+  assert.match(typo.problems.join("\n"), /모르는 프로젝트 값: 하네스시험2/, "모르는 이름은 여전히 묻는다 — 오타일 수 있다");
 });
 
 test("「새 프로젝트」 칸은 프로젝트를 하나 늘리고, 이미 있는 이름이면 그리로 넣는다", () => {
   const made = parseIssue(now("프로젝트: 새 프로젝트\n새 프로젝트: 블루키 리뉴얼 2기\n화면 유형: 웹\n요구사항: 지표를 본다"), { projects: NOW });
-  assert.deepEqual(made.project, { id: "블루키-리뉴얼-2기", name: "블루키 리뉴얼 2기", isNew: true });
+  assert.deepEqual(made.project, { id: "블루키-리뉴얼-2기", name: "블루키 리뉴얼 2기", isNew: true, undecided: false });
   assert.deepEqual(made.problems, []);
   assert.match(made.generateArgs, /프로젝트: 블루키-리뉴얼-2기 새 프로젝트 이름: 블루키 리뉴얼 2기 유형: web$/);
   assert.match(made.notes.join("\n"), /새 프로젝트 「블루키 리뉴얼 2기」/);

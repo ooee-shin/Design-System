@@ -48,6 +48,12 @@ const labelKey = (text) => LABELS.find(({ label }) => label === text.replace(/[ 
 /** 폼의 화면 유형 값 → `screens.ts` 의 `viewport`. 한글과 영문을 함께 받는다. */
 export const VIEWPORTS = { web: "web", 웹: "web", tablet: "tablet", 태블릿: "tablet", 테블릿: "tablet", mobile: "mobile", 모바일: "mobile" };
 
+/** 폼의 프로젝트 목록 마지막 항목. 이름이 아니라 「목록에 없다」는 표식이다. */
+export const NEW_PROJECT = "새 프로젝트";
+
+/** 프로젝트를 요청이 정하지 않았을 때 `generateArgs` 에 두는 자리. process-issue 가 정한 id 로 바꾼다. */
+export const UNDECIDED = "<정한다>";
+
 /** 새 프로젝트 이름을 id 로 만든다. 한글 이름은 그대로 두고 공백만 붙임표로 바꾼다. */
 export function projectId(name) {
   return name.trim().toLowerCase().replace(/[\s/·,]+/g, "-").replace(/[^0-9a-z가-힣-]/g, "").replace(/^-+|-+$/g, "");
@@ -219,16 +225,22 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
     if (screenKey && !/^[a-z0-9-]+$/.test(screenKey)) problems.push(`화면 key 가 소문자·숫자·붙임표가 아니다: 「${oneLine(screenKey)}」`);
   }
 
-  const { matched, unknown: unknownProjects } = matchProject(values.projects ?? "", known);
+  const { matched, unknown: unknownRaw } = matchProject(values.projects ?? "", known);
+  // 목록의 마지막 「새 프로젝트」는 프로젝트 이름이 아니라 「목록에 없다」는 표식이다.
+  const wantsNew = unknownRaw.some((part) => part === NEW_PROJECT);
+  const unknownProjects = unknownRaw.filter((part) => part !== NEW_PROJECT);
   const newProjectName = (values.newProject ?? "").trim();
   // 폼은 있는 프로젝트를 목록에서 고르거나 「새 프로젝트」 칸에 이름을 적게 한다. 적은 이름이 이미 있는
   // 프로젝트면 새로 만들지 않고 그리로 간다 — 오타 하나로 프로젝트가 둘로 갈라지는 것을 막는다.
   const namedMatch = newProjectName ? matchProject(newProjectName, known).matched[0] : null;
   const chosen = namedMatch ?? (newProjectName ? projectId(newProjectName) : null) ?? matched[0] ?? null;
   const isNewProject = Boolean(chosen) && !allowed.includes(chosen);
+  // 프로젝트를 요청이 정하지 않았으면(칸이 비었거나 「새 프로젝트」만 골랐으면) 처리하는 쪽이 요구사항을 보고
+  // 있는 프로젝트에 넣거나 새로 만든다(2026-09-23 개발자, process-issue 1단계). 묻지 않는다.
+  const undecided = mode === "생성" && !chosen && !unknownProjects.length && matched.length === 0;
 
   if (mode === "생성") {
-    if (!chosen) problems.push(`프로젝트가 없다 — 있는 프로젝트(${known.map((row) => row.name).join("·")}) 가운데 하나를 고르거나 「새 프로젝트」 이름을 요청자에게 묻는다`);
+    if (undecided) notes.push(`프로젝트를 요청이 정하지 않았다${wantsNew ? "(「새 프로젝트」만 골랐다)" : ""} — 요구사항을 보고 있는 프로젝트(${known.map((row) => row.name).join("·")})에 넣거나 새로 만든다. 정한 것은 결과 댓글에 남긴다`);
     if (!newProjectName && unknownProjects.length) {
       problems.push(`모르는 프로젝트 값: ${unknownProjects.join(", ")} — apps/sandbox/src/screens.ts 의 SANDBOX_PROJECTS(${allowed.join(", ")})에 없다. 새 프로젝트면 「새 프로젝트:」 칸에 이름을 적는다`);
     }
@@ -254,7 +266,7 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
   const generateArgs =
     problems.length || mode === "수정"
       ? null
-      : `${screenName}. ${paragraph} 프로젝트: ${chosen}${isNewProject ? ` 새 프로젝트 이름: ${newProjectName}` : ""} 유형: ${viewports.join(", ")}`;
+      : `${screenName}. ${paragraph} 프로젝트: ${chosen ?? UNDECIDED}${isNewProject ? ` 새 프로젝트 이름: ${newProjectName}` : ""} 유형: ${viewports.join(", ")}`;
 
   return {
     number,
@@ -262,7 +274,7 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
     screenName,
     mode,
     fix: mode === "수정" ? { target: Number.isInteger(fixTarget) ? fixTarget : null, screenKey, instruction: problems.length ? null : paragraph } : null,
-    project: chosen ? { id: chosen, name: newProjectName || null, isNew: isNewProject } : null,
+    project: chosen ? { id: chosen, name: newProjectName || null, isNew: isNewProject, undecided: false } : undecided ? { id: null, name: null, isNew: null, undecided: true } : null,
     viewports,
     fields: {
       projects: chosen ? [chosen] : [],
