@@ -11,7 +11,9 @@ import { looksLikeDecision, readCommentDecision } from "./decision.mjs";
 
 import {
   CHAINED_SKILLS,
+  EFFORT,
   EXTRA_ALLOWED,
+  OWN_SKILL,
   closingComment,
   MODEL,
   buildClaudeArgs,
@@ -22,6 +24,7 @@ import {
   outsideScreenFiles,
   pickActionable,
   pickUnreadLookalikes,
+  resultMissing,
   staleBranches,
   stopNotice,
   validateHandoff,
@@ -60,7 +63,12 @@ test("모델과 effort 를 하네스 명령과 같은 값으로 박는다", () =
   const args = buildClaudeArgs("x");
   assert.equal(args[args.indexOf("--model") + 1], MODEL);
   assert.equal(MODEL, "claude-sonnet-5", "별칭이 아니라 전체 ID 여야 새 모델로 저절로 옮겨 가지 않는다");
-  assert.equal(args[args.indexOf("--effort") + 1], "high");
+  assert.equal(args[args.indexOf("--effort") + 1], EFFORT);
+  assert.equal(EFFORT, "high", "별칭이나 빈 값이 아니라 고정된 값이어야 세션마다 같은 결과가 난다");
+  for (const file of [OWN_SKILL, ...CHAINED_SKILLS]) {
+    const head = readFileSync(path.join(repoRoot, file), "utf8").match(/^---\n[\s\S]*?^effort:(.*)$/m)?.[1]?.trim();
+    assert.equal(head, EFFORT, `${file} 머리말의 effort 가 러너와 다르다`);
+  }
 });
 
 test("이어 받을 때만 세션을 넘긴다", () => {
@@ -80,6 +88,19 @@ test("하위 명령이 머리말에 적은 도구를 넘긴다 — 요청 처리
   const args = buildClaudeArgs("x");
   for (const tool of tools) assert.ok(args.includes(tool), `${tool} 이 CLI 로 넘어가지 않는다`);
   for (const arg of args) assert.doesNotMatch(arg, /figma|design-page|\.mcp\.json/i, `Figma 흔적이 CLI 에 남았다: ${arg}`);
+});
+
+test("하위 명령이 실제로 쓰는 검사 명령이 넘어간다 — 머리말이 비면 러너가 넘길 것이 없다", () => {
+  // 2026-09-23: generate-code·review-design 에 allowed-tools 가 아예 없어 러너가 빈 줄을 읽었다. 신뢰하지
+  // 않은 사본에서는 공용 allow 가 무시되므로 화면 규칙 검사와 화면 테스트가 막혀 #62 가 4단계에서 멈췄다.
+  const tools = chainedAllowedTools();
+  for (const need of ["Bash(node plugins/ooee-harness/lib/check-screens.mjs:*)", "Bash(pnpm --filter @ooee/sandbox test)"]) {
+    assert.ok(tools.includes(need), `${need} 이 넘어가지 않는다`);
+  }
+  for (const file of CHAINED_SKILLS) {
+    const head = readFileSync(path.join(repoRoot, file), "utf8").match(/^---\n[\s\S]*?^allowed-tools:(.*)$/m)?.[1];
+    assert.ok(head && head.trim(), `${file} 머리말에 allowed-tools 가 없다`);
+  }
 });
 
 test("넘기는 도구에 결정을 만들거나 pull request 를 여닫는 명령이 섞이지 않는다", () => {
@@ -159,6 +180,34 @@ test("CLI 는 인수가 틀리면 claude 를 부르지 않고 종료 코드 2 �
     }
     assert.equal(code, 2, `${JSON.stringify(argv)} 가 2 로 끝나지 않았다`);
   }
+});
+
+test("멈춤 카드는 멈춘 절만 읽는다 — 통과한 단계를 까닭 자리에 싣지 않는다", () => {
+  // 2026-09-23 #62: 카드에 「git switch dev — 통과」 넉 줄이 갔다. 다음 제목까지 넘어가 「거친 자리」를 읽었다.
+  const report = [
+    "## 처리 중 실패",
+    "",
+    "4단계에서 화면 규칙 검사가 승인 요청에 막혔다.",
+    "- `check-screens.mjs` — 거부됨",
+    "",
+    "## 거친 자리",
+    "- `git switch dev` — 통과",
+    "- `node scripts/harness/issue.mjs 62` — 통과",
+  ].join("\n");
+  const card = stopNotice(62, report, { title: "카카오톡 대시보드" });
+  assert.match(card, /check-screens\.mjs` — 거부됨/);
+  assert.ok(!card.includes("통과"), `통과한 단계가 카드에 실렸다:\n${card}`);
+});
+
+test("화면은 합쳐졌는데 결과가 없으면 그것도 결과 채널에 알린다", () => {
+  // #60: 넘김은 성공해 dev 까지 합쳐졌고 배포 확인·결과 댓글만 빠졌다. 그 자리가 알림 밖이라 기획자에게는
+  // 아무 일도 없던 것이 됐다. 카드에 무엇이 됐고 무엇이 빠졌는지, 개발자가 무엇을 돌려야 하는지 적는다.
+  const card = stopNotice(60, resultMissing(60, 69), { title: "챗봇 채팅 화면", url: "https://x/60", tail: "개발자가 결과를 다시 올려야 합니다." });
+  assert.match(card, /^⚠️ 화면 요청 #60 「챗봇 채팅 화면」 — 화면은 만들었는데 결과가 올라가지 않았다/);
+  assert.match(card, /pull request #69/);
+  assert.match(card, /`결과 60` 명령을 돌리면/);
+  assert.ok(!card.includes("요청을 고쳐 다시 내"), "요청 잘못이 아닌데 기획자에게 다시 내라고 한다");
+  assert.match(card, /자세히: https:\/\/x\/60$/);
 });
 
 test("workflow 는 손으로 부르는 예비다 — 저절로 도는 길은 이 Mac 의 1분 감시다", () => {

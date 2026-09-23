@@ -25,6 +25,9 @@ const repoRoot = path.resolve(here, "../..");
 
 /** 하네스 명령과 같은 값이다. SKILL.md 머리말이 명령 안에서 다시 고정하지만, 이어 받는 차례는 머리말 밖이다. */
 export const MODEL = "claude-sonnet-5";
+// `2026-09-23` 에 #60 이 143분 걸려 `medium` 으로 낮췄다가 같은 날 개발자가 되돌렸다 — 느린 까닭은 생각
+// 시간이 아니라 막힌 검사를 우회하느라 전체 검사를 네 번 돈 것이었다. 세 명령의 머리말도 같은 값이어야
+// 한다(runner.test.mjs 가 본다).
 export const EFFORT = "high";
 
 /** 스킬의 allowed-tools 밖에서 러너가 더 여는 것. D3 의 되돌리기만이다. */
@@ -139,16 +142,36 @@ export function closingComment(kind, detail) {
  * 멈췄을 때 결과 채널에 올릴 글. 보고의 첫 제목과 그 아래 문제 줄만 뽑는다 — 기획자가 무엇을 다시 내야
  * 하는지만 보면 된다. 러너가 멈추면 job 로그에만 남아 요청한 사람은 알 길이 없었다(#60).
  */
-export function stopNotice(issue, report, { title = "", url = "" } = {}) {
+export function stopNotice(issue, report, { title = "", url = "", tail = "요청을 고쳐 다시 내거나 개발자에게 알려 주세요." } = {}) {
   const lines = String(report ?? "").split("\n");
   const at = lines.findIndex((line) => /^## /.test(line));
   const heading = at >= 0 ? lines[at].replace(/^## /, "") : "처리가 멈췄다";
-  const rest = (at >= 0 ? lines.slice(at + 1) : lines).map((line) => line.trim()).filter(Boolean);
+  // 그 제목의 절만 읽는다. 다음 제목까지 넘어가면 「거친 자리」의 통과한 단계가 까닭 자리에 실린다
+  // (`2026-09-23` #62 카드: 멈춘 까닭 대신 `git switch dev — 통과` 넉 줄이 갔다).
+  const section = at >= 0 ? lines.slice(at + 1) : lines;
+  const end = section.findIndex((line) => /^## /.test(line));
+  const rest = (end < 0 ? section : section.slice(0, end)).map((line) => line.trim()).filter(Boolean);
   const problems = rest.filter((line) => /^[-*] |^\d+\. /.test(line)).slice(0, 4);
   const detail = (problems.length ? problems : rest.slice(0, 3)).map((line) => line.replace(/^[-*] /, "· ")).join("\n");
   const head = `⚠️ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
   const where = url ? `\n자세히: ${url}` : "";
-  return `${head}\n${detail}\n\n요청을 고쳐 다시 내거나 개발자에게 알려 주세요.${where}`;
+  return `${head}\n${detail}\n\n${tail}${where}`;
+}
+
+/**
+ * 화면은 `dev` 에 합쳐졌는데 결과 댓글이 없을 때 결과 채널에 올릴 글.
+ *
+ * 기획자가 보기에 결과가 없는 것과 같으므로 무엇이 됐고 무엇이 안 됐는지 가른다. 화면은 이미 배포돼 있어
+ * 주소로 볼 수 있고, 빠진 것은 결과 댓글과 그에 딸린 결정 버튼이다.
+ */
+export function resultMissing(issue, pr) {
+  return [
+    "## 화면은 만들었는데 결과가 올라가지 않았다",
+    `- 화면은 dev 에 합쳐졌습니다(pull request #${pr}).`,
+    "- 배포 확인이나 결과 댓글에서 멈춰 결정 버튼이 없습니다.",
+    // 조사는 번호 읽기에 따라 갈리므로(60 은 「을」, 62 는 「를」) 「명령을」로 적어 어느 번호에나 맞춘다.
+    `- 개발자가 \`결과 ${issue}\` 명령을 돌리면 결과가 올라갑니다.`,
+  ].join("\n");
 }
 
 /** 같은 결정을 두 번 처리하지 않게 하는 열쇠. 사람이 새 신호를 남기면 `at` 이 바뀌어 다시 처리한다. */
@@ -319,7 +342,7 @@ function postedResult(issue, before) {
 }
 
 /** 멈춘 것을 결과 채널에 알린다. 카드가 실패해도 러너의 결과는 바뀌지 않는다. */
-async function notifyStop(issue, report) {
+async function notifyStop(issue, report, options = {}) {
   const target = slackTarget();
   if (!target) return;
   let meta = {};
@@ -329,7 +352,7 @@ async function notifyStop(issue, report) {
   } catch {
     meta = {};
   }
-  await postCard(stopNotice(issue, report, meta), target).then(
+  await postCard(stopNotice(issue, report, { ...meta, ...options }), target).then(
     () => log("- 멈춘 것을 결과 채널에 알렸다"),
     (error) => log(`- 결과 채널에 알리지 못했다: ${error.message}`),
   );
@@ -348,7 +371,11 @@ async function runChain(issue, argument) {
   }
   if (!landed.handoff.resume) return true;
   runClaude(continuationPrompt(landed.pr, landed.mergeCommit), { resume: first.session_id });
-  return postedResult(issue, before);
+  if (postedResult(issue, before)) return true;
+  // 화면은 합쳐졌는데 결과만 빠진 자리다. 넘김이 없을 때와 달리 여기는 알림 밖이었다 — #60 에서 이어 받은
+  // 세션이 배포 확인을 부르지 않고 「알림이 올 것」이라며 끝냈고, 기획자에게는 아무 일도 없던 것이 됐다.
+  await notifyStop(issue, resultMissing(issue, landed.pr), { tail: "개발자가 결과를 다시 올려야 합니다." });
+  return false;
 }
 
 function readState(file) {

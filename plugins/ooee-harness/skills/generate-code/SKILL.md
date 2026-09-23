@@ -3,6 +3,7 @@ name: generate-code
 description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/ui만으로 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> [원본: <저장소 경로>]」이다.
 model: claude-sonnet-5
 effort: high
+allowed-tools: Read, Grep, Glob, Write, Edit, Bash(git status:*), Bash(node --import tsx --test apps/sandbox/src/app/*), Bash(pnpm --filter @ooee/sandbox test), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm check), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*)
 ---
 
 # /generate-code
@@ -153,7 +154,13 @@ node ${CLAUDE_PLUGIN_ROOT}/lib/check-screens.mjs --screens ${user_config.screens
 
 `check_command`는 세미콜론으로 이어 붙인 여러 명령일 수 있다. 하나씩 나눠 돌리고 각각의 종료 코드를 따로 본다.
 
+**Plugin 이 저장소 안에 있으면 상대 경로로 부른다** — `node plugins/ooee-harness/lib/check-screens.mjs …`. 이 명령의 머리말 `allowed-tools` 가 그 꼴로 열려 있고, 러너는 그 머리말을 `--allowedTools` 로 넘긴다. 절대 경로(`${CLAUDE_PLUGIN_ROOT}` 가 편 것)로 부르면 그 규칙에 걸리지 않아 막힌다(`2026-09-23` #60·#62). 저장소 밖에 설치했으면 절대 경로를 쓰고, 그때는 설치한 저장소의 `permissions.allow` 가 열어야 한다.
+
 화면 규칙 검사가 승인 요청에 막히면 그 자리에서 멈추고 「막힌 명령」에 적는다. 경로 표기를 절대에서 상대로 바꿔 다시 돌리는 것도 「막힌 명령 다시 시도」다. 이 명령을 늘 쓰려면 설치한 저장소가 `permissions.allow`에 한 줄을 두어야 하며, 그 줄은 Plugin의 `README.md`에 있다.
+
+**고치는 동안에는 이 화면의 것만 돌린다.** 화면 테스트(`node --import tsx --test ${user_config.screens_dir}/<key>/page.test.tsx`)와 화면 규칙 검사는 몇 초면 끝나고, `check_command`(이 저장소는 `pnpm check`)는 저장소 전체를 보느라 서너 분이 든다. 고칠 때마다 전체를 돌리면 그 시간이 그대로 쌓인다 — `2026-09-23` #60 은 전체 검사를 네 번 돌려 15분가량을 여기 썼다.
+
+**`check_command` 는 마지막에 한 번, 많아야 두 번이다.** 화면의 것이 모두 통과한 뒤 한 번 돌리고, 거기서 나온 것을 고쳤으면 확인으로 한 번 더 돌린다. 세 번째가 필요하면 그 화면만으로는 풀리지 않는 문제이므로 5단계의 「검사가 실패하면」으로 간다. pull request 를 올리면 `Quality` 가 같은 것을 다시 돌리고 러너가 그 결과를 기다렸다 합치므로, 로컬에서 더 도는 것은 같은 답을 다시 사는 일이다.
 
 모두 통과할 때까지 「하지 않는 것」의 세 파일을 고친다. `check_command` 는 화면 자리 밖까지 함께 보는 자리다.
 
