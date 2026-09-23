@@ -23,6 +23,7 @@
       "Bash(gh pr checks *)",
       "Bash(gh run list *)",
       "Bash(node *lib/check-screens.mjs *)",
+      "Bash(node -e *)",
       "Bash(node --import tsx --test *)",
       "Bash(node scripts/*)",
       "Bash(node plugins/ooee-harness/lib/*)",
