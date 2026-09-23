@@ -39,14 +39,19 @@ test("allowed-tools 는 결정을 만들 수 있는 명령을 열지 않고, cur
   for (const tool of allowed) {
     assert.doesNotMatch(tool, /gh api|gh issue comment|gh issue (edit|close|reopen)|gh label/, `allowed-tools 가 연다: ${tool}`);
   }
-  const curl = allowed.filter((tool) => tool.startsWith("Bash(curl"));
-  assert.deepEqual(curl, ["Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)"], "curl 은 상태 코드 확인 꼴 하나만 연다");
+  assert.deepEqual(allowed.filter((tool) => tool.startsWith("Bash(curl")), [], "배포 확인은 deploy-check.mjs 가 한다 — curl 을 열지 않는다");
+});
 
-  // 본문이 돌리는 curl 이 그 꼴에서 벗어나면 단계마다 확인을 묻는다. 둘이 함께 움직이게 본다.
-  const prefix = curl[0].slice("Bash(".length, -"*)".length);
-  const used = [...skill.matchAll(/^\s*(curl .*?)\s*(?:#.*)?$/gm)].map((match) => match[1]);
-  assert.ok(used.length > 0, "본문에 curl 명령이 없다 — 7단계 모양이 바뀌었다");
-  for (const command of used) assert.ok(command.startsWith(prefix), `allowed-tools 의 curl 꼴이 아니다: ${command}`);
+test("기다리는 일은 스크립트가 맡는다 — 세션이 직접 기다리지 않는다", () => {
+  // `gh run watch`·`sleep` 은 허용 목록 밖이라 헤드리스에서 거부된다. #37 이 7단계에서 그렇게 멈췄다.
+  const body = skill.replace(/^---\n[\s\S]*?\n---\n/, "");
+  // 설명 문장이 아니라 실제로 시키는 명령(bash 울타리 안)만 본다.
+  const commands = [...body.matchAll(/```bash\n([\s\S]*?)```/g)].flatMap((match) => match[1].split("\n"));
+  for (const forbidden of ["gh run watch", "sleep ", "curl "]) {
+    const found = commands.filter((line) => line.includes(forbidden));
+    assert.deepEqual(found, [], `본문의 명령이 ${forbidden} 로 기다리려 한다`);
+  }
+  assert.ok(commands.some((line) => line.includes("node scripts/harness/deploy-check.mjs --sha")), "7단계가 배포 확인 스크립트를 부르지 않는다");
 });
 
 test("$ARGUMENTS 의 세 입구가 모두 절로 있다", () => {
@@ -54,10 +59,10 @@ test("$ARGUMENTS 의 세 입구가 모두 절로 있다", () => {
   assert.match(skill, /「결정」으로 시작하면 「결정 뒤」, 「결과」로 시작하면 「결과만 올리기」/);
 });
 
-test("process-issue 가 부르는 세 스크립트가 frontmatter 의 allowed-tools 에 있다", () => {
+test("process-issue 가 부르는 스크립트가 모두 frontmatter 의 allowed-tools 에 있다", () => {
   // 본문이 부르는 스크립트가 allowed-tools 에서 빠지면 단계마다 확인을 묻다가 headless 에서는 거부된다.
   const allowed = skill.match(/^allowed-tools:(.*)$/m)?.[1] ?? "";
-  for (const script of ["issue.mjs", "result-comment.mjs", "decision.mjs"]) {
+  for (const script of ["issue.mjs", "result-comment.mjs", "decision.mjs", "post-result.mjs", "deploy-check.mjs"]) {
     assert.ok(skill.includes(`node scripts/harness/${script}`), `본문이 ${script} 를 부르지 않는다`);
     assert.ok(allowed.includes(`Bash(node scripts/harness/${script}:*)`), `allowed-tools 에 ${script} 가 없다`);
     assert.ok(existsSync(path.join(root, "scripts/harness", script)), `scripts/harness/${script} 가 없다`);

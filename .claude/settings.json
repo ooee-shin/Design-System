@@ -29,6 +29,7 @@
       "Bash(node scripts/harness/result-comment.mjs *)",
       "Bash(node scripts/harness/decision.mjs *)",
       "Bash(node scripts/harness/post-result.mjs *)",
+      "Bash(node scripts/harness/deploy-check.mjs *)",
       "Bash(node scripts/visual/inspect.mjs *)"
     ],
     "ask": [

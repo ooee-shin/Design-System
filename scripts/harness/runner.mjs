@@ -165,7 +165,11 @@ function runClaude(prompt, opts) {
   const json = JSON.parse(out);
   log(`\n### Claude (${prompt.slice(0, 60)}…)\n`);
   log(`- 세션 ${json.session_id} · 턴 ${json.num_turns} · 모델 ${Object.keys(json.modelUsage ?? {}).join(", ") || "알 수 없음"}`);
-  if (json.permission_denials?.length) log(`- 막힌 도구 ${json.permission_denials.length}건: ${json.permission_denials.map((d) => d.tool_name).join(", ")}`);
+  // 이름만 적으면 무엇이 막혔는지 알 수 없어 허용 목록을 고칠 수 없다. 명령의 앞머리를 함께 남긴다.
+  if (json.permission_denials?.length) {
+    const denied = json.permission_denials.map((d) => `${d.tool_name}(${String(d.tool_input?.command ?? "").replace(/\s+/g, " ").slice(0, 70)})`);
+    log(`- 막힌 도구 ${denied.length}건: ${denied.join(" · ")}`);
+  }
   log(`\n${json.result ?? ""}\n`);
   if (json.is_error) throw new Error(`Claude 가 오류로 끝났다(${json.subtype})`);
   return json;

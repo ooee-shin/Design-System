@@ -172,7 +172,7 @@ test("이어 받는 차례에도 배포 확인과 결과 댓글에 쓰는 도구
   for (const tool of ["Bash(gh run view:*)", "Bash(node scripts/harness/post-result.mjs:*)", "Bash(node scripts/harness/decision.mjs:*)"]) {
     assert.ok(args.includes(tool), `${tool} 이 이어 받는 차례에 넘어가지 않는다`);
   }
-  assert.ok(args.some((arg) => arg.startsWith("Bash(curl -s -o /dev/null")), "배포 주소 확인(curl)이 넘어가지 않는다");
+  assert.ok(args.includes("Bash(node scripts/harness/deploy-check.mjs:*)"), "배포 확인 스크립트가 넘어가지 않는다");
 });
 
 test("dev 로 합칠 pull request 는 생성 화면의 폴더와 목록만 바꿀 수 있다", () => {

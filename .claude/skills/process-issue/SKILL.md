@@ -3,7 +3,7 @@ name: process-issue
 description: Slack 폼으로 들어온 화면 요청 이슈 하나를 처음부터 결과 댓글까지 처리한다. 이슈를 읽고 /ooee-harness:generate-code 로 화면을 만든 뒤 dev 에 머지하고 배포된 주소를 확인해 결과를 이슈 댓글로 올리고 멈춘다. 「결정 <n>」으로 다시 부르면 그 댓글에 사람이 단 결정(승인·반려·개선)을 읽어 다음 일을 한다. 화면이 이미 dev 에 들어갔는데 결과 댓글이 없으면 「결과 <n>」으로 결과 댓글만 올린다. 「이슈 <n> 처리」, 「<n> 결정 봐 줘」, 「<n> 결과만 올려 줘」 요청에 쓴다. 인수는 「<이슈 번호>」, 「결정 <이슈 번호>」 또는 「결과 <이슈 번호>」이다.
 model: claude-sonnet-5
 effort: high
-allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-*), Bash(git add apps/sandbox/*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(pnpm --filter @ooee/sandbox build), Bash(node scripts/visual/inspect.mjs:*), Bash(curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/*)
+allowed-tools: Read, Grep, Glob, Write, Skill, Bash(git status:*), Bash(git rev-parse --show-prefix), Bash(git fetch origin), Bash(git switch dev), Bash(git pull --ff-only), Bash(git switch -c feature/issue-*), Bash(git add apps/sandbox/*), Bash(git commit:*), Bash(git log:*), Bash(git push -u origin feature/issue-*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/result-comment.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/harness/post-result.mjs:*), Bash(node scripts/harness/deploy-check.mjs:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr checks:*), Bash(gh run list:*), Bash(gh run view:*), Bash(pnpm check), Bash(pnpm --filter @ooee/sandbox build), Bash(node scripts/visual/inspect.mjs:*)
 ---
 
 # /process-issue
@@ -171,17 +171,16 @@ gh pr merge <번호> --squash --delete-branch
 
 ### 7. 배포를 확인한다
 
-`dev`에 들어간 머지 commit(`gh pr view <번호> --json mergeCommit`)으로 `.github/workflows/deploy.yml`의 실행을 찾아 끝날 때까지 본다.
+`dev`에 들어간 머지 commit(`gh pr view <번호> --json mergeCommit`)의 배포가 끝나고 화면 주소가 열리는지 본다.
 
 ```bash
-gh run list --workflow deploy.yml --branch dev --limit 5
-gh run view <run id> --json status,conclusion,headSha
-curl -s -o /dev/null -w '%{http_code}' https://ooee-sandbox.pages.dev/<key>
+node scripts/harness/deploy-check.mjs --sha <머지 commit> --key <key> --key <key>
 ```
 
-- 실행의 `headSha`가 머지 commit과 같아야 그 실행이다.
-- **`success`만으로 배포되었다고 하지 않는다.** 저장소 secret이 없으면 workflow가 경고 한 줄만 남기고 배포를 건너뛴 채 `success`로 끝난다. 화면 key마다 주소가 `200`인지가 기준이다. 없는 key는 `404`를 돌려주므로 옛 화면이 대신 열릴 걱정은 없다. 끝난 직후 `404`면 몇 번 더 본다.
-- 실행이 실패했거나 주소가 끝내 `200`이 아니면 보고의 첫 제목을 「## 처리 중 실패」로 하고 멈춘다. 다시 배포하는 것(Actions에서 `Deploy`를 손으로 돌리기)은 사람이 한다.
+- **기다리는 일은 이 스크립트가 맡는다.** 그 머지 commit 의 `deploy.yml` 실행이 나타나 끝날 때까지 기다렸다가 화면마다 주소를 200 이 될 때까지 몇 번 본다. `gh run watch`·`sleep`·기다리는 도구는 허용 목록 밖이라, 직접 기다리려 하면 거부되어 7단계에서 멈춘다(#37 에서 그랬다). 끝나면 JSON 한 장을 낸다.
+- **`success`만으로 배포되었다고 하지 않는다.** 저장소 secret 이 없으면 workflow 가 경고 한 줄만 남기고 배포를 건너뛴 채 `success`로 끝난다. 판정은 화면 key 마다 주소가 `200` 인지다. 스크립트의 `ok` 가 그 판정이고, 아니면 `reason` 이 까닭이다.
+- `ok` 가 `false`거나 스크립트가 「배포를 확인하지 못했다: …」로 끝나면 보고의 첫 제목을 「## 처리 중 실패」로 하고 그 줄을 옮겨 적고 멈춘다. 다시 배포하는 것(Actions 에서 `Deploy`를 손으로 돌리기)은 사람이 한다.
+- 8단계 `checks` 의 「배포 주소 <N>장 200」은 이 결과다.
 
 ### 8. 결과 댓글을 올린다
 
@@ -226,7 +225,7 @@ node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방�
 3. `node scripts/harness/decision.mjs <n>`이 「결과 없음」이어야 한다. 아니면 이미 올린 것이니 `/process-issue 결정 <n>`을 알리고 멈춘다.
 4. 1단계의 검사로 이 요청의 머지된 pull request를 찾는다. 없으면 `/process-issue <n>`을 알리고 멈춘다. 열린 것만 있으면 머지를 기다리라고 알리고 멈춘다. 머지된 것이 둘 이상이면 모두 쓰고, 결과 댓글의 `pullRequest`는 가장 늦게 머지된 것이다.
 5. 화면은 그 pull request들이 더한 `apps/sandbox/src/app/<key>/page.tsx`의 key다(`gh pr view <번호> --json files`). 이름은 `apps/sandbox/src/screens.ts`의 등록에서 읽는다. 화면 코드는 열지 않는다.
-6. 7단계의 주소 확인과 5단계의 sandbox 검사를 key마다 한다. 빌드는 지금 `dev`의 것이다. 머지 commit의 Deploy 실행은 찾지 않아도 된다. 지금 `dev`의 배포에서 주소가 `200`이면 된다.
+6. 7단계의 주소 확인과 5단계의 sandbox 검사를 key마다 한다. 머지 commit의 Deploy 실행은 찾지 않는다 — `--sha` 없이 `node scripts/harness/deploy-check.mjs --key <key> …`로 지금 `dev`의 배포에서 주소만 본다. 빌드는 지금 `dev`의 것이다.
 7. 8단계를 `round` 1로 돈다.
    - `needsDecision`은 pull request 본문의 「판단이 필요한 것」과 2단계 표의 「지어낸 것」에서 옮긴다. 본문이 「화면별 요구사항 문단은 처리하는 쪽이 썼다」처럼 지어냈다고만 적었으면(#19) 화면마다 「<화면>: 요청에 없어 지어낸 것 — 화면 요구사항 문단 전체(요청 원문은 「<요구사항>」)」로 적는다.
    - `checks`에는 이번에 돌린 것(`pnpm check`, 주소 200, sandbox 화면 검사)과 `gh pr checks <번호>`로 본 `Quality`만 적는다. pull request 본문의 체크 표시는 옮기지 않는다. 이번에 확인한 것이 아니다.
