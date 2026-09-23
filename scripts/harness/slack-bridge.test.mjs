@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import { readCommentDecision } from "./decision.mjs";
 import { buildComment, loadEnv, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
 
 const card = "화면 요청 #39 결과 · 1회차 — 공지사항 목록 · 결정은 GitHub 댓글에 👍 👎 😕\n요청: @기획자 · 프로젝트 하네스 시험";
@@ -37,17 +38,22 @@ test("반응 셋은 decision.mjs 와 같은 낱말로 옮긴다", () => {
   assert.deepEqual([REACTION_DECISIONS["+1"], REACTION_DECISIONS["-1"], REACTION_DECISIONS.confused], ["승인", "반려", "개선"]);
 });
 
-test("댓글은 누가 눌렀는지와 Slack 링크를 달고 간다", () => {
+test("댓글은 결정 낱말만 홀로 두고, 누가 눌렀는지는 인용 줄로 앞에 둔다", () => {
   const body = buildComment({ decision: "승인", by: "기획자", permalink: "https://slack.com/x" });
-  assert.match(body, /^승인 — 기획자 \(\[Slack\]\(https:\/\/slack\.com\/x\)\)/);
-  assert.match(body, /반응으로 남긴 결정/);
+  assert.match(body, /^> 기획자 님이 Slack 결과 카드에 반응을 달아 남긴 결정입니다\. \(\[Slack에서 보기\]\(https:\/\/slack\.com\/x\)\)\n\n승인$/);
 });
 
-test("반려·개선은 사유를 따로 남기라고 적는다 — 이모지 하나로는 무엇을 고칠지 모른다", () => {
-  for (const decision of ["반려", "개선"]) {
-    assert.match(buildComment({ decision, by: "기획자" }), new RegExp(`「${decision}: …」 꼴로 한 줄`));
+test("판독이 이 댓글을 그 결정으로 읽는다 — 꼴이 어긋나면 조용히 무시된다", () => {
+  // decision.mjs 는 인용 줄을 건너뛴 첫 글이 결정 낱말로 시작할 때만 읽는다. 두 모듈을 함께 고정한다.
+  for (const decision of ["승인", "반려", "개선"]) {
+    const read = readCommentDecision(buildComment({ decision, by: "기획자", permalink: "https://slack.com/x" }));
+    assert.deepEqual(read, { decision, reason: null }, `${decision} 댓글이 결정으로 읽히지 않는다`);
   }
-  assert.doesNotMatch(buildComment({ decision: "승인", by: "기획자" }), /사유를/);
+});
+
+test("반려·개선의 사유는 비워 둔다 — 안내문이 개선 사유로 넘어가면 안 된다", () => {
+  const read = readCommentDecision(buildComment({ decision: "개선", by: "기획자" }));
+  assert.equal(read.reason, null, "안내문이 사유로 읽혔다 — generate-code 인수에 그대로 붙는다");
 });
 
 test("토큰은 홈의 파일에서 읽고 저장소에 두지 않는다", () => {

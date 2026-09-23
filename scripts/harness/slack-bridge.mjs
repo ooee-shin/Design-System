@@ -49,14 +49,18 @@ export function readIssueNumber(text) {
 }
 
 /**
- * 이슈에 달 댓글. 사유가 필요한 결정(반려·개선)은 사람이 사유를 덧붙이게 남겨 둔다 — 이모지 하나로는
- * 무엇을 고칠지 알 수 없다. 사유 없는 반려·개선은 처리하는 쪽이 「사유가 아직 없다」로 읽고 멈춘다.
+ * 이슈에 달 댓글. **판독이 읽는 꼴을 지킨다** — `decision.mjs` 는 댓글의 첫 글(인용 줄을 건너뛴 뒤)이
+ * 「승인」·「반려: …」·「개선: …」으로 시작할 때만 결정으로 읽는다. 그래서 누가 눌렀는지는 **인용 줄로 앞에**
+ * 두고 결정 낱말만 홀로 남긴다. 뒤에 붙이면 「승인 — 기획자」가 되어 읽히지 않고, 사유 자리에 붙이면
+ * 그 안내문이 개선 사유로 generate-code 에 넘어간다.
+ *
+ * 반려·개선은 사유를 비워 둔다. 이모지 하나로는 무엇을 고칠지 알 수 없어, 사람이 「개선: 고칠 것」을
+ * 따로 남길 때까지 D3·D4 가 멈추는 것이 맞다.
  */
 export function buildComment({ decision, by, permalink }) {
-  const who = by ? ` — ${by}` : "";
-  const where = permalink ? ` ([Slack](${permalink}))` : "";
-  const ask = decision === "승인" ? "" : `\n\n사유를 이 이슈에 「${decision}: …」 꼴로 한 줄 남겨 주세요. 사유가 없으면 처리가 멈춥니다.`;
-  return `${decision}${who}${where}\n\nSlack 결과 카드의 반응으로 남긴 결정입니다.${ask}`;
+  const who = by ? `${by} 님이` : "누군가";
+  const where = permalink ? ` ([Slack에서 보기](${permalink}))` : "";
+  return `> ${who} Slack 결과 카드에 반응을 달아 남긴 결정입니다.${where}\n\n${decision}`;
 }
 
 /** 옮길 반응인지. 봇이 단 것과 결정이 아닌 이모지는 버린다. */
