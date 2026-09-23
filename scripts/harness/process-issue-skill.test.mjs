@@ -81,3 +81,12 @@ test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {
     assert.deepEqual(broken, [], `${file} 의 규칙이 낱말 중간의 :* 라 아무것도 받지 못한다`);
   }
 });
+
+test("하위 명령의 보고로 끝내지 않는다 — 이 명령의 보고는 첫 제목 넷 가운데 하나다", () => {
+  // #39 가 generate-code 의 「pull request 준비 완료」를 그대로 내고 차례를 끝내, 5·6단계를 밟지 않아
+  // 만든 화면이 push 되지 못했다. 러너에는 이어 갈 다음 차례가 없다.
+  assert.match(skill, /generate-code 의 보고는 이 명령의 끝이 아니다/);
+  for (const heading of ["## 결과 댓글을 올렸다", "## 러너에 넘김", "## 처리 중 실패", "## 묻고 멈춤"]) {
+    assert.ok(skill.includes(heading), `보고의 첫 제목 ${heading} 이 없다`);
+  }
+});
