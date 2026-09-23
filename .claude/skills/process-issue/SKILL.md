@@ -241,7 +241,7 @@ node scripts/harness/decision.mjs <n> --round <회차>   # 「대기」와 방�
 4. 1단계의 검사로 이 요청의 머지된 pull request를 찾는다. 없으면 `/process-issue <n>`을 알리고 멈춘다. 열린 것만 있으면 머지를 기다리라고 알리고 멈춘다. 머지된 것이 둘 이상이면 모두 쓰고, 결과 댓글의 `pullRequest`는 가장 늦게 머지된 것이다.
 5. 화면은 그 pull request들이 더한 `apps/sandbox/src/app/<key>/page.tsx`의 key다(`gh pr view <번호> --json files`). 이름은 `apps/sandbox/src/screens.ts`의 등록에서 읽는다. 화면 코드는 열지 않는다.
 6. 7단계의 주소 확인과 5단계의 sandbox 검사를 key마다 한다. 머지 commit의 Deploy 실행은 찾지 않는다 — `--sha` 없이 `node scripts/harness/deploy-check.mjs --key <key> …`로 지금 `dev`의 배포에서 주소만 본다. 빌드는 지금 `dev`의 것이다.
-7. 8단계를 `round` 1로 돈다.
+7. 8단계를 돈다. **`round` 는 이 요청에 이미 있는 결과 댓글 수 + 1 이다** — 처음이면 1, 개선 회차의 화면이 합쳐졌는데 그 회차의 결과만 빠졌으면 2다(`2026-09-23` #60: 2회차 pull request 가 합쳐진 뒤 `gh pr merge` 의 응답이 타임아웃해 러너가 멈췄고, 머지는 실제로 됐는데 결과 댓글만 없었다). 회차를 1로 고정하면 표식이 겹쳐 `post-result.mjs` 가 거부한다. 앞 회차 결과 댓글은 `gh issue view <n> --json comments` 로 세고, 그 회차의 「화면」 표는 이번 `screens` 에 그대로 옮긴다.
    - `needsDecision`은 pull request 본문의 「판단이 필요한 것」과 2단계 표의 「지어낸 것」에서 옮긴다. 본문이 「화면별 요구사항 문단은 처리하는 쪽이 썼다」처럼 지어냈다고만 적었으면(#19) 화면마다 「<화면>: 요청에 없어 지어낸 것 — 화면 요구사항 문단 전체(요청 원문은 「<요구사항>」)」로 적는다.
    - `checks`에는 이번에 돌린 것(주소 200, sandbox 화면 검사)과 `gh pr checks <번호>`로 본 `Quality`만 적는다. pull request 본문의 체크 표시는 옮기지 않는다. 이번에 확인한 것이 아니다.
    - **`pnpm check` 를 돌리지 않는다.** 화면은 이미 합쳐졌고 그 pull request 의 `Quality` 가 같은 것을 이미 돌렸다. 여기서 다시 돌리면 그동안 `dev` 에 들어온 남의 변경까지 함께 재게 되어, 이 요청과 무관한 실패로 결과 댓글이 막힌다(`2026-09-23` #62). 저장소가 성한지는 `Quality` 가 본다.

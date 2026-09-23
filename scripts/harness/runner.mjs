@@ -299,7 +299,7 @@ async function landHandoff(issue) {
   }
   await waitQuality(headRefOid);
   const method = handoff.target === "dev" ? ["--squash", "--delete-branch"] : ["--merge"];
-  sh("gh", ["pr", "merge", String(pr), ...method]);
+  mergePr(pr, method);
   const { mergeCommit } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "mergeCommit"]));
   log(`- #${pr} 머지 ${mergeCommit.oid}`);
   const deploy = handoff.target === "dev" && handoff.resume ? checkDeploy(mergeCommit.oid, screenKeys(files.map((file) => file.path))) : null;
@@ -309,6 +309,23 @@ async function landHandoff(issue) {
   if (handoff.target === "main") closeIssue(issue, closingComment("승인", `PR #${pr}`));
   else if (firstLine.startsWith("되돌림:")) closeIssue(issue, closingComment("반려", `되돌림 PR #${pr}`));
   return { handoff, pr, mergeCommit: mergeCommit.oid, deploy };
+}
+
+/**
+ * 합친다. 명령이 실패하면 **정말 안 합쳐졌는지 다시 본다.**
+ *
+ * 이 Mac 의 연결이 오락가락해서 `gh pr merge` 가 GitHub 의 응답을 못 읽고 타임아웃하는 일이 있다. 합치기는
+ * 이미 된 뒤인데 러너만 실패로 알고 멈춘다 — `2026-09-23` 에 #60 2회차가 그렇게 멈췄고, pull request #74 는
+ * 멀쩡히 합쳐져 있었다. 결과 댓글만 없는 채로 끝나 기획자는 개선이 됐는지 알 수 없었다.
+ */
+function mergePr(pr, method) {
+  try {
+    sh("gh", ["pr", "merge", String(pr), ...method]);
+  } catch (error) {
+    const state = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "state"])).state;
+    if (state !== "MERGED") throw error;
+    log(`- #${pr} 합치는 명령은 실패했지만 이미 합쳐져 있다(${error.message.split("\n")[0]}). 이어 간다`);
+  }
 }
 
 /**
