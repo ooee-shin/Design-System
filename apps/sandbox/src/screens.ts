@@ -213,4 +213,14 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "STO 사장님 앱의 공지사항 목록. 전체·필독·일반 거르기 칩, 새 글·필독 배지, 더 보기로 20건씩 이어 붙는 목록.",
     createdAt: "2026-09-23",
   },
+  {
+    key: "store-inventory",
+    project: "harness-test",
+    viewport: "web",
+    name: "매장 재고 조회",
+    href: "/store-inventory",
+    prompt:
+      "매장 직원이 판매대에서 상품 재고를 확인하는 화면. 검색 칸·조회 버튼, 전체·품절·부족 거르기 칩, 상품명·규격·매장 재고·창고 재고·최근 입고일 표, 품절·부족 배지, 검색 전·결과 없음 안내.",
+    createdAt: "2026-09-23",
+  },
 ];
