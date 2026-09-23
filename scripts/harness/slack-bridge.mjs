@@ -6,6 +6,9 @@
 // 단계가 없다.** 이모지 반응 트리거가 주는 값도 메시지 글·링크·누른 사람뿐이라, 그 카드가 몇 번 요청인지
 // 뽑아낼 자리가 없다. 그래서 카드 글에서 번호를 읽어 `gh` 로 옮기는 이 다리를 둔다.
 //
+// **세 가지 길로 결정이 들어온다.** 카드의 버튼(블록 액션), 카드에 단 반응, 그리고 반려·개선 버튼을 누른
+// 뒤 그 카드의 스레드에 적은 까닭이다. 버튼은 낱말로 서 있어 무엇이 승인인지 카드가 알려 준다.
+//
 // **무엇을 다는가.** 반응 하나에 댓글 한 줄이다(`승인` · `반려: …` · `개선: …`). 그 댓글은 **누른 사람의
 // 이름과 Slack 링크를 달고 간다** — 결정을 누가 했는지가 기록으로 남아야 한다. 판독은 그 댓글을 사람이 단
 // 것으로 읽는다(decision.mjs). 에이전트는 이 길로 결정을 만들지 못한다. 이 다리는 사람이 누른 반응만
@@ -15,23 +18,27 @@
 //
 // 1. https://api.slack.com/apps 에서 앱을 하나 만든다(From scratch, 워크스페이스 bluekey).
 // 2. **Socket Mode** 를 켜고 App-Level Token 을 만든다(스코프 `connections:write`). `xapp-` 로 시작한다.
-// 3. **OAuth & Permissions** 에서 Bot Token Scopes 에 `reactions:read` · `channels:history` · `channels:read`
-//    를 더하고 워크스페이스에 설치한다. `xoxb-` 로 시작하는 Bot Token 이 나온다.
-// 4. **Event Subscriptions** 를 켜고 `reaction_added` 를 구독한다.
-// 5. 결과 채널(#디자인시스템-화면-요청-결과물)에 그 앱을 초대한다: `/invite @<앱 이름>`.
-// 6. 토큰 두 개를 `~/.ooee-harness/slack.env` 에 적는다(이 파일은 저장소에 넣지 않는다).
+// 3. **OAuth & Permissions** 의 Bot Token Scopes 에 `reactions:read` · `channels:history` · `channels:read` ·
+//    `users:read` · `chat:write` 를 더하고 워크스페이스에 설치한다. `xoxb-` 로 시작하는 Bot Token 이 나온다.
+// 4. **Interactivity & Shortcuts** 를 켠다. 소켓 모드라 Request URL 은 적지 않는다 — 버튼을 누른 것이
+//    소켓으로 온다.
+// 5. **Event Subscriptions** 를 켜고 봇 이벤트로 `reaction_added` 와 `message.channels` 를 구독한다.
+//    뒤의 것이 스레드에 적은 까닭을 받는 길이다.
+// 6. 결과 채널(#디자인시스템-화면-요청-결과물)에 그 앱을 초대한다: `/invite @<앱 이름>`.
+// 7. 토큰 둘과 채널을 `~/.ooee-harness/slack.env` 에 적는다(이 파일은 저장소에 넣지 않는다).
 //
 //    ```sh
 //    SLACK_APP_TOKEN=xapp-…
 //    SLACK_BOT_TOKEN=xoxb-…
+//    SLACK_RESULT_CHANNEL=C0C3LKRKJCU
 //    ```
 //
-// 7. `cp scripts/harness/com.ooee.harness.slack.plist ~/Library/LaunchAgents/` 뒤
+// 8. `cp scripts/harness/com.ooee.harness.slack.plist ~/Library/LaunchAgents/` 뒤
 //    `launchctl load ~/Library/LaunchAgents/com.ooee.harness.slack.plist`. 로그는 `~/.ooee-harness/slack.log` 다.
 //
 // 토큰은 사람이 넣는다. 이 저장소에도 이 스크립트에도 두지 않는다.
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -57,10 +64,30 @@ export function readIssueNumber(text) {
  * 반려·개선은 사유를 비워 둔다. 이모지 하나로는 무엇을 고칠지 알 수 없어, 사람이 「개선: 고칠 것」을
  * 따로 남길 때까지 D3·D4 가 멈추는 것이 맞다.
  */
-export function buildComment({ decision, by, permalink }) {
+export function buildComment({ decision, by, permalink, how = "반응을 달아", reason = null }) {
   const who = by ? `${by} 님이` : "누군가";
   const where = permalink ? ` ([Slack에서 보기](${permalink}))` : "";
-  return `> ${who} Slack 결과 카드에 반응을 달아 남긴 결정입니다.${where}\n\n${decision}`;
+  const body = reason ? `${decision}: ${String(reason).replace(/\s+/g, " ").trim()}` : decision;
+  return `> ${who} Slack 결과 카드에서 ${how} 남긴 결정입니다.${where}\n\n${body}`;
+}
+
+/** 버튼의 `action_id` 에서 결정을 읽는다. 다른 버튼은 null 이다. */
+export function readAction(actionId) {
+  const match = /^decide:(승인|반려|개선)$/.exec(String(actionId ?? ""));
+  return match ? match[1] : null;
+}
+
+/** 까닭을 기다리는 자리. 카드 하나에 하나다. */
+export const pendingKey = (channel, ts) => `${channel}:${ts}`;
+
+/**
+ * 이 스레드 글이 기다리던 까닭인지. 누른 사람이 그 스레드에 적은 사람 글만 받는다 — 봇이 남긴 안내나
+ * 다른 사람의 잡담을 사유로 GitHub 에 올리지 않는다.
+ */
+export function isReason(event, pending) {
+  if (!event || event.type !== "message" || event.subtype || event.bot_id) return false;
+  if (!event.thread_ts || !pending) return false;
+  return pending.user === event.user && String(event.text ?? "").trim().length > 0;
 }
 
 /** 옮길 반응인지. 봇이 단 것과 결정이 아닌 이모지는 버린다. */
@@ -153,6 +180,72 @@ function comment(issue, body, { dryRun }) {
   log(`#${issue} 에 댓글을 달았다: ${body.split("\n")[0]}`);
 }
 
+/** 카드의 스레드에 한 줄 남긴다. 사람이 누른 자리에서 다음에 무엇을 해야 하는지 보이게 한다. */
+async function replyInThread(token, { channel, ts, text }) {
+  await slack("chat.postMessage", token, { channel, thread_ts: ts, text }).catch((error) => log(`스레드에 적지 못했다: ${error.message}`));
+}
+
+/** 까닭을 기다리는 카드들. 다리가 다시 떠도 이어지게 파일에 둔다. */
+const pendingFile = () => path.join(path.dirname(HOME_ENV), "pending.json");
+const readPending = () => {
+  try {
+    return JSON.parse(readFileSync(pendingFile(), "utf8"));
+  } catch {
+    return {};
+  }
+};
+const writePending = (all) => {
+  mkdirSync(path.dirname(pendingFile()), { recursive: true });
+  writeFileSync(pendingFile(), `${JSON.stringify(all, null, 2)}\n`);
+};
+
+/**
+ * 카드의 결정 버튼을 눌렀을 때. 승인은 바로 올리고, 반려·개선은 까닭을 스레드로 받는다 —
+ * 버튼 하나로는 무엇을 고칠지 알 수 없어 D3·D4 가 멈추기 때문이다.
+ */
+export async function handleAction(payload, { token, dryRun, channel }) {
+  const decision = readAction(payload?.actions?.[0]?.action_id);
+  if (!decision) return null;
+  const channelId = payload.channel?.id;
+  const ts = payload.message?.ts;
+  if (channel && channelId !== channel) return null;
+  const issue = Number(payload.actions[0].value) || readIssueNumber(messageText(payload.message ?? {}));
+  if (!issue) return log(`버튼 ${decision} — 어느 요청인지 읽지 못했다(${ts})`);
+  const by = await userName(token, payload.user?.id);
+  const { permalink } = await slack("chat.getPermalink", token, { channel: channelId, message_ts: ts }).catch(() => ({ permalink: null }));
+
+  if (decision === "승인") {
+    comment(issue, buildComment({ decision, by, permalink, how: "승인 버튼을 눌러" }), { dryRun });
+    await replyInThread(token, { channel: channelId, ts, text: `${by} 님이 승인했습니다. GitHub #${issue} 에 남겼습니다.` });
+    return { issue, decision, by };
+  }
+
+  const all = readPending();
+  all[pendingKey(channelId, ts)] = { issue, decision, user: payload.user?.id, by, permalink, at: new Date().toISOString() };
+  writePending(all);
+  await replyInThread(token, {
+    channel: channelId,
+    ts,
+    text: `${by} 님이 ${decision}을 골랐습니다. **이 스레드에 까닭을 한 줄 적어 주세요.** 적으면 GitHub #${issue} 에 「${decision}: …」으로 남깁니다.`,
+  });
+  return { issue, decision, by, pending: true };
+}
+
+/** 까닭을 기다리던 스레드에 사람이 적으면 그 글을 결정 댓글로 올린다. */
+export async function handleMessage(event, { token, dryRun, channel }) {
+  if (!event || event.type !== "message" || !event.thread_ts) return null;
+  if (channel && event.channel !== channel) return null;
+  const all = readPending();
+  const key = pendingKey(event.channel, event.thread_ts);
+  const pending = all[key];
+  if (!isReason(event, pending)) return null;
+  comment(pending.issue, buildComment({ decision: pending.decision, by: pending.by, permalink: pending.permalink, how: `${pending.decision} 버튼을 누르고 까닭을 적어`, reason: event.text }), { dryRun });
+  delete all[key];
+  writePending(all);
+  await replyInThread(token, { channel: event.channel, ts: event.thread_ts, text: `GitHub #${pending.issue} 에 「${pending.decision}: …」으로 남겼습니다.` });
+  return { issue: pending.issue, decision: pending.decision, reason: event.text };
+}
+
 export async function handleEvent(event, { token, botUserId, dryRun, channel }) {
   if (!shouldRelay(event, { botUserId })) return null;
   if (channel && event.item.channel !== channel) return null;
@@ -200,10 +293,11 @@ async function main(argv) {
         }
         if (frame.envelope_id) socket.send(JSON.stringify({ envelope_id: frame.envelope_id }));
         if (frame.type === "disconnect") return socket.close();
-        const event = frame.payload?.event;
-        if (!event) return;
         try {
-          await handleEvent(event, { token: botToken, botUserId: me.user_id, dryRun, channel });
+          if (frame.type === "interactive") await handleAction(frame.payload, { token: botToken, dryRun, channel });
+          const event = frame.payload?.event;
+          if (event?.type === "message") await handleMessage(event, { token: botToken, dryRun, channel });
+          else if (event) await handleEvent(event, { token: botToken, botUserId: me.user_id, dryRun, channel });
         } catch (error) {
           log(`옮기지 못했다: ${error.message}`);
         }

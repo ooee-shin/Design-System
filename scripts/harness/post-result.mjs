@@ -17,7 +17,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { looksLikeDecision, readCommentDecision, readMarker } from "./decision.mjs";
 import { renderResultComment } from "./result-comment.mjs";
-import { buildCard, postCard, slackTarget } from "./slack-card.mjs";
+import { buildBlocks, buildCard, postCard, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../..");
@@ -58,7 +58,9 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     // 이슈에 달린 뒤에만 카드를 올린다. 카드가 실패해도 결과는 이슈에 남으므로 처리를 멈추지 않는다.
     const target = slackTarget();
     if (target) {
-      await postCard(buildCard({ body, commentUrl: out.trim().split("\n").at(-1) }), target).then(
+      const commentUrl = out.trim().split("\n").at(-1);
+      const text = buildCard({ body, commentUrl });
+      await postCard(text, { ...target, blocks: buildBlocks({ text, issue: number, commentUrl }) }).then(
         (ts) => process.stdout.write(`결과 채널에 카드를 올렸다(${ts})\n`),
         (error) => process.stdout.write(`결과 채널에 카드를 올리지 못했다: ${error.message}\n`),
       );

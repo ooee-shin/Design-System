@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { readCommentDecision } from "./decision.mjs";
-import { buildComment, loadEnv, messageText, pickMessage, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
+import { buildComment, isReason, loadEnv, messageText, pendingKey, pickMessage, readAction, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
 
 const card = "화면 요청 #39 결과 · 1회차 — 공지사항 목록 · 결정은 GitHub 댓글에 👍 👎 😕\n요청: @기획자 · 프로젝트 하네스 시험";
 
@@ -40,7 +40,37 @@ test("반응 셋은 decision.mjs 와 같은 낱말로 옮긴다", () => {
 
 test("댓글은 결정 낱말만 홀로 두고, 누가 눌렀는지는 인용 줄로 앞에 둔다", () => {
   const body = buildComment({ decision: "승인", by: "기획자", permalink: "https://slack.com/x" });
-  assert.match(body, /^> 기획자 님이 Slack 결과 카드에 반응을 달아 남긴 결정입니다\. \(\[Slack에서 보기\]\(https:\/\/slack\.com\/x\)\)\n\n승인$/);
+  assert.match(body, /^> 기획자 님이 Slack 결과 카드에서 반응을 달아 남긴 결정입니다\. \(\[Slack에서 보기\]\(https:\/\/slack\.com\/x\)\)\n\n승인$/);
+});
+
+test("까닭이 있으면 「개선: 까닭」 꼴로 적는다 — D4 가 그 꼴만 사유로 읽는다", () => {
+  const body = buildComment({ decision: "개선", by: "기획자", how: "개선 버튼을 누르고 까닭을 적어", reason: "조회 버튼을\n채움으로" });
+  assert.match(body, /\n\n개선: 조회 버튼을 채움으로$/, "줄바꿈을 펴지 않으면 뒤가 잘린다");
+  assert.equal(readCommentDecision(body).reason, "조회 버튼을 채움으로");
+});
+
+test("버튼의 action_id 에서 결정을 읽는다", () => {
+  assert.equal(readAction("decide:승인"), "승인");
+  assert.equal(readAction("decide:개선"), "개선");
+  assert.equal(readAction("decide:머시기"), null);
+  assert.equal(readAction(undefined), null);
+});
+
+test("까닭은 누른 사람이 그 스레드에 적은 사람 글만 받는다", () => {
+  const pending = { issue: 9, decision: "개선", user: "U1" };
+  const base = { type: "message", thread_ts: "1.0", user: "U1", text: "조회 버튼을 채움으로" };
+  assert.equal(isReason(base, pending), true);
+  assert.equal(isReason({ ...base, user: "U2" }, pending), false, "다른 사람의 잡담을 사유로 올렸다");
+  assert.equal(isReason({ ...base, bot_id: "B1" }, pending), false, "봇이 남긴 안내를 사유로 올렸다");
+  assert.equal(isReason({ ...base, subtype: "channel_join" }, pending), false);
+  assert.equal(isReason({ ...base, thread_ts: undefined }, pending), false, "스레드 밖의 글을 사유로 올렸다");
+  assert.equal(isReason({ ...base, text: "   " }, pending), false);
+  assert.equal(isReason(base, undefined), false, "기다리지 않는 카드의 글을 사유로 올렸다");
+});
+
+test("기다리는 자리는 채널과 카드로 가른다", () => {
+  assert.equal(pendingKey("C1", "1.0"), "C1:1.0");
+  assert.notEqual(pendingKey("C1", "1.0"), pendingKey("C2", "1.0"));
 });
 
 test("판독이 이 댓글을 그 결정으로 읽는다 — 꼴이 어긋나면 조용히 무시된다", () => {
