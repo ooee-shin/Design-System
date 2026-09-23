@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Slack 결과 카드의 👍 👎 😕 를 GitHub 결과 댓글의 결정으로 옮긴다(scripts/harness/slack-bridge.mjs 머리말 「설치」).
+     오래 도는 프로세스라 KeepAlive 로 되살린다. 토큰은 ~/.ooee-harness/slack.env 에 사람이 넣는다.
+     Desktop 은 launchd 가 읽지 못해(TCC) 보호 밖의 사본에서 돈다. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ooee.harness.slack</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/yujinsik/.local/node/bin/node</string>
+    <string>/Users/yujinsik/.ooee-harness/harness/scripts/harness/slack-bridge.mjs</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/yujinsik/.ooee-harness/harness</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/Users/yujinsik/.local/node/bin:/Users/yujinsik/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>30</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/yujinsik/.ooee-harness/slack.log</string>
+  <key>StandardErrorPath</key><string>/Users/yujinsik/.ooee-harness/slack.log</string>
+</dict>
+</plist>
