@@ -248,15 +248,6 @@ export const sandboxScreens: SandboxScreen[] = [
     createdAt: "2026-09-23",
   },
   {
-    key: "kakao-message-dashboard",
-    project: "harness-test",
-    viewports: ["web", "mobile"],
-    name: "카카오톡 api 연동 메인 대시보드",
-    href: "/kakao-message-dashboard",
-    prompt: "카카오톡 api 연동해서 메시지를 대시보드에서 이력 관리 하는 페이지.",
-    createdAt: "2026-09-23",
-  },
-  {
     key: "invoice-dashboard",
     project: "자동-송장-api",
     viewports: ["web"],
