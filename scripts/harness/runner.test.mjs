@@ -215,9 +215,9 @@ test("닫는 글은 결정으로 읽히지 않는다 — 러너가 남긴 글이
 test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기획자가 무엇을 다시 낼지 보면 된다", () => {
   const report = "앞말\n\n## 묻고 멈춤\n\n**멈춘 단계:** 1단계\n\n- 화면 유형이 2개(모바일, 태블릿)다 — 하나를 묻는다\n- 새 프로젝트 「신주희 테스트」\n\n## 막힌 명령\n- 없음";
   const text = stopNotice(60, report, { title: "챗봇 채팅 화면", url: "https://github.com/x/y/issues/60" });
-  assert.match(text, /^⚠️ 화면 요청 #60 「챗봇 채팅 화면」 — 묻고 멈춤\n/);
+  assert.match(text, /^🙋 화면 요청 #60 「챗봇 채팅 화면」 — 묻고 멈춤\n/, "묻는 것은 실패 표시를 달지 않는다");
   assert.match(text, /· 화면 유형이 2개/);
-  assert.match(text, /요청을 고쳐 다시 내거나/);
+  assert.match(text, /폼으로 다시 내 주세요/);
   assert.match(text, /자세히: https:\/\/github\.com\/x\/y\/issues\/60$/);
   assert.doesNotMatch(text, /막힌 명령/, "보고 전체를 옮기면 카드가 길어진다");
   assert.match(stopNotice(1, "제목 없는 보고"), /처리가 끝나지 않았다/);
@@ -230,4 +230,19 @@ test("하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다", (
   const card = stopNotice(85, report, { title: "자동 송장 api 대시보드" });
   assert.match(card, /— 처리가 끝나지 않았다/);
   assert.ok(!card.includes("준비 완료"), `성공 제목이 카드에 실렸다:\n${card}`);
+});
+
+test("묻는 것과 실패를 가려 카드를 쓴다 — 묻는 것을 실패로 적으면 기획자가 개발자를 부른다", () => {
+  // 2026-09-24 #99: 「무엇을 고칠지 요청에 없다」고 물었는데 카드가 「⚠️ 처리 중 실패 · 개발자가 봐야
+  // 합니다」로 나갔다. 게다가 고를 갈래 셋 가운데 「1.」 한 줄에서 잘렸다.
+  const asking = ["## 묻고 멈춤", "", "- 상단에 검색 UI 가 없다 — 무엇을 만들지 요청에 없다", "1. 검색창을 새로 둔다", "2. 입력줄을 옮긴다", "3. 다른 화면이다"].join("\n");
+  const card = stopNotice(99, asking, { title: "수정" });
+  assert.match(card, /^🙋 /, "묻는 것에 실패 표시를 달면 안 된다");
+  assert.match(card, /폼으로 다시 내 주세요/);
+  for (const n of ["1.", "2.", "3."]) assert.ok(card.includes(n), `갈래 ${n} 가 잘렸다`);
+
+  const failing = ["## 처리 중 실패", "", "- `pnpm check` 가 화면 자리 밖에서 실패했다"].join("\n");
+  const bad = stopNotice(99, failing, { title: "수정" });
+  assert.match(bad, /^⚠️ /);
+  assert.match(bad, /개발자에게 알려 주세요/);
 });

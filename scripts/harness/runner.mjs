@@ -99,7 +99,10 @@ export function closingComment(kind, detail) {
  * 멈췄을 때 결과 채널에 올릴 글. 보고의 첫 제목과 그 아래 문제 줄만 뽑는다 — 기획자가 무엇을 다시 내야
  * 하는지만 보면 된다. 러너가 멈추면 job 로그에만 남아 요청한 사람은 알 길이 없었다(#60).
  */
-export function stopNotice(issue, report, { title = "", url = "", tail = "요청을 고쳐 다시 내거나 개발자에게 알려 주세요." } = {}) {
+/** 기획자가 답해야 하는 멈춤인지. 그러면 카드의 꼬리말이 개발자가 아니라 요청자를 가리킨다. */
+const ASKING = /묻고 멈춤|무엇을|알 수 없|새 요구|다시 내/;
+
+export function stopNotice(issue, report, { title = "", url = "", tail } = {}) {
   const lines = String(report ?? "").split("\n");
   // 하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다. `2026-09-24` #85 카드가 「⚠️ … pull request 준비
   // 완료」로 나갔다 — generate-code 가 화면 하나를 만들고 낸 제목인데, 그 뒤 단계를 하지 않아 실패한 실행
@@ -112,16 +115,25 @@ export function stopNotice(issue, report, { title = "", url = "", tail = "요청
   const section = at >= 0 ? lines.slice(at + 1) : lines;
   const end = section.findIndex((line) => /^## /.test(line));
   const rest = (end < 0 ? section : section.slice(0, end)).map((line) => line.trim()).filter(Boolean);
-  const problems = rest.filter((line) => /^[-*] |^\d+\. /.test(line)).slice(0, 4);
-  const picked = problems.length ? problems : rest.slice(0, 3);
+  // 고른 갈래를 반만 보여 주면 물음이 되지 않는다. `2026-09-24` #99 카드가 세 갈래 가운데 「1.」 한 줄만
+  // 내보냈다. 번호 목록은 끊지 않고, 그 밖에는 여섯 줄까지 싣는다.
+  const listed = rest.filter((line) => /^[-*] |^\d+\. /.test(line));
+  const numbered = listed.filter((line) => /^\d+\. /.test(line)).length;
+  const problems = listed.slice(0, Math.max(6, numbered + 3));
+  const picked = problems.length ? problems : rest.slice(0, 4);
   // 쓸 줄이 하나도 없을 때가 있다 — 하위 명령의 제목만 남기고 끝난 실행(#85)이 그렇다. 빈 카드를 올리면
   // 기획자는 무엇이 잘못됐는지도, 무엇을 해야 하는지도 알 수 없다.
   const detail = picked.length
     ? picked.map((line) => line.replace(/^[-*] /, "· ")).join("\n")
     : "· 어디서 멈췄는지 보고에 남지 않았습니다. 개발자가 실행 기록을 봐야 합니다.";
-  const head = `⚠️ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
+  // 「실패」와 「물음」은 다르다. 묻는 것을 실패로 적으면 기획자는 고장 난 줄 알고 개발자를 부른다
+  // (`2026-09-24` #99). 답할 사람이 요청자면 그렇게 말한다.
+  const asking = ASKING.test(heading) || ASKING.test(detail);
+  const mark = asking ? "🙋" : "⚠️";
+  const say = tail ?? (asking ? "위 가운데 무엇인지 한 줄로 적어 폼으로 다시 내 주세요." : "요청을 고쳐 다시 내거나 개발자에게 알려 주세요.");
+  const head = `${mark} 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${asking && !/묻/.test(heading) ? `${heading} (물음)` : heading}`;
   const where = url ? `\n자세히: ${url}` : "";
-  return `${head}\n${detail}\n\n${tail}${where}`;
+  return `${head}\n${detail}\n\n${say}${where}`;
 }
 
 /** 같은 결정을 두 번 처리하지 않게 하는 열쇠. 사람이 새 신호를 남기면 `at` 이 바뀌어 다시 처리한다. */
