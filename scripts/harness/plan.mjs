@@ -127,6 +127,31 @@ export function section(body, heading) {
     .map((line) => line.slice(2).trim());
 }
 
+
+/**
+ * `screens.ts` 원문에서 그 화면들의 등록을 지운다. 반려가 화면을 걷어낼 때 쓴다.
+ *
+ * **`git revert` 를 쓰지 않는 까닭**(`2026-09-24` #62). 화면을 더한 commit 을 되돌리려면 그 뒤에 다른
+ * 요청이 `screens.ts` 에 더한 줄과 부딪힌다 — 실제로 부딪혔다. 반려가 뜻하는 것은 「그 요청의 화면을
+ * 걷어낸다」이지 「그 commit 을 되돌린다」가 아니므로, 화면 자리와 등록 줄만 지운다. 다른 요청의 줄은
+ * 건드리지 않으므로 부딪힐 일이 없다.
+ */
+export function removeScreens(text, keys) {
+  let out = String(text ?? "");
+  const gone = [];
+  for (const key of keys) {
+    // `{` 부터 짝이 맞는 `},` 까지가 한 화면이다. key 줄을 찾아 그 블록의 처음과 끝을 잡는다.
+    const at = out.indexOf(`    key: "${key}",`);
+    if (at < 0) continue;
+    const start = out.lastIndexOf("\n  {\n", at);
+    const end = out.indexOf("\n  },\n", at);
+    if (start < 0 || end < 0) continue;
+    out = out.slice(0, start) + out.slice(end + "\n  },".length);
+    gone.push(key);
+  }
+  return { text: out, removed: gone };
+}
+
 /** 화면 key 로 만드는 샌드박스 주소. 결과 댓글의 링크가 이것이다. */
 export const sandboxUrl = (key, origin = "https://ooee-sandbox.pages.dev") => `${origin}/${key}`;
 

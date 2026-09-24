@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderResultComment } from "./result-comment.mjs";
-import { branchName, planPath, prBody, readScreens, resultInput, sandboxUrl, section, title, validatePlan } from "./plan.mjs";
+import { branchName, planPath, prBody, readScreens, removeScreens, resultInput, sandboxUrl, section, title, validatePlan } from "./plan.mjs";
 
 const screen = (over = {}) => ({
   key: "invoice-dashboard",
@@ -132,4 +132,33 @@ test("개선 회차는 다시 만든 화면만 「추가한 페이지」에 넣�
   const input = resultInput({ issue: 60, read, round: 2, screens: [screen(), kept], plan: {} });
   assert.deepEqual(input.summary.pagesAdded, ["자동 송장 대시보드"], "그대로 둔 화면을 다시 만들었다고 적으면 안 된다");
   assert.equal(input.screens.length, 2, "표에는 이 요청의 화면이 모두 있어야 한다");
+});
+
+test("반려는 그 요청의 화면 등록만 지운다 — 다른 요청의 줄은 건드리지 않는다", () => {
+  // 2026-09-24 #62: `git revert` 로 걷어내려니 그 뒤에 다른 요청이 screens.ts 에 더한 줄과 부딪혔다.
+  const text = `export const sandboxScreens: SandboxScreen[] = [
+  {
+    key: "keep-me",
+    project: "p",
+    viewports: ["web"],
+    name: "남는 화면",
+  },
+  {
+    key: "drop-me",
+    project: "p",
+    viewports: ["web"],
+    name: "걷어낼 화면",
+  },
+  {
+    key: "keep-me-too",
+    project: "p",
+    viewports: ["web"],
+    name: "이것도 남는다",
+  },
+];`;
+  const out = removeScreens(text, ["drop-me"]);
+  assert.deepEqual(out.removed, ["drop-me"]);
+  assert.deepEqual(readScreens(out.text).map((screen) => screen.key), ["keep-me", "keep-me-too"]);
+  assert.ok(!out.text.includes("drop-me"));
+  assert.deepEqual(removeScreens(text, ["없는-key"]).removed, [], "없는 key 는 지웠다고 하지 않는다");
 });

@@ -143,7 +143,7 @@ export function mainPr({ issue, read, screenName, landed }) {
 }
 
 /** 되돌림 pull request 의 제목과 본문. 첫 줄의 `되돌림: #<n>` 을 D2 가 읽는다. */
-export function revertPr({ issue, read, screenName, commits, alsoOnMain = false }) {
+export function revertPr({ issue, read, screenName, commits = [], alsoOnMain = false, keys = [] }) {
   const title = `revert(sandbox): 화면 요청 #${issue} 반려 — ${screenName}`;
   const body = [
     `되돌림: #${issue}`,
@@ -156,9 +156,10 @@ export function revertPr({ issue, read, screenName, commits, alsoOnMain = false 
     read.reason ? `> ${read.reason}` : "> (사유가 적히지 않았다)",
     ...(read.reasonSource && read.reasonSource !== "prefix" ? ["", `사유는 짐작이다(${read.reasonSource}). 원문: ${read.reasonCommentUrl ?? "없음"}`] : []),
     "",
-    "## 되돌린 commit",
+    "## 걷어낸 화면",
     "",
-    ...commits.map((sha) => `- \`${sha}\``),
+    ...keys.map((key) => `- \`apps/sandbox/src/app/${key}/\` 와 \`screens.ts\` 의 등록`),
+    ...(commits.length ? ["", `만든 commit: ${commits.map((sha) => `\`${sha.slice(0, 7)}\``).join(", ")}`] : []),
     "",
     ...(alsoOnMain
       ? ["", "## main 에도 있다", "", "이 화면은 `main` 에도 올라가 있다(개발자가 승인 전에 dev → main 을 올렸다). 이 되돌림은 `dev` 에만 들어가고, 다음 `dev → main` 최신화에 함께 올라간다."]

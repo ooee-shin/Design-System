@@ -21,7 +21,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { freeBranch, howToUnmix, improveBlocked, isRequestOf, isRevertOf, mainPr, revertPr, screenCommits, sortLanded } from "./decide.mjs";
-import { branchName, planPath, prBody, readScreens, resultInput, section, title, validatePlan } from "./plan.mjs";
+import { branchName, planPath, prBody, readScreens, removeScreens, resultInput, section, title, validatePlan } from "./plan.mjs";
 import { postCard, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -569,24 +569,33 @@ async function reject(issue, read, stop) {
     return true;
   }
 
-  // **`main..dev` 로 찾지 않는다.** 개발자가 dev → main 을 올린 뒤에 반려가 나면 그 사이가 비어 있어
-  // 「되돌릴 것이 없다」가 된다(`2026-09-24` #62). 이 요청의 commit 은 그래도 dev 의 이력에 있다.
+  // 이 요청이 더한 화면 key. 걷어낼 자리를 여기서 정한다.
+  const prs = JSON.parse(sh("gh", ["pr", "list", "--state", "merged", "--base", "dev", "--search", `"요청: #${issue}" in:body`, "--json", "number,body,files"]))
+    .filter((pr) => isRequestOf(pr.body, issue));
+  const keys = [...new Set(prs.flatMap((pr) => screenKeys(pr.files.map((file) => file.path))))];
+  if (!keys.length) return stop("되돌릴 것이 없다", ["이 요청이 더한 화면을 찾지 못했다 — 아직 만들지 않았거나 이미 걷어냈다"]);
   const commits = screenCommits(sh("git", ["log", "--format=%H %s", "origin/dev", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n"), issue);
-  if (!commits.length) return stop("되돌릴 것이 없다", ["이 요청의 화면 commit 이 dev 의 이력에 없다 — 아직 만들지 않았거나 이미 되돌렸다"]);
-  // 화면이 이미 main 에도 있으면 되돌림은 dev 에만 들어간다. 다음 dev → main 에 함께 올라간다.
+  // 화면이 이미 main 에도 있으면 걷어냄은 dev 에만 들어간다. 다음 dev → main 에 함께 올라간다.
   const alsoOnMain = onMain(issue).length > 0;
 
+  dropStaleBranches(issue);
+  const local = sh("git", ["branch", "--format=%(refname:short)"]).split("\n").filter(Boolean);
   const remote = sh("git", ["ls-remote", "--heads", "origin"]).split("\n").filter(Boolean).map((line) => line.split("refs/heads/")[1]);
-  const branch = freeBranch(`feature/issue-${issue}-revert`, remote);
+  const branch = freeBranch(`feature/issue-${issue}-revert`, [...local, ...remote]);
   sh("git", ["switch", "-c", branch]);
-  try {
-    sh("git", ["revert", "--no-edit", ...commits]);
-  } catch (error) {
-    sh("git", ["revert", "--abort"]);
-    return stop("되돌리다 부딪혔다", [error.message.split("\n")[0], "다른 요청의 화면이 같은 자리를 고쳤다 — 사람이 푼다"]);
+
+  // **`git revert` 를 쓰지 않는다**(plan.mjs `removeScreens` 머리말). 화면 자리와 등록 줄만 지운다.
+  const screensFile = path.join(repoRoot, "apps/sandbox/src/screens.ts");
+  const { text, removed } = removeScreens(readFileSync(screensFile, "utf8"), keys);
+  if (removed.length !== keys.length) {
+    return stop("걷어낼 화면을 찾지 못했다", [`screens.ts 에 없는 key: ${keys.filter((key) => !removed.includes(key)).join(", ")}`]);
   }
+  writeFileSync(screensFile, text);
+  for (const key of keys) rmSync(path.join(repoRoot, "apps/sandbox/src/app", key), { recursive: true, force: true });
+  sh("git", ["add", "apps/sandbox"]);
+  sh("git", ["commit", "-q", "-m", `revert(sandbox): 화면 요청 #${issue} 반려 — 화면 ${keys.length}장을 걷어낸다 (#${issue})`]);
   sh("git", ["push", "-q", "-u", "origin", branch]);
-  const { title: prTitle, body } = revertPr({ issue, read, screenName: readScreenName(issue), commits, alsoOnMain });
+  const { title: prTitle, body } = revertPr({ issue, read, screenName: readScreenName(issue), commits, alsoOnMain, keys });
   const bodyFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, "revert.md");
   mkdirSync(path.dirname(bodyFile), { recursive: true });
   writeFileSync(bodyFile, body);

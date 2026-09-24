@@ -76,12 +76,13 @@ test("main pull request 는 첫 줄에 승인 표식을 둔다 — 러너가 그
 
 test("되돌림 pull request 는 사유와 되돌린 commit 을 남기고, 짐작한 사유는 그렇다고 적는다", () => {
   const read = { by: "유진식", at: "2026-09-24T02:00:00Z", reason: "표가 잘린다", reasonSource: "after", reasonCommentUrl: "https://x/r", resultCommentUrl: "https://x/c" };
-  const { title, body } = revertPr({ issue: 62, read, screenName: "카카오톡 대시보드", commits: ["abc1234", "def5678"] });
+  const { title, body } = revertPr({ issue: 62, read, screenName: "카카오톡 대시보드", commits: ["abc1234", "def5678"], keys: ["kakao-message-dashboard"] });
   assert.equal(title, "revert(sandbox): 화면 요청 #62 반려 — 카카오톡 대시보드");
   assert.match(body, /^되돌림: #62\n/, "D2 가 이 줄로 되돌림을 가린다");
   assert.match(body, /> 표가 잘린다/);
   assert.match(body, /사유는 짐작이다\(after\)/);
-  assert.match(body, /- `abc1234`\n- `def5678`/);
+  assert.match(body, /## 걷어낸 화면\n\n- `apps\/sandbox\/src\/app\/kakao-message-dashboard\/`/);
+  assert.match(body, /만든 commit: `abc1234`, `def5678`/);
 });
 
 test("개선은 사유가 밝혀졌을 때만, 세 번까지 한다", () => {
