@@ -9,6 +9,7 @@ Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 �
 | 파일 | 하는 일 |
 | --- | --- |
 | `plan.mjs` | 모델이 화면을 만든 뒤 남기는 `plan.json` 을 읽어 가지 이름·pull request 본문·결과 댓글 입력으로 바꾼다. 순수 함수라 시험이 값으로 고정한다 |
+| `decide.mjs` | 승인·반려·개선을 스크립트가 처리할 때 쓰는 규칙. `main` 에 승인 아닌 것이 섞였는지 가르고, main·되돌림 pull request 본문을 만든다. 역시 순수 함수다 |
 | `issue.mjs` | 이슈 본문을 칸별로 읽어 `/ooee-harness:generate-code` 인수(`generateArgs`)를 만든다. 만들 수 없으면 `null`과 까닭(`problems`)을 낸다 |
 | `result-comment.mjs` | 처리 결과를 결과 댓글 markdown 으로 만든다. 빠진 링크나 실패한 검사가 있으면 만들지 않고 던진다 |
 | `post-result.mjs` | 결과 댓글을 이슈에 단다(에이전트가 이슈에 글을 다는 유일한 길). 단 뒤 `slack-card.mjs` 로 결과 채널에 카드를 올린다 |
@@ -21,14 +22,14 @@ Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 �
 | `com.ooee.harness.*.plist` | launchd 정의 둘(다리 · 감시). 설치는 아래 「launchd」 |
 | `decision.mjs` | 결과 댓글의 반응과 뒤따른 댓글에서 승인·반려·개선을 읽는다. `gh api` GET 만 쓴다 |
 | `post-result.mjs` | 결과 댓글 한 장을 이슈에 단다. 에이전트가 이슈에 글을 다는 유일한 길이다 — 아래 「알아 둘 것」 |
-| `runner.mjs` | 이 Mac 의 러너가 부른다. `/process-issue … 러너`를 돌리고, 넘김 파일대로 pull request 를 만들어 Quality 를 본 뒤 합치고, 세션을 이어 받게 한다. 아래 「러너」 |
+| `runner.mjs` | 요청 하나를 처음부터 끝까지 돌린다. 모델(`/make-screens`)은 화면만 만들고, 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글·이슈 닫기는 모두 여기다. 아래 「러너」 |
 | `fixtures/issue-*.json` | `gh issue view`로 한 번 받아 둔 실제 이슈 #1~#4·#6·#9. 폼이 바뀌어 온 양식이 다 들어 있다 |
 | `fixtures/issue-9-comments.json` | 실제 #9 댓글(`--paginate --slurp` 모양). 아직 비어 있다 |
 | `fixtures/result-input.example.json` | `result-comment.mjs` 입력의 예. #9 를 처리했다고 치고 지어낸 값이다(주소도 가짜다) |
 
 ## 돌리는 순서
 
-이 차례를 처음부터 끝까지 도는 것은 `/process-issue`(`.claude/skills/process-issue/SKILL.md`)다. 손으로 돌릴 때도 같은 차례다.
+이 차례를 도는 것은 `runner.mjs` 다. 모델은 그 가운데 화면 만들기 하나만 맡는다(`.claude/skills/make-screens/SKILL.md`).
 
 ```bash
 node scripts/harness/issue.mjs 9                         # generateArgs 가 null 이면 problems 를 요청자에게 묻는다
@@ -44,14 +45,14 @@ node scripts/harness/decision.mjs 9 [--round 1]          # 결과 없음 · 대�
 - 허용 프로젝트는 `apps/sandbox/src/screens.ts`의 `SANDBOX_PROJECTS`에서 읽는다. 폼의 「새 프로젝트」 칸으로 온 이름은 러너가 그 목록에 더하므로 폼의 선택지와 같을 필요는 없다 — 폼 선택지에 있는 이름이 목록에 없으면 모르는 값이 되어 멈춘다.
 - 결과 댓글의 첫 네 줄(제목과 결정 안내 · 요청 · 샌드박스 · 작업 요약)이 Slack 결과 채널의 카드에 보인다. 머리에 드는 값은 한 줄로 펴서 입력이 어떻든 네 줄이다. 결과는 샌드박스에서만 본다(`2026-09-22` 에 Figma 를 뺐다). 작업 줄은 만든 페이지 이름을 앞의 셋까지 적는다. 개선 회차의 샌드박스 링크는 `summary.pagesAdded`에 이름이 있는 첫 화면이라, 그 이름은 `screens[].name`과 같아야 한다(다르면 만들지 않는다). 표식 `<!-- harness:result issue=<n> round=<r> -->`는 카드에 드러나지 않게 맨 끝에 둔다.
 - 결정 신호는 결과 댓글의 👍·👎·😕 반응과 「승인」 한 낱말, 또는 「반려: …」·「개선: …」처럼 콜론을 붙인 댓글이다. 가장 늦은 것이 이긴다.
-- 결정 낱말로 시작하지만 꼴이 맞지 않는 댓글(「승인합니다」「반려합니다. …」「개선 요청: …」)은 결정이 아니고 `lookalikes`에 주소·글과 함께 나온다. 그 가운데 이긴 신호보다 늦은 것이 있으면(신호가 없으면 하나라도 있으면) `lookalikeAfterDecision`이 `true`다. `/process-issue`는 그때 결정을 따르지 않고 묻는다.
+- 결정 낱말로 시작하지만 꼴이 맞지 않는 댓글(「승인합니다」「반려합니다. …」「개선 요청: …」)은 결정이 아니고 `lookalikes`에 주소·글과 함께 나온다. 그 가운데 이긴 신호보다 늦은 것이 있으면(신호가 없으면 하나라도 있으면) `lookalikeAfterDecision`이 `true`다. 러너는 그때 결정을 따르지 않고 멈춘다.
 - 반려·개선의 사유는 `reasonSource`와 함께 나온다. `prefix`는 「반려: …」 댓글 자신, `after`는 신호를 남긴 사람이 그 뒤에 쓴 첫 댓글, `before`는 신호 앞 10분(`REASON_BEFORE_MS`) 안의 마지막 댓글이다. `after`·`before`는 짐작이라 `reasonCommentUrl`로 원문을 가리키고 `note`에 적는다.
 
 ## 러너
 
-**새 요청은 스크립트가 운전한다**(`2026-09-24` 역할 뒤집기). `runner.mjs` 의 `runRequest` 가 이슈를 읽고 → `/make-screens` 를 한 번 부르고 → `plan.json` 을 확인한 뒤 → 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글까지 한다. **모델이 하는 일은 화면을 만들고 `plan.json` 을 쓰는 것 하나뿐이다.** 까닭은 `plan.mjs` 머리말에 있다 — `2026-09-23`~`24` 에 요청 처리가 아홉 번 무너졌는데 화면 생성은 한 번도 실패하지 않았고, 무너진 것은 언제나 모델이 운전하던 주변이었다. **결정(승인·반려·개선)은 아직 옛 길(`/process-issue 결정` + 넘김 파일)이다** — 처리 경로를 실제 요청으로 검증한 뒤 옮긴다.
+**새 요청은 스크립트가 운전한다**(`2026-09-24` 역할 뒤집기). `runner.mjs` 의 `runRequest` 가 이슈를 읽고 → `/make-screens` 를 한 번 부르고 → `plan.json` 을 확인한 뒤 → 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글까지 한다. **모델이 하는 일은 화면을 만들고 `plan.json` 을 쓰는 것 하나뿐이다.** 까닭은 `plan.mjs` 머리말에 있다 — `2026-09-23`~`24` 에 요청 처리가 아홉 번 무너졌는데 화면 생성은 한 번도 실패하지 않았고, 무너진 것은 언제나 모델이 운전하던 주변이었다. **결정도 같은 길이다** — 승인·반려는 판단이 없어 모델을 아예 부르지 않고(`decide.mjs`), 개선만 사유가 앞 회차의 무엇을 가리키는지 읽히려고 부른다. 넘김 파일과 세션 이어받기는 없앴다.
 
-**러너를 부르는 것은 이 Mac 의 1분 감시다**(`2026-09-23` 개발자: 「로컬에서 돌리는 걸로, 항상 켜두는 컴퓨터라 괜찮다」). `watch-decisions.mjs` 가 열린 화면 요청을 읽어 처리할 것과 결정을 고르고, `local-run.mjs` 가 사본(`~/.ooee-harness/harness`)을 `origin/dev` 로 맞춘 뒤 러너를 **Actions job 밖에서** 돌린다. 흐름은 ai-environment.md 「처리와 승인」이, Claude 쪽 절차는 `/process-issue`의 「러너에서 돌 때」가 갖는다.
+**러너를 부르는 것은 이 Mac 의 1분 감시다**(`2026-09-23` 개발자: 「로컬에서 돌리는 걸로, 항상 켜두는 컴퓨터라 괜찮다」). `watch-decisions.mjs` 가 열린 화면 요청을 읽어 처리할 것과 결정을 고르고, `local-run.mjs` 가 사본(`~/.ooee-harness/harness`)을 `origin/dev` 로 맞춘 뒤 러너를 **Actions job 밖에서** 돌린다. 흐름은 ai-environment.md 「처리와 승인」이, 모델이 맡는 한 조각은 `/make-screens` 가 갖는다.
 
 ```bash
 node scripts/harness/local-run.mjs 처리 12   # 감시가 부르는 것과 같다(사본을 맞추고 기록을 남긴다)
@@ -71,9 +72,9 @@ node scripts/harness/runner.mjs 결과 9       # 결과 댓글만
 - **한 번에 한 요청이다.** 러너가 도는 동안 launchd 는 다음 tick 을 띄우지 않는다(한 working tree 한 요청).
 
 - **수정 요청도 같은 길로 온다.** 본문에 `수정 대상: #<n>` 이 있으면 `issue.mjs` 가 `mode: "수정"` 으로 읽고, 처리하는 쪽이 그 요청의 화면을 제자리에서 고친다(ai-environment.md 「두 번째 폼」).
-- **Claude 는 push 까지, 합치기는 스크립트가.** `claude -p "/process-issue <인수> 러너"`는 pull request 를 만들 자리에서 `.harness-work/issue-<n>/handoff.json`을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(이 요청의 `feature/issue-<n>-` 가지인지, 본문이 이 요청의 작업 자리 안에 있고 첫 줄이 `요청:`·`되돌림:`·`승인: #<n>`인지) `gh pr create --base <dev|main>` → 그 head commit 의 Quality 실행을 기다려 `gh run watch` → `dev`는 squash, `main`은 머지 commit 으로 합친다. `resume`이 `true`면 같은 세션을 `-r`로 이어 받아 7·8단계를 맡긴다. `dev`로 합칠 pull request 는 생성 화면의 자리(`apps/sandbox/src/app/<key>/` 바로 아래와 `apps/sandbox/src/screens.ts`)만 바꿔야 한다. 그 밖을 건드렸으면 합치지 않고 열어 둔 채 멈춘다 — 모델이 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌기 때문이다.
+- **Claude 는 화면까지, 나머지는 스크립트가.** `claude -p "/make-screens <n> 러너"` 는 화면을 만들고 `.harness-work/issue-<n>/plan.json` 을 쓰고 멈춘다. 스크립트는 그 파일을 다시 검사하고(`plan.mjs` 의 `validatePlan`) 가지를 만들어 commit·push 한 뒤 `gh pr create` → Quality → squash 머지 → 배포 확인 → 결과 댓글까지 한다. 올릴 변경은 생성 화면의 자리(`apps/sandbox/src/app/<key>/` 바로 아래와 `apps/sandbox/src/screens.ts`)뿐이어야 한다. 그 밖을 건드렸으면 올리지 않고 멈춘다 — 모델이 하네스 스크립트나 workflow 를 함께 올리면 러너가 스스로 합치고 다음 실행에서 그 코드로 돌기 때문이다.
 - **모델은 `claude-sonnet-5`·`high`로 박는다.** 명령 머리말과 같은 값이다. 이어 받는 차례는 명령 밖이라 CLI 인수로도 준다. 실행 기록에 쓴 모델이 찍힌다.
-- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **`/process-issue` 와 하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아 #29 에서 하위 명령이 적어 둔 명령이 거부됐고, 이어 받는 차례(7·8단계)는 `/process-issue` 밖이라 그 머리말도 적용되지 않는다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다. MCP 서버는 싣지 않는다.
+- **러너가 스스로 더 여는 것은 `git revert`뿐이다**(D3). **`/make-screens` 와 하위 명령(generate-code · review-design)의 머리말 allowed-tools 는 러너가 읽어 `--allowedTools`로 넘긴다** — 바깥 명령 안에서 Skill 로 불린 명령의 머리말은 적용되지 않아 #29 에서 하위 명령이 적어 둔 명령이 거부됐다. 원본은 여전히 각 SKILL.md 이고, 넘기는 목록에 gh 쓰기 명령이 섞이면 시험이 실패한다. 파일 쓰기는 `--permission-mode acceptEdits`로 받고, Plugin 은 `--plugin-dir plugins/ooee-harness`로 싣는다. MCP 서버는 싣지 않는다.
 - **gh·git 은 이 Mac 의 로그인이다.** checkout 은 `persist-credentials: false`로 받아 GITHUB_TOKEN 을 남기지 않는다. GITHUB_TOKEN 으로 만든 pull request 와 머지는 다른 workflow 를 깨우지 않아 Quality 와 Deploy 가 돌지 않는다.
 - **같은 결정은 한 번만 처리한다.** 처리하기 **전에** `~/.ooee-harness/decisions.json`에 `<이슈>:<회차>:<결정>:<신호 시각>`을 적는다. 멈추거나 실패한 결정을 감시가 돌 때마다 다시 돌리지 않으려는 것이다. 다시 돌리려면 기획자가 새 신호를 남기거나(시각이 바뀐다) 개발자가 그 줄을 지운다. `HARNESS_STATE_DIR`로 자리를 옮길 수 있다.
 - **기다리는 일은 스크립트가 맡고, 7단계는 러너가 한다**(`2026-09-23`). 합친 뒤 러너가 `deploy-check.mjs` 를 직접 돌려 「실행이 끝날 때까지 기다렸다가 주소가 200 인지」를 받고, 그 JSON 을 이어받는 말에 실어 준다. 모델에게 기다리라고 시켰더니 #60 은 「알림이 올 것이므로 기다린다」, #62 는 「백그라운드로 넘어갔다」 하고 턴을 끝내 결과 댓글이 올라가지 않았다. 확인할 화면 key 는 머지된 pull request 가 바꾼 파일에서 뽑는다(`screenKeys`).

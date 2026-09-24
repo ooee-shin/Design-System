@@ -155,7 +155,7 @@ const clip = (text, max) => (text.length > max ? `${text.slice(0, max)}…` : te
 /**
  * 작업 요약 한 줄. 예: 「페이지 5장 추가(web) — 상품 목록·상품 상세·장바구니 외 2장 · 새 컴포넌트 없음 · PR #17」.
  * 장 수만 적으면 기획자는 카드에서 무엇을 만들었는지 모른다. 개선 회차(2회차부터)는 요청에 없던 화면을
- * 더하지 않으므로(process-issue D4) 「다시 만듦」으로 적는다.
+ * 더하지 않으므로(개선 회차) 「다시 만듦」으로 적는다.
  */
 function workLine({ added, work, round, pr }) {
   const parts = [];
@@ -170,7 +170,7 @@ function workLine({ added, work, round, pr }) {
 
 /**
  * 샌드박스 줄. 이번 회차에 만든 첫 화면을 건다. 개선 회차의 `screens` 에는 앞 회차에서 그대로 둔 화면도
- * 들어 있어(process-issue D4), 첫 칸을 걸면 카드가 바뀌지 않은 화면을 연다.
+ * 들어 있어(개선 회차), 첫 칸을 걸면 카드가 바뀌지 않은 화면을 연다.
  */
 function sandboxLine({ screens, added, round }) {
   const link = added[0] ?? screens[0];

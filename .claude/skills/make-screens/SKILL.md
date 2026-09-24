@@ -3,7 +3,7 @@ name: make-screens
 description: 화면 요청 이슈 하나를 읽어 sandbox 에 화면을 만들고 무엇을 만들었는지 plan.json 에 적는다. 가지·commit·pull request·배포·결과 댓글은 하지 않는다 — 러너가 한다. 「이슈 <n> 화면 만들어 줘」 요청에 쓴다. 인수는 「<이슈 번호>」다.
 model: claude-sonnet-5
 effort: high
-allowed-tools: Read, Grep, Glob, Write, Edit, Skill, Bash(git status:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/visual/inspect.mjs:*), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *), Bash(gh issue view:*), Bash(gh pr view:*), Bash(gh pr list:*)
+allowed-tools: Read, Grep, Glob, Write, Edit, Skill, Bash(git status:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/visual/inspect.mjs:*), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *), Bash(gh issue view:*), Bash(gh pr view:*), Bash(gh pr list:*)
 ---
 
 # /make-screens
@@ -33,6 +33,22 @@ node scripts/harness/issue.mjs <n>
   4. 정한 것을 `needsDecision` 첫 줄에 「프로젝트를 정했다: 「<이름>」(있는 것 | 새로 만듦) — <까닭 한 줄>」로 남긴다.
 - **`mode` 가 `수정` 이면 있는 화면을 제자리에서 고친다.** `fix.target` 이 그 화면을 만든 요청이다. 그 요청의 머지된 pull request 를 `gh pr list --state all --base dev --search '"요청: #<fix.target>" in:body'` 로 찾아 본문 `## 화면별 인수` 에서 key 와 앞 인수 원문을 읽는다. 화면 코드는 열지 않는다. 그 key 가 `screens.ts` 에 없으면 멈춘다. 화면은 그 하나이고 2단계를 건너뛴다.
 - `fields.similar`·`fields.onSubmit` 이 비어 있지 않으면 `needsDecision` 에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다.
+
+### 1-1. 인수에 「개선」이 있으면 다시 만드는 회차다
+
+러너가 `/make-screens <n> 개선 러너` 로 부른다. 기획자가 결과 카드에서 😕 를 누르고 까닭을 적은 것이다.
+
+```bash
+node scripts/harness/decision.mjs <n>      # reason 이 그 까닭이다
+```
+
+1. **사유가 앞 회차의 어느 항목을 가리키는지 본다.** 그 회차 pull request 본문(`gh pr view <번호> --json body`)의 「판단이 필요한 것」·「화면별 인수」와 대조한다. 번호는 결과 댓글 작업 줄의 `PR #<번호>` 다.
+   - 가리키는 항목이 있으면 개선이다. 지어낸 것을 고쳐 달라는 사유도 개선이다 — 요청이 비워 둔 자리를 기획자가 채우는 일이다.
+   - **어느 항목도 가리키지 않는 새 요구면 다시 만들지 않는다.** 「## 처리 중 실패」로 「개선이 아니라 새 요구입니다 — 폼으로 새 요청을 내 주세요」를 적고 멈춘다. 요청 문단의 원본은 이슈 본문이라, 댓글로 요구가 늘면 원본이 둘이 된다.
+2. **사유가 가리키는 화면만 다시 만든다.** 인수는 그 화면의 앞 회차 인수 원문 뒤에 ` 개선: <사유 원문>` 을 붙인 것이다. 본문에 인수가 없으면 멈춘다. 인수를 찾으려고 `page.tsx` 를 열지 않는다.
+3. **앞 회차 코드를 읽지 않는다.** generate-code 가 같은 대화에서 도는데, 여기서 읽은 코드가 맥락에 남아 그 명령의 「다른 화면의 코드 읽기」 금지를 우회한다.
+4. `plan.json` 의 `screens` 에는 **이 요청의 화면을 모두** 넣고, 다시 만들지 않은 화면에는 `"remade": false` 를 적는다. 결과 댓글의 표에는 모두 나오고 「추가한 페이지」에는 다시 만든 것만 들어간다.
+5. `other` 첫 줄을 「<앞 회차>회차 개선 반영: <사유 한 줄>」로 적는다.
 
 ### 2. 만들 화면을 정한다
 
@@ -102,6 +118,7 @@ node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewpor
 | `componentsAdded` | `@ooee/ui` 에 새로 더한 컴포넌트. 보통 비어 있다 |
 | `componentsUsed` | 쓴 컴포넌트 이름. 겹치지 않게 |
 | `other` | 그 밖에 한 일. 개선 회차면 「<앞 회차>회차 개선 반영: <사유 한 줄>」 |
+| `screens[].remade` | 개선 회차에서 다시 만들지 않은 화면에만 `false`. 없으면 다시 만든 것으로 본다 |
 | `needsDecision` | 요청에 없어 정한 것, 확인받지 않고 나눈 목록, 반영하지 않은 칸. 화면이 여럿이면 이름을 앞에 붙인다 |
 
 쓴 뒤 **보고의 첫 제목을 「## 화면을 만들었다」로 하고 멈춘다.** 화면 표(이름·key·폭)와 `needsDecision` 을 함께 적는다. 러너가 이 파일을 다시 확인하고 pull request 부터 결과 댓글까지 한다.

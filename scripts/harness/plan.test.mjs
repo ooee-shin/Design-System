@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderResultComment } from "./result-comment.mjs";
-import { branchName, planPath, prBody, resultInput, sandboxUrl, title, validatePlan } from "./plan.mjs";
+import { branchName, planPath, prBody, readScreens, resultInput, sandboxUrl, section, title, validatePlan } from "./plan.mjs";
 
 const screen = (over = {}) => ({
   key: "invoice-dashboard",
@@ -98,4 +98,38 @@ test("배포를 확인하지 못했으면 그 줄이 통과가 아니다", () =>
 
 test("샌드박스 주소는 key 로만 만든다", () => {
   assert.equal(sandboxUrl("shop-cart"), "https://ooee-sandbox.pages.dev/shop-cart");
+});
+
+test("screens.ts 에서 등록된 이름과 프로젝트를 읽는다 — 결과 댓글이 원본을 쓴다", () => {
+  const text = `export const sandboxScreens: SandboxScreen[] = [
+  {
+    key: "admin-login",
+    project: "harness-test",
+    viewports: ["web", "mobile"],
+    name: "관리자 로그인",
+  },
+  {
+    key: "voc",
+    project: "harness-test",
+    viewports: ["web"],
+    name: "VOC",
+  },
+];`;
+  assert.deepEqual(readScreens(text), [
+    { key: "admin-login", name: "관리자 로그인", project: "harness-test", viewports: ["web", "mobile"] },
+    { key: "voc", name: "VOC", project: "harness-test", viewports: ["web"] },
+  ]);
+});
+
+test("pull request 본문의 한 절을 고치지 않고 옮긴다", () => {
+  const body = "요청: #9\n\n## 판단이 필요한 것\n\n- 예시 값은 지어냈다\n- 링크 목적지는 미정\n\n## 그 밖\n\n- 다른 것\n";
+  assert.deepEqual(section(body, "판단이 필요한 것"), ["예시 값은 지어냈다", "링크 목적지는 미정"]);
+  assert.deepEqual(section(body, "없는 절"), []);
+});
+
+test("개선 회차는 다시 만든 화면만 「추가한 페이지」에 넣는다", () => {
+  const kept = { ...screen({ key: "kept", name: "그대로 둔 화면" }), remade: false };
+  const input = resultInput({ issue: 60, read, round: 2, screens: [screen(), kept], plan: {} });
+  assert.deepEqual(input.summary.pagesAdded, ["자동 송장 대시보드"], "그대로 둔 화면을 다시 만들었다고 적으면 안 된다");
+  assert.equal(input.screens.length, 2, "표에는 이 요청의 화면이 모두 있어야 한다");
 });

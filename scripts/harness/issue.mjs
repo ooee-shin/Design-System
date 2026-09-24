@@ -51,7 +51,7 @@ export const VIEWPORTS = { web: "web", 웹: "web", tablet: "tablet", 태블릿: 
 /** 폼의 프로젝트 목록 마지막 항목. 이름이 아니라 「목록에 없다」는 표식이다. */
 export const NEW_PROJECT = "새 프로젝트";
 
-/** 프로젝트를 요청이 정하지 않았을 때 `generateArgs` 에 두는 자리. process-issue 가 정한 id 로 바꾼다. */
+/** 프로젝트를 요청이 정하지 않았을 때 `generateArgs` 에 두는 자리. 처리하는 쪽이 정한 id 로 바꾼다. */
 export const UNDECIDED = "<정한다>";
 
 /** 새 프로젝트 이름을 id 로 만든다. 한글 이름은 그대로 두고 공백만 붙임표로 바꾼다. */
@@ -189,7 +189,7 @@ function sliceByLabels(body) {
  * 본문에 「수정 대상: #<n>」이 있으면 **수정 요청**이다(`mode: "수정"`). 승인되어 `main` 에 들어간 화면을
  * 제자리에서 고치는 입구이고, Slack 의 「화면 수정 요청」 폼이 만든다. 이때 프로젝트·화면 key·앞 요구사항은
  * 대상 요청에서 물려받으므로 이 스크립트는 `fix` 만 내고 `generateArgs` 는 null 이다 — 고칠 화면의 key 와
- * 앞 인수는 대상 요청의 머지된 pull request 본문 「화면별 인수」에서 처리하는 쪽이 찾는다(process-issue 2단계).
+ * 앞 인수는 대상 요청의 머지된 pull request 본문 「화면별 인수」에서 처리하는 쪽이 찾는다(`/make-screens` 1단계).
  *
  * `problems` 가 하나라도 있으면 `generateArgs` 는 null 이다. generate-code 는 판단이 서지 않으면 만들지
  * 않고 묻는다(SKILL.md 3단계 `project`, 「입력」의 빈 요구사항). 막지 않는 것은 `notes` 에 적는다.
@@ -236,7 +236,7 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
   const chosen = namedMatch ?? (newProjectName ? projectId(newProjectName) : null) ?? matched[0] ?? null;
   const isNewProject = Boolean(chosen) && !allowed.includes(chosen);
   // 프로젝트를 요청이 정하지 않았으면(칸이 비었거나 「새 프로젝트」만 골랐으면) 처리하는 쪽이 요구사항을 보고
-  // 있는 프로젝트에 넣거나 새로 만든다(2026-09-23 개발자, process-issue 1단계). 묻지 않는다.
+  // 있는 프로젝트에 넣거나 새로 만든다(2026-09-23 개발자, `/make-screens` 1단계). 묻지 않는다.
   const undecided = mode === "생성" && !chosen && !unknownProjects.length && matched.length === 0;
 
   if (mode === "생성") {

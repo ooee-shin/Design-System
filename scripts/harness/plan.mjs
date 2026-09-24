@@ -92,6 +92,41 @@ export function prBody({ issue, round, screens, needsDecision = [], other = [] }
   return `${lines.join("\n")}\n`;
 }
 
+
+/**
+ * `screens.ts` 원문에서 화면을 읽는다. key 로 이름·프로젝트·폭을 찾을 때 쓴다.
+ *
+ * 결과 댓글의 이름은 **등록된 이름**이어야 한다. 모델이 따로 적어 주면 등록과 어긋날 수 있어 원본을 읽는다.
+ */
+export function readScreens(text) {
+  const out = [];
+  for (const block of String(text ?? "").split(/\n  \{\n/).slice(1)) {
+    const get = (field) => block.match(new RegExp(`${field}:\\s*"([^"]+)"`))?.[1] ?? null;
+    const key = get("key");
+    if (!key) continue;
+    const viewports = [...(block.match(/viewports:\s*\[([^\]]*)\]/)?.[1] ?? "").matchAll(/"([a-z]+)"/g)].map((hit) => hit[1]);
+    out.push({ key, name: get("name"), project: get("project"), viewports });
+  }
+  return out;
+}
+
+/**
+ * pull request 본문의 한 절을 그대로 뜬다. 「판단이 필요한 것」을 결과 댓글로 옮길 때 쓴다.
+ *
+ * 다시 쓰지 않고 옮기기만 한다 — 그 글은 만들 때 정한 것의 기록이라, 고쳐 쓰면 근거가 바뀐다.
+ */
+export function section(body, heading) {
+  const lines = String(body ?? "").split("\n");
+  const at = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (at < 0) return [];
+  const rest = lines.slice(at + 1);
+  const end = rest.findIndex((line) => /^## /.test(line));
+  return (end < 0 ? rest : rest.slice(0, end))
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("- "))
+    .map((line) => line.slice(2).trim());
+}
+
 /** 화면 key 로 만드는 샌드박스 주소. 결과 댓글의 링크가 이것이다. */
 export const sandboxUrl = (key, origin = "https://ooee-sandbox.pages.dev") => `${origin}/${key}`;
 
@@ -103,7 +138,8 @@ export const sandboxUrl = (key, origin = "https://ooee-sandbox.pages.dev") => `$
  * screens 와 다르다」 같은 실수가 구조적으로 생기지 않는다 — 한 자리에서 같은 값으로 만든다.
  */
 export function resultInput({ issue, read, round, screens, plan = {}, pr = null, deploy = null, origin }) {
-  const names = screens.map((screen) => screen.name);
+  // 개선 회차에서는 다시 만든 화면만 「추가한 페이지」다. 그대로 둔 화면은 표에만 남는다.
+  const names = screens.filter((screen) => screen.remade !== false).map((screen) => screen.name);
   const checks = [
     { name: "check-screens (화면 규칙)", passed: true },
     { name: "/review-design 위반 0건", passed: true },

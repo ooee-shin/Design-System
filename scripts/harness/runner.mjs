@@ -4,11 +4,13 @@
 //   node scripts/harness/runner.mjs 결정 [<번호>]   # 번호가 없으면 열린 화면 요청을 모두 본다
 //   node scripts/harness/runner.mjs 결과 <번호>
 //
-// Claude 는 `/process-issue … 러너` 로 화면을 만들고 push 한 뒤, pull request 를 만들 자리에서 넘김 파일
-// (`.harness-work/issue-<n>/handoff.json`)을 쓰고 멈춘다. pull request 를 만들고 합치는 것은 이 스크립트다.
-// `gh pr create`·`gh pr merge` 는 공용 권한의 ask 이고, ask 는 allow 보다 먼저 판정되어 headless 세션에서
-// 풀 방법이 없다. 게이트를 에이전트가 스스로 넘지 않게 한 #8·#21 과도 맞는다. 합친 뒤에는 같은 세션을
-// 이어 받게 해 배포 확인과 결과 댓글을 맡긴다.
+// **모델이 하는 일은 하나다** — `/make-screens <n> 러너` 로 화면을 만들고 `plan.json` 을 쓴다. 나머지(가지·
+// commit·push·pull request·Quality·머지·배포 확인·결과 댓글·이슈 닫기)는 모두 이 스크립트다. 승인과 반려는
+// 판단이 없어 모델을 아예 부르지 않고, 개선만 사유가 무엇을 가리키는지 읽히려고 부른다. 까닭은
+// `plan.mjs`·`decide.mjs` 머리말에 있다(`2026-09-24` 역할 뒤집기).
+//
+// `gh pr create`·`gh pr merge` 는 공용 권한의 ask 이고, ask 는 allow 보다 먼저 판정되어 headless 세션에서 풀
+// 방법이 없다. 게이트를 에이전트가 스스로 넘지 않게 한 #8·#21 과도 맞는다.
 //
 // gh 와 git 은 이 Mac 의 로그인(gh keyring)으로 돈다. workflow 의 GITHUB_TOKEN 으로 만든 pull request 와
 // 머지는 다른 workflow 를 깨우지 않아 Quality 와 Deploy 가 돌지 않기 때문이다.
@@ -18,7 +20,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { branchName, planPath, prBody, resultInput, title, validatePlan } from "./plan.mjs";
+import { howToUnmix, improveBlocked, isRequestOf, mainPr, revertPr, sortLanded } from "./decide.mjs";
+import { branchName, planPath, prBody, readScreens, resultInput, section, title, validatePlan } from "./plan.mjs";
 import { postCard, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -35,7 +38,7 @@ export const EFFORT = "high";
 export const EXTRA_ALLOWED = ["Bash(git revert --no-edit *)", "Bash(git revert --abort)"];
 
 /**
- * `/process-issue` 가 Skill 로 부르는 하위 명령. 하위 명령 머리말의 allowed-tools 는 바깥 명령 안에서 불릴 때
+ * `/make-screens` 가 Skill 로 부르는 하위 명령. 하위 명령 머리말의 allowed-tools 는 바깥 명령 안에서 불릴 때
  * 적용되지 않는다 — #29 에서 하위 명령이 머리말에 적어 둔 명령이 그대로 거부됐다. 그래서 러너가 그 머리말을
  * 읽어 CLI 로 넘긴다. 원본은 여전히 각 SKILL.md 다.
  */
@@ -45,17 +48,15 @@ export const CHAINED_SKILLS = [
 ];
 
 /**
- * `/process-issue` 자신. 이어 받는 차례(7단계 배포 확인 · 8단계 결과 댓글)는 명령 밖에서 돌아 이 머리말도
- * 적용되지 않는다. 넘기지 않으면 `gh run view`·`curl` 이 거부되어, 이미 dev 에 합친 뒤 결과 댓글 없이 멈춘다.
+ * 모델을 부르는 유일한 명령. 화면을 만들고 `plan.json` 을 쓰는 것 하나만 한다(`2026-09-24` 역할 뒤집기).
+ *
+ * 그 밖의 단계는 이 스크립트가 하므로 모델에게 `gh`·`git` 쓰기 명령을 넘길 일이 없다.
  */
-export const OWN_SKILL = ".claude/skills/process-issue/SKILL.md";
-
-/** 화면만 만드는 명령. 요청 처리(`처리`)는 이것 하나만 부른다(2026-09-24 역할 뒤집기). */
 export const MAKE_SKILL = ".claude/skills/make-screens/SKILL.md";
 
 /** 러너가 CLI 로 넘기는 머리말 allowed-tools. 이 명령과 하위 명령의 것을 겹치지 않게 모은다. */
 export function chainedAllowedTools(root = repoRoot) {
-  const tools = [OWN_SKILL, MAKE_SKILL, ...CHAINED_SKILLS].flatMap((file) => {
+  const tools = [MAKE_SKILL, ...CHAINED_SKILLS].flatMap((file) => {
     const text = readFileSync(path.join(root, file), "utf8");
     const line = text.match(/^---\n[\s\S]*?^allowed-tools:(.*)$/m)?.[1] ?? "";
     return line.split(/,\s+/).map((tool) => tool.trim()).filter(Boolean);
@@ -68,10 +69,6 @@ export const ACTIONABLE = new Set(["승인", "반려", "개선"]);
 
 const QUALITY_TIMEOUT_MS = 30 * 60 * 1000;
 const POLL_MS = 15 * 1000;
-
-export function handoffPath(issue, root = repoRoot) {
-  return path.join(root, ".harness-work", `issue-${issue}`, "handoff.json");
-}
 
 /** 러너 상태(이미 처리한 결정)는 checkout 이 지우지 않는 자리에 둔다. */
 export function stateFile(env = process.env) {
@@ -87,54 +84,6 @@ export function buildClaudeArgs(prompt, { resume } = {}) {
   if (resume) args.push("-r", resume);
   args.push("--allowedTools", ...EXTRA_ALLOWED, ...chainedAllowedTools());
   return args;
-}
-
-/** 합친 뒤 세션을 이어 받게 하는 말. 스킬의 「러너에서 돌 때」가 이 꼴을 기다린다. */
-export function continuationPrompt(pr, mergeCommit, deploy = null) {
-  const head = `러너: pull request #${pr} 가 dev 에 squash 로 머지되었다(머지 commit ${mergeCommit}).`;
-  // 7단계는 러너가 이미 했다. 모델에게 「기다리라」고 시키면 기다리는 도구를 부르거나 배경으로 돌리고 턴을
-  // 끝낸다 — #60·#62 가 잇달아 그렇게 결과 댓글 없이 끝났다. 확인은 스크립트가 하고 결과만 넘긴다.
-  if (!deploy) return `${head} 「러너에서 돌 때」대로 7단계부터 이어 간다.`;
-  return `${head}\n\n러너가 7단계(배포 확인)를 이미 마쳤다. 결과는 아래 JSON 이다. 배포를 다시 확인하지 말고, 이것을 8단계 \`checks\` 의 「배포 주소 <N>장 200」 근거로 삼아 8단계(결과 댓글)부터 이어 간다.\n\n\`\`\`json\n${JSON.stringify(deploy)}\n\`\`\``;
-}
-
-/**
- * 넘김 파일을 검사한다. 모델이 쓴 파일이라 그대로 믿지 않는다 — 이 스크립트는 그것으로 pull request 를
- * 만들고 합치므로, 이 요청의 가지·제목·본문 첫 줄이 아니면 만들지 않는다.
- */
-export function validateHandoff(handoff, issue, root = repoRoot) {
-  const problems = [];
-  const n = Number(issue);
-  if (!handoff || typeof handoff !== "object") return ["넘김 파일이 JSON 객체가 아니다"];
-  if (handoff.issue !== n) problems.push(`issue 가 ${n} 이 아니다(${handoff.issue})`);
-  if (!["dev", "main"].includes(handoff.target)) problems.push(`target 이 dev·main 이 아니다(${handoff.target})`);
-  // pull request 를 만들지 않는 넘김(already)에는 제목이 없다.
-  if (handoff.already !== true && (typeof handoff.title !== "string" || !handoff.title.trim())) problems.push("title 이 없다");
-  // 이미 main 에 있는 요청의 승인: pull request 를 만들지 않고 이슈만 닫는다. 화면 commit 이 무엇인지는 모델이
-  // 적어 주지만 그대로 믿지 않는다 — 러너가 origin/main 의 조상인지 다시 본다(landHandoff).
-  if (handoff.already === true) {
-    if (handoff.target !== "main") problems.push("already 는 main 넘김에서만 쓴다");
-    if (!Array.isArray(handoff.commits) || !handoff.commits.length || !handoff.commits.every((sha) => /^[0-9a-f]{7,40}$/.test(sha))) {
-      problems.push("already 넘김에는 이 요청의 화면 commit(commits) 이 하나 이상 있어야 한다");
-    }
-    return problems;
-  }
-  const bodyFile = typeof handoff.bodyFile === "string" ? path.resolve(root, handoff.bodyFile) : null;
-  const workDir = path.join(root, ".harness-work", `issue-${n}`) + path.sep;
-  if (!bodyFile || !bodyFile.startsWith(workDir)) problems.push(`bodyFile 이 .harness-work/issue-${n}/ 안이 아니다`);
-  else if (!existsSync(bodyFile)) problems.push(`bodyFile 이 없다(${handoff.bodyFile})`);
-  if (problems.length) return problems;
-
-  const firstLine = readFileSync(bodyFile, "utf8").split("\n")[0].trim();
-  if (handoff.target === "dev") {
-    if (typeof handoff.branch !== "string" || !handoff.branch.startsWith(`feature/issue-${n}-`)) {
-      problems.push(`branch 가 feature/issue-${n}- 로 시작하지 않는다(${handoff.branch})`);
-    }
-    if (!new RegExp(`^(요청|되돌림): #${n}(?!\\d)`).test(firstLine)) problems.push(`본문 첫 줄이 「요청: #${n}」·「되돌림: #${n}」이 아니다`);
-  } else if (!new RegExp(`^승인: #${n}(?!\\d)`).test(firstLine)) {
-    problems.push(`본문 첫 줄이 「승인: #${n}」이 아니다`);
-  }
-  return problems;
 }
 
 /**
@@ -173,22 +122,6 @@ export function stopNotice(issue, report, { title = "", url = "", tail = "요청
   const head = `⚠️ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
   const where = url ? `\n자세히: ${url}` : "";
   return `${head}\n${detail}\n\n${tail}${where}`;
-}
-
-/**
- * 화면은 `dev` 에 합쳐졌는데 결과 댓글이 없을 때 결과 채널에 올릴 글.
- *
- * 기획자가 보기에 결과가 없는 것과 같으므로 무엇이 됐고 무엇이 안 됐는지 가른다. 화면은 이미 배포돼 있어
- * 주소로 볼 수 있고, 빠진 것은 결과 댓글과 그에 딸린 결정 버튼이다.
- */
-export function resultMissing(issue, pr) {
-  return [
-    "## 화면은 만들었는데 결과가 올라가지 않았다",
-    `- 화면은 dev 에 합쳐졌습니다(pull request #${pr}).`,
-    "- 배포 확인이나 결과 댓글에서 멈춰 결정 버튼이 없습니다.",
-    // 조사는 번호 읽기에 따라 갈리므로(60 은 「을」, 62 는 「를」) 「명령을」로 적어 어느 번호에나 맞춘다.
-    `- 개발자가 \`결과 ${issue}\` 명령을 돌리면 결과가 올라갑니다.`,
-  ].join("\n");
 }
 
 /** 같은 결정을 두 번 처리하지 않게 하는 열쇠. 사람이 새 신호를 남기면 `at` 이 바뀌어 다시 처리한다. */
@@ -279,51 +212,6 @@ async function waitQuality(sha) {
   }
 }
 
-/** 넘김 파일대로 pull request 를 만들고 Quality 를 본 뒤 합친다. 머지 commit 을 돌려준다. */
-async function landHandoff(issue) {
-  const file = handoffPath(issue);
-  if (!existsSync(file)) return null;
-  const handoff = JSON.parse(readFileSync(file, "utf8"));
-  const problems = validateHandoff(handoff, issue);
-  if (problems.length) throw new Error(`넘김 파일을 따르지 않는다: ${problems.join(" · ")}`);
-
-  if (handoff.already) {
-    sh("git", ["fetch", "origin", "main"]);
-    for (const sha of handoff.commits) {
-      try {
-        sh("git", ["merge-base", "--is-ancestor", sha, "origin/main"]);
-      } catch {
-        throw new Error(`${sha} 는 origin/main 에 없다 — 이미 main 에 있다는 넘김을 따르지 않는다`);
-      }
-    }
-    closeIssue(issue, closingComment("승인", `화면 commit ${handoff.commits.map((sha) => sha.slice(0, 7)).join(", ")} 이 이미 main 에 있음`));
-    return { handoff, pr: null, mergeCommit: null };
-  }
-
-  const head = handoff.target === "dev" ? handoff.branch : "dev";
-  const url = sh("gh", ["pr", "create", "--base", handoff.target, "--head", head, "--title", handoff.title, "--body-file", handoff.bodyFile]).trim();
-  const pr = Number(url.split("/").pop());
-  log(`- pull request #${pr} (${head} → ${handoff.target}) ${url}`);
-
-  const { headRefOid, files } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid,files"]));
-  if (handoff.target === "dev") {
-    const outside = outsideScreenFiles(files.map((file) => file.path));
-    if (outside.length) throw new Error(`#${pr} 가 화면 밖을 바꿨다(${outside.join(", ")}). 합치지 않고 열어 둔다`);
-  }
-  await waitQuality(headRefOid);
-  const method = handoff.target === "dev" ? ["--squash", "--delete-branch"] : ["--merge"];
-  mergePr(pr, method);
-  const { mergeCommit } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "mergeCommit"]));
-  log(`- #${pr} 머지 ${mergeCommit.oid}`);
-  const deploy = handoff.target === "dev" && handoff.resume ? checkDeploy(mergeCommit.oid, screenKeys(files.map((file) => file.path))) : null;
-  // 결정이 끝까지 간 자리에서 이슈를 닫는다(2026-09-23 개발자). 승인은 main 에 반영된 때, 반려는 되돌림이
-  // dev 에 합쳐진 때다. 개선 회차와 첫 회차의 dev 머지는 아직 결정을 기다리므로 닫지 않는다.
-  const firstLine = readFileSync(path.resolve(repoRoot, handoff.bodyFile), "utf8").split("\n")[0].trim();
-  if (handoff.target === "main") closeIssue(issue, closingComment("승인", `PR #${pr}`));
-  else if (firstLine.startsWith("되돌림:")) closeIssue(issue, closingComment("반려", `되돌림 PR #${pr}`));
-  return { handoff, pr, mergeCommit: mergeCommit.oid, deploy };
-}
-
 /**
  * 합친다. 명령이 실패하면 **정말 안 합쳐졌는지 다시 본다.**
  *
@@ -349,7 +237,8 @@ function mergePr(pr, method) {
  */
 function checkDeploy(sha, keys) {
   if (!keys.length) return null;
-  const args = ["scripts/harness/deploy-check.mjs", "--sha", sha, ...keys.flatMap((key) => ["--key", key])];
+  // `sha` 가 없으면 지금 `dev` 배포에서 주소만 본다(「결과만 올리기」). 그 머지의 Deploy 실행은 찾지 않는다.
+  const args = ["scripts/harness/deploy-check.mjs", ...(sha ? ["--sha", sha] : []), ...keys.flatMap((key) => ["--key", key])];
   try {
     const out = JSON.parse(sh("node", args));
     log(`- 배포 확인: ${out.ok ? `화면 ${keys.length}장 200` : `실패 — ${out.reason ?? "까닭 없음"}`}`);
@@ -366,7 +255,6 @@ function closeIssue(issue, body) {
   log(`- #${issue} 를 닫았다`);
 }
 
-/** 한 번의 `/process-issue` 호출과, 넘김이 있으면 합치기·이어 받기까지. */
 /**
  * 이 요청의 로컬 가지 가운데 origin 에 없는 것을 지운다. 앞 실행이 push 전에 멈추면 가지가 러너 작업 자리에
  * 남아, 다시 돌릴 때 3단계의 `git switch -c` 가 「이미 있다」로 멈춘다. push 하지 않은 것은 다시 만들면 되고,
@@ -422,6 +310,32 @@ async function notifyStop(issue, report, options = {}) {
   );
 }
 
+
+/** `screens.ts` 에 등록된 화면 key. 표식 없는 pull request 가 화면을 건드렸는지 볼 때 쓴다. */
+function registeredKeys() {
+  const text = readFileSync(path.join(repoRoot, "apps/sandbox/src/screens.ts"), "utf8");
+  return [...text.matchAll(/key:\s*"([a-z0-9-]+)"/g)].map((hit) => hit[1]);
+}
+
+/** `main..dev` 에 든 squash commit 이 가리키는 pull request 들. 제목 끝의 `(#<번호>)` 가 번호다. */
+function landedPrs() {
+  const lines = sh("git", ["log", "--oneline", "origin/main..origin/dev"]).split("\n").filter(Boolean);
+  const numbers = [...new Set(lines.map((line) => line.match(/\(#(\d+)\)\s*$/)?.[1]).filter(Boolean))];
+  return numbers.map((number) => {
+    const view = JSON.parse(sh("gh", ["pr", "view", number, "--json", "number,url,body,files"]));
+    return { ...view, files: view.files.map((file) => file.path) };
+  });
+}
+
+/** 이 요청의 화면이 이미 `main` 에 있는지. 회차마다 squash commit 이 하나씩 있다. */
+function onMain(issue) {
+  const lines = sh("git", ["log", "--format=%H %s", "origin/main", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n").filter(Boolean);
+  return lines.map((line) => line.split(" ")[0]);
+}
+
+/** 결정을 읽는다. 섞임 검사가 남의 요청마다 이것을 부른다. */
+const decisionOf = (issue) => JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)])).decision;
+
 /** 이 요청에 이미 올라간 결과 댓글의 수. 다음 회차는 그 +1 이다. */
 function resultRound(issue) {
   const read = JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)]));
@@ -471,7 +385,16 @@ async function runRequest(issue) {
   const problems = validatePlan(plan, { issue, mode: read.mode });
   if (problems.length) return stop("만든 것을 읽을 수 없다", problems);
 
-  // 4. 화면 자리 밖을 고쳤으면 올리지 않는다. 모델이 하네스나 workflow 를 함께 바꾸면 다음 실행이 그 코드로 돈다.
+  return landScreens(issue, read, round, plan, stop);
+}
+
+/**
+ * 만든 화면을 `dev` 까지 올리고 결과 댓글을 단다. 처음 처리와 개선 회차가 같은 길을 쓴다.
+ *
+ * 여기부터 끝까지 모델은 없다. 기다리는 일과 꼴을 지키는 일만 남아서다.
+ */
+async function landScreens(issue, read, round, plan, stop) {
+  // 화면 자리 밖을 고쳤으면 올리지 않는다. 모델이 하네스나 workflow 를 함께 바꾸면 다음 실행이 그 코드로 돈다.
   const changed = sh("git", ["status", "--porcelain", "--untracked-files=all"]).split("\n").filter(Boolean).map((line) => line.slice(3));
   if (!changed.length) return stop("바뀐 파일이 없다", ["화면을 만들었다고 적었지만 working tree 가 그대로다"]);
   const outside = outsideScreenFiles(changed);
@@ -513,24 +436,177 @@ async function runRequest(issue) {
   return true;
 }
 
-async function runChain(issue, argument) {
-  rmSync(handoffPath(issue), { force: true });
-  dropStaleBranches(issue);
-  const before = latestResultId(issue);
-  const first = runClaude(`/process-issue ${argument} 러너`);
-  const landed = await landHandoff(issue);
-  if (!landed) {
-    log("- 넘김 파일이 없다. 처리가 멈춘 자리는 위 보고에 있다.");
-    await notifyStop(issue, first.result);
+
+
+
+/**
+ * 결과 댓글만 올린다. 화면은 이미 `dev` 에 있는데 결과가 없는 요청의 자리다(#9 → PR #19, 또는 앞 실행이
+ * 결과 직전에 멈춘 때).
+ *
+ * **모델을 부르지 않는다.** 필요한 것이 모두 이미 적혀 있어서다 — 화면은 pull request 가 바꾼 파일에,
+ * 이름과 프로젝트는 `screens.ts` 에, 정한 것은 그 본문의 「판단이 필요한 것」에 있다. 고쳐 쓰지 않고 옮긴다.
+ */
+async function runResult(issue) {
+  log(`## 화면 요청 #${issue} 결과 댓글`);
+  const stop = async (heading, lines) => {
+    const report = [`## ${heading}`, "", ...lines.map((line) => `- ${line}`)].join("\n");
+    log(`\n${report}\n`);
+    await notifyStop(issue, report, { tail: "개발자가 봐야 합니다." });
     return false;
+  };
+  const read = JSON.parse(sh("node", ["scripts/harness/issue.mjs", String(issue)]));
+  if (!read.fields.requester) return stop("올릴 수 없다", ["요청자가 비어 있다"]);
+
+  sh("git", ["fetch", "-q", "origin"]);
+  const prs = JSON.parse(sh("gh", ["pr", "list", "--state", "merged", "--base", "dev", "--search", `"요청: #${issue}" in:body`, "--json", "number,url,body,files,mergedAt"]))
+    .filter((pr) => isRequestOf(pr.body, issue))
+    .sort((a, b) => a.mergedAt.localeCompare(b.mergedAt));
+  if (!prs.length) return stop("올릴 것이 없다", ["이 요청의 화면이 dev 에 합쳐진 적이 없다 — `처리 <n>` 이 먼저다"]);
+
+  const registered = readScreens(readFileSync(path.join(repoRoot, "apps/sandbox/src/screens.ts"), "utf8"));
+  const keys = [...new Set(prs.flatMap((pr) => screenKeys(pr.files.map((file) => file.path))))];
+  const screens = keys.map((key) => registered.find((screen) => screen.key === key)).filter(Boolean);
+  if (!screens.length) return stop("화면을 찾지 못했다", [`pull request 가 더한 key 를 screens.ts 에서 찾지 못했다: ${keys.join(", ") || "없음"}`]);
+
+  const last = prs[prs.length - 1];
+  const round = resultRound(issue);
+  const deploy = checkDeploy(null, keys);
+  if (deploy && !deploy.ok) return stop("배포를 확인하지 못했다", [deploy.reason ?? "까닭 없음"]);
+
+  const plan = { needsDecision: section(last.body, "판단이 필요한 것"), other: section(last.body, "그 밖에 한 일") };
+  const inputFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, `result-${round}.json`);
+  mkdirSync(path.dirname(inputFile), { recursive: true });
+  writeFileSync(inputFile, `${JSON.stringify(resultInput({ issue, read, round, screens, plan, pr: { number: last.number, url: last.url }, deploy }), null, 2)}\n`);
+  const before = latestResultId(issue);
+  sh("node", ["scripts/harness/post-result.mjs", String(issue), path.relative(repoRoot, inputFile)], { stdio: ["ignore", "inherit", "inherit"] });
+  if (!postedResult(issue, before)) return stop("결과 댓글이 올라가지 않았다", ["post-result 의 줄을 보고 고친다"]);
+  log(`\n## 결과 댓글을 올렸다 — 화면 ${screens.length}장 · ${round}회차`);
+  return true;
+}
+
+/**
+ * 개선 — 사유가 가리키는 화면만 다시 만든다. **모델이 필요한 유일한 결정이다.**
+ *
+ * 사유가 앞 회차의 어느 항목(판단이 필요한 것·지어낸 것·검수 결과)을 가리키는지, 그것이 개선인지 새
+ * 요구인지는 글을 읽어야 안다. 그 판단만 모델에게 두고 나머지는 이 파일이 한다.
+ */
+async function improve(issue, read, stop) {
+  const round = read.round + 1;
+  dropStaleBranches(issue);
+  rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
+  runClaude(`/make-screens ${issue} 개선 러너`);
+  const file = path.join(repoRoot, planPath(issue));
+  if (!existsSync(file)) return stop("다시 만들지 못했다", [`${planPath(issue)} 이 없다 — 위 보고에 멈춘 자리가 있다`]);
+  const plan = JSON.parse(readFileSync(file, "utf8"));
+  const problems = validatePlan(plan, { issue, mode: read.mode });
+  if (problems.length) return stop("다시 만든 것을 읽을 수 없다", problems);
+  if (!plan.screens.some((screen) => screen.remade !== false)) return stop("다시 만든 화면이 없다", ["개선인데 고친 화면이 하나도 없다고 적었다"]);
+  return landScreens(issue, { ...read, mode: read.mode ?? "생성" }, round, plan, stop);
+}
+
+/**
+ * 승인 — `dev` 를 `main` 으로 올린다. **판단이 없어 모두 스크립트가 한다**(decide.mjs 머리말).
+ *
+ * `main` 은 승인된 요청만 담으므로, 같은 머지에 실려 갈 pull request 가 모두 승인되었는지 먼저 본다.
+ */
+async function approve(issue, read, stop) {
+  sh("git", ["fetch", "-q", "origin"]);
+  const prs = landedPrs();
+  const mine = prs.filter((pr) => isRequestOf(pr.body, issue));
+  if (!mine.length) {
+    // `dev` 에 없으면 이미 `main` 에 있는지 본다. 개발자가 dev → main 을 한꺼번에 올린 뒤 승인이 난 경우다(#48).
+    const commits = onMain(issue);
+    if (!commits.length) return stop("올릴 것이 없다", [`이 요청의 화면이 dev 에도 main 에도 없다`, "아직 만들지 않았으면 `처리 <n>` 이다"]);
+    closeIssue(issue, closingComment("승인", `화면 commit ${commits.map((sha) => sha.slice(0, 7)).join(", ")} 이 이미 main 에 있음`));
+    log(`- 이미 main 에 있어 pull request 없이 닫았다`);
+    return true;
   }
-  if (!landed.handoff.resume) return true;
-  runClaude(continuationPrompt(landed.pr, landed.mergeCommit, landed.deploy), { resume: first.session_id });
-  if (postedResult(issue, before)) return true;
-  // 화면은 합쳐졌는데 결과만 빠진 자리다. 넘김이 없을 때와 달리 여기는 알림 밖이었다 — #60 에서 이어 받은
-  // 세션이 배포 확인을 부르지 않고 「알림이 올 것」이라며 끝냈고, 기획자에게는 아무 일도 없던 것이 됐다.
-  await notifyStop(issue, resultMissing(issue, landed.pr), { tail: "개발자가 결과를 다시 올려야 합니다." });
-  return false;
+
+  const { landed, mixed } = sortLanded(prs, decisionOf, registeredKeys());
+  if (mixed.length) return stop("승인 아닌 것이 섞였다", ["main 은 승인된 요청만 담는다. 아래를 푼 뒤 다시 승인한다", ...howToUnmix(mixed)]);
+
+  const open = JSON.parse(sh("gh", ["pr", "list", "--base", "main", "--head", "dev", "--state", "open", "--json", "number,url"]));
+  if (open.length) return stop("이미 열린 dev → main 이 있다", [`${open[0].url} 에 이 승인을 더해 사람이 합친다`]);
+
+  const { title: prTitle, body } = mainPr({ issue, read, screenName: readScreenName(issue), landed });
+  const bodyFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, "main-pr.md");
+  mkdirSync(path.dirname(bodyFile), { recursive: true });
+  writeFileSync(bodyFile, body);
+  const url = sh("gh", ["pr", "create", "--base", "main", "--head", "dev", "--title", prTitle, "--body-file", bodyFile]).trim();
+  const pr = Number(url.split("/").pop());
+  log(`- pull request #${pr} (dev → main) ${url}`);
+  const { headRefOid } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid"]));
+  await waitQuality(headRefOid);
+  mergePr(pr, ["--merge"]);
+  closeIssue(issue, closingComment("승인", `PR #${pr}`));
+  log(`\n## 승인을 마쳤다 — main 에 반영하고 닫았다 (pull request #${pr})`);
+  return true;
+}
+
+/** 반려 — 이 요청의 화면을 `dev` 에서 되돌린다. 두면 어떤 승인도 `main` 으로 올라가지 못한다. */
+async function reject(issue, read, stop) {
+  sh("git", ["fetch", "-q", "origin"]);
+  const prs = landedPrs().filter((pr) => isRequestOf(pr.body, issue));
+  if (!prs.length) return stop("되돌릴 것이 없다", ["이 요청의 화면이 dev 에 없다"]);
+  // 늦은 것부터 되돌린다. 개선 회차가 있으면 회차마다 하나씩이다.
+  const commits = sh("git", ["log", "--format=%H", "origin/main..origin/dev", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n").filter(Boolean);
+  if (!commits.length) return stop("되돌릴 commit 을 찾지 못했다", [`main..dev 에 (#${issue}) 를 제목에 단 commit 이 없다`]);
+
+  const branch = `feature/issue-${issue}-revert`;
+  sh("git", ["switch", "-c", branch]);
+  try {
+    sh("git", ["revert", "--no-edit", ...commits]);
+  } catch (error) {
+    sh("git", ["revert", "--abort"]);
+    return stop("되돌리다 부딪혔다", [error.message.split("\n")[0], "다른 요청의 화면이 같은 자리를 고쳤다 — 사람이 푼다"]);
+  }
+  sh("git", ["push", "-q", "-u", "origin", branch]);
+  const { title: prTitle, body } = revertPr({ issue, read, screenName: readScreenName(issue), commits });
+  const bodyFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, "revert.md");
+  mkdirSync(path.dirname(bodyFile), { recursive: true });
+  writeFileSync(bodyFile, body);
+  const url = sh("gh", ["pr", "create", "--base", "dev", "--head", branch, "--title", prTitle, "--body-file", bodyFile]).trim();
+  const pr = Number(url.split("/").pop());
+  log(`- 되돌림 pull request #${pr} ${url}`);
+  const { headRefOid } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid"]));
+  await waitQuality(headRefOid);
+  mergePr(pr, ["--squash", "--delete-branch"]);
+  closeIssue(issue, closingComment("반려", `되돌림 PR #${pr}`));
+  log(`\n## 반려를 마쳤다 — 화면 ${commits.length}건을 dev 에서 되돌리고 닫았다`);
+  return true;
+}
+
+/** 이슈 제목에서 화면 이름을 읽는다. `화면 요청: <이름>` 꼴이다. */
+function readScreenName(issue) {
+  return JSON.parse(sh("node", ["scripts/harness/issue.mjs", String(issue)])).screenName;
+}
+
+/**
+ * 결정 하나를 처리한다. 승인·반려는 이 파일이 끝까지 하고, 개선만 모델을 부른다 — 사유가 앞 회차의
+ * 어느 항목을 가리키는지는 판단이기 때문이다(decide.mjs 머리말).
+ */
+async function runDecision(issue, read) {
+  const stop = async (heading, lines) => {
+    const report = [`## ${heading}`, "", ...lines.map((line) => `- ${line}`)].join("\n");
+    log(`\n${report}\n`);
+    await notifyStop(issue, report, { tail: "개발자가 봐야 합니다." });
+    return false;
+  };
+  if (read.lookalikeAfterDecision) {
+    return stop("결정을 가릴 수 없다", [
+      "결정 뒤에 결정처럼 보이는 댓글이 더 있다 — 마지막 뜻이 무엇인지 알 수 없다",
+      ...read.lookalikes.map((item) => `${item.url ?? item.at} 「${item.text}」`),
+      "카드의 버튼으로 다시 남겨 주세요",
+    ]);
+  }
+  if (read.decision === "승인") return approve(issue, read, stop);
+  if (read.decision === "반려") return reject(issue, read, stop);
+  if (read.decision === "개선") {
+    const blocked = improveBlocked(read);
+    if (blocked) return stop("개선을 시작할 수 없다", [blocked]);
+    return improve(issue, read, stop);
+  }
+  return stop("처리할 결정이 아니다", [`decision 이 ${read.decision} 다`]);
 }
 
 function readState(file) {
@@ -570,7 +646,7 @@ async function decideAll(only) {
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, `${JSON.stringify(done, null, 2)}\n`);
     log(`\n## #${read.issue} ${read.round}회차 ${read.decision} (${read.by} · ${read.at})`);
-    if (!(await runChain(read.issue, `결정 ${read.issue}`))) ok = false;
+    if (!(await runDecision(read.issue, read))) ok = false;
   }
   return ok;
 }
@@ -583,11 +659,7 @@ async function main(argv) {
     return 2;
   }
   if (mode === "결정") return (await decideAll(issue)) ? 0 : 1;
-  if (mode === "결과") {
-    const before = latestResultId(issue);
-    runClaude(`/process-issue 결과 ${issue} 러너`);
-    return postedResult(issue, before) ? 0 : 1;
-  }
+  if (mode === "결과") return (await runResult(Number(issue))) ? 0 : 1;
   return (await runRequest(Number(issue))) ? 0 : 1;
 }
 

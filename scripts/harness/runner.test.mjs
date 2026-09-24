@@ -13,49 +13,27 @@ import {
   CHAINED_SKILLS,
   EFFORT,
   EXTRA_ALLOWED,
-  OWN_SKILL,
+  MAKE_SKILL,
   closingComment,
   MODEL,
   buildClaudeArgs,
   chainedAllowedTools,
-  continuationPrompt,
   decisionKey,
   lookalikeKey,
   outsideScreenFiles,
   screenKeys,
   pickActionable,
   pickUnreadLookalikes,
-  resultMissing,
   staleBranches,
   stopNotice,
-  validateHandoff,
 } from "./runner.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../..");
 
-/** 가짜 저장소 뿌리에 넘김 본문을 써 두고 그 뿌리를 돌려준다. */
-function fakeRoot(issue, firstLine) {
-  const root = mkdtempSync(path.join(os.tmpdir(), "runner-"));
-  const dir = path.join(root, ".harness-work", `issue-${issue}`);
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(path.join(dir, "pr-1.md"), `${firstLine}\n\n본문\n`);
-  return root;
-}
-
-const devHandoff = (over = {}) => ({
-  issue: 12,
-  target: "dev",
-  branch: "feature/issue-12-shop",
-  title: "feat(sandbox): 상품 목록 화면 추가 (#12)",
-  bodyFile: ".harness-work/issue-12/pr-1.md",
-  resume: true,
-  ...over,
-});
-
 test("프롬프트는 -p 바로 뒤에 두고 --allowedTools 는 맨 끝에 둔다", () => {
-  const args = buildClaudeArgs("/process-issue 12 러너");
-  assert.deepEqual(args.slice(0, 2), ["-p", "/process-issue 12 러너"], "프롬프트가 --allowedTools 에 삼켜질 자리에 있다");
+  const args = buildClaudeArgs("/make-screens 12 러너");
+  assert.deepEqual(args.slice(0, 2), ["-p", "/make-screens 12 러너"], "프롬프트가 --allowedTools 에 삼켜질 자리에 있다");
   const after = args.slice(args.indexOf("--allowedTools") + 1);
   assert.ok(after.length > 0 && after.every((arg) => !arg.startsWith("--")), "--allowedTools 뒤에 다른 인수가 있다");
 });
@@ -66,7 +44,7 @@ test("모델과 effort 를 하네스 명령과 같은 값으로 박는다", () =
   assert.equal(MODEL, "claude-sonnet-5", "별칭이 아니라 전체 ID 여야 새 모델로 저절로 옮겨 가지 않는다");
   assert.equal(args[args.indexOf("--effort") + 1], EFFORT);
   assert.equal(EFFORT, "high", "별칭이나 빈 값이 아니라 고정된 값이어야 세션마다 같은 결과가 난다");
-  for (const file of [OWN_SKILL, ...CHAINED_SKILLS]) {
+  for (const file of [MAKE_SKILL, ...CHAINED_SKILLS]) {
     const head = readFileSync(path.join(repoRoot, file), "utf8").match(/^---\n[\s\S]*?^effort:(.*)$/m)?.[1]?.trim();
     assert.equal(head, EFFORT, `${file} 머리말의 effort 가 러너와 다르다`);
   }
@@ -117,23 +95,6 @@ test("앞 실행이 push 하지 않은 이 요청의 가지만 지운다", () =>
   assert.deepEqual(staleBranches(29, local, remote), ["feature/issue-29-ecommerce-dashboard"]);
 });
 
-test("이어 받는 말은 스킬의 「러너에서 돌 때」가 기다리는 꼴이다", () => {
-  const prompt = continuationPrompt(31, "abc123");
-  assert.match(prompt, /^러너: pull request #31 가 dev 에 squash 로 머지되었다\(머지 commit abc123\)/);
-  const skill = readFileSync(path.join(repoRoot, ".claude/skills/process-issue/SKILL.md"), "utf8");
-  assert.ok(skill.includes("러너: pull request #<번호> 가 dev 에 squash 로 머지되었다"), "스킬이 이 말을 모른다");
-});
-
-test("배포를 러너가 확인했으면 그 결과를 넘기고 8단계부터 시키다", () => {
-  // #60 은 「알림이 올 것이므로 기다린다」, #62 는 「백그라운드로 넘어갔다」 하고 턴을 끝내 결과 댓글이
-  // 없었다. 기다림은 deploy-check.mjs 의 일이라, 모델에게는 끝난 결과만 준다.
-  const prompt = continuationPrompt(72, "abc123", { ok: true, keys: ["kakao-message-dashboard"] });
-  assert.match(prompt, /8단계\(결과 댓글\)부터 이어 간다/);
-  assert.match(prompt, /배포를 다시 확인하지 말고/);
-  assert.match(prompt, /"kakao-message-dashboard"/);
-  assert.match(continuationPrompt(72, "abc"), /7단계부터 이어 간다/, "확인 결과가 없으면 예전처럼 7단계부터다");
-});
-
 test("머지된 화면 key 를 바뀐 파일에서 뽑는다 — 러너가 무엇을 확인할지 안다", () => {
   assert.deepEqual(
     screenKeys([
@@ -145,39 +106,6 @@ test("머지된 화면 key 를 바뀐 파일에서 뽑는다 — 러너가 무�
     ["shop-cart", "voc"],
   );
   assert.deepEqual(screenKeys(["apps/sandbox/src/screens.ts"]), []);
-});
-
-test("이 요청의 dev 넘김은 따른다", () => {
-  const root = fakeRoot(12, "요청: #12");
-  assert.deepEqual(validateHandoff(devHandoff(), 12, root), []);
-});
-
-test("되돌리기 넘김도 따른다", () => {
-  const root = fakeRoot(12, "되돌림: #12");
-  assert.deepEqual(validateHandoff(devHandoff({ branch: "feature/issue-12-revert", resume: false }), 12, root), []);
-});
-
-test("다른 요청의 가지나 본문이면 따르지 않는다", () => {
-  const root = fakeRoot(12, "요청: #123");
-  const problems = validateHandoff(devHandoff({ branch: "feature/issue-13-shop" }), 12, root);
-  assert.ok(problems.some((p) => p.includes("branch")), "다른 요청의 가지를 받았다");
-  assert.ok(problems.some((p) => p.includes("첫 줄")), "#123 을 #12 로 읽었다");
-});
-
-test("main 넘김은 승인 줄이 있어야 한다", () => {
-  const root = fakeRoot(12, "요청: #12");
-  const problems = validateHandoff(devHandoff({ target: "main", branch: undefined }), 12, root);
-  assert.ok(problems.some((p) => p.includes("승인: #12")), "승인 없이 main 으로 가는 넘김을 받았다");
-  const approved = fakeRoot(12, "승인: #12 1회차 — 기획자 · 2026-09-22 · 반응");
-  assert.deepEqual(validateHandoff(devHandoff({ target: "main", branch: undefined }), 12, approved), []);
-});
-
-test("본문 파일이 이 요청의 작업 자리 밖이면 따르지 않는다", () => {
-  const root = fakeRoot(12, "요청: #12");
-  for (const bodyFile of ["README.md", ".harness-work/issue-13/pr-1.md", ".harness-work/issue-12/../../README.md"]) {
-    const problems = validateHandoff(devHandoff({ bodyFile }), 12, root);
-    assert.ok(problems.some((p) => p.includes("bodyFile")), `${bodyFile} 를 받았다`);
-  }
 });
 
 test("같은 결정은 한 번만 처리하고, 새 신호가 오면 다시 처리한다", () => {
@@ -223,17 +151,6 @@ test("멈춤 카드는 멈춘 절만 읽는다 — 통과한 단계를 까닭 �
   assert.ok(!card.includes("통과"), `통과한 단계가 카드에 실렸다:\n${card}`);
 });
 
-test("화면은 합쳐졌는데 결과가 없으면 그것도 결과 채널에 알린다", () => {
-  // #60: 넘김은 성공해 dev 까지 합쳐졌고 배포 확인·결과 댓글만 빠졌다. 그 자리가 알림 밖이라 기획자에게는
-  // 아무 일도 없던 것이 됐다. 카드에 무엇이 됐고 무엇이 빠졌는지, 개발자가 무엇을 돌려야 하는지 적는다.
-  const card = stopNotice(60, resultMissing(60, 69), { title: "챗봇 채팅 화면", url: "https://x/60", tail: "개발자가 결과를 다시 올려야 합니다." });
-  assert.match(card, /^⚠️ 화면 요청 #60 「챗봇 채팅 화면」 — 화면은 만들었는데 결과가 올라가지 않았다/);
-  assert.match(card, /pull request #69/);
-  assert.match(card, /`결과 60` 명령을 돌리면/);
-  assert.ok(!card.includes("요청을 고쳐 다시 내"), "요청 잘못이 아닌데 기획자에게 다시 내라고 한다");
-  assert.match(card, /자세히: https:\/\/x\/60$/);
-});
-
 test("workflow 는 손으로 부르는 예비다 — 저절로 도는 길은 이 Mac 의 1분 감시다", () => {
   // 2026-09-23: job 안에서 돌면 연결이 끊길 때 GitHub 이 job 을 버리고 claude 가 강제로 끝난다(#60).
   const workflow = readFileSync(path.join(repoRoot, ".github/workflows/harness.yml"), "utf8");
@@ -243,15 +160,6 @@ test("workflow 는 손으로 부르는 예비다 — 저절로 도는 길은 이
   assert.ok(workflow.includes("scripts/harness/runner.mjs"), "이 스크립트를 부르지 않는다");
   const on = workflow.slice(workflow.indexOf("\non:"), workflow.indexOf("permissions:"));
   assert.deepEqual([...on.matchAll(/^ {2}(\w+):/gm)].map((hit) => hit[1]), ["workflow_dispatch"], "저절로 깨우는 이벤트가 남아 있다 — 감시와 둘이 같은 요청을 처리한다");
-});
-
-test("이어 받는 차례에도 배포 확인과 결과 댓글에 쓰는 도구를 넘긴다", () => {
-  // 7·8단계는 이어 받은 세션이 명령 밖에서 한다. process-issue 머리말이 CLI 로 넘어가지 않으면 거부된다.
-  const args = buildClaudeArgs("러너: …", { resume: "abc" });
-  for (const tool of ["Bash(gh run view:*)", "Bash(node scripts/harness/post-result.mjs:*)", "Bash(node scripts/harness/decision.mjs:*)"]) {
-    assert.ok(args.includes(tool), `${tool} 이 이어 받는 차례에 넘어가지 않는다`);
-  }
-  assert.ok(args.includes("Bash(node scripts/harness/deploy-check.mjs:*)"), "배포 확인 스크립트가 넘어가지 않는다");
 });
 
 test("dev 로 합칠 pull request 는 생성 화면의 폴더와 목록만 바꿀 수 있다", () => {
@@ -302,17 +210,6 @@ test("닫는 글은 결정으로 읽히지 않는다 — 러너가 남긴 글이
   }
   assert.match(closingComment("승인", "PR #58"), /main 에 반영/);
   assert.match(closingComment("반려", "되돌림 PR #59"), /dev 에서 되돌렸/);
-});
-
-test("이미 main 에 있는 승인은 commit 목록으로 넘긴다 — pull request 없이 이슈만 닫는다", () => {
-  const root = fakeRoot(12, "요청: #12");
-  assert.deepEqual(validateHandoff({ issue: 12, target: "main", already: true, commits: ["abc1234", "def5678"] }, 12, root), []);
-  const noCommits = validateHandoff({ issue: 12, target: "main", already: true, commits: [] }, 12, root);
-  assert.ok(noCommits.some((p) => p.includes("commits")), "commit 이 없는데 받았다");
-  const wrongTarget = validateHandoff({ issue: 12, target: "dev", already: true, commits: ["abc1234"] }, 12, root);
-  assert.ok(wrongTarget.some((p) => p.includes("main 넘김")), "dev 넘김에 already 를 받았다");
-  const junk = validateHandoff({ issue: 12, target: "main", already: true, commits: ["not a sha"] }, 12, root);
-  assert.ok(junk.some((p) => p.includes("commits")), "sha 가 아닌 것을 받았다");
 });
 
 test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기획자가 무엇을 다시 낼지 보면 된다", () => {

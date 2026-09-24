@@ -8,7 +8,8 @@
 
 ```text
 Slack 폼(화면 요청 · 화면 수정 요청) → GitHub issue (요청서 원본)
-→ 이 Mac 의 1분 감시가 집는다 (watch-decisions → local-run → runner.mjs → /process-issue)
+→ 이 Mac 의 1분 감시가 집는다 (watch-decisions → local-run → runner.mjs)
+→ 모델은 화면만 만든다 (/make-screens → plan.json) · 나머지는 러너가 한다
 → /ooee-harness:generate-code 로 화면 생성 · 검사
 → sandbox 에서 띄워 보고 검사 (빌드한 화면을 캡처해 눈으로 대조)
 → pull request → dev 머지 (러너가 합친다) → Cloudflare Pages 에 자동 배포 (deploy-check 가 기다린다)
@@ -31,14 +32,14 @@ Slack 폼(화면 요청 · 화면 수정 요청) → GitHub issue (요청서 원
 
 앞의 둘은 `plugins/ooee-harness/`의 Plugin이라 설치해야 보인다. 이 저장소에서는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우거나, `/plugin marketplace add ./` 뒤 `/plugin install ooee-harness@ooee`로 설치한다. 다른 저장소에 설치할 때 필요한 설정값과 권한은 [Plugin README](plugins/ooee-harness/README.md)에 있다.
 
-두 명령과 이 둘을 잇는 `/process-issue`는 모두 `SKILL.md` 머리말에서 모델 `claude-sonnet-5`, effort `high`로 고정되어 있다. 세션이 다른 모델이어도 명령이 도는 동안만 이 값으로 바뀐다. 까닭은 Plugin README의 「모델과 effort」에 있다.
+두 명령과 이 둘을 부르는 `/make-screens`는 모두 `SKILL.md` 머리말에서 모델 `claude-sonnet-5`, effort `high`로 고정되어 있다. 세션이 다른 모델이어도 명령이 도는 동안만 이 값으로 바뀐다. 까닭은 Plugin README의 「모델과 effort」에 있다.
 
 ## 저장소 구조
 
 ```text
 plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과 화면 규칙 검사(lib/)
 .claude-plugin/        Plugin marketplace 정의(ooee)
-.claude/               /process-issue Skill과 공용 권한(settings.json)
+.claude/               /make-screens Skill과 공용 권한(settings.json)
 .github/workflows      Quality(pnpm check) · Deploy(Cloudflare Pages) · Harness(이 Mac 의 러너)
 scripts/harness        요청 처리 도구: runner · issue · deploy-check · result-comment · post-result · slack-card · slack-bridge · decision · watch-decisions (README 참조)
 scripts/visual         브라우저에서 화면을 재는 도구

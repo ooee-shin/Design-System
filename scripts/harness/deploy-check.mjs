@@ -1,4 +1,4 @@
-// 머지한 것이 실제로 배포되어 화면 주소가 열리는지 본다. `/process-issue` 7단계가 부른다.
+// 머지한 것이 실제로 배포되어 화면 주소가 열리는지 본다. `러너` 7단계가 부른다.
 //
 //   node scripts/harness/deploy-check.mjs --sha <머지 commit> --key shop-cart --key voc
 //   node scripts/harness/deploy-check.mjs --key shop-cart        # 지금 dev 배포에서 주소만 본다(「결과만 올리기」)

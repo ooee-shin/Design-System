@@ -9,7 +9,7 @@
 // 옵션은 `--help`로 본다. 결과는 JSON으로 stdout에 나오고 이미지는 --out 디렉터리에 쌓인다.
 //
 // 빌드한 정적 사이트를 잴 때는 `--serve apps/sandbox/out` 을 준다. 빈 포트에 잠깐 띄우고 끝나면 닫는다.
-// `/process-issue` 5단계가 이것으로 만든 화면을 띄워 본다 — 개발 서버를 따로 띄우고 끄면 무인 러너에
+// `/make-screens` 5단계가 이것으로 만든 화면을 띄워 본다 — 개발 서버를 따로 띄우고 끄면 무인 러너에
 // 프로세스가 남거나 포트가 부딪친다(3001 을 다른 저장소의 서버가 잡고 있어 옛 화면을 읽은 일이 있다).
 import { createReadStream, existsSync, writeFileSync, mkdirSync, statSync } from "node:fs";
 import { createServer } from "node:http";

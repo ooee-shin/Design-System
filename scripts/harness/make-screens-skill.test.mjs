@@ -1,4 +1,4 @@
-// `/process-issue` Skill 이 가리키는 파일이 실제로 있는지 본다.
+// `/make-screens` Skill 이 가리키는 파일이 실제로 있는지 본다.
 //
 // 이 Skill 은 규칙을 스스로 갖지 않고 generate-code·review-design 의 SKILL.md 와 이 폴더의
 // 스크립트를 가리키기만 한다. 그래서 가리킨 자리가 옮겨 가면 Skill 은 오류 없이 엉뚱한 자리를 읽거나
@@ -10,9 +10,9 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const skill = readFileSync(path.join(root, ".claude/skills/process-issue/SKILL.md"), "utf8");
+const skill = readFileSync(path.join(root, ".claude/skills/make-screens/SKILL.md"), "utf8");
 
-test("process-issue SKILL.md 가 적은 저장소 경로가 모두 있다", () => {
+test("make-screens SKILL.md 가 적은 저장소 경로가 모두 있다", () => {
   // `<n>`·`<key>` 같은 자리 표시가 든 경로(.harness-work/issue-<n>/… 등)는 처리할 때 생기는 것이라 뺀다.
   const looksLikePath = (text) =>
     /^[a-zA-Z0-9._/-]+$/.test(text) && text.includes("/") && !text.startsWith("/") && /\.(ts|tsx|mjs|js|json|md|yml)$/.test(text);
@@ -27,9 +27,9 @@ test("process-issue SKILL.md 가 적은 저장소 경로가 모두 있다", () =
   ].filter(looksLikePath);
   const missing = [...new Set(cited)].filter((target) => !existsSync(path.join(root, target)));
 
-  // 실제로 가리키는 자리가 스무 곳 가까이 된다. 너무 적게 읽혔으면 정규식이 SKILL.md 모양과 어긋난 것이다.
-  assert.ok(new Set(cited).size >= 10, `경로를 ${new Set(cited).size}개만 읽었다 — 정규식이 SKILL.md 모양과 어긋났다`);
-  assert.deepEqual(missing, [], `process-issue SKILL.md 가 없는 파일을 가리킨다:\n${missing.join("\n")}`);
+  // 짧은 명령이라 가리키는 자리가 많지 않다. 아주 적게 읽혔으면 정규식이 SKILL.md 모양과 어긋난 것이다.
+  assert.ok(new Set(cited).size >= 3, `경로를 ${new Set(cited).size}개만 읽었다 — 정규식이 SKILL.md 모양과 어긋났다`);
+  assert.deepEqual(missing, [], `make-screens SKILL.md 가 없는 파일을 가리킨다:\n${missing.join("\n")}`);
 });
 
 test("allowed-tools 는 결정을 만들 수 있는 명령을 열지 않고, curl 은 배포 주소 확인 꼴만 연다", () => {
@@ -42,30 +42,30 @@ test("allowed-tools 는 결정을 만들 수 있는 명령을 열지 않고, cur
   assert.deepEqual(allowed.filter((tool) => tool.startsWith("Bash(curl")), [], "배포 확인은 deploy-check.mjs 가 한다 — curl 을 열지 않는다");
 });
 
-test("기다리는 일은 스크립트가 맡는다 — 세션이 직접 기다리지 않는다", () => {
-  // `gh run watch`·`sleep` 은 허용 목록 밖이라 헤드리스에서 거부된다. #37 이 7단계에서 그렇게 멈췄다.
+test("기다리는 일을 이 명령이 맡지 않는다 — 배포도 머지도 러너가 본다", () => {
+  // 기다리는 명령은 허용 목록 밖이라 헤드리스에서 거부되고, 이 차례가 끝나면 세션도 끝나 뒤를 받을 수 없다.
   const body = skill.replace(/^---\n[\s\S]*?\n---\n/, "");
-  // 설명 문장이 아니라 실제로 시키는 명령(bash 울타리 안)만 본다.
   const commands = [...body.matchAll(/```bash\n([\s\S]*?)```/g)].flatMap((match) => match[1].split("\n"));
-  for (const forbidden of ["gh run watch", "sleep ", "curl "]) {
-    const found = commands.filter((line) => line.includes(forbidden));
-    assert.deepEqual(found, [], `본문의 명령이 ${forbidden} 로 기다리려 한다`);
+  for (const forbidden of ["gh run watch", "sleep ", "curl ", "deploy-check", "gh pr create", "gh pr merge", "git commit", "git push"]) {
+    assert.deepEqual(commands.filter((line) => line.includes(forbidden)), [], `이 명령이 ${forbidden} 를 시킨다 — 러너의 몫이다`);
   }
-  assert.ok(commands.some((line) => line.includes("node scripts/harness/deploy-check.mjs --sha")), "7단계가 배포 확인 스크립트를 부르지 않는다");
 });
 
-test("$ARGUMENTS 의 세 입구가 모두 절로 있다", () => {
-  for (const heading of ["## 순서", "## 결과만 올리기", "## 결정 뒤"]) assert.ok(skill.includes(`\n${heading}\n`), `${heading} 절이 없다`);
-  assert.match(skill, /「결정」으로 시작하면 「결정 뒤」, 「결과」로 시작하면 「결과만 올리기」/);
+test("plan.json 의 칸이 모두 적혀 있다 — 러너가 그것으로 pull request 와 결과 댓글을 만든다", () => {
+  for (const field of ["screens[].key", "screens[].name", "screens[].project", "screens[].viewports", "screens[].args", "componentsUsed", "needsDecision"]) {
+    assert.ok(skill.includes(field), `plan.json 의 ${field} 가 적혀 있지 않다`);
+  }
+  assert.match(skill, /\.harness-work\/issue-<n>\/plan\.json/);
 });
 
-test("process-issue 가 부르는 스크립트가 모두 frontmatter 의 allowed-tools 에 있다", () => {
-  // 본문이 부르는 스크립트가 allowed-tools 에서 빠지면 단계마다 확인을 묻다가 headless 에서는 거부된다.
+test("이 명령에는 git·gh 쓰기 명령이 열려 있지 않다 — 못 하게 해 두는 것이 규칙보다 낫다", () => {
   const allowed = skill.match(/^allowed-tools:(.*)$/m)?.[1] ?? "";
-  for (const script of ["issue.mjs", "result-comment.mjs", "decision.mjs", "post-result.mjs", "deploy-check.mjs"]) {
-    assert.ok(skill.includes(`node scripts/harness/${script}`), `본문이 ${script} 를 부르지 않는다`);
-    assert.ok(allowed.includes(`Bash(node scripts/harness/${script}:*)`), `allowed-tools 에 ${script} 가 없다`);
-    assert.ok(existsSync(path.join(root, "scripts/harness", script)), `scripts/harness/${script} 가 없다`);
+  for (const forbidden of ["git commit", "git push", "git switch", "gh pr create", "gh pr merge", "gh issue comment", "gh issue close", "deploy-check", "post-result"]) {
+    assert.ok(!allowed.includes(forbidden), `allowed-tools 가 ${forbidden} 를 연다 — 러너의 몫이다`);
+  }
+  // 읽고 만드는 데 꼭 필요한 것은 있어야 한다. 없으면 단계마다 확인을 묻다가 헤드리스에서 거부된다.
+  for (const need of ["node scripts/harness/issue.mjs:*", "node scripts/visual/inspect.mjs:*"]) {
+    assert.ok(allowed.includes(`Bash(${need})`), `allowed-tools 에 ${need} 가 없다`);
   }
 });
 
@@ -73,7 +73,7 @@ test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {
   // `:*` 는 「공백 + *」와 같다(Claude Code 문서 「Configure permissions」). `feature/issue-:*` 는 `feature/issue- …` 만
   // 받고 `feature/issue-29-…` 는 받지 않는다. 사람이 연 세션에서는 확인 창이 가려 주지만, 러너에서는 거부되어
   // #29 가 3단계에서 멈췄다. 낱말 중간에서 이어 받으려면 공백 없이 `*` 를 쓴다.
-  const skills = [".claude/skills/process-issue/SKILL.md", ...["generate-code", "review-design"].map((name) => `plugins/ooee-harness/skills/${name}/SKILL.md`)];
+  const skills = [".claude/skills/make-screens/SKILL.md", ...["generate-code", "review-design"].map((name) => `plugins/ooee-harness/skills/${name}/SKILL.md`)];
   for (const file of skills) {
     const text = readFileSync(path.join(root, file), "utf8");
     const allowed = (text.match(/^allowed-tools:(.*)$/m)?.[1] ?? "").split(/,\s+/).map((tool) => tool.trim());
@@ -82,11 +82,10 @@ test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {
   }
 });
 
-test("하위 명령의 보고로 끝내지 않는다 — 이 명령의 보고는 첫 제목 넷 가운데 하나다", () => {
-  // #39 가 generate-code 의 「pull request 준비 완료」를 그대로 내고 차례를 끝내, 5·6단계를 밟지 않아
-  // 만든 화면이 push 되지 못했다. 러너에는 이어 갈 다음 차례가 없다.
-  assert.match(skill, /generate-code 의 보고는 이 명령의 끝이 아니다/);
-  for (const heading of ["## 결과 댓글을 올렸다", "## 러너에 넘김", "## 처리 중 실패", "## 묻고 멈춤"]) {
+test("하위 명령의 보고로 끝내지 않는다", () => {
+  // #39·#85 가 generate-code 의 「pull request 준비 완료」를 그대로 내고 차례를 끝냈다. 남은 화면이 있어도 멈췄다.
+  assert.match(skill, /하위 명령의 보고는 이 명령의 끝이 아니다/);
+  for (const heading of ["## 화면을 만들었다", "## 처리 중 실패"]) {
     assert.ok(skill.includes(heading), `보고의 첫 제목 ${heading} 이 없다`);
   }
 });
