@@ -18,6 +18,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { branchName, planPath, prBody, resultInput, title, validatePlan } from "./plan.mjs";
 import { postCard, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -49,9 +50,12 @@ export const CHAINED_SKILLS = [
  */
 export const OWN_SKILL = ".claude/skills/process-issue/SKILL.md";
 
+/** 화면만 만드는 명령. 요청 처리(`처리`)는 이것 하나만 부른다(2026-09-24 역할 뒤집기). */
+export const MAKE_SKILL = ".claude/skills/make-screens/SKILL.md";
+
 /** 러너가 CLI 로 넘기는 머리말 allowed-tools. 이 명령과 하위 명령의 것을 겹치지 않게 모은다. */
 export function chainedAllowedTools(root = repoRoot) {
-  const tools = [OWN_SKILL, ...CHAINED_SKILLS].flatMap((file) => {
+  const tools = [OWN_SKILL, MAKE_SKILL, ...CHAINED_SKILLS].flatMap((file) => {
     const text = readFileSync(path.join(root, file), "utf8");
     const line = text.match(/^---\n[\s\S]*?^allowed-tools:(.*)$/m)?.[1] ?? "";
     return line.split(/,\s+/).map((tool) => tool.trim()).filter(Boolean);
@@ -418,6 +422,97 @@ async function notifyStop(issue, report, options = {}) {
   );
 }
 
+/** 이 요청에 이미 올라간 결과 댓글의 수. 다음 회차는 그 +1 이다. */
+function resultRound(issue) {
+  const read = JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)]));
+  return (read.round ?? 0) + 1;
+}
+
+/** 이 요청의 화면이 이미 `dev` 에 올라간 적이 있는지. 있으면 다시 만들지 않는다. */
+function alreadyLanded(issue) {
+  const prs = JSON.parse(sh("gh", ["pr", "list", "--state", "all", "--base", "dev", "--search", `"요청: #${issue}" in:body`, "--json", "number,state,url,body"]));
+  return prs.find((pr) => pr.state !== "CLOSED" && new RegExp(`요청: #${issue}(?!\\d)`).test(pr.body ?? "")) ?? null;
+}
+
+/**
+ * 화면 요청 하나를 처음부터 끝까지 돌린다. **모델은 화면만 만들고 나머지는 이 함수가 한다**
+ * (`2026-09-24` 역할 뒤집기 — plan.mjs 머리말).
+ *
+ * 모델이 멈출 수 있는 자리는 하나다: 화면을 만들고 `plan.json` 을 쓰는 것. 기다리는 일(Quality·배포),
+ * 되풀이되는 일(가지·commit·push·pull request·머지), 꼴을 지켜야 하는 일(결과 댓글)은 모두 여기 있다.
+ */
+async function runRequest(issue) {
+  log(`## 화면 요청 #${issue} 처리`);
+  const stop = async (heading, lines) => {
+    const report = [`## ${heading}`, "", ...lines.map((line) => `- ${line}`)].join("\n");
+    log(`\n${report}\n`);
+    await notifyStop(issue, report);
+    return false;
+  };
+
+  // 1. 이슈를 읽는다. 물어야 할 것이 있으면 만들지 않는다.
+  const read = JSON.parse(sh("node", ["scripts/harness/issue.mjs", String(issue)]));
+  if (read.problems.length) return stop("묻고 멈춤", read.problems);
+  if (!read.fields.requester) return stop("묻고 멈춤", ["요청자가 비어 있다 — 결과 댓글은 요청자 없이 만들어지지 않는다"]);
+
+  // 2. 이미 만든 요청을 또 만들지 않는다. #9 처럼 화면만 있고 결과 댓글이 없는 것은 `결과 <n>` 의 자리다.
+  const landed = alreadyLanded(issue);
+  if (landed) return stop("이미 처리함", [`${landed.url} 가 이 요청의 화면을 이미 올렸다`, "결과 댓글이 없으면 `결과 <n>`, 있으면 `결정 <n>` 이다"]);
+
+  const round = resultRound(issue);
+  dropStaleBranches(issue);
+  rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
+
+  // 3. 모델이 하는 유일한 일 — 화면을 만들고 무엇을 만들었는지 적는다.
+  runClaude(`/make-screens ${issue} 러너`);
+  const file = path.join(repoRoot, planPath(issue));
+  if (!existsSync(file)) return stop("화면을 만들지 못했다", [`${planPath(issue)} 이 없다 — 위 보고에 멈춘 자리가 있다`]);
+  const plan = JSON.parse(readFileSync(file, "utf8"));
+  const problems = validatePlan(plan, { issue, mode: read.mode });
+  if (problems.length) return stop("만든 것을 읽을 수 없다", problems);
+
+  // 4. 화면 자리 밖을 고쳤으면 올리지 않는다. 모델이 하네스나 workflow 를 함께 바꾸면 다음 실행이 그 코드로 돈다.
+  const changed = sh("git", ["status", "--porcelain", "--untracked-files=all"]).split("\n").filter(Boolean).map((line) => line.slice(3));
+  if (!changed.length) return stop("바뀐 파일이 없다", ["화면을 만들었다고 적었지만 working tree 가 그대로다"]);
+  const outside = outsideScreenFiles(changed);
+  if (outside.length) return stop("화면 자리 밖을 고쳤다", outside);
+
+  // 5. 여기서부터 끝까지 스크립트다.
+  const branch = branchName(issue, round, plan.screens);
+  sh("git", ["switch", "-c", branch]);
+  sh("git", ["add", "apps/sandbox"]);
+  sh("git", ["commit", "-q", "-m", `${title(issue, round, plan.screens, read.mode)}\n\nCo-authored-by: Claude ${MODEL} <noreply@anthropic.com>`]);
+  sh("git", ["push", "-q", "-u", "origin", branch]);
+  log(`- ${branch} 에 ${plan.screens.length}장을 commit·push 했다`);
+
+  const bodyFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, `pr-${round}.md`);
+  mkdirSync(path.dirname(bodyFile), { recursive: true });
+  writeFileSync(bodyFile, prBody({ issue, round, screens: plan.screens, needsDecision: plan.needsDecision ?? [], other: plan.other ?? [] }));
+  const url = sh("gh", ["pr", "create", "--base", "dev", "--head", branch, "--title", title(issue, round, plan.screens, read.mode), "--body-file", bodyFile]).trim();
+  const pr = Number(url.split("/").pop());
+  log(`- pull request #${pr} ${url}`);
+
+  const { headRefOid, files } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "headRefOid,files"]));
+  const outsidePr = outsideScreenFiles(files.map((item) => item.path));
+  if (outsidePr.length) return stop("pull request 가 화면 밖을 바꿨다", [...outsidePr, `${url} 를 열어 둔 채 멈춘다`]);
+  await waitQuality(headRefOid);
+  mergePr(pr, ["--squash", "--delete-branch"]);
+  const { mergeCommit } = JSON.parse(sh("gh", ["pr", "view", String(pr), "--json", "mergeCommit"]));
+  log(`- #${pr} 머지 ${mergeCommit.oid}`);
+
+  const deploy = checkDeploy(mergeCommit.oid, plan.screens.map((screen) => screen.key));
+  if (deploy && !deploy.ok) return stop("배포를 확인하지 못했다", [deploy.reason ?? "까닭 없음", `화면은 dev 에 있다(pull request #${pr})`]);
+
+  // 6. 결과 댓글. 모델이 만들지 않으므로 주소와 이름이 어긋날 수 없다.
+  const inputFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, `result-${round}.json`);
+  writeFileSync(inputFile, `${JSON.stringify(resultInput({ issue, read, round, screens: plan.screens, plan, pr: { number: pr, url }, deploy }), null, 2)}\n`);
+  const before = latestResultId(issue);
+  sh("node", ["scripts/harness/post-result.mjs", String(issue), path.relative(repoRoot, inputFile)], { stdio: ["ignore", "inherit", "inherit"] });
+  if (!postedResult(issue, before)) return stop("결과 댓글이 올라가지 않았다", [`화면은 dev 에 있다(pull request #${pr})`, "개발자가 `결과 <n>` 명령을 돌려야 한다"]);
+  log(`\n## 처리를 마쳤다 — 화면 ${plan.screens.length}장 · pull request #${pr} · ${round}회차`);
+  return true;
+}
+
 async function runChain(issue, argument) {
   rmSync(handoffPath(issue), { force: true });
   dropStaleBranches(issue);
@@ -493,8 +588,7 @@ async function main(argv) {
     runClaude(`/process-issue 결과 ${issue} 러너`);
     return postedResult(issue, before) ? 0 : 1;
   }
-  log(`## 화면 요청 #${issue} 처리`);
-  return (await runChain(Number(issue), String(issue))) ? 0 : 1;
+  return (await runRequest(Number(issue))) ? 0 : 1;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

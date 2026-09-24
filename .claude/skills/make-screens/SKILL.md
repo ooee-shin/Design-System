@@ -1,0 +1,117 @@
+---
+name: make-screens
+description: 화면 요청 이슈 하나를 읽어 sandbox 에 화면을 만들고 무엇을 만들었는지 plan.json 에 적는다. 가지·commit·pull request·배포·결과 댓글은 하지 않는다 — 러너가 한다. 「이슈 <n> 화면 만들어 줘」 요청에 쓴다. 인수는 「<이슈 번호>」다.
+model: claude-sonnet-5
+effort: high
+allowed-tools: Read, Grep, Glob, Write, Edit, Skill, Bash(git status:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/visual/inspect.mjs:*), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *), Bash(gh issue view:*), Bash(gh pr view:*), Bash(gh pr list:*)
+---
+
+# /make-screens
+
+**하는 일은 하나다.** 요청을 화면 몇 장으로 나누고, 그 화면을 만들고, 무엇을 만들었는지 한 장에 적는다.
+
+## 하지 않는 것
+
+가지 만들기, `git commit`·`push`, pull request, 머지, 배포 확인, 결과 댓글, 이슈 닫기. **모두 러너가 한다.** 그 명령들은 이 명령에 열려 있지도 않다.
+
+`2026-09-23`~`24` 에 요청 처리가 아홉 번 무너졌는데 화면 생성은 한 번도 실패하지 않았다. 무너진 것은 언제나 그 주변이었다 — 배포를 기다리다 턴을 끝내기, 하위 명령의 보고를 전체의 끝으로 여기기, 머지 응답 타임아웃. 기다리는 일과 되풀이되는 일은 스크립트의 몫이라 옮겼다(`scripts/harness/plan.mjs` 머리말).
+
+## 순서
+
+### 1. 이슈를 읽는다
+
+```bash
+node scripts/harness/issue.mjs <n>
+```
+
+출력의 `mode`·`generateArgs`·`fix`·`project`·`viewports`·`notes`·`fields` 를 쓴다. 본문을 눈으로 다시 나누지 않는다. **`problems` 가 있으면 러너가 이미 막았으므로 여기까지 오지 않는다.**
+
+- **`project.undecided` 가 `true` 면 프로젝트를 이 명령이 정한다.** 묻지 않는다(`2026-09-23` 개발자).
+  1. `apps/sandbox/src/screens.ts` 의 `SANDBOX_PROJECTS` 와 그 프로젝트에 든 화면 이름을 읽는다.
+  2. 요구사항이 부르는 제품·사용자·흐름이 있는 프로젝트의 것과 같으면 **그 프로젝트**다. 「하네스 시험」은 하네스를 시험하는 자리라 요구사항이 시험이라고 하지 않으면 넣지 않는다.
+  3. 맞는 곳이 없으면 **새 프로젝트**다. 이름은 요구사항이 부르는 제품·업무 이름이고(두 어절에서 네 어절), 사람 이름·「테스트」·날짜는 쓰지 않는다. id 는 소문자, 공백은 붙임표, 그 밖의 기호는 뺀다.
+  4. 정한 것을 `needsDecision` 첫 줄에 「프로젝트를 정했다: 「<이름>」(있는 것 | 새로 만듦) — <까닭 한 줄>」로 남긴다.
+- **`mode` 가 `수정` 이면 있는 화면을 제자리에서 고친다.** `fix.target` 이 그 화면을 만든 요청이다. 그 요청의 머지된 pull request 를 `gh pr list --state all --base dev --search '"요청: #<fix.target>" in:body'` 로 찾아 본문 `## 화면별 인수` 에서 key 와 앞 인수 원문을 읽는다. 화면 코드는 열지 않는다. 그 key 가 `screens.ts` 에 없으면 멈춘다. 화면은 그 하나이고 2단계를 건너뛴다.
+- `fields.similar`·`fields.onSubmit` 이 비어 있지 않으면 `needsDecision` 에 「반영하지 않은 칸 <라벨>: <값>」으로 남긴다.
+
+### 2. 만들 화면을 정한다
+
+요구사항이 여러 화면을 부르면 나눈다(「2-3페이지」·「자율 4-5페이지」·흐름을 이루는 화면들). 한 장이면 이 단계를 건너뛴다.
+
+- **확인받지 않고 정한다.** 물을 사람이 없다. 나눈 목록을 `needsDecision` 첫 줄에 「확인받지 않고 나눈 화면: <key>·<key>…」로 남기면 기획자가 결과 카드에서 보고 개선이나 반려로 고친다.
+- 화면마다 정할 것은 **이름**, **요청 원문에서 온 것**, **지어낸 것**(화면에 보일 항목·버튼 문구·기본값 가운데 요청에 없는 것) 셋이다.
+- 화면끼리 링크로 이을 때는 **이 회차에 함께 만드는 화면만** 가리킨다. 만들지 않을 화면 주소를 걸면 열리지 않는 링크가 남는다.
+
+### 3. 화면마다 generate-code 를 돌린다
+
+`/ooee-harness:generate-code` 를 화면마다 한 번씩 부른다. 인수는 이 꼴이다.
+
+```
+<화면 이름>. <요청 원문에서 온 것> 지어냄(요청에 없어 처리하는 쪽이 정함): <지어낸 것> 프로젝트: <id> 유형: <web, tablet, mobile 가운데 고른 것들>
+```
+
+- 새 프로젝트면 `새 프로젝트 이름: <이름>` 을 뒤에 붙인다.
+- 수정 요청이면 **앞 인수 원문 + ` 수정: <fix.instruction>` + ` 고칠 화면: <key>`** 다.
+- 개선 회차면 앞 회차 인수 뒤에 ` 개선: <사유 원문>` 을 붙인다.
+- 한 장 요청이면 `issue.mjs` 의 `generateArgs` 를 그대로 쓴다(`프로젝트: <정한다>` 는 1단계에서 정한 id 로 바꾼다).
+
+**하위 명령의 보고는 이 명령의 끝이 아니다.** generate-code 가 「pull request 준비 완료」를 내면 그 화면 하나가 끝난 것이다. 남은 화면이 있으면 이어 가고, 없으면 4단계로 간다(`2026-09-24` #85 가 여기서 끝냈다).
+
+### 4. sandbox 에서 띄워 보고 잰다
+
+```bash
+pnpm --filter @ooee/sandbox build
+node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewport <WxH> --shot <key>-<유형>
+```
+
+- 뷰포트는 화면 유형이 정한다 — 웹 `1440x900`, 태블릿 `1024x768`, 모바일 `390x844`. **유형이 여럿이면 폭마다 한 번씩** 찍는다.
+- 기계로 재는 둘: `h1` 이 있는지, 가로 넘침이 없는지(`documentElement.scrollWidth` 가 뷰포트 폭 이하).
+- 찍은 그림을 **눈으로 본다.** 겹침·잘림·빈 화면이 있으면 고치고 다시 잰다. 고친 것은 `other` 에, 고치지 않고 남긴 판단은 `needsDecision` 에 적는다.
+- 화면 위의 「보기 폭」 전환은 sandbox 가 얹는 것이라 화면 코드가 신경 쓰지 않는다.
+
+### 5. 무엇을 만들었는지 적고 멈춘다
+
+`.harness-work/issue-<n>/plan.json` 에 `Write` 로 쓴다. **이 파일이 이 명령의 결과물이다.**
+
+```json
+{
+  "issue": 85,
+  "screens": [
+    {
+      "key": "invoice-dashboard",
+      "name": "자동 송장 대시보드",
+      "project": "자동-송장-api",
+      "viewports": ["web"],
+      "args": "3단계에서 generate-code 에 넘긴 인수 원문 그대로"
+    }
+  ],
+  "componentsAdded": [],
+  "componentsUsed": ["Badge", "Button"],
+  "other": ["모바일에서 표가 잘려 카드형 목록으로 바꿨다"],
+  "needsDecision": ["예시 데이터 셋은 요청에 없어 정했다"]
+}
+```
+
+| 칸 | 무엇 |
+| --- | --- |
+| `screens[].key` | `screens.ts` 에 등록된 key. 소문자·숫자·붙임표 |
+| `screens[].name` | `screens.ts` 에 등록된 이름. 결과 댓글의 표와 「추가한 페이지」가 이 글자다 |
+| `screens[].project` | 그 화면이 든 프로젝트 id |
+| `screens[].viewports` | `web`·`tablet`·`mobile` 가운데 고른 것들 |
+| `screens[].args` | 3단계에서 실제로 넘긴 인수 원문. pull request 본문에 그대로 실려 다음 회차가 읽는다 |
+| `componentsAdded` | `@ooee/ui` 에 새로 더한 컴포넌트. 보통 비어 있다 |
+| `componentsUsed` | 쓴 컴포넌트 이름. 겹치지 않게 |
+| `other` | 그 밖에 한 일. 개선 회차면 「<앞 회차>회차 개선 반영: <사유 한 줄>」 |
+| `needsDecision` | 요청에 없어 정한 것, 확인받지 않고 나눈 목록, 반영하지 않은 칸. 화면이 여럿이면 이름을 앞에 붙인다 |
+
+쓴 뒤 **보고의 첫 제목을 「## 화면을 만들었다」로 하고 멈춘다.** 화면 표(이름·key·폭)와 `needsDecision` 을 함께 적는다. 러너가 이 파일을 다시 확인하고 pull request 부터 결과 댓글까지 한다.
+
+**멈춰야 할 때**(요청이 가리키는 화면을 찾지 못함, 검사가 화면 자리 밖에서 실패, 물을 것이 남음)는 `plan.json` 을 쓰지 않고 첫 제목을 「## 처리 중 실패」로 하여 멈춘 자리와 까닭을 적는다. 러너가 그 제목과 줄을 결과 채널 카드로 옮긴다.
+
+## 러너에서 돌 때
+
+인수 끝의 `러너` 는 이 Mac 의 1분 감시가 부른 것이다. 대화할 사람이 없으므로 묻지 않고 정하며, 정한 것은 모두 `needsDecision` 에 남긴다. 기획자는 결과 카드에서 보고 개선·반려로 고친다.
+
+- **기다리지 않는다.** 이 차례가 끝나면 세션도 끝나 나중에 올 알림을 받을 수 없다. 오래 걸리는 명령을 배경으로 밀어 두고 기다리는 도구를 부르지 않는다.
+- **한 줄에 명령을 여러 개 묶지 않는다**(`A && B`·`for … done`). 권한 검사가 그 줄 전체를 모르는 명령으로 보아 거부한다.
+- 막힌 명령은 형태를 바꿔 다시 시도하지 않고 보고에 적는다.

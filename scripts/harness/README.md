@@ -8,6 +8,7 @@ Slack 폼으로 들어온 화면 요청 이슈를 읽고, 처리한 결과를 �
 
 | 파일 | 하는 일 |
 | --- | --- |
+| `plan.mjs` | 모델이 화면을 만든 뒤 남기는 `plan.json` 을 읽어 가지 이름·pull request 본문·결과 댓글 입력으로 바꾼다. 순수 함수라 시험이 값으로 고정한다 |
 | `issue.mjs` | 이슈 본문을 칸별로 읽어 `/ooee-harness:generate-code` 인수(`generateArgs`)를 만든다. 만들 수 없으면 `null`과 까닭(`problems`)을 낸다 |
 | `result-comment.mjs` | 처리 결과를 결과 댓글 markdown 으로 만든다. 빠진 링크나 실패한 검사가 있으면 만들지 않고 던진다 |
 | `post-result.mjs` | 결과 댓글을 이슈에 단다(에이전트가 이슈에 글을 다는 유일한 길). 단 뒤 `slack-card.mjs` 로 결과 채널에 카드를 올린다 |
@@ -47,6 +48,8 @@ node scripts/harness/decision.mjs 9 [--round 1]          # 결과 없음 · 대�
 - 반려·개선의 사유는 `reasonSource`와 함께 나온다. `prefix`는 「반려: …」 댓글 자신, `after`는 신호를 남긴 사람이 그 뒤에 쓴 첫 댓글, `before`는 신호 앞 10분(`REASON_BEFORE_MS`) 안의 마지막 댓글이다. `after`·`before`는 짐작이라 `reasonCommentUrl`로 원문을 가리키고 `note`에 적는다.
 
 ## 러너
+
+**새 요청은 스크립트가 운전한다**(`2026-09-24` 역할 뒤집기). `runner.mjs` 의 `runRequest` 가 이슈를 읽고 → `/make-screens` 를 한 번 부르고 → `plan.json` 을 확인한 뒤 → 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글까지 한다. **모델이 하는 일은 화면을 만들고 `plan.json` 을 쓰는 것 하나뿐이다.** 까닭은 `plan.mjs` 머리말에 있다 — `2026-09-23`~`24` 에 요청 처리가 아홉 번 무너졌는데 화면 생성은 한 번도 실패하지 않았고, 무너진 것은 언제나 모델이 운전하던 주변이었다. **결정(승인·반려·개선)은 아직 옛 길(`/process-issue 결정` + 넘김 파일)이다** — 처리 경로를 실제 요청으로 검증한 뒤 옮긴다.
 
 **러너를 부르는 것은 이 Mac 의 1분 감시다**(`2026-09-23` 개발자: 「로컬에서 돌리는 걸로, 항상 켜두는 컴퓨터라 괜찮다」). `watch-decisions.mjs` 가 열린 화면 요청을 읽어 처리할 것과 결정을 고르고, `local-run.mjs` 가 사본(`~/.ooee-harness/harness`)을 `origin/dev` 로 맞춘 뒤 러너를 **Actions job 밖에서** 돌린다. 흐름은 ai-environment.md 「처리와 승인」이, Claude 쪽 절차는 `/process-issue`의 「러너에서 돌 때」가 갖는다.
 
