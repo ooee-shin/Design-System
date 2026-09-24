@@ -148,15 +148,24 @@ export function closingComment(kind, detail) {
  */
 export function stopNotice(issue, report, { title = "", url = "", tail = "요청을 고쳐 다시 내거나 개발자에게 알려 주세요." } = {}) {
   const lines = String(report ?? "").split("\n");
-  const at = lines.findIndex((line) => /^## /.test(line));
-  const heading = at >= 0 ? lines[at].replace(/^## /, "") : "처리가 멈췄다";
+  // 하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다. `2026-09-24` #85 카드가 「⚠️ … pull request 준비
+  // 완료」로 나갔다 — generate-code 가 화면 하나를 만들고 낸 제목인데, 그 뒤 단계를 하지 않아 실패한 실행
+  // 이었다. 이 명령 자신의 제목이 아니면 무엇이 됐든 끝나지 않은 것이다.
+  const own = (line) => /^## /.test(line) && !/준비 완료|검사 실패|위반/.test(line);
+  const at = lines.findIndex(own);
+  const heading = at >= 0 ? lines[at].replace(/^## /, "") : "처리가 끝나지 않았다";
   // 그 제목의 절만 읽는다. 다음 제목까지 넘어가면 「거친 자리」의 통과한 단계가 까닭 자리에 실린다
   // (`2026-09-23` #62 카드: 멈춘 까닭 대신 `git switch dev — 통과` 넉 줄이 갔다).
   const section = at >= 0 ? lines.slice(at + 1) : lines;
   const end = section.findIndex((line) => /^## /.test(line));
   const rest = (end < 0 ? section : section.slice(0, end)).map((line) => line.trim()).filter(Boolean);
   const problems = rest.filter((line) => /^[-*] |^\d+\. /.test(line)).slice(0, 4);
-  const detail = (problems.length ? problems : rest.slice(0, 3)).map((line) => line.replace(/^[-*] /, "· ")).join("\n");
+  const picked = problems.length ? problems : rest.slice(0, 3);
+  // 쓸 줄이 하나도 없을 때가 있다 — 하위 명령의 제목만 남기고 끝난 실행(#85)이 그렇다. 빈 카드를 올리면
+  // 기획자는 무엇이 잘못됐는지도, 무엇을 해야 하는지도 알 수 없다.
+  const detail = picked.length
+    ? picked.map((line) => line.replace(/^[-*] /, "· ")).join("\n")
+    : "· 어디서 멈췄는지 보고에 남지 않았습니다. 개발자가 실행 기록을 봐야 합니다.";
   const head = `⚠️ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
   const where = url ? `\n자세히: ${url}` : "";
   return `${head}\n${detail}\n\n${tail}${where}`;

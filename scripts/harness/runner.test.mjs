@@ -323,5 +323,14 @@ test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기�
   assert.match(text, /요청을 고쳐 다시 내거나/);
   assert.match(text, /자세히: https:\/\/github\.com\/x\/y\/issues\/60$/);
   assert.doesNotMatch(text, /막힌 명령/, "보고 전체를 옮기면 카드가 길어진다");
-  assert.match(stopNotice(1, "제목 없는 보고"), /처리가 멈췄다/);
+  assert.match(stopNotice(1, "제목 없는 보고"), /처리가 끝나지 않았다/);
+});
+
+test("하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다", () => {
+  // 2026-09-24 #85: 화면 하나를 만들고 그 뒤 단계를 하지 않아 실패했는데, 카드는 generate-code 의
+  // 「pull request 준비 완료」를 그대로 실어 성공처럼 보였다.
+  const report = ["## pull request 준비 완료", "", "제목: feat(sandbox): …", "- page.tsx 를 만들었다"].join("\n");
+  const card = stopNotice(85, report, { title: "자동 송장 api 대시보드" });
+  assert.match(card, /— 처리가 끝나지 않았다/);
+  assert.ok(!card.includes("준비 완료"), `성공 제목이 카드에 실렸다:\n${card}`);
 });
