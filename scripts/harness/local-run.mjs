@@ -60,12 +60,33 @@ export function runnerArgs(mode, issue) {
  * 자리가 아니라 실행마다 새로 맞추는 자리이므로, 남은 것은 버리는 것이 맞다.
  */
 export const PREPARE = [
-  ["git", ["fetch", "-q", "origin", "dev"]],
+  ["git", ["fetch", "-q", "origin"]],
   ["git", ["checkout", "-q", "-B", "dev", "origin/dev"]],
   ["git", ["reset", "-q", "--hard", "origin/dev"]],
   ["git", ["clean", "-qfd"]],
   ["pnpm", ["install", "--frozen-lockfile"]],
 ];
+
+/**
+ * 사본이 `main` 까지 볼 수 있게 고친다. 설치할 때 `--depth 1 -b dev` 로 받으면 `origin/dev` 하나만 따라가고
+ * 이력도 한 겹뿐이라, 승인(D2)이 쓰는 `git log origin/main..origin/dev` 와 `git log origin/main --grep` 이
+ * 성립하지 않는다 — `2026-09-24` 에 #85 승인이 「이 저장소에는 origin/main 이 없습니다」로 멈췄다.
+ *
+ * 두 번째부터는 할 일이 없으므로 조용히 지나간다. 실패해도 막지 않는다 — 여기서 못 고쳐도 처리는 돌고,
+ * 승인만 그 자리에서 다시 멈춰 까닭을 알린다.
+ */
+export function ensureFullClone(dir, run = (cmd, args) => spawnSync(cmd, args, { cwd: dir, encoding: "utf8" })) {
+  const done = [];
+  const refspec = run("git", ["config", "--get-all", "remote.origin.fetch"]).stdout ?? "";
+  if (!refspec.includes("refs/heads/*")) {
+    run("git", ["config", "--replace-all", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*"]);
+    done.push("모든 가지를 따라가게 했다");
+  }
+  if ((run("git", ["rev-parse", "--is-shallow-repository"]).stdout ?? "").trim() === "true") {
+    if (run("git", ["fetch", "-q", "--unshallow", "origin"]).status === 0) done.push("이력을 모두 받았다");
+  }
+  return done;
+}
 
 /**
  * 러너 한 번. 사본을 맞추고 `runner.mjs <모드> [<이슈>]` 를 돌려 exit 코드와 기록 파일을 돌려준다.
@@ -83,6 +104,7 @@ export function runLocal(mode, issue, { env = process.env, now = new Date() } = 
   const say = (line) => writeSync(fd, `${new Date().toISOString()} ${line}\n`);
   try {
     say(`## ${mode}${issue ? ` #${issue}` : ""} — ${dir}`);
+    for (const line of ensureFullClone(dir)) say(`사본을 고쳤다: ${line}`);
     for (const [cmd, args] of PREPARE) {
       const step = spawnSync(cmd, args, { cwd: dir, stdio: ["ignore", fd, fd], env });
       if (step.status !== 0) {

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { PREPARE, runLocal, runLogFile, runnerArgs, workDir } from "./local-run.mjs";
+import { PREPARE, ensureFullClone, runLocal, runLogFile, runnerArgs, workDir } from "./local-run.mjs";
 
 test("작업 사본은 상태 폴더 아래 harness 이고 HARNESS_WORK_DIR 로 옮긴다 — 개발자의 clone 에서는 돌지 않는다", () => {
   assert.equal(workDir({ HARNESS_STATE_DIR: "/tmp/ooee" }), path.join("/tmp/ooee", "harness"));
@@ -28,7 +28,7 @@ test("러너 인수는 모드 셋과 숫자 이슈만 받는다", () => {
 test("돌기 전에 dev 로 맞추고 남은 파일을 지우고 의존성을 맞춘다 — actions/checkout 이 하던 일이다", () => {
   const lines = PREPARE.map(([cmd, args]) => `${cmd} ${args.join(" ")}`);
   assert.deepEqual(lines, [
-    "git fetch -q origin dev",
+    "git fetch -q origin",
     "git checkout -q -B dev origin/dev",
     "git reset -q --hard origin/dev",
     "git clean -qfd",
@@ -42,4 +42,28 @@ test("돌기 전에 dev 로 맞추고 남은 파일을 지우고 의존성을 �
 test("작업 사본이 없으면 돌리지 않고 설치 안내로 던진다", () => {
   const dir = mkdtempSync(path.join(tmpdir(), "ooee-local-run-"));
   assert.throws(() => runLocal("처리", 1, { env: { HARNESS_WORK_DIR: dir, HARNESS_STATE_DIR: dir } }), /작업 사본이 없다/);
+});
+
+test("사본이 dev 한 가지만 얕게 받아졌으면 고친다 — 승인은 main 을 봐야 한다", () => {
+  // 2026-09-24 #85 승인: 「이 저장소에는 origin/main 이 없습니다」로 멈췄다. 설치할 때 --depth 1 -b dev 로
+  // 받아 origin/dev 하나만 따라가고 이력도 한 겹뿐이었다. D2 는 main..dev 비교와 이력 검색을 쓴다.
+  const calls = [];
+  const fake = (cmd, args) => {
+    calls.push(`${cmd} ${args.join(" ")}`);
+    if (args[0] === "config" && args[1] === "--get-all") return { stdout: "+refs/heads/dev:refs/remotes/origin/dev\n", status: 0 };
+    if (args.includes("--is-shallow-repository")) return { stdout: "true\n", status: 0 };
+    return { stdout: "", status: 0 };
+  };
+  const done = ensureFullClone("/tmp/x", fake);
+  assert.deepEqual(done, ["모든 가지를 따라가게 했다", "이력을 모두 받았다"]);
+  assert.ok(calls.some((line) => line.includes("+refs/heads/*:refs/remotes/origin/*")), "모든 가지를 따라가게 고치지 않는다");
+  assert.ok(calls.some((line) => line.includes("--unshallow")), "이력을 받지 않는다");
+});
+
+test("이미 성한 사본은 건드리지 않는다", () => {
+  const fake = (cmd, args) => ({
+    stdout: args[1] === "--get-all" ? "+refs/heads/*:refs/remotes/origin/*\n" : args.includes("--is-shallow-repository") ? "false\n" : "",
+    status: 0,
+  });
+  assert.deepEqual(ensureFullClone("/tmp/x", fake), []);
 });

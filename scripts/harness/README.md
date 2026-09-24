@@ -95,7 +95,7 @@ node scripts/harness/runner.mjs 결과 9       # 결과 댓글만
 plist 둘은 기기별 경로를 `__HOME__` 로 두었다(저장소에 절대경로를 적지 않는다). 설치할 때 `sed` 로 채운다. launchd 가 띄운 프로그램은 `~/Desktop` 을 읽지 못하므로(macOS TCC) 보호 밖의 사본 `~/.ooee-harness/harness` 에서 돈다.
 
 ```sh
-git clone --depth 1 -b dev https://github.com/bluekey-kr/Design-System-Harness.git ~/.ooee-harness/harness
+git clone -b dev https://github.com/bluekey-kr/Design-System-Harness.git ~/.ooee-harness/harness
 for name in decisions slack; do
   sed "s#__HOME__#$HOME#g" ~/.ooee-harness/harness/scripts/harness/com.ooee.harness.$name.plist > ~/Library/LaunchAgents/com.ooee.harness.$name.plist
   launchctl load ~/Library/LaunchAgents/com.ooee.harness.$name.plist
@@ -104,6 +104,8 @@ launchctl list | grep ooee.harness          # 둘 다 보여야 한다
 tail -f ~/.ooee-harness/watch.log ~/.ooee-harness/slack.log
 ```
 
+- **얕게(`--depth 1`) 받거나 한 가지만 받지 않는다.** 승인(D2)은 `git log origin/main..origin/dev` 와 이력 검색을 쓰므로 `origin/main` 과 이력이 있어야 한다(`2026-09-24` 에 #85 승인이 「origin/main 이 없습니다」로 멈췄다). 이미 얕게 받아 두었으면 `local-run.mjs` 의 `ensureFullClone` 이 처음 돌 때 고친다.
+- **그 폴더에서 `claude` 를 한 번 열어 신뢰 창을 수락한다.** 아니면 `.claude/settings.json` 의 `allow` 가 통째로 무시되어 화면 규칙 검사와 화면 테스트가 막힌다(`2026-09-23`).
 - `com.ooee.harness.decisions` — 60초마다 `watch-tick.sh`. 사본을 `origin/dev` 로 맞춘 뒤 새 요청과 결정을 읽고, 있으면 그 자리에서 러너를 돌린다(`local-run.mjs`). 처리가 20분 걸려도 launchd 는 다음 tick 을 겹쳐 띄우지 않는다.
 - `com.ooee.harness.slack` — 다리(`slack-bridge.mjs`)를 상시로. 끊기면 launchd 가 되살린다. 토큰은 `~/.ooee-harness/slack.env`(「slack-bridge.mjs」 머리말 「설치」).
 - 코드가 바뀌면 사본이 다음 감시 때 스스로 맞춰지지만, 다리는 `launchctl kickstart -k gui/$(id -u)/com.ooee.harness.slack` 로 다시 띄워야 새 코드를 탄다.
