@@ -21,15 +21,18 @@
  *
  * 개선: 상세보기 눌렀는데 아무런 효과가 없음 확인해줘
  *
+ * 수정: 상단에 지난 대화를 검색하는 입력창을 넣어줘. 키워드를 치면 그 말이 든 대화만 남긴다.
+ *
  * 비워 둔 자리: 뒤로가기 버튼을 눌렀을 때의 이동 경로, 관련 화면 이동 버튼이 실제로 여는 상세
  * 페이지 주소(이 저장소에 매장 상세 화면이 아직 없어 여전히 만들지 않음 — 대신 클릭하면 대화에
  * "아직 준비되지 않았다"는 답을 추가해 클릭이 반응했다는 것을 보여 줌), 샘플 매장·매출·권리금·
  * 계약일·리뷰 값 자체(요청은 "미리 준비한 샘플 데이터"라고만 말함), 질문을 해석하는 실제 자연어
  * 처리 로직(여기서는 매장명·키워드 매칭으로 대신함), 첨부한 이미지·파일을 실제로 서버에 올리는
- * 동작.
+ * 동작, 대화 검색에서 질문과 답변 중 어느 쪽에 키워드가 있어도 한 쌍을 함께 남기는 규칙과
+ * 맞는 대화가 없을 때의 안내 문구(요청은 "그 말이 든 대화만 남긴다"라고만 말함).
  */
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   RiArrowLeftLine,
   RiArrowRightLine,
@@ -37,10 +40,11 @@ import {
   RiFileLine,
   RiImageAddLine,
   RiImageLine,
+  RiSearchLine,
   RiSendPlaneLine,
 } from "@remixicon/react";
 
-import { AppHeader, Button, Chip, MessageBubble, Textarea } from "@ooee/ui";
+import { AppHeader, Button, Chip, Input, MessageBubble, Textarea } from "@ooee/ui";
 import { cn } from "@/lib/utils";
 
 type StoreKey = "gangnam" | "hongdae" | "jamsil";
@@ -282,16 +286,32 @@ const SEED_TIMES = [
 
 type ChatMessage = {
   id: string;
+  turn: string;
   direction: "incoming" | "outgoing";
   time: string;
   content: React.ReactNode;
 };
 
+function nodeToText(node: React.ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeToText).join(" ");
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) return nodeToText(node.props.children);
+  return "";
+}
+
 function buildSeedMessages(onOpenDetail: (store: Store) => void): ChatMessage[] {
   return SEED_QUESTIONS.flatMap((question, index) => [
-    { id: `seed-${index}-q`, direction: "outgoing" as const, time: SEED_TIMES[index], content: <p>{question}</p> },
+    {
+      id: `seed-${index}-q`,
+      turn: `seed-${index}`,
+      direction: "outgoing" as const,
+      time: SEED_TIMES[index],
+      content: <p>{question}</p>,
+    },
     {
       id: `seed-${index}-a`,
+      turn: `seed-${index}`,
       direction: "incoming" as const,
       time: SEED_TIMES[index],
       content: answerQuery(question, onOpenDetail),
@@ -310,6 +330,7 @@ export default function AiWorkAssistantPage() {
   const openDetail = useRef((store: Store) => detailNoticeRef.current(store)).current;
   const [messages, setMessages] = useState<ChatMessage[]>(() => buildSeedMessages(openDetail));
   const [draft, setDraft] = useState("");
+  const [search, setSearch] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const nextId = useRef(SEED_QUESTIONS.length);
@@ -320,7 +341,8 @@ export default function AiWorkAssistantPage() {
     setMessages((prev) => [
       ...prev,
       {
-        id: `notice-${nextId.current++}`,
+        id: `notice-${nextId.current}`,
+        turn: `notice-${nextId.current++}`,
         direction: "incoming",
         time: "방금",
         content: <p>{store.name} 상세 페이지는 아직 만들지 않았어요. 화면이 준비되면 이 버튼에서 연결할게요.</p>,
@@ -360,8 +382,10 @@ export default function AiWorkAssistantPage() {
     const question = draft.trim();
     if (!question && attachments.length === 0) return;
 
+    const turn = `turn-${nextId.current++}`;
     const outgoing: ChatMessage = {
       id: `message-${nextId.current++}`,
+      turn,
       direction: "outgoing",
       time: "방금",
       content: (
@@ -387,6 +411,7 @@ export default function AiWorkAssistantPage() {
 
     const incoming: ChatMessage = {
       id: `message-${nextId.current++}`,
+      turn,
       direction: "incoming",
       time: "방금",
       content: question ? answerQuery(question, openDetail) : <p>첨부를 확인했어요. 궁금한 점을 함께 입력해 주세요.</p>,
@@ -396,6 +421,12 @@ export default function AiWorkAssistantPage() {
     setDraft("");
     setAttachments([]);
   }
+
+  const keyword = search.trim().toLocaleLowerCase();
+  const matchedTurns = new Set(
+    messages.filter((message) => nodeToText(message.content).toLocaleLowerCase().includes(keyword)).map((message) => message.turn),
+  );
+  const visibleMessages = keyword ? messages.filter((message) => matchedTurns.has(message.turn)) : messages;
 
   return (
     <div className="flex min-h-dvh flex-col bg-oe-background-primary">
@@ -408,8 +439,29 @@ export default function AiWorkAssistantPage() {
       />
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden">
+        <div className="border-b border-oe-border-secondary px-oe-padding-default py-3 md:px-oe-padding-wide">
+          <Input
+            type="search"
+            variant="filled"
+            controlSize="large"
+            aria-label="대화 검색"
+            placeholder="지난 대화 검색"
+            leadingElement={<RiSearchLine aria-hidden="true" />}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            clearable={search.length > 0}
+            clearLabel="검색어 지우기"
+            onClear={() => setSearch("")}
+          />
+        </div>
+
         <div className="flex-1 space-y-4 overflow-y-auto px-oe-padding-default py-4 md:px-oe-padding-wide">
-          {messages.map((message) => (
+          {keyword && visibleMessages.length === 0 && (
+            <p role="status" className="py-8 text-sm text-oe-foreground-tertiary">
+              「{search.trim()}」이(가) 들어 있는 대화가 없어요.
+            </p>
+          )}
+          {visibleMessages.map((message) => (
             <MessageBubble
               key={message.id}
               direction={message.direction}

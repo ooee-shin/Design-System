@@ -22,6 +22,8 @@ test("매핑표의 상호작용 요소가 접근 가능한 이름으로 찾아�
   const view = render(<AiWorkAssistantPage />);
 
   assert.ok(view.getByRole("button", { name: "뒤로가기" }));
+  assert.ok(view.getByRole("searchbox", { name: "대화 검색" }));
+  assert.ok(view.getByPlaceholderText("지난 대화 검색"));
   assert.ok(view.getByRole("textbox", { name: "질문 입력" }));
   assert.ok(view.getByPlaceholderText("점포 매출, 계약 정보 같은 업무 데이터를 물어보세요"));
   assert.ok(view.getByRole("button", { name: "전송" }));
@@ -64,6 +66,39 @@ test("상세보기 버튼을 누르면 아직 준비되지 않았다는 안내�
   fireEvent.click(view.getByRole("link", { name: "강남점 상세보기" }));
 
   assert.ok(view.getByText("강남점 상세 페이지는 아직 만들지 않았어요. 화면이 준비되면 이 버튼에서 연결할게요."));
+});
+
+test("대화 검색에 키워드를 치면 그 말이 든 대화만 남는다", () => {
+  const view = render(<AiWorkAssistantPage />);
+
+  fireEvent.change(view.getByRole("searchbox", { name: "대화 검색" }), { target: { value: "계약" } });
+
+  assert.ok(view.getByText("홍대점 계약 종료일 알려줘"));
+  assert.ok(view.getByText("홍대점 계약 종료일은 2026년 11월 30일이에요."));
+  assert.equal(view.queryByText("강남점 권리금이 얼마야?"), null);
+  assert.equal(view.queryByText("잠실점 이번 달 매출 얼마야?"), null);
+});
+
+test("답변에만 있는 말로 검색해도 질문과 답변이 함께 남는다", () => {
+  const view = render(<AiWorkAssistantPage />);
+
+  fireEvent.change(view.getByRole("searchbox", { name: "대화 검색" }), { target: { value: "3,000만원" } });
+
+  assert.ok(view.getByText("강남점 권리금이 얼마야?"));
+  assert.ok(view.getByText("강남점 권리금은 3,000만원이에요."));
+  assert.equal(view.queryByText("홍대점 계약 종료일 알려줘"), null);
+});
+
+test("검색어를 지우면 모든 대화가 다시 보이고, 맞는 대화가 없으면 안내가 나온다", () => {
+  const view = render(<AiWorkAssistantPage />);
+  const search = view.getByRole("searchbox", { name: "대화 검색" });
+
+  fireEvent.change(search, { target: { value: "없는말" } });
+  assert.ok(view.getByText("「없는말」이(가) 들어 있는 대화가 없어요."));
+
+  fireEvent.change(search, { target: { value: "" } });
+  assert.ok(view.getByText("강남점 권리금이 얼마야?"));
+  assert.ok(view.getByText("홍대점 계약 종료일 알려줘"));
 });
 
 test("새 질문을 입력해 전송하면 답변이 대화에 추가된다", () => {
