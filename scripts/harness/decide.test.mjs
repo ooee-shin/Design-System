@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { freeBranch, howToUnmix, improveBlocked, isRequestOf, isRevertOf, mainPr, readMark, revertPr, sortLanded, touchesScreens } from "./decide.mjs";
+import { freeBranch, howToUnmix, improveBlocked, screenCommits, isRequestOf, isRevertOf, mainPr, readMark, revertPr, sortLanded, touchesScreens } from "./decide.mjs";
 
 const pr = (number, body, files = []) => ({ number, url: `https://github.com/x/pull/${number}`, body, files });
 
@@ -107,4 +107,16 @@ test("화면이 main 에도 있으면 되돌림 본문이 그 사실을 적는�
   assert.match(on.body, /다음 `dev → main` 최신화에 함께 올라간다/);
   const off = revertPr({ issue: 62, read, screenName: "대시보드", commits: ["abc1234"] });
   assert.ok(!off.body.includes("main 에도 있다"), "main 에 없을 때까지 그 말을 적으면 안 된다");
+});
+
+test("화면 commit 은 제목으로만 가린다 — 본문이 남의 이슈를 언급해도 걸리지 않는다", () => {
+  // 2026-09-24 #62: 하네스 PR 본문의 「…막힌다(#62)」 때문에 그 commit 까지 되돌리려다 부딪혔다.
+  const lines = [
+    "05fdaf8 배포 확인을 러너가 한다 — 모델에게 기다리라고 시키지 않는다 (#73)",
+    "2ec2f19 feat(sandbox): 카카오톡 api 연동 메인 대시보드 화면 추가 (#62) (#72)",
+    "",
+  ];
+  assert.deepEqual(screenCommits(lines, 62), ["2ec2f19"]);
+  assert.deepEqual(screenCommits(lines, 73), ["05fdaf8"]);
+  assert.deepEqual(screenCommits(lines, 99), []);
 });

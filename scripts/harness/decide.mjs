@@ -87,6 +87,23 @@ export function howToUnmix(mixed) {
 }
 
 /**
+ * 이 요청의 화면 commit. `git log --format="%H %s"` 의 줄을 받아 **제목에** `(#<n>)` 이 있는 것만 고른다.
+ *
+ * `git log --grep` 은 제목과 본문을 함께 뒤진다. pull request 본문이 다른 이슈를 언급하면(하네스 PR 이
+ * 「…막힌다(#62)」처럼 적는다) 그 commit 까지 화면 commit 으로 잡혀 엉뚱한 것을 되돌리게 된다 —
+ * `2026-09-24` 에 #62 의 되돌리기가 하네스 commit 을 함께 되돌리려다 부딪혔다. 제목만 본다.
+ */
+export function screenCommits(lines, issue) {
+  const mark = `(#${issue})`;
+  return lines
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => [line.slice(0, line.indexOf(" ")), line.slice(line.indexOf(" ") + 1)])
+    .filter(([sha, subject]) => /^[0-9a-f]{7,40}$/.test(sha) && subject.includes(mark))
+    .map(([sha]) => sha);
+}
+
+/**
  * 아직 쓰이지 않은 가지 이름. 앞 실행이 실패하며 남긴 가지를 덮어쓰지 않으려는 것이다.
  *
  * `2026-09-24` 에 #62 의 되돌리기가 검사 실패 뒤에도 push 까지 나가 `feature/issue-62-revert` 를 남겼다.
