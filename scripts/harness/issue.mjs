@@ -218,7 +218,9 @@ export function parseIssue({ number = null, title = "", body = "", url = null },
   const fixTargetRaw = (values.fixTarget ?? "").trim();
   const mode = fixTargetRaw ? "수정" : "생성";
   const fixTarget = Number(fixTargetRaw.match(/#?\s*(\d+)/)?.[1] ?? NaN);
-  const screenKey = (values.screenKey ?? "").trim() || null;
+  // 칸에 라벨까지 함께 붙여 넣는 일이 있다(`2026-09-24` #101: 「key: ai-work-assistant」). 뜻이 하나뿐이니
+  // 막지 않고 떼어 낸다 — 사람에게 폼을 다시 내라고 하는 값이 아니다.
+  const screenKey = (values.screenKey ?? "").trim().replace(/^(?:화면\s*)?key\s*[:：]\s*/i, "").trim() || null;
   if (mode === "수정") {
     if (!Number.isInteger(fixTarget)) problems.push(`「수정 대상:」 에서 이슈 번호를 읽지 못했다: 「${oneLine(fixTargetRaw)}」 — 「#39」처럼 적는다`);
     else if (number !== null && fixTarget === number) problems.push("수정 대상이 이 요청 자신이다 — 고칠 화면을 만든 요청의 번호를 적는다");

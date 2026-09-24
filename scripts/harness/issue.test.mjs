@@ -266,3 +266,14 @@ test("화면 유형은 여러 개를 고를 수 있다 — 한 화면이 여러 
   const mixed = parseIssue(now('프로젝트: 하네스 시험\n화면 유형: 웹, 워치\n요구사항: 채팅 화면'), { projects: NOW });
   assert.match(mixed.problems.join("\n"), /모르는 화면 유형: 「워치」/);
 });
+
+test("화면 key 칸에 라벨이 함께 붙어도 읽는다", () => {
+  // 2026-09-24 #101: 예시를 그대로 붙여 「key: ai-work-assistant」가 값으로 들어왔다. 뜻이 하나뿐이라 막지 않는다.
+  const of = (value) => parseIssue(now(`수정 대상: #60\n화면 key: ${value}\n요구사항: 검색창을 넣어줘`), { projects: NOW });
+  for (const value of ["ai-work-assistant", "key: ai-work-assistant", "화면 key: ai-work-assistant", "KEY:ai-work-assistant"]) {
+    const read = of(value);
+    assert.equal(read.fix.screenKey, "ai-work-assistant", `「${value}」 를 읽지 못했다`);
+    assert.deepEqual(read.problems, [], `「${value}」 를 막았다`);
+  }
+  assert.match(of("Ai_Work").problems.join("\n"), /소문자·숫자·붙임표가 아니다/, "정말 틀린 값은 그대로 막는다");
+});
