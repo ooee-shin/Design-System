@@ -7,7 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { loadSandboxProjectIds, loadSandboxProjects, parseIssue, parseSandboxProjectIds, projectId, splitChoices, splitProjects } from "./issue.mjs";
+import { loadSandboxProjects, parseIssue, projectId, splitChoices } from "./issue.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (n) => JSON.parse(readFileSync(path.join(here, "fixtures", `issue-${n}.json`), "utf8"));
@@ -30,7 +30,7 @@ const nineWith = (projectLine) => {
 test("허용 프로젝트는 screens.ts 의 SANDBOX_PROJECTS 에서 읽는다", () => {
   // 목록을 고정하지 않는다 — 폼의 「새 프로젝트」 칸으로 생긴 프로젝트를 러너가 screens.ts 에 더한다(#60).
   // 폼의 프로젝트 선택지는 자주 쓰는 것만 두는 편의라 여기서 맞추지 않는다.
-  const ids = loadSandboxProjectIds();
+  const ids = loadSandboxProjects().map((row) => row.id);
   assert.ok(ids.includes("harness-test"), "기본 프로젝트 「하네스 시험」이 없다");
   for (const project of loadSandboxProjects()) {
     assert.equal(project.id, projectId(project.id), `프로젝트 id 「${project.id}」 가 projectId 꼴이 아니다`);
@@ -39,8 +39,15 @@ test("허용 프로젝트는 screens.ts 의 SANDBOX_PROJECTS 에서 읽는다", 
 });
 
 test("SANDBOX_PROJECTS 를 찾지 못하면 조용히 넘어가지 않고 던진다", () => {
-  assert.throws(() => parseSandboxProjectIds("export const OTHER = [];"), /SANDBOX_PROJECTS/);
-  assert.throws(() => parseSandboxProjectIds("export const SANDBOX_PROJECTS = [] as const;"), /id·name 짝이 하나도 없다/);
+  // 파서는 밖으로 내지 않는다. 파일을 읽는 입구로 같은 메시지가 나오는지 본다.
+  const dir = mkdtempSync(path.join(tmpdir(), "harness-screens-"));
+  const screensFile = (source) => {
+    const file = path.join(dir, `screens-${Math.random().toString(36).slice(2)}.ts`);
+    writeFileSync(file, source);
+    return file;
+  };
+  assert.throws(() => loadSandboxProjects(screensFile("export const OTHER = [];")), /SANDBOX_PROJECTS/);
+  assert.throws(() => loadSandboxProjects(screensFile("export const SANDBOX_PROJECTS = [] as const;")), /id·name 짝이 하나도 없다/);
 });
 
 test("#9: 대괄호 프로젝트, 콜론 뒤 공백 없음, 빈 값을 읽는다", () => {
@@ -174,11 +181,6 @@ test("모르는 프로젝트 값은 unknownProjects 로 가고 만들지 않는�
   assert.deepEqual(out.unknownProjects, ["admin"]);
   assert.equal(out.generateArgs, null, "모르는 값이 섞이면 무엇을 뜻했는지 짐작하지 않는다");
   assert.match(out.problems.join("\n"), /모르는 프로젝트 값: admin/);
-});
-
-test("옛 양식의 쉼표 목록은 그대로 나뉜다", () => {
-  assert.deepEqual(splitProjects(" Web ,  sto,web sv"), ["web", "sto", "sv"]);
-  assert.deepEqual(splitProjects(""), []);
 });
 
 test("CRLF 줄바꿈이어도 같게 읽는다", () => {

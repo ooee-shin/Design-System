@@ -50,6 +50,8 @@ export function validatePlan(plan, { issue, mode = "생성" } = {}) {
     if (!Array.isArray(screen.viewports) || !screen.viewports.length) add(`${where}.viewports 가 비었다`);
     else for (const item of screen.viewports) if (!VIEWPORTS.has(item)) add(`${where}.viewports 에 모르는 폭: ${item}`);
     if (!isText(screen.args)) add(`${where}.args 가 없다 — pull request 본문이 무엇을 시켰는지 남겨야 다음 회차가 읽는다`);
+    // `false` 만 뜻이 있다. 문자열 "false" 는 `remade !== false` 판정에서 다시 만든 것으로 세어 버린다.
+    if (screen.remade !== undefined && typeof screen.remade !== "boolean") add(`${where}.remade 는 true/false 여야 한다: ${JSON.stringify(screen.remade)}`);
   }
 
   // 수정 요청은 있는 화면을 제자리에서 고치므로 한 장이다. 여러 장이면 잘못 읽은 것이다.
@@ -108,6 +110,39 @@ export function readScreens(text) {
     out.push({ key, name: get("name"), project: get("project"), viewports });
   }
   return out;
+}
+
+/**
+ * `plan.json` 의 화면을 `screens.ts` 등록값과 맞춘다. `screens.ts` 가 원본이므로 이름·프로젝트·폭이 다르면
+ * **등록값으로 덮어쓴다** — 멈추면 개선 회차의 `remade: false` 화면까지 막히고, 결과 댓글에 실릴 글자는
+ * 어차피 등록값이어야 한다(`readScreens` 머리말). 등록에 없는 key 는 덮어쓸 원본이 없으니 `missing` 으로
+ * 돌려주고, 부르는 쪽이 멈춘다. 덮어쓴 것은 `overwritten` 에 한 줄씩 남겨 러너 log 에 적는다.
+ *
+ * `screens` 를 제자리에서 고친다 — 그 뒤의 pull request 본문과 결과 댓글이 같은 객체를 읽어서다.
+ */
+export function reconcileScreens(screens, registered) {
+  const byKey = new Map(registered.map((screen) => [screen.key, screen]));
+  const missing = [];
+  const overwritten = [];
+  for (const screen of screens) {
+    const found = byKey.get(screen.key);
+    if (!found) {
+      missing.push(screen.key);
+      continue;
+    }
+    const diffs = [];
+    if (found.name && found.name !== screen.name) diffs.push(`이름 「${screen.name}」 → 「${found.name}」`);
+    if (found.project && found.project !== screen.project) diffs.push(`프로젝트 ${screen.project} → ${found.project}`);
+    if (found.viewports.length && found.viewports.join(",") !== (screen.viewports ?? []).join(",")) {
+      diffs.push(`폭 ${(screen.viewports ?? []).join("·")} → ${found.viewports.join("·")}`);
+    }
+    if (!diffs.length) continue;
+    if (found.name) screen.name = found.name;
+    if (found.project) screen.project = found.project;
+    if (found.viewports.length) screen.viewports = [...found.viewports];
+    overwritten.push(`\`${screen.key}\` 를 screens.ts 등록값으로 덮어썼다: ${diffs.join(" · ")}`);
+  }
+  return { missing, overwritten };
 }
 
 /**

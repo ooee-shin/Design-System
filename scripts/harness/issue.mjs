@@ -18,14 +18,14 @@ const repoRoot = path.resolve(here, "../..");
 const SCREENS_TS = path.join(repoRoot, "apps/sandbox/src/screens.ts");
 
 /** Slack 워크플로의 「문제 생성」 단계가 제목 앞에 붙이는 말. */
-export const TITLE_PREFIX = "화면 요청:";
+const TITLE_PREFIX = "화면 요청:";
 const TITLE_PREFIX_RE = /^화면\s*요청\s*[:：]\s*/;
 
 /**
  * 본문의 라벨. 실제 이슈에서 본 이름만 둔다 — 폼 칸의 긴 설명문(「저장하거나 제출하면 …」)은 채널
  * 카드에만 나오고 이슈 본문에는 오지 않는다. 폼 칸 이름을 바꾸면 이 표도 함께 고친다.
  */
-export const LABELS = [
+const LABELS = [
   { key: "projects", label: "프로젝트" },
   { key: "viewport", label: "화면 유형" },
   { key: "newProject", label: "새 프로젝트" },
@@ -46,13 +46,13 @@ const LABEL_RE = new RegExp(
 const labelKey = (text) => LABELS.find(({ label }) => label === text.replace(/[ \t]+/g, " "))?.key;
 
 /** 폼의 화면 유형 값 → `screens.ts` 의 `viewport`. 한글과 영문을 함께 받는다. */
-export const VIEWPORTS = { web: "web", 웹: "web", tablet: "tablet", 태블릿: "tablet", 테블릿: "tablet", mobile: "mobile", 모바일: "mobile" };
+const VIEWPORTS = { web: "web", 웹: "web", tablet: "tablet", 태블릿: "tablet", 테블릿: "tablet", mobile: "mobile", 모바일: "mobile" };
 
 /** 폼의 프로젝트 목록 마지막 항목. 이름이 아니라 「목록에 없다」는 표식이다. */
-export const NEW_PROJECT = "새 프로젝트";
+const NEW_PROJECT = "새 프로젝트";
 
 /** 프로젝트를 요청이 정하지 않았을 때 `generateArgs` 에 두는 자리. 처리하는 쪽이 정한 id 로 바꾼다. */
-export const UNDECIDED = "<정한다>";
+const UNDECIDED = "<정한다>";
 
 /** 새 프로젝트 이름을 id 로 만든다. 한글 이름은 그대로 두고 공백만 붙임표로 바꾼다. */
 export function projectId(name) {
@@ -64,15 +64,13 @@ export function projectId(name) {
  * 어긋나므로(ai-environment.md 「다섯 칸」: 한쪽을 고치면 다른 쪽도 고친다) 원본을 읽는다.
  * TypeScript 를 불러오지 않고 글자로 읽는 것은 CLI 가 tsx 없이 맨 node 로 돌게 하려는 것이다.
  */
-export function parseSandboxProjects(source) {
+function parseSandboxProjects(source) {
   const block = source.match(/export const SANDBOX_PROJECTS\s*=\s*\[([\s\S]*?)\]\s*as const/);
   if (!block) throw new Error("screens.ts 에서 `export const SANDBOX_PROJECTS = [ … ] as const` 를 찾지 못했다. 모양이 바뀌었으면 issue.mjs 도 고친다");
   const rows = [...block[1].matchAll(/\bid:\s*["']([^"']+)["']\s*,\s*name:\s*["']([^"']+)["']/g)].map((m) => ({ id: m[1], name: m[2] }));
   if (!rows.length) throw new Error("SANDBOX_PROJECTS 에 id·name 짝이 하나도 없다");
   return rows;
 }
-
-export const parseSandboxProjectIds = (source) => parseSandboxProjects(source).map((row) => row.id);
 
 let cachedProjects;
 /** 저장소의 `apps/sandbox/src/screens.ts` 를 읽는다. 한 번 읽으면 기억해 둔다. */
@@ -82,13 +80,11 @@ export function loadSandboxProjects(file = SCREENS_TS) {
   return cachedProjects;
 }
 
-export const loadSandboxProjectIds = (file = SCREENS_TS) => loadSandboxProjects(file).map((row) => row.id);
-
 /**
  * 폼이 보낸 프로젝트 값을 있는 프로젝트에 맞춰 본다. id 로도 이름으로도 받는다 — 목록이 무엇을 보내는지에
  * 기대지 않는다. 이름에 공백이 있으므로(「하네스 시험」) 쉼표로만 가른다.
  */
-export function matchProject(value, projects) {
+function matchProject(value, projects) {
   const parts = splitChoices(value);
   const matched = [];
   const unknown = [];
@@ -121,16 +117,6 @@ export function splitChoices(value) {
     .split(/[,，、/]+/)
     .map((part) => part.trim().replace(/^["']|["']$/g, "").trim())
     .filter(Boolean);
-}
-
-/** 옛 양식(#6·#9)의 `web,sto,sv` 를 나눈다. 지금 폼은 한 프로젝트만 보낸다. */
-export function splitProjects(value) {
-  const out = [];
-  for (const part of value.split(/[\s,，、/]+/)) {
-    const id = part.trim().toLowerCase();
-    if (id && !out.includes(id)) out.push(id);
-  }
-  return out;
 }
 
 const oneLine = (text, max = 60) => {
@@ -181,7 +167,7 @@ function sliceByLabels(body) {
 /**
  * 이슈 하나를 읽는다. `allowedProjects` 를 주지 않으면 `screens.ts` 에서 읽는다.
  *
- * `generateArgs` 는 generate-code 의 인수 꼴 「<화면 이름>. <요구사항> 프로젝트: <id>」다. SKILL.md 의
+ * `generateArgs` 는 generate-code 의 인수 꼴 「<화면 이름>. <요구사항> 프로젝트: <id> 유형: <web, tablet, mobile>」다. SKILL.md 의
  * 예시(「… 원본: apps/…」)처럼 대괄호 없이 끝에 붙인다 — 설명의 `[원본: …]` 대괄호는 「있으면」이라는
  * 표시다. 요구사항은 한 문단이라야 해서(폼 안내: 목록으로 끊지 말고 한 문단으로) 줄바꿈을 공백으로 편다.
  * `fields.requirement` 는 원문 줄바꿈을 그대로 둔다.

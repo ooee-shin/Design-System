@@ -1,6 +1,6 @@
 # ooee sandbox
 
-`/generate-code` 명령이 만든 화면을 두는 자리다. 전달 범위 밖이며 `docs/process/`와 함께 이관 시 제거한다. 무엇을 여기에 두고 무엇을 두지 않는지는 `docs/process/ai-environment.md`의 「이 문서가 제안하는 기본값」이 정한다.
+`/make-screens`(안에서 `/ooee-harness:generate-code`)가 만든 화면과 블루키 리뉴얼을 두는 자리다. 전달 범위 밖이며 `docs/process/`와 함께 이관 시 제거한다. 무엇을 여기에 두고 무엇을 두지 않는지는 `docs/process/ai-environment.md`의 「이 문서가 제안하는 기본값」이 정한다.
 
 - 화면은 `src/app/<key>/page.tsx`에 두고 `src/screens.ts`에 등록한다. 첫 화면 `/`가 그 목록이다.
 - 화면 하나의 회귀 검사는 같은 디렉터리의 `page.test.tsx`에 둔다. 첫 줄 `import "@/test-setup"`으로 공용 JSDOM 환경을 불러온다.

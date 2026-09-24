@@ -4,10 +4,7 @@
 //   node scripts/harness/local-run.mjs 결정 [60]    # 결정을 읽어 처리한다
 //   node scripts/harness/local-run.mjs 결과 9       # 결과 댓글만 올린다
 //
-// **왜 job 밖에서 도는가.** self-hosted runner 는 job 이 도는 동안 GitHub 에 1분마다 「아직 돈다」고 알려야
-// 한다. `2026-09-23` 에 이 Mac 의 연결이 15~25분마다 끊겨 그 갱신이 실패했고, GitHub 가 job 을 버리면
-// 러너가 다시 붙는 순간 claude 를 강제로 끝냈다 — #60 이 네 번 연속 그렇게 죽었다. 처리 자체는 이 Mac 의
-// 것이라 GitHub 가 잊어도 이어질 수 있다. 결과는 이슈 댓글과 Slack 카드로 가므로 job 요약이 없어도 된다.
+// job 밖에서 도는 까닭은 scripts/harness/README.md 「러너」에 있다.
 //
 // 돌 자리는 launchd 가 읽을 수 있는 사본 `~/.ooee-harness/harness`(`HARNESS_WORK_DIR`)다. 개발자의 clone
 // 이 아니다 — 돌기 전에 `origin/dev` 로 맞추고 남은 파일을 지우므로, 사람이 일하는 tree 에서 돌리면 안 된다.
@@ -20,10 +17,10 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const MODES = new Set(["처리", "결정", "결과"]);
+const MODES = new Set(["처리", "결정", "결과"]);
 
 /** 화면 여러 장을 만드는 요청은 오래 걸린다. harness.yml 의 timeout 과 같은 4시간이다. */
-export const RUN_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+const RUN_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 
 /** 상태·기록을 두는 폴더. 러너의 `decisions.json` 과 같은 자리다. */
 export function stateDir(env = process.env) {

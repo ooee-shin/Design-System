@@ -1,6 +1,6 @@
 ---
 name: make-screens
-description: 화면 요청 이슈 하나를 읽어 sandbox 에 화면을 만들고 무엇을 만들었는지 plan.json 에 적는다. 가지·commit·pull request·배포·결과 댓글은 하지 않는다 — 러너가 한다. 「이슈 <n> 화면 만들어 줘」 요청에 쓴다. 인수는 「<이슈 번호>」다.
+description: 화면 요청 이슈 하나를 읽어 sandbox 에 화면을 만들고 무엇을 만들었는지 plan.json 에 적는다. 가지·commit·pull request·배포·결과 댓글은 하지 않는다 — 러너가 한다. 「이슈 <n> 화면 만들어 줘」 요청에 쓴다. 인수는 「<이슈 번호> [개선] [러너]」다 — `개선` 은 다시 만드는 회차, `러너` 는 사람이 없는 실행.
 model: claude-sonnet-5
 effort: high
 allowed-tools: Read, Grep, Glob, Write, Edit, Skill, Bash(git status:*), Bash(node scripts/harness/issue.mjs:*), Bash(node scripts/harness/decision.mjs:*), Bash(node scripts/visual/inspect.mjs:*), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *), Bash(gh issue view:*), Bash(gh pr view:*), Bash(gh pr list:*)
@@ -14,7 +14,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Skill, Bash(git status:*), Bash(no
 
 가지 만들기, `git commit`·`push`, pull request, 머지, 배포 확인, 결과 댓글, 이슈 닫기. **모두 러너가 한다.** 그 명령들은 이 명령에 열려 있지도 않다.
 
-`2026-09-23`~`24` 에 요청 처리가 아홉 번 무너졌는데 화면 생성은 한 번도 실패하지 않았다. 무너진 것은 언제나 그 주변이었다 — 배포를 기다리다 턴을 끝내기, 하위 명령의 보고를 전체의 끝으로 여기기, 머지 응답 타임아웃. 기다리는 일과 되풀이되는 일은 스크립트의 몫이라 옮겼다(`scripts/harness/plan.mjs` 머리말).
+기다리는 일과 되풀이되는 일은 스크립트의 몫이다 — 까닭은 `scripts/harness/plan.mjs` 머리말.
 
 ## 순서
 
@@ -63,7 +63,7 @@ node scripts/harness/decision.mjs <n>      # reason 이 그 까닭이다
 `/ooee-harness:generate-code` 를 화면마다 한 번씩 부른다. 인수는 이 꼴이다.
 
 ```
-<화면 이름>. <요청 원문에서 온 것> 지어냄(요청에 없어 처리하는 쪽이 정함): <지어낸 것> 프로젝트: <id> 유형: <web, tablet, mobile 가운데 고른 것들>
+<화면 이름>. <요청 원문에서 온 것> 지어냄: <지어낸 것> 프로젝트: <id> 유형: <web, tablet, mobile 가운데 고른 것들>
 ```
 
 - 새 프로젝트면 `새 프로젝트 이름: <이름>` 을 뒤에 붙인다.
@@ -72,6 +72,8 @@ node scripts/harness/decision.mjs <n>      # reason 이 그 까닭이다
 - 한 장 요청이면 `issue.mjs` 의 `generateArgs` 를 그대로 쓴다(`프로젝트: <정한다>` 는 1단계에서 정한 id 로 바꾼다).
 
 **하위 명령의 보고는 이 명령의 끝이 아니다.** generate-code 가 「pull request 준비 완료」를 내면 그 화면 하나가 끝난 것이다. 남은 화면이 있으면 이어 가고, 없으면 4단계로 간다(`2026-09-24` #85 가 여기서 끝냈다).
+
+- generate-code 보고의 「판단이 필요한 것」·「미확정 자산 후보」 줄은 화면 이름을 앞에 붙여 `needsDecision` 에, 「막힌 명령」(없음이 아니면)은 `other` 에 옮긴다. 러너는 이 보고를 읽지 않고 `plan.json` 만 읽으므로, 옮기지 않으면 pull request 본문과 결과 댓글에서 사라진다. `issue.mjs` 의 `notes` 가운데 파싱 주의(라벨이 줄 처음이 아님·라벨 없는 앞 글)도 `other` 에 옮긴다 — 프로젝트 선택은 1단계가 이미 `needsDecision` 에 옮긴다.
 
 ### 4. sandbox 에서 띄워 보고 잰다
 
@@ -111,7 +113,7 @@ node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewpor
 | 칸 | 무엇 |
 | --- | --- |
 | `screens[].key` | `screens.ts` 에 등록된 key. 소문자·숫자·붙임표 |
-| `screens[].name` | `screens.ts` 에 등록된 이름. 결과 댓글의 표와 「추가한 페이지」가 이 글자다 |
+| `screens[].name` | `screens.ts` 에 등록된 이름. 결과 댓글의 표와 「추가한 페이지」가 이 글자다. 이름·프로젝트·폭이 등록과 다르면 러너가 등록값으로 덮어쓰고, 등록에 없는 key 면 멈춘다 |
 | `screens[].project` | 그 화면이 든 프로젝트 id |
 | `screens[].viewports` | `web`·`tablet`·`mobile` 가운데 고른 것들 |
 | `screens[].args` | 3단계에서 실제로 넘긴 인수 원문. pull request 본문에 그대로 실려 다음 회차가 읽는다 |
@@ -119,7 +121,7 @@ node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewpor
 | `componentsUsed` | 쓴 컴포넌트 이름. 겹치지 않게 |
 | `other` | 그 밖에 한 일. 개선 회차면 「<앞 회차>회차 개선 반영: <사유 한 줄>」 |
 | `screens[].remade` | 개선 회차에서 다시 만들지 않은 화면에만 `false`. 없으면 다시 만든 것으로 본다 |
-| `needsDecision` | 요청에 없어 정한 것, 확인받지 않고 나눈 목록, 반영하지 않은 칸. 화면이 여럿이면 이름을 앞에 붙인다 |
+| `needsDecision` | 요청에 없어 정한 것, 확인받지 않고 나눈 목록, 반영하지 않은 칸, generate-code 가 낸 판단 항목(「판단이 필요한 것」·「미확정 자산 후보」) 포함. 화면이 여럿이면 이름을 앞에 붙인다 |
 
 쓴 뒤 **보고의 첫 제목을 「## 화면을 만들었다」로 하고 멈춘다.** 화면 표(이름·key·폭)와 `needsDecision` 을 함께 적는다. 러너가 이 파일을 다시 확인하고 pull request 부터 결과 댓글까지 한다.
 

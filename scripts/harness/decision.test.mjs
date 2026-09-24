@@ -91,7 +91,8 @@ test("신호보다 10분 넘게 앞선 댓글은 사유로 잡지 않는다", ()
 });
 
 test("신호 바로 앞의 무관한 댓글은 사유로 잡히지만 'before' 로 드러난다", () => {
-  // 검증에서 찾은 두 경우다. 판독만으로는 칭찬·질문과 사유를 가를 수 없으니 출처를 남겨 Skill 이 확인받게 한다.
+  // 검증에서 찾은 두 경우다. 판독만으로는 칭찬·질문과 사유를 가를 수 없으니 출처(reasonSource)를 남긴다 —
+  // 러너는 prefix 가 아니면 개선을 시작하지 않고(decide.mjs improveBlocked), 반려는 되돌림 본문에 짐작이라고 적는다.
   const result = { ...comment(0, resultBody(1)), created_at: "2026-09-22T10:00:00Z" };
   const at = (s) => `2026-09-22T10:00:${s}Z`;
   const praise = { ...comment(0, "와 좋네요 ㅎㅎ"), created_at: at(12) };

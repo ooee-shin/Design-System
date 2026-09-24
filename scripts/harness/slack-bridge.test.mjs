@@ -1,12 +1,9 @@
 // 옮길 반응인지, 어느 이슈인지, 무엇을 다는지만 본다. Slack 도 gh 도 부르지 않는다.
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import path from "node:path";
 import test from "node:test";
 
 import { readCommentDecision } from "./decision.mjs";
-import { buildComment, isReason, loadEnv, messageText, nextStep, pendingKey, pickMessage, readAction, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
+import { buildComment, isReason, messageText, nextStep, pendingKey, pickMessage, readAction, readIssueNumber, REACTION_DECISIONS, shouldRelay } from "./slack-bridge.mjs";
 
 const card = "화면 요청 #39 결과 · 1회차 — 공지사항 목록 · 결정은 GitHub 댓글에 👍 👎 😕\n요청: @기획자 · 프로젝트 하네스 시험";
 
@@ -93,16 +90,6 @@ test("판독이 이 댓글을 그 결정으로 읽는다 — 꼴이 어긋나면
 test("반려·개선의 사유는 비워 둔다 — 안내문이 개선 사유로 넘어가면 안 된다", () => {
   const read = readCommentDecision(buildComment({ decision: "개선", by: "기획자" }));
   assert.equal(read.reason, null, "안내문이 사유로 읽혔다 — generate-code 인수에 그대로 붙는다");
-});
-
-test("토큰은 홈의 파일에서 읽고 저장소에 두지 않는다", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "slack-env-"));
-  const file = path.join(dir, "slack.env");
-  writeFileSync(file, '# 주석\nSLACK_APP_TOKEN=xapp-1\nSLACK_BOT_TOKEN="xoxb-2"\n');
-  const env = loadEnv(file, {});
-  assert.equal(env.SLACK_APP_TOKEN, "xapp-1");
-  assert.equal(env.SLACK_BOT_TOKEN, "xoxb-2", "따옴표를 벗기지 못했다");
-  assert.deepEqual(loadEnv(path.join(dir, "없는파일"), { A: "1" }), { A: "1" });
 });
 
 test("스레드 답글의 카드도 그 시각의 메시지로 고른다", () => {

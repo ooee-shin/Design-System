@@ -151,8 +151,9 @@ export function decide({ comments, reactionsByCommentId = {}, round, issue } = {
   // 결과 댓글을 쓴 계정과 반응한 계정이 같아도 거르지 않는다. 지금은 Slack 커넥터가 처리하는 세션과
   // 같은 GitHub 계정으로 이슈를 만들어서 처리 계정과 요청자 계정이 같다. 거르면 어떤 결정도 읽히지 않는다.
   // 그래서 이 판독은 「에이전트가 반응이나 결정 댓글을 달지 않는다」에 기댄다. 공용 권한(.claude/settings.json)이
-  // `gh api` 를 통째로 deny 하고 `gh issue comment` 를 ask 로 두어(#21), 처리하는 세션이 댓글을 다는 길은
-  // 결과 댓글만 만드는 post-result.mjs 하나다. 러너는 headless 라 ask 가 곧 거부다.
+  // `gh api` 를 통째로 deny 하고 `gh issue comment` 를 ask 로 두어(#21), 에이전트 세션에는 이슈 쓰기 명령이
+  // 열려 있지 않다. 결과 댓글은 러너가 post-result.mjs 로 달며 표식이 붙으므로, 이 판독은 그 표식만 믿으면
+  // 된다. 러너는 headless 라 ask 가 곧 거부다.
   const reactions = reactionsByCommentId[result.id] ?? [];
   const signals = [
     ...reactions

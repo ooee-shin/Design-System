@@ -1,4 +1,4 @@
-// 러너가 모델이 쓴 넘김 파일을 믿지 않는지, 같은 결정을 두 번 처리하지 않는지를 고정한다. claude·gh 는 부르지 않는다.
+// 러너의 순수한 조각(claude 인수·허용 목록·가지·화면 key·결정 열쇠·멈춤 카드·닫는 글)을 값으로 고정한다. claude·gh 는 부르지 않는다.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -12,7 +12,6 @@ import { looksLikeDecision, readCommentDecision } from "./decision.mjs";
 import {
   CHAINED_SKILLS,
   EFFORT,
-  EXTRA_ALLOWED,
   MAKE_SKILL,
   closingComment,
   MODEL,
@@ -26,6 +25,7 @@ import {
   pickUnreadLookalikes,
   staleBranches,
   stopNotice,
+  stopReport,
 } from "./runner.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -50,14 +50,10 @@ test("모델과 effort 를 하네스 명령과 같은 값으로 박는다", () =
   }
 });
 
-test("이어 받을 때만 세션을 넘긴다", () => {
-  assert.ok(!buildClaudeArgs("x").includes("-r"), "처음 부르는데 세션을 이어 받으려 한다");
-  const args = buildClaudeArgs("x", { resume: "abc" });
-  assert.equal(args[args.indexOf("-r") + 1], "abc");
-});
-
-test("러너가 스스로 더 여는 것은 되돌리기뿐이다 — pull request 명령은 열지 않는다", () => {
-  assert.ok(EXTRA_ALLOWED.every((rule) => rule.startsWith("Bash(git revert")), `되돌리기 밖의 규칙이 있다: ${EXTRA_ALLOWED}`);
+test("러너는 머리말 밖의 도구를 열지 않는다 — 반려의 되돌리기도 스크립트가 한다", () => {
+  // 2026-09-24 #96: git revert 를 버리고 plan.mjs `removeScreens` 로 걷어내므로 러너가 더 여는 것이 없다.
+  const args = buildClaudeArgs("x");
+  assert.deepEqual(args.slice(args.indexOf("--allowedTools") + 1), chainedAllowedTools());
 });
 
 test("하위 명령이 머리말에 적은 도구를 넘긴다 — 요청 처리는 Figma 를 부르지 않는다", () => {
@@ -84,7 +80,7 @@ test("하위 명령이 실제로 쓰는 검사 명령이 넘어간다 — 머리
 
 test("넘기는 도구에 결정을 만들거나 pull request 를 여닫는 명령이 섞이지 않는다", () => {
   // 하위 명령 머리말이 넓어지면 러너에서 그대로 열린다. 공용 권한의 ask·deny 가 먼저 판정되지만 두 겹으로 둔다.
-  for (const tool of [...EXTRA_ALLOWED, ...chainedAllowedTools()]) {
+  for (const tool of chainedAllowedTools()) {
     assert.doesNotMatch(tool, /gh (api|issue (comment|edit|close|reopen)|label|pr (create|merge))/, `넘기면 안 되는 도구: ${tool}`);
   }
 });
@@ -151,6 +147,19 @@ test("멈춤 카드는 멈춘 절만 읽는다 — 통과한 단계를 까닭 �
   assert.ok(!card.includes("통과"), `통과한 단계가 카드에 실렸다:\n${card}`);
 });
 
+test("판독·이슈·pull request 검색은 한 자리에서만 부른다 — 명령 하나에 같은 spawn 이 두 번 있으면 판정 기준이 갈린다", () => {
+  // 리뷰(2026-09-24): decision.mjs 를 한 명령에 두세 번 spawn 하고, 이슈 제목을 세 길로 읽고, 「요청: #n」 검색이
+  // 세 곳에 있었다. 헬퍼 하나로 모았으니 그 밖의 자리에 같은 호출이 다시 생기면 여기서 잡는다.
+  const source = readFileSync(path.join(here, "runner.mjs"), "utf8");
+  const count = (needle) => source.split(needle).length - 1;
+  assert.equal(count('"scripts/harness/decision.mjs"'), 1, "decision.mjs 는 readDecision 만 부른다");
+  assert.equal(count('"scripts/harness/issue.mjs"'), 1, "issue.mjs 는 readIssue 만 부른다");
+  assert.equal(count('"요청: #${issue}" in:body'), 1, "「요청: #n」 검색은 requestPrs 만 한다");
+  assert.equal(count('"gh", ["issue", "view"'), 0, "이슈 제목은 issue.mjs 가 읽은 것을 넘긴다");
+  assert.equal(count('"ls-remote"'), 1, "가지 목록은 dropStaleBranches 가 돌려준다");
+  assert.equal(count("await notifyStop("), 2, "멈춤 클로저는 stopper 하나다(그 밖은 stopWith)");
+});
+
 test("workflow 는 손으로 부르는 예비다 — 저절로 도는 길은 이 Mac 의 1분 감시다", () => {
   // 2026-09-23: job 안에서 돌면 연결이 끊길 때 GitHub 이 job 을 버리고 claude 가 강제로 끝난다(#60).
   const workflow = readFileSync(path.join(repoRoot, ".github/workflows/harness.yml"), "utf8");
@@ -209,7 +218,7 @@ test("닫는 글은 결정으로 읽히지 않는다 — 러너가 남긴 글이
     assert.match(body, /Slack 폼으로 새 요청/);
   }
   assert.match(closingComment("승인", "PR #58"), /main 에 반영/);
-  assert.match(closingComment("반려", "되돌림 PR #59"), /dev 에서 되돌렸/);
+  assert.match(closingComment("반려", "되돌림 PR #59"), /dev 에서 걷어냈/);
 });
 
 test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기획자가 무엇을 다시 낼지 보면 된다", () => {
@@ -230,6 +239,16 @@ test("하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다", (
   const card = stopNotice(85, report, { title: "자동 송장 api 대시보드" });
   assert.match(card, /— 처리가 끝나지 않았다/);
   assert.ok(!card.includes("준비 완료"), `성공 제목이 카드에 실렸다:\n${card}`);
+});
+
+test("모델이 까닭을 적었으면 그 보고를 그대로 카드로 보낸다 — 없을 때만 러너의 제목을 쓴다", () => {
+  // 2026-09-24 #60: 모델이 「새 요구입니다 — 폼으로 새 요청을 내 주세요」라고 적었는데 러너가 「plan.json 이
+  // 없다」로 덮어 보냈다. 기획자는 무엇을 해야 할지 알 수 없었다.
+  const report = "## 묻고 멈춤\n\n- 새 요구입니다";
+  assert.equal(stopReport(report, "화면을 만들지 못했다"), report);
+  for (const empty of ["", undefined]) {
+    assert.match(stopReport(empty, "화면을 만들지 못했다"), /^## 화면을 만들지 못했다\n\n- 모델이 까닭을 남기지 않았다/);
+  }
 });
 
 test("묻는 것과 실패를 가려 카드를 쓴다 — 묻는 것을 실패로 적으면 기획자가 개발자를 부른다", () => {

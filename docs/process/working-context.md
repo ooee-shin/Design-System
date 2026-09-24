@@ -2,29 +2,9 @@
 
 새 작업이나 새로운 협업 환경에서 빠르게 현재 상태를 복구하기 위한 요약이다. 시스템 정의는 `docs/system/`, 제작 절차와 근거는 `docs/process/`, 작업 운영 규칙은 루트 `AGENTS.md`를 확인한다.
 
-마지막 내용 점검: `2026-09-14`
-
 이 파일은 현재 구현과 다음 작업처럼 변하는 정보만 관리한다. 설치 방법과 고정 규칙은 README/AGENTS에 두고 중복하지 않는다. 다른 기기에서 보이는 실제 상태는 마지막으로 push된 commit까지이므로, 아래 내용과 코드가 함께 commit되어 있는지 `git status -sb`와 `git log -1`로 확인한다.
 
-## Git 작업 기준
-
-- Remote: `https://github.com/bluekey-kr/Design-System-Harness.git` (private). 디자인 시스템 자체의 원본은 `ooee-shin/ooee-ui`(`2026-09-21` 이관, [ai-environment.md](ai-environment.md))
-- 공식 기준 branch: `main` (초기 작업 branch에서 전환)
-- 다른 기기와 계정도 이 private repository 접근 권한과 각자의 Git identity 설정이 필요하다.
-- 기기 교대 전 commit/push, 다음 기기에서 작업 전 `git pull --ff-only`를 원칙으로 한다.
-- 현재 repository에는 필수 환경변수가 없다.
-- branch는 `main` · `dev` · `feature/*` 세 층이며 `2026-09-14`에 개발자와 정했다. 작업은 `dev`에서 뻗은 자기 `feature/*`에서 하고 pull request로 `dev`에 올린다. 절차는 [git-workflow.md](git-workflow.md)가 소유한다.
-- `Quality` 자동 검사는 모든 pull request와 `main`·`dev` push에서 돈다. 실패하면 즉시 되돌린다.
-
-## 현재 기술 환경
-
-- pnpm workspace
-- Node.js 22.22.1 고정
-- Next.js App Router Studio
-- React 19, TypeScript, Tailwind CSS v4
-- shadcn CLI v4
-- Base UI + Nova preset
-- Material Color Utilities HCT
+Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙은 `AGENTS.md`, 정본 관계(`ooee-shin/ooee-ui` 이관)는 `README.md` 머리말과 [ai-environment.md](ai-environment.md) 「아직 정하지 않은 것」이 갖는다.
 
 ## 현재 구현
 
@@ -395,19 +375,9 @@ pnpm visual --path /components/badge \
 
 ### 2026-09-14 AI 개발 환경 트랙을 시작했다
 
-개발자 몫의 순서와 일정, 스파이크, 통합 검증 항목을 채우는 계획과 아직 정하지 않은 것은 [ai-environment.md](ai-environment.md)가 소유하며 여기에 다시 적지 않는다. **Storybook 은 두지 않기로 했다**(`2026-09-18`) — Studio 가 이미 문서와 Playground 로 그 일을 하고 있어서, Story 작성과 `apps/storybook` 골격, 기본 브랜드 값의 자리를 정하는 일이 모두 사라졌다. `@ooee/ui`를 반영한 Figma 라이브러리는 없고 seat는 Full, Code Connect는 플랜상 쓸 수 없음을 `2026-09-14` 스파이크 R1에서 확인했다. 라이브러리를 만들지는 A/B 검증 뒤에 정한다. 모두 그 문서의 「아직 정하지 않은 것」에 있다.
+화면 요청은 Slack 폼 → 이슈 → 이 Mac 의 1분 감시 → `runner.mjs` 가 처리하고, 모델은 `/make-screens` 로 화면만 만든다(`2026-09-24` 역할 뒤집기). 흐름·결정 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」, 스크립트와 설치(사본 신뢰 등록·`node -e` 열지 않기 포함)는 `scripts/harness/README.md` 「러너」·「launchd」·「알아 둘 것」, 까닭은 `scripts/harness/plan.mjs` 머리말이 갖는다. sandbox 는 프로젝트 탭과 여러 폭으로 나뉜다([ai-environment.md](ai-environment.md) 「요청 폼」). Figma 는 쓰지 않는다([ai-environment.md](ai-environment.md) 「2026-09-22 Figma 를 뺐다」).
 
-**화면 요청은 러너가 처리한다**(`2026-09-22`, `2026-09-24` 에 역할을 뒤집었다). Slack 폼으로 들어온 이슈 하나를 화면·`dev` 배포까지 돌리고 결과를 이슈 댓글로 올리며, 기획자가 그 댓글에 단 반응(승인·반려·개선)을 러너가 읽는다. 기획자에게 닿는 것은 결과 채널의 카드 한 장과 그 아래 버튼(👍 승인 · 👎 반려 · 😕 개선)이다 — 반려·개선의 까닭은 카드 스레드에 적으면 다리가 GitHub 로 옮긴다(`2026-09-23`). 흐름과 규칙은 [ai-environment.md](ai-environment.md) 「처리와 승인」이 갖는다. #9 는 화면이 PR #19 로 `dev`에 들어갔지만 결과 댓글이 없다. 러너의 `결과 9` 가 그 자리다. 반려 때 `dev`에서 되돌리는 것과 개선 전 화면을 `main`에 함께 보내는 것은 출발값이고, 공용 권한이 반응 달기·자가 승인 댓글을 다 막지 못하는 틈은 제안만 적어 두었다(같은 절 「남은 것」).
-
-**러너는 Actions job 밖, 이 Mac 의 1분 감시가 돌린다**(`2026-09-23`). `watch-decisions.mjs`(launchd, 60초)가 열린 화면 요청에서 **결과 댓글이 없는 요청**과 **새 결정**을 골라 `local-run.mjs` 로 러너를 직접 돌린다. job 안에서 돌리면 러너가 1분마다 GitHub 에 살아 있다고 알려야 하는데 이 Mac 의 연결이 15~25분마다 끊겨 그 갱신이 실패했고, GitHub 가 job 을 버리는 순간 claude 가 강제로 끝났다(#60 이 네 번 연속). `harness.yml` 은 손으로 부르는 예비로만 남았고 기록은 `~/.ooee-harness/runs/` 에 쌓인다. **사본 `~/.ooee-harness/harness` 는 신뢰 등록해야 한다** — 아니면 `.claude/settings.json` 의 `allow` 가 통째로 무시되어 화면 규칙 검사와 화면 테스트가 막힌다. `node -e` 는 열지 않는다(열면 명령 문자열로 막아 둔 `deny`·`ask` 가 한꺼번에 뜻을 잃는다).
-
-**`2026-09-23`~`24` 에 끝 단계가 잇달아 무너져 여덟 번 고쳤다.** 화면 생성은 매번 성공했고 무너진 것은 언제나 그 뒤였다 — 배포를 기다리다 턴을 끝내기(#60·#62), 머지 응답 타임아웃인데 실제로는 합쳐져 있던 것(#74), 10분을 넘긴 전체 검사(#75), 앞 실행이 남긴 파일이 다음 실행을 막은 것(#75), 감시 tick 이 도는 실행의 가지를 `reset --hard` 로 민 것. 고친 자리는 PR #71·#73·#76~#80 이고 공통점은 **모델에게 파이프라인을 운전시킨 것**이다. 배포 확인은 러너로 옮겼고(`checkDeploy`) 나머지는 규칙으로 막았다. 처리 시간은 143분 → 33분 → **12분**으로 줄었다(effort 는 계속 `high` 다 — 느렸던 까닭은 막힌 검사를 우회하느라 전체 검사를 네 번 돈 것이었다).
-
-**역할을 뒤집었다**(`2026-09-24` 개발자: 「역할 뒤집기 시작해」). 모델은 화면만 만들고 `plan.json` 에 무엇을 만들었는지 적는다(`/make-screens`, 134줄). 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글·이슈 닫기는 `runner.mjs` 가 한다. 승인·반려는 판단이 없어 모델을 아예 부르지 않고(`decide.mjs`), 개선만 사유가 앞 회차의 무엇을 가리키는지 읽히려고 부른다. 392줄짜리 `/process-issue` 와 넘김 파일·세션 이어받기는 지웠다(`runner.mjs` 에서 다섯 함수가 함께 사라졌다). 새 요청 처리는 #85 로 11분 42초에 화면 3장까지 확인했다.
-
-**sandbox 는 프로젝트 단위로 나뉘고 화면은 여러 폭을 가진다**(`2026-09-23`). `SANDBOX_PROJECTS` 가 첫 화면의 탭이 되고, 화면마다 `viewports: ("web"|"tablet"|"mobile")[]` 를 갖는다. 요청 폼의 「화면 유형」이 여러 선택이라 한 화면이 웹·모바일을 함께 가질 수 있고(#60), 그때는 상자를 두르지 않고 반응형으로 만들어 폭마다 검사한다. 모든 화면 위의 「보기 폭」 전환이 같은 화면을 그 폭의 액자로 바꿔 보인다. 프로젝트를 요청이 정하지 않으면 처리하는 쪽이 요구사항을 보고 정한다(#65). 화면마다 쓴 컴포넌트는 「컴포넌트 보기」가 보여 준다.
-
-**Figma 는 쓰지 않는다**(`2026-09-22`). 화면마다 Figma 로 옮기는 데 오래 걸리고 도구가 복잡해져 요청 처리에서 뺐다. 결과는 sandbox 에서만 본다. `/design-page`·`scripts/figma/`·Figma MCP·sandbox 의 Figma 카탈로그를 지웠고, 까닭과 남긴 것은 [ai-environment.md](ai-environment.md) 「2026-09-22 Figma 를 뺐다」가 갖는다.
+**처리 시간 실측**(`2026-09-24`): #60 이 설정이 깨진 상태에서 143분, 권한을 고친 뒤 #62 가 33분, 역할을 뒤집은 뒤 #85(화면 3장)가 11분 42초·#101(제자리 수정)이 11분 31초. 기록은 `~/.ooee-harness/runs/` 에 있고, 줄어든 까닭은 `plugins/ooee-harness/README.md` 「모델과 effort」와 `scripts/harness/plan.mjs` 머리말에 있다.
 
 ### 2026-09-09 Badge 색을 단계 규칙으로 바꿨다
 

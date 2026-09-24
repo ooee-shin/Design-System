@@ -12,7 +12,7 @@
 | `docs/process/` | 어떤 자료를 근거로 어떤 순서와 규칙으로 만드는가. 전달 시 제거 |
 | `AGENTS.md` | 작업 운영 규칙. 전달 시 제거 |
 | `.claude/` | Claude Code 공용 권한(`settings.json`)과 `/make-screens` Skill. 화면을 만들고 검수하는 두 명령은 `plugins/ooee-harness/`로 옮겼다. 기기별 값은 `settings.local.json` 이 갖고 저장소에 넣지 않는다. 전달 시 제거한다 |
-| `apps/sandbox` | `/generate-code`가 만든 화면을 두는 자리. 채택 여부는 기획자가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
+| `apps/sandbox` | `/make-screens`(안에서 `/ooee-harness:generate-code`)가 만든 화면과 블루키 리뉴얼을 두는 자리. 채택 여부는 기획자가 정하며 전달 시 제거. 규칙은 `docs/process/ai-environment.md` |
 | `plugins/ooee-harness/` | `/ooee-harness:generate-code`·`/ooee-harness:review-design` 을 싣는 Claude Code Plugin. **전달 대상이다.** 설치·설정·권한 조각은 그 안의 `README.md`가 갖는다 |
 | `scripts/harness/` | 화면 요청을 돌리는 도구: 러너(`runner.mjs`, 이 Mac 의 1분 감시가 `local-run.mjs` 로 부른다), 이슈 읽기, 배포 확인, 결과 댓글과 Slack 카드, 결정 읽기, Slack 다리와 1분 감시(launchd). 중간 산출물은 `.harness-work/`에 쌓이며 저장소에 넣지 않는다. 전달 시 제거. 사용법은 `scripts/harness/README.md` |
 
@@ -47,7 +47,7 @@
 - `apps/studio`는 Workbench, 예시 콘텐츠, 출처, viewport·theme·locale 검수 control만 소유한다.
 - 외부 원본을 그대로 검토하는 초기 화면 실험은 Studio에 둘 수 있다.
 - 사용자가 수정하거나 ooee 자산으로 채택한 UI는 검증이 끝나지 않았어도 `packages/ui`에 실제 원본을 둔다.
-- 채택된 화면 예시와 조합은 내부를 성급하게 분해하지 않고 전체 단위로 `packages/patterns`에 실제 원본을 둔다. 확정된 Pattern이 생기기 전에는 예시를 Pattern이라고 부르지 않는다.
+- 채택된 화면 예시와 조합은 내부를 성급하게 분해하지 않고 전체 단위로 둔다. 확정된 Pattern 이 생기면 그때 `packages/patterns` 를 다시 만든다(`2026-09-14` 에 걷어냄). 그전에는 예시를 Pattern 이라고 부르지 않는다.
 - Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
 
 ## 변경 원칙
@@ -87,10 +87,10 @@
 ## Claude Code 명령과 권한
 
 - **Claude Code는 저장소 루트에서 시작한다.** 공용 권한 `.claude/settings.json`은 세션을 시작한 폴더에서만 읽힌다. 하위 폴더나 홈에서 시작한 세션은 Skill은 보이지만 아래 권한이 걸리지 않는다.
-- **공용 권한이 막는 것.** `deny`는 `main`으로 직접 push하는 명령과, 에이전트가 요청서와 결정을 스스로 바꾸지 못하도록 `gh issue edit`·`close`·`reopen`, `gh label`, `gh api` 전부다. `ask`는 작업을 되돌리거나 지우는 명령(`git stash`, `git reset --hard`, `git clean`, `git checkout -- …`, `rm -r`), force push, `apps/sandbox`의 공용 파일(`package.json`, `test-setup.ts`, 첫 화면) 수정, `gh issue comment`·`gh pr create`·`gh pr merge`, 그리고 하네스가 자기 판정을 고치지 못하도록 `plugins/ooee-harness/lib/` 의 규칙 엔진과 `scripts/harness/` 의 판독·양식·게시 스크립트 수정이다. 에이전트가 이슈에 글을 다는 길은 결과 댓글 한 장을 다는 `scripts/harness/post-result.mjs` 하나다. `ask`와 `deny`는 개인 설정·`--allowedTools`·권한 모드로 풀리지 않고, 확인을 물을 수 없는 headless 세션에서는 거부된다. 규칙은 명령 문자열을 대조할 뿐이라 `git -C . push`처럼 형태를 바꾸면 걸리지 않으며 GitHub의 branch 보호가 아니다. 규칙을 바꾸는 pull request는 상대에게 먼저 알린다.
+- **공용 권한이 막는 것.** `deny`는 `main`으로 직접 push하는 명령과, 에이전트가 요청서와 결정을 스스로 바꾸지 못하도록 `gh issue edit`·`close`·`reopen`, `gh pr edit`·`close`·`reopen`, `gh label`, `gh api` 전부다. `ask`는 작업을 되돌리거나 지우는 명령(`git stash`, `git reset --hard`, `git clean`, `git checkout -- …`, `rm -r`), force push, `apps/sandbox`의 공용 파일(`package.json`, `test-setup.ts`, 첫 화면) 수정, `gh issue comment`·`gh pr create`·`gh pr merge`, 그리고 하네스가 자기 판정을 고치지 못하도록 `plugins/ooee-harness/lib/` 의 규칙 엔진과 `scripts/harness/` 의 스크립트·세 명령의 SKILL.md 수정, 그리고 workflow 를 손으로 깨우거나 실행을 되돌리는 `gh workflow run`·`gh run rerun`·`gh run cancel` 이다. 에이전트 세션에 열린 이슈 쓰기 명령은 없다. 결과 댓글은 러너가 `scripts/harness/post-result.mjs`로 달며, 그 첫 줄은 「화면 요청 #<n> 결과」라 판독이 결정으로 읽지 않는다. `ask`와 `deny`는 개인 설정·`--allowedTools`·권한 모드로 풀리지 않고, 확인을 물을 수 없는 headless 세션에서는 거부된다. 규칙은 명령 문자열을 대조할 뿐이라 `git -C . push`처럼 형태를 바꾸면 걸리지 않으며 GitHub의 branch 보호가 아니다. 규칙을 바꾸는 pull request는 상대에게 먼저 알린다.
 - **막힌 명령은 형태를 바꿔 다시 시도하지 않는다.** 권한 규칙이나 확인 요청에 막히면 경로·옵션·도구를 바꿔 같은 일을 되풀이하지 않고, 막힌 명령과 거부 메시지를 사용자에게 알린다.
-- **`/make-screens <n>` 은 화면만 만든다**(`2026-09-24`). 이슈를 읽어 화면 몇 장으로 나누고 `/ooee-harness:generate-code` 로 만든 뒤 `.harness-work/issue-<n>/plan.json` 에 무엇을 만들었는지 적고 멈춘다. 가지·commit·pull request·머지·배포 확인·결과 댓글은 하지 않으며 그 명령들이 열려 있지도 않다 — 러너(`scripts/harness/runner.mjs`)가 한다.
-- **명령의 쓰임과 멈추는 자리.** `/ooee-harness:generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/ooee-harness:review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. 이 둘은 commit·push·pull request를 만들지 않는다. 요청 처리에서 Figma 는 쓰지 않는다(`2026-09-22`) — 결과는 sandbox 에서만 본다. **요청 하나를 처음부터 끝까지 도는 것은 `scripts/harness/runner.mjs` 다**(`2026-09-24` 역할 뒤집기). `처리 <n>` 은 `/make-screens` 로 화면을 만들게 한 뒤 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글까지 스스로 하고, `결정 <n>` 은 승인이면 `dev → main` 을, 반려면 되돌림을 만들어 합치고 이슈를 닫는다(승인·반려에는 모델을 부르지 않는다). `결과 <n>` 은 결과 댓글만 올린다. 에이전트가 반응을 달거나 이슈를 고치는 일은 여전히 없다. 절차는 `plugins/ooee-harness/skills/<이름>/SKILL.md`와 `.claude/skills/make-screens/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다.
+- **`/make-screens <n>` 은 화면만 만든다**(`2026-09-24`). 이슈를 읽어 화면 몇 장으로 나누고 `/ooee-harness:generate-code` 로 만든 뒤 `.harness-work/issue-<n>/plan.json` 에 무엇을 만들었는지 적고 멈춘다. 가지·commit·pull request·머지·배포 확인·결과 댓글은 하지 않으며 그 명령들이 열려 있지도 않다. **요청 하나를 처음부터 끝까지 도는 것은 `scripts/harness/runner.mjs` 다**(`2026-09-24` 역할 뒤집기) — `처리 <n>` 은 `/make-screens` 뒤 가지·commit·push·pull request·Quality·머지·배포 확인·결과 댓글까지, `결정 <n>` 은 승인이면 `dev → main`·반려면 화면 걷어내기(승인·반려에는 모델을 부르지 않는다)·개선이면 `/make-screens` 다시, `결과 <n>` 은 결과 댓글만.
+- **명령의 쓰임과 멈추는 자리.** `/ooee-harness:generate-code`는 기획자 요청으로 `apps/sandbox`에 화면과 테스트를 만들고 「pull request 준비 완료」 또는 「검사 실패」 보고에서 멈춘다. `/ooee-harness:review-design`은 화면 코드를 `docs/system/`에 대조해 위반 목록만 내고 고치지 않는다. 이 둘은 commit·push·pull request를 만들지 않는다. 절차는 `plugins/ooee-harness/skills/<이름>/SKILL.md`와 `.claude/skills/make-screens/SKILL.md`, 순서와 결과는 `docs/process/ai-environment.md`가 소유한다.
 - **한 working tree에는 명령 세션 하나만 돌린다.** 두 세션이 같은 tree에서 서로의 쓰는 중인 파일을 테스트하고 공용 파일을 함께 고친 적이 있다. 동시에 돌려야 하면 저장소를 따로 clone한다. `git worktree`는 stash·branch·remote 설정을 원래 checkout과 공유하므로 격리가 아니다.
 - **headless로 돌릴 때.** `claude -p "<프롬프트>" --model sonnet --allowedTools … < /dev/null`처럼 프롬프트를 `--allowedTools` 앞에 둔다. `--allowedTools`는 뒤따르는 인수를 모두 먹는다. 신뢰하지 않은 폴더의 headless 세션은 공용 `allow`를 무시하므로 필요한 도구를 `--allowedTools`로 좁게 준다. `Bash(pnpm *)`처럼 넓게 주면 `pnpm exec`·`pnpm dlx`까지 열린다. 결과를 기록할 때는 실제로 돈 모델의 전체 이름을 적는다.
 - **Plugin.** 화면 명령 둘은 `plugins/ooee-harness/`의 Plugin으로 산다. 이 저장소에서도 설치해 쓰며, 고치는 중에는 `claude --plugin-dir ./plugins/ooee-harness`로 띄우고 `/reload-plugins`로 다시 읽는다. Plugin은 권한 규칙을 싣지 못하므로 공용 권한은 `.claude/settings.json`이 계속 소유한다.

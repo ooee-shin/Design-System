@@ -1,6 +1,6 @@
 # Design-System-Harness
 
-블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin, 요청 처리 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다. 결과는 sandbox 에서만 본다 — Figma 는 쓰지 않는다(`2026-09-22`).
+블루키 디자인 시스템(`ooee-ui`)으로 **기획자의 화면 요청을 검수된 화면 코드까지 잇는 하네스**다. Claude Code Plugin, 요청 처리 도구, 생성 화면을 두는 sandbox, 그리고 그 설계와 결정 기록을 갖는다. 결과는 sandbox 에서만 본다.
 
 `2026-09-21`에 `ooee-shin/ooee-ui`에서 이력과 함께 옮겨 왔다. 저장소 문서와 스크립트는 여기가 정본이다. 디자인 시스템 자체(`packages/*`, `docs/system/`, `apps/studio`)의 원본은 `ooee-ui`이고, 하네스가 그것을 읽어야 돌기 때문에 이 저장소에도 함께 있다. 그쪽을 여기서 고치면 `ooee-ui`에도 같은 변경을 내야 두 저장소가 갈라지지 않는다.
 
@@ -40,7 +40,7 @@ Slack 폼(화면 요청 · 화면 수정 요청) → GitHub issue (요청서 원
 plugins/ooee-harness   Claude Code Plugin. generate-code·review-design Skill과 화면 규칙 검사(lib/)
 .claude-plugin/        Plugin marketplace 정의(ooee)
 .claude/               /make-screens Skill과 공용 권한(settings.json)
-.github/workflows      Quality(pnpm check) · Deploy(Cloudflare Pages) · Harness(이 Mac 의 러너)
+.github/workflows      Quality(pnpm check) · Deploy(Cloudflare Pages) · Harness(손으로 부르는 예비. 러너는 이 Mac 의 launchd 감시가 돌린다)
 scripts/harness        요청 처리 도구: runner · issue · deploy-check · result-comment · post-result · slack-card · slack-bridge · decision · watch-decisions (README 참조)
 scripts/visual         브라우저에서 화면을 재는 도구
 scripts/docs           llms.txt 링크 시험, 배포본에 시스템 문서 원본을 싣는 빌드 단계

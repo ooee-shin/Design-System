@@ -2,10 +2,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseArgs, pickReplacement, pickRun, screenUrl, summarize } from "./deploy-check.mjs";
+import { parseArgs, pickReplacement, pickRun, summarize } from "./deploy-check.mjs";
+import { sandboxUrl } from "./plan.mjs";
 
-test("화면 주소는 배포된 sandbox 의 key 자리다", () => {
-  assert.equal(screenUrl("shop-cart"), "https://ooee-sandbox.pages.dev/shop-cart");
+test("화면 주소는 결과 댓글과 같은 sandbox 의 key 자리다(plan.mjs 의 sandboxUrl)", () => {
+  assert.equal(sandboxUrl("shop-cart"), "https://ooee-sandbox.pages.dev/shop-cart");
 });
 
 test("이 머지 commit 의 실행만 고르고, 여러 번 돌았으면 가장 늦은 것이다", () => {

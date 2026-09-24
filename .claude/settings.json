@@ -23,17 +23,12 @@
       "Bash(gh pr checks *)",
       "Bash(gh run list *)",
       "Bash(node *lib/check-screens.mjs *)",
-      "Bash(node --import tsx --test *)",
       "Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *)",
-      "Bash(node scripts/*)",
       "Bash(node plugins/ooee-harness/lib/*)",
       "Bash(gh issue view *)",
       "Bash(gh issue list *)",
       "Bash(node scripts/harness/issue.mjs *)",
-      "Bash(node scripts/harness/result-comment.mjs *)",
       "Bash(node scripts/harness/decision.mjs *)",
-      "Bash(node scripts/harness/post-result.mjs *)",
-      "Bash(node scripts/harness/deploy-check.mjs *)",
       "Bash(node scripts/visual/inspect.mjs *)"
     ],
     "ask": [
@@ -73,7 +68,20 @@
       "Edit(/scripts/harness/deploy-check.mjs)",
       "Edit(/scripts/harness/watch-decisions.mjs)",
       "Edit(/scripts/harness/local-run.mjs)",
-      "Edit(/.github/workflows/harness.yml)"
+      "Edit(/.github/workflows/harness.yml)",
+      "Edit(/scripts/harness/plan.mjs)",
+      "Edit(/scripts/harness/decide.mjs)",
+      "Edit(/scripts/harness/slack-env.mjs)",
+      "Edit(/scripts/harness/watch-tick.sh)",
+      "Edit(/scripts/harness/com.ooee.harness.decisions.plist)",
+      "Edit(/scripts/harness/com.ooee.harness.slack.plist)",
+      "Edit(/scripts/harness/com.ooee.harness.caffeinate.plist)",
+      "Edit(/.claude/skills/make-screens/SKILL.md)",
+      "Edit(/plugins/ooee-harness/skills/generate-code/SKILL.md)",
+      "Edit(/plugins/ooee-harness/skills/review-design/SKILL.md)",
+      "Bash(gh workflow run *)",
+      "Bash(gh run rerun *)",
+      "Bash(gh run cancel *)"
     ],
     "deny": [
       "Bash(git push origin main)",
@@ -92,7 +100,10 @@
       "Bash(gh issue reopen *)",
       "Bash(gh label *)",
       "Bash(gh api)",
-      "Bash(gh api *)"
+      "Bash(gh api *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr reopen *)"
     ]
   }
 }

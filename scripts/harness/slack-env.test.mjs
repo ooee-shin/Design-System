@@ -25,7 +25,7 @@ test("값 끝의 공백을 벗긴다 — 한 칸 붙은 토큰은 invalid_auth �
   assert.equal(env.SLACK_RESULT_CHANNEL, "C1");
 });
 
-test("이미 있는 환경변수가 파일보다 세고, 파일이 없으면 환경변수만 쓴다", () => {
+test("이미 있는 환경변수가 파일보다 세고, 파일이 없으면 환경변수만 쓴다 — 토큰은 홈의 파일에 두고 저장소에 두지 않는다", () => {
   const env = loadEnv(fileWith("SLACK_BOT_TOKEN=file\n"), { SLACK_BOT_TOKEN: "env" });
   assert.equal(env.SLACK_BOT_TOKEN, "env");
   assert.deepEqual(loadEnv(path.join(tmpdir(), "없는-파일-" + Date.now()), { A: "1" }), { A: "1" });

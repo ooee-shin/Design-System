@@ -39,17 +39,15 @@
 // 토큰은 사람이 넣는다. 이 저장소에도 이 스크립트에도 두지 않는다.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { REACTION_DECISIONS as GITHUB_REACTIONS } from "./decision.mjs";
 import { buildConfirmBlocks } from "./slack-card.mjs";
 import { HOME_ENV, loadEnv } from "./slack-env.mjs";
 
-export { loadEnv };
-
-/** 반응 → 결정. decision.mjs 의 표와 같아야 한다. */
-export const REACTION_DECISIONS = { "+1": "승인", thumbsup: "승인", "-1": "반려", thumbsdown: "반려", confused: "개선" };
+/** 반응 → 결정. decision.mjs 의 표에서 파생한다 — Slack 은 👍👎 를 thumbsup/thumbsdown 별칭으로도 보낸다. */
+export const REACTION_DECISIONS = { ...GITHUB_REACTIONS, thumbsup: GITHUB_REACTIONS["+1"], thumbsdown: GITHUB_REACTIONS["-1"] };
 
 /** 결과 카드의 첫 줄이 「화면 요청 #39 결과 · 1회차 — …」이다. 거기서 번호를 읽는다. */
 export function readIssueNumber(text) {
@@ -218,7 +216,7 @@ const writePending = (all) => {
  * 카드의 결정 버튼을 눌렀을 때. 승인은 바로 올리고, 반려·개선은 까닭을 스레드로 받는다 —
  * 버튼 하나로는 무엇을 고칠지 알 수 없어 D3·D4 가 멈추기 때문이다.
  */
-export async function handleAction(payload, { token, dryRun, channel }) {
+async function handleAction(payload, { token, dryRun, channel }) {
   const action = readAction(payload?.actions?.[0]?.action_id);
   if (!action) return null;
   const channelId = payload.channel?.id;
@@ -255,7 +253,7 @@ export async function handleAction(payload, { token, dryRun, channel }) {
 }
 
 /** 까닭을 기다리던 스레드에 사람이 적으면 그 글을 결정 댓글로 올린다. */
-export async function handleMessage(event, { token, dryRun, channel }) {
+async function handleMessage(event, { token, dryRun, channel }) {
   if (!event || event.type !== "message" || !event.thread_ts) return null;
   if (channel && event.channel !== channel) return null;
   const all = readPending();
@@ -269,7 +267,7 @@ export async function handleMessage(event, { token, dryRun, channel }) {
   return { issue: pending.issue, decision: pending.decision, reason: event.text };
 }
 
-export async function handleEvent(event, { token, botUserId, dryRun, channel }) {
+async function handleEvent(event, { token, botUserId, dryRun, channel }) {
   if (!shouldRelay(event, { botUserId })) return null;
   if (channel && event.item.channel !== channel) return null;
   const message = await readMessage(token, { channel: event.item.channel, ts: event.item.ts });

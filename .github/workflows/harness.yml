@@ -3,14 +3,16 @@ name: Harness
 # 화면 요청 이슈를 이 Mac(self-hosted runner, 라벨 ooee-mac)에서 **손으로** 돌리는 자리다. Claude 와 gh 가
 # 이 Mac 에 로그인한 계정으로 돈다 — GitHub 이 빌려 주는 컴퓨터에는 그 로그인이 없다.
 #
-# **저절로 도는 길은 이 파일이 아니다**(`2026-09-23` 개발자: 「로컬에서 돌리는 걸로, 항상 켜두는 컴퓨터라
-# 괜찮다」). 새 요청과 결정은 이 Mac 의 1분 감시(scripts/harness/watch-decisions.mjs, launchd)가 읽고
-# `scripts/harness/local-run.mjs` 로 러너를 job 밖에서 돌린다. job 안에서 돌리면 러너가 1분마다 GitHub 에
-# 살아 있다고 알려야 하는데, 이 Mac 의 연결이 15~25분마다 끊겨 그 갱신이 실패했고 GitHub 가 job 을 버리는
-# 순간 claude 가 강제로 끝났다 — #60 이 네 번 연속 그렇게 죽었다.
+# **저절로 도는 길은 이 파일이 아니다**(개발자 결정 `2026-09-23`) — 새 요청과 결정은 이 Mac 의 1분 감시
+# (scripts/harness/watch-decisions.mjs, launchd)가 job 밖에서 돌린다. 까닭은 scripts/harness/README.md 「러너」.
 #
 # 그래서 여기 남는 것은 `workflow_dispatch` 하나다. Actions 화면에서 손으로 부를 때, 또는 이 Mac 의 감시가
 # 멈췄을 때 쓴다. 감시가 이미 돌린 것을 또 돌리지 않게, 부르기 전에 `~/.ooee-harness/runs/` 를 본다.
+#
+# 이 길은 actions runner 서비스(`~/actions-runner`, launchd `actions.runner.…ooee-mac`)가 켜져 있고 그 `_work`
+# 사본에서 `claude` 를 한 번 열어 신뢰를 수락해야 돈다. job 이 도는 동안은 watch-tick.sh 의 pgrep 이 감시를
+# 멈추므로 둘이 겹치지 않는다. Actions 화면의 「Use workflow from」을 dev 로 골라야 dev 의 이 파일로 돈다
+# (기본은 main).
 on:
   workflow_dispatch:
     inputs:

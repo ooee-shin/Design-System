@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { renderResultComment } from "./result-comment.mjs";
-import { branchName, planPath, prBody, readScreens, removeScreens, resultInput, sandboxUrl, section, title, validatePlan } from "./plan.mjs";
+import { branchName, planPath, prBody, readScreens, reconcileScreens, removeScreens, resultInput, sandboxUrl, section, title, validatePlan } from "./plan.mjs";
 
 const screen = (over = {}) => ({
   key: "invoice-dashboard",
@@ -43,6 +43,25 @@ test("화면이 없으면 올릴 것이 없다고 막는다", () => {
 test("같은 key 를 두 번 적으면 막는다 — 한 화면을 두 줄로 세면 표와 개수가 어긋난다", () => {
   const problems = validatePlan({ issue: 85, screens: [screen(), screen()] }, { issue: 85 });
   assert.match(problems.join("\n"), /key 가 겹친다: invoice-dashboard/);
+});
+
+test("remade 는 true/false 만 받는다 — 문자열 'false' 는 다시 만든 것으로 세어 버린다", () => {
+  assert.match(validatePlan({ issue: 85, screens: [screen({ remade: "false" })] }, { issue: 85 }).join("\n"), /remade 는 true\/false 여야 한다/);
+  assert.deepEqual(validatePlan({ issue: 85, screens: [screen({ remade: false })] }, { issue: 85 }), []);
+});
+
+test("plan.json 의 화면은 screens.ts 등록값으로 맞춘다 — 등록이 원본이고, 없는 key 만 돌려준다", () => {
+  const registered = [
+    { key: "invoice-dashboard", name: "송장 대시보드", project: "invoice-api", viewports: ["web", "mobile"] },
+    { key: "invoice-logs", name: "API 호출 이력", project: "invoice-api", viewports: ["web"] },
+  ];
+  const screens = [screen(), screen({ key: "invoice-logs", name: "API 호출 이력", project: "invoice-api" }), screen({ key: "gone" })];
+  const { missing, overwritten } = reconcileScreens(screens, registered);
+  assert.deepEqual(missing, ["gone"]);
+  assert.equal(overwritten.length, 1, "등록과 같은 화면은 건드리지 않는다");
+  assert.match(overwritten[0], /`invoice-dashboard` 를 screens.ts 등록값으로 덮어썼다: 이름 「자동 송장 대시보드」 → 「송장 대시보드」 · 프로젝트 자동-송장-api → invoice-api · 폭 web → web·mobile/);
+  assert.deepEqual(screens[0], { ...screen(), name: "송장 대시보드", project: "invoice-api", viewports: ["web", "mobile"] });
+  assert.equal(screens[1].name, "API 호출 이력");
 });
 
 test("수정 요청은 화면 하나다", () => {

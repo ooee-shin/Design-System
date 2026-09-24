@@ -32,14 +32,19 @@ test("make-screens SKILL.md 가 적은 저장소 경로가 모두 있다", () =>
   assert.deepEqual(missing, [], `make-screens SKILL.md 가 없는 파일을 가리킨다:\n${missing.join("\n")}`);
 });
 
-test("allowed-tools 는 결정을 만들 수 있는 명령을 열지 않고, curl 은 배포 주소 확인 꼴만 연다", () => {
+test("make-screens 의 allowed-tools 는 읽고 만드는 것만 연다 — 결정·pull request·배포 확인은 러너의 몫이다", () => {
   // 판독(decision.mjs)은 계정으로 거르지 않아 에이전트가 단 반응·「승인」 댓글을 사람의 것과 가르지 못한다.
   // 공용 권한이 `gh api` 를 통째로 막고 `gh issue comment` 를 ask 로 두지만, Skill 도 스스로 열지 않아 두 겹으로 둔다.
+  // 배포 확인은 deploy-check.mjs 가 하므로 curl 도 열지 않는다. 못 하게 해 두는 것이 규칙보다 낫다.
   const allowed = (skill.match(/^allowed-tools:(.*)$/m)?.[1] ?? "").split(/,\s+/).map((tool) => tool.trim());
+  const forbidden = /gh api|gh issue (comment|edit|close|reopen)|gh label|gh pr (create|merge)|git (commit|push|switch)|curl|deploy-check|post-result/;
   for (const tool of allowed) {
-    assert.doesNotMatch(tool, /gh api|gh issue comment|gh issue (edit|close|reopen)|gh label/, `allowed-tools 가 연다: ${tool}`);
+    assert.doesNotMatch(tool, forbidden, `allowed-tools 가 연다: ${tool} — 러너의 몫이다`);
   }
-  assert.deepEqual(allowed.filter((tool) => tool.startsWith("Bash(curl")), [], "배포 확인은 deploy-check.mjs 가 한다 — curl 을 열지 않는다");
+  // 읽고 만드는 데 꼭 필요한 것은 있어야 한다. 없으면 단계마다 확인을 묻다가 헤드리스에서 거부된다.
+  for (const need of ["node scripts/harness/issue.mjs:*", "node scripts/visual/inspect.mjs:*"]) {
+    assert.ok(allowed.includes(`Bash(${need})`), `allowed-tools 에 ${need} 가 없다`);
+  }
 });
 
 test("기다리는 일을 이 명령이 맡지 않는다 — 배포도 머지도 러너가 본다", () => {
@@ -56,17 +61,6 @@ test("plan.json 의 칸이 모두 적혀 있다 — 러너가 그것으로 pull 
     assert.ok(skill.includes(field), `plan.json 의 ${field} 가 적혀 있지 않다`);
   }
   assert.match(skill, /\.harness-work\/issue-<n>\/plan\.json/);
-});
-
-test("이 명령에는 git·gh 쓰기 명령이 열려 있지 않다 — 못 하게 해 두는 것이 규칙보다 낫다", () => {
-  const allowed = skill.match(/^allowed-tools:(.*)$/m)?.[1] ?? "";
-  for (const forbidden of ["git commit", "git push", "git switch", "gh pr create", "gh pr merge", "gh issue comment", "gh issue close", "deploy-check", "post-result"]) {
-    assert.ok(!allowed.includes(forbidden), `allowed-tools 가 ${forbidden} 를 연다 — 러너의 몫이다`);
-  }
-  // 읽고 만드는 데 꼭 필요한 것은 있어야 한다. 없으면 단계마다 확인을 묻다가 헤드리스에서 거부된다.
-  for (const need of ["node scripts/harness/issue.mjs:*", "node scripts/visual/inspect.mjs:*"]) {
-    assert.ok(allowed.includes(`Bash(${need})`), `allowed-tools 에 ${need} 가 없다`);
-  }
 });
 
 test("allowed-tools 의 `:*` 는 낱말이 끝난 뒤에만 쓴다", () => {

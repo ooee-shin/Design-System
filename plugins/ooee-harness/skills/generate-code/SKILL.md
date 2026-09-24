@@ -1,6 +1,6 @@
 ---
 name: generate-code
-description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/ui만으로 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> [원본: <저장소 경로>]」이다.
+description: 기획자의 화면 요청을 디자인 시스템 문서와 @ooee/ui만으로 화면 코드와 테스트로 만들고 「pull request 준비 완료」에서 멈춘다. 화면을 만들어 달라는 요청에 쓴다. 인수는 「<화면 이름>. <요구사항 한 문단> 프로젝트: <id> 유형: <web, tablet, mobile> [원본: <저장소 경로>] [새 프로젝트 이름: …] [고칠 화면: <key>]」이다.
 model: claude-sonnet-5
 effort: high
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash(git status:*), Bash(pnpm --filter @ooee/sandbox exec node --import tsx --test *), Bash(pnpm --filter @ooee/sandbox test), Bash(pnpm --filter @ooee/sandbox build), Bash(pnpm check), Bash(node plugins/ooee-harness/lib/check-screens.mjs:*)
@@ -16,6 +16,7 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash(git status:*), Bash(pnpm --fi
 
 - **끝의 `프로젝트: <id>` 와 `유형: <web|tablet|mobile>`은 화면이 설 자리와 폭이다.** 프로젝트는 화면 목록을 나누는 단위(「블루키 리뉴얼」 같은 일의 이름)이고, 유형은 폭이다 — 한 프로젝트에 웹 화면과 모바일 화면이 함께 있다. 유형은 `유형: web, mobile` 처럼 **여럿일 수 있다** — 그 화면이 그 폭들에서 모두 서야 한다는 뜻이다. 뒤에 `새 프로젝트 이름: <이름>`이 있으면 아직 없는 프로젝트라 「파일과 등록」에서 한 줄을 더한다.
 - **끝에 `고칠 화면: <key>`가 있으면 그 화면을 제자리에서 고친다.** 새 화면을 만드는 것이 아니라 이미 있는 세 파일(`page.tsx`·`page.test.tsx`·`screens.ts` 한 줄)을 고치는 일이다. 승인되어 제품으로 간 화면을 고치는 입구이고, 주소(key)가 그대로여야 공유된 링크가 살아 있다. 아래 「파일과 등록」의 key 규칙과 「하지 않는 것」의 코드 읽기 금지에 이 경우의 예외가 있다.
+- **`지어냄: …` 은 요청에 없어 부르는 쪽이 정한 것이다.** 머리말 주석에서 요청 원문과 갈라 적고, 「판단이 필요한 것」에 그대로 옮긴다. `수정: …`·`개선: …` 은 앞 인수 뒤에 붙은 이번 회차의 요구이며, 머리말 주석의 요구사항 문단을 이것으로 다시 쓴다(「파일과 등록」의 제자리 수정 규칙과 같다).
 - 요구사항에 없는 것은 지어내지 않고 「판단이 필요한 것」에 적는다. 정렬·글자 크기·간격처럼 코드를 쓰려면 정해야만 하는 값은 3단계의 「정렬과 간격」을 따른다.
 - 요구사항이 적은 것이 `${user_config.docs_root}`의 기준과 어긋나면 2단계의 「요구사항과 문서가 어긋날 때」를 따른다.
 
@@ -168,7 +169,7 @@ pnpm --filter @ooee/sandbox exec node --import tsx --test src/app/<key>/page.tes
 
 **한 줄에 명령을 여러 개 묶지 않는다.** `A && B`, `A; B`, `for … do … done` 처럼 묶으면 권한 검사가 그 줄 전체를 모르는 명령으로 보아 거부한다. 한 번에 하나씩 돌린다.
 
-**고치는 동안에는 이 화면의 것만 돌린다.** 화면 테스트와 화면 규칙 검사는 몇 초면 끝나고, `check_command`(이 저장소는 `pnpm check`)는 저장소 전체를 보느라 서너 분이 든다. 고칠 때마다 전체를 돌리면 그 시간이 그대로 쌓인다 — `2026-09-23` #60 은 전체 검사를 네 번 돌려 15분가량을 여기 썼다.
+**고치는 동안에는 이 화면의 것만 돌린다.** 화면 테스트와 화면 규칙 검사는 몇 초면 끝나고, `check_command`(이 저장소 기본값은 sandbox build·test·`pnpm check` 셋 — 그중 `pnpm check` 가 저장소 전체를 본다)는 저장소 전체를 보느라 서너 분이 든다. 고칠 때마다 전체를 돌리면 그 시간이 그대로 쌓인다 — `2026-09-23` #60 은 전체 검사를 네 번 돌려 15분가량을 여기 썼다.
 
 **`check_command` 는 마지막에 한 번, 많아야 두 번이다.** 화면의 것이 모두 통과한 뒤 한 번 돌리고, 거기서 나온 것을 고쳤으면 확인으로 한 번 더 돌린다. 세 번째가 필요하면 그 화면만으로는 풀리지 않는 문제이므로 5단계의 「검사가 실패하면」으로 간다. pull request 를 올리면 `Quality` 가 같은 것을 다시 돌리고 러너가 그 결과를 기다렸다 합치므로, 로컬에서 더 도는 것은 같은 답을 다시 사는 일이다.
 
@@ -190,7 +191,7 @@ pnpm --filter @ooee/sandbox exec node --import tsx --test src/app/<key>/page.tes
 
 commit하지 않은 working tree 그대로 두고 아래를 대화에 낸다. 5단계의 셋이 모두 통과했을 때만 첫 제목이 「## pull request 준비 완료」이며, 하나라도 실패했으면 「## 검사 실패」다.
 
-보고 직전에 5단계의 세 명령을 **마지막으로 한 번 더** 돌리고 `git status --porcelain --untracked-files=all`을 돌린다. 확인 사항은 그 결과로만 채운다.
+확인 사항은 5단계에서 마지막으로 돈 `check_command` 결과로 채운다. 6단계에서 `page.tsx` 를 고쳤으면 몇 초면 끝나는 화면 테스트와 check-screens 만 다시 돌리고 `check_command` 는 다시 돌리지 않는다 — 5단계의 「마지막에 한 번, 많아야 두 번」과 같은 셈이고, 저장소 전체는 pull request 의 `Quality` 가 다시 본다. 보고 직전에 `git status --porcelain --untracked-files=all` 을 돌린다.
 
 - 명령 줄은 그 실행의 종료 코드가 0일 때만 `[x]`다. 테스트가 1건이라도 `not ok`이거나 「내 변경과 무관」해 보여도 `[ ]`이며, 괄호 단서를 붙여 `[x]`로 두지 않는다. `[ ]` 줄 옆에는 오류 메시지 첫 줄을 그대로 적는다.
 - 「세 파일 밖을 고치지 않았다」는 `git status` 출력의 경로가 세 파일(새 디렉터리 안의 두 파일과 `screens.ts`)뿐일 때만 `[x]`다. 출력은 「변경 파일」에 원문 그대로 붙인다.
