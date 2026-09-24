@@ -336,6 +336,20 @@ function onMain(issue) {
 /** 결정을 읽는다. 섞임 검사가 남의 요청마다 이것을 부른다. */
 const decisionOf = (issue) => JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)])).decision;
 
+/**
+ * 모델이 멈췄을 때, **그 보고를 그대로** 카드로 보낸다.
+ *
+ * `2026-09-24` 에 #60 의 개선이 「개선이 아니라 새 요구입니다 — 폼으로 새 요청을 내 주세요」라고 제대로
+ * 적었는데, 러너가 그것을 버리고 「plan.json 이 없다」를 보냈다. 기획자는 무엇을 해야 할지 알 수 없었다.
+ * 까닭을 아는 쪽이 모델이면 그 말을 옮긴다.
+ */
+async function stopWith(issue, report, fallback) {
+  const has = /^## /m.test(String(report ?? ""));
+  log(`\n${report ?? ""}\n`);
+  await notifyStop(issue, has ? report : `## ${fallback}\n\n- 모델이 까닭을 남기지 않았다 — 개발자가 실행 기록을 봐야 한다`, { tail: "개발자가 봐야 합니다." });
+  return false;
+}
+
 /** 이 요청에 이미 올라간 결과 댓글의 수. 다음 회차는 그 +1 이다. */
 function resultRound(issue) {
   const read = JSON.parse(sh("node", ["scripts/harness/decision.mjs", String(issue)]));
@@ -378,9 +392,10 @@ async function runRequest(issue) {
   rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
 
   // 3. 모델이 하는 유일한 일 — 화면을 만들고 무엇을 만들었는지 적는다.
-  runClaude(`/make-screens ${issue} 러너`);
+  const made = runClaude(`/make-screens ${issue} 러너`);
   const file = path.join(repoRoot, planPath(issue));
-  if (!existsSync(file)) return stop("화면을 만들지 못했다", [`${planPath(issue)} 이 없다 — 위 보고에 멈춘 자리가 있다`]);
+  // 모델이 왜 멈췄는지는 그 보고에 있다. 「plan.json 이 없다」만 보내면 기획자는 무엇을 해야 할지 모른다.
+  if (!existsSync(file)) return stopWith(issue, made.result, "화면을 만들지 못했다");
   const plan = JSON.parse(readFileSync(file, "utf8"));
   const problems = validatePlan(plan, { issue, mode: read.mode });
   if (problems.length) return stop("만든 것을 읽을 수 없다", problems);
@@ -494,9 +509,9 @@ async function improve(issue, read, stop) {
   const round = read.round + 1;
   dropStaleBranches(issue);
   rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
-  runClaude(`/make-screens ${issue} 개선 러너`);
+  const made = runClaude(`/make-screens ${issue} 개선 러너`);
   const file = path.join(repoRoot, planPath(issue));
-  if (!existsSync(file)) return stop("다시 만들지 못했다", [`${planPath(issue)} 이 없다 — 위 보고에 멈춘 자리가 있다`]);
+  if (!existsSync(file)) return stopWith(issue, made.result, "다시 만들지 못했다");
   const plan = JSON.parse(readFileSync(file, "utf8"));
   const problems = validatePlan(plan, { issue, mode: read.mode });
   if (problems.length) return stop("다시 만든 것을 읽을 수 없다", problems);
@@ -546,11 +561,21 @@ async function approve(issue, read, stop) {
 /** 반려 — 이 요청의 화면을 `dev` 에서 되돌린다. 두면 어떤 승인도 `main` 으로 올라가지 못한다. */
 async function reject(issue, read, stop) {
   sh("git", ["fetch", "-q", "origin"]);
-  const prs = landedPrs().filter((pr) => isRequestOf(pr.body, issue));
-  if (!prs.length) return stop("되돌릴 것이 없다", ["이 요청의 화면이 dev 에 없다"]);
-  // 늦은 것부터 되돌린다. 개선 회차가 있으면 회차마다 하나씩이다.
-  const commits = sh("git", ["log", "--format=%H", "origin/main..origin/dev", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n").filter(Boolean);
-  if (!commits.length) return stop("되돌릴 commit 을 찾지 못했다", [`main..dev 에 (#${issue}) 를 제목에 단 commit 이 없다`]);
+  // 이미 되돌렸으면 두 번 하지 않는다.
+  const reverted = JSON.parse(sh("gh", ["pr", "list", "--state", "merged", "--base", "dev", "--search", `"되돌림: #${issue}" in:body`, "--json", "number,url,body"]))
+    .filter((pr) => isRevertOf(pr.body, issue));
+  if (reverted.length) {
+    closeIssue(issue, closingComment("반려", `되돌림 PR #${reverted[reverted.length - 1].number}`));
+    log(`- 이미 되돌려져 있어 닫기만 했다`);
+    return true;
+  }
+
+  // **`main..dev` 로 찾지 않는다.** 개발자가 dev → main 을 올린 뒤에 반려가 나면 그 사이가 비어 있어
+  // 「되돌릴 것이 없다」가 된다(`2026-09-24` #62). 이 요청의 commit 은 그래도 dev 의 이력에 있다.
+  const commits = sh("git", ["log", "--format=%H", "origin/dev", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n").filter(Boolean);
+  if (!commits.length) return stop("되돌릴 것이 없다", ["이 요청의 화면 commit 이 dev 의 이력에 없다 — 아직 만들지 않았거나 이미 되돌렸다"]);
+  // 화면이 이미 main 에도 있으면 되돌림은 dev 에만 들어간다. 다음 dev → main 에 함께 올라간다.
+  const alsoOnMain = onMain(issue).length > 0;
 
   const remote = sh("git", ["ls-remote", "--heads", "origin"]).split("\n").filter(Boolean).map((line) => line.split("refs/heads/")[1]);
   const branch = freeBranch(`feature/issue-${issue}-revert`, remote);
@@ -562,7 +587,7 @@ async function reject(issue, read, stop) {
     return stop("되돌리다 부딪혔다", [error.message.split("\n")[0], "다른 요청의 화면이 같은 자리를 고쳤다 — 사람이 푼다"]);
   }
   sh("git", ["push", "-q", "-u", "origin", branch]);
-  const { title: prTitle, body } = revertPr({ issue, read, screenName: readScreenName(issue), commits });
+  const { title: prTitle, body } = revertPr({ issue, read, screenName: readScreenName(issue), commits, alsoOnMain });
   const bodyFile = path.join(repoRoot, ".harness-work", `issue-${issue}`, "revert.md");
   mkdirSync(path.dirname(bodyFile), { recursive: true });
   writeFileSync(bodyFile, body);

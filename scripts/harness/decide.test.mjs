@@ -98,3 +98,13 @@ test("앞 실행이 남긴 가지를 덮지 않고 비킨다", () => {
   assert.equal(freeBranch("feature/issue-62-revert", ["feature/issue-62-revert"]), "feature/issue-62-revert-2");
   assert.equal(freeBranch("feature/issue-62-revert", ["feature/issue-62-revert", "feature/issue-62-revert-2"]), "feature/issue-62-revert-3");
 });
+
+test("화면이 main 에도 있으면 되돌림 본문이 그 사실을 적는다", () => {
+  // 2026-09-24 #62: 개발자가 승인 전에 dev → main 을 올려, 반려가 나도 main 에는 화면이 남는다.
+  const read = { by: "유진식", at: "2026-09-24T03:00:00Z", reason: "그냥", reasonSource: "prefix", resultCommentUrl: "https://x/c" };
+  const on = revertPr({ issue: 62, read, screenName: "대시보드", commits: ["abc1234"], alsoOnMain: true });
+  assert.match(on.body, /## main 에도 있다/);
+  assert.match(on.body, /다음 `dev → main` 최신화에 함께 올라간다/);
+  const off = revertPr({ issue: 62, read, screenName: "대시보드", commits: ["abc1234"] });
+  assert.ok(!off.body.includes("main 에도 있다"), "main 에 없을 때까지 그 말을 적으면 안 된다");
+});

@@ -126,7 +126,7 @@ export function mainPr({ issue, read, screenName, landed }) {
 }
 
 /** 되돌림 pull request 의 제목과 본문. 첫 줄의 `되돌림: #<n>` 을 D2 가 읽는다. */
-export function revertPr({ issue, read, screenName, commits }) {
+export function revertPr({ issue, read, screenName, commits, alsoOnMain = false }) {
   const title = `revert(sandbox): 화면 요청 #${issue} 반려 — ${screenName}`;
   const body = [
     `되돌림: #${issue}`,
@@ -142,6 +142,10 @@ export function revertPr({ issue, read, screenName, commits }) {
     "## 되돌린 commit",
     "",
     ...commits.map((sha) => `- \`${sha}\``),
+    "",
+    ...(alsoOnMain
+      ? ["", "## main 에도 있다", "", "이 화면은 `main` 에도 올라가 있다(개발자가 승인 전에 dev → main 을 올렸다). 이 되돌림은 `dev` 에만 들어가고, 다음 `dev → main` 최신화에 함께 올라간다."]
+      : []),
     "",
     "다시 만들려면 폼으로 새 요청을 낸다.",
   ].join("\n");
