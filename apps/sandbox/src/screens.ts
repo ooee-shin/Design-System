@@ -14,6 +14,7 @@
 export const SANDBOX_PROJECTS = [
   { id: "harness-test", name: "하네스 시험", description: "요청에서 화면까지의 흐름을 시험하며 만든 화면입니다. 제품에 들어가지 않습니다." },
   { id: "신주희-테스트", name: "신주희 테스트", description: "신주희 테스트 화면입니다." },
+  { id: "자동-송장-api", name: "자동 송장 API", description: "송장 발급과 배송 현황을 보는 자동 송장 API 화면입니다." },
 ] as const;
 
 export type SandboxProject = (typeof SANDBOX_PROJECTS)[number]["id"];
@@ -254,5 +255,32 @@ export const sandboxScreens: SandboxScreen[] = [
     href: "/kakao-message-dashboard",
     prompt: "카카오톡 api 연동해서 메시지를 대시보드에서 이력 관리 하는 페이지.",
     createdAt: "2026-09-23",
+  },
+  {
+    key: "invoice-dashboard",
+    project: "자동-송장-api",
+    viewports: ["web"],
+    name: "자동 송장 API 대시보드",
+    href: "/invoice-dashboard",
+    prompt: "자동 송장 API의 첫 화면. 오늘 발급·배송 중·배송 완료·예외 건수 요약과 최근 발급 송장 표, 송장 조회로 가는 버튼. (CJ 송장 조회 참고)",
+    createdAt: "2026-09-24",
+  },
+  {
+    key: "invoice-lookup",
+    project: "자동-송장-api",
+    viewports: ["web"],
+    name: "자동 송장 API 송장 조회",
+    href: "/invoice-lookup",
+    prompt: "송장번호 한 칸으로 배송 상태를 찾는 조회 화면. 조회 폼과 결과 표, 결과 없음 안내. (CJ 송장 조회 참고)",
+    createdAt: "2026-09-24",
+  },
+  {
+    key: "invoice-detail",
+    project: "자동-송장-api",
+    viewports: ["web"],
+    name: "자동 송장 API 송장 상세",
+    href: "/invoice-detail",
+    prompt: "송장 한 건의 배송 정보와 배송 이력을 보는 화면. 송장 조회로 돌아가는 링크. (CJ 송장 조회 참고)",
+    createdAt: "2026-09-24",
   },
 ];
