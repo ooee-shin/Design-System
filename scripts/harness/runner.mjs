@@ -20,7 +20,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { howToUnmix, improveBlocked, isRequestOf, mainPr, revertPr, sortLanded } from "./decide.mjs";
+import { freeBranch, howToUnmix, improveBlocked, isRequestOf, mainPr, revertPr, sortLanded } from "./decide.mjs";
 import { branchName, planPath, prBody, readScreens, resultInput, section, title, validatePlan } from "./plan.mjs";
 import { postCard, slackTarget } from "./slack-card.mjs";
 
@@ -552,7 +552,8 @@ async function reject(issue, read, stop) {
   const commits = sh("git", ["log", "--format=%H", "origin/main..origin/dev", "--grep", `(#${issue})`, "--fixed-strings"]).split("\n").filter(Boolean);
   if (!commits.length) return stop("되돌릴 commit 을 찾지 못했다", [`main..dev 에 (#${issue}) 를 제목에 단 commit 이 없다`]);
 
-  const branch = `feature/issue-${issue}-revert`;
+  const remote = sh("git", ["ls-remote", "--heads", "origin"]).split("\n").filter(Boolean).map((line) => line.split("refs/heads/")[1]);
+  const branch = freeBranch(`feature/issue-${issue}-revert`, remote);
   sh("git", ["switch", "-c", branch]);
   try {
     sh("git", ["revert", "--no-edit", ...commits]);

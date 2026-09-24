@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { howToUnmix, improveBlocked, isRequestOf, isRevertOf, mainPr, readMark, revertPr, sortLanded, touchesScreens } from "./decide.mjs";
+import { freeBranch, howToUnmix, improveBlocked, isRequestOf, isRevertOf, mainPr, readMark, revertPr, sortLanded, touchesScreens } from "./decide.mjs";
 
 const pr = (number, body, files = []) => ({ number, url: `https://github.com/x/pull/${number}`, body, files });
 
@@ -90,4 +90,11 @@ test("개선은 사유가 밝혀졌을 때만, 세 번까지 한다", () => {
   assert.match(improveBlocked({ ...ok, reason: null }), /사유가 없다/);
   assert.match(improveBlocked({ ...ok, reasonSource: "after" }), /짐작했다\(after\)/);
   assert.match(improveBlocked({ ...ok, round: 4 }), /개선은 3번까지다\(지금 4회차\)/);
+});
+
+test("앞 실행이 남긴 가지를 덮지 않고 비킨다", () => {
+  // 2026-09-24 #62: 되돌리기가 검사 실패 뒤에도 push 까지 나가 feature/issue-62-revert 를 남겼다.
+  assert.equal(freeBranch("feature/issue-62-revert", []), "feature/issue-62-revert");
+  assert.equal(freeBranch("feature/issue-62-revert", ["feature/issue-62-revert"]), "feature/issue-62-revert-2");
+  assert.equal(freeBranch("feature/issue-62-revert", ["feature/issue-62-revert", "feature/issue-62-revert-2"]), "feature/issue-62-revert-3");
 });

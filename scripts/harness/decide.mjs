@@ -86,6 +86,19 @@ export function howToUnmix(mixed) {
   return mixed.map((item) => `#${item.issue ?? "?"} (${item.decision}) ${item.url} — ${how[item.decision] ?? "사람이 본다"}`);
 }
 
+/**
+ * 아직 쓰이지 않은 가지 이름. 앞 실행이 실패하며 남긴 가지를 덮어쓰지 않으려는 것이다.
+ *
+ * `2026-09-24` 에 #62 의 되돌리기가 검사 실패 뒤에도 push 까지 나가 `feature/issue-62-revert` 를 남겼다.
+ * 같은 이름으로 다시 push 하면 거절되거나(non-fast-forward) 남의 기록을 덮는다. 뒤에 숫자를 붙여 비킨다.
+ */
+export function freeBranch(base, taken) {
+  const used = new Set(taken);
+  if (!used.has(base)) return base;
+  for (let i = 2; i < 100; i += 1) if (!used.has(`${base}-${i}`)) return `${base}-${i}`;
+  throw new Error(`빈 가지 이름을 찾지 못했다: ${base}`);
+}
+
 /** `dev → main` pull request 의 제목과 본문. 첫 줄의 `승인: #<n>` 을 러너가 다시 확인한다. */
 export function mainPr({ issue, read, screenName, landed }) {
   const title = `dev → main: 화면 요청 #${issue} 승인 — ${screenName}`;
