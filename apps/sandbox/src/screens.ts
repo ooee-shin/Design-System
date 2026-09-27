@@ -310,4 +310,14 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "나이키 런의 러닝 기록 목록 화면. 누적 거리와 최근 기록 표. (키로수 저장 및 위치정보 페이지 약관 팝업 등 4-5장 중 한 장)",
     createdAt: "2026-09-24",
   },
+  {
+    key: "shade-map-running",
+    project: "harness-test",
+    viewports: ["mobile"],
+    name: "그늘 지도 러닝",
+    href: "/shade-map-running",
+    prompt:
+      "그늘 지도 러닝 앱의 메인 화면(#113). 시간대 고르기, 코스 3개 카드(그늘 비율 막대·체감 더위 배지), 러닝 시작 버튼. 요청 원문은 기획 문서 전체라 화면 구성의 메인 화면 하나로 읽음.",
+    createdAt: "2026-09-27",
+  },
 ];
