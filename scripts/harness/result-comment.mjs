@@ -14,6 +14,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { componentLink } from "./studio-links.mjs";
+
 /**
  * 결과 댓글의 표식. decision.mjs 가 이것으로 결과 댓글을 찾는다.
  *
@@ -221,10 +223,13 @@ export function renderResultComment(input) {
   ];
 
   const none = (items) => (items.length ? items.join(", ") : "없음");
+  // 컴포넌트는 Studio 문서로 링크한다(`2026-09-27` 개발자). 화면 표의 링크와 함께, 기획자가 결과에서 화면과
+  // 그 화면이 쓴 컴포넌트의 문서로 바로 간다. 머리 네 줄은 그대로 날 글자다 — 카드는 markdown 을 모른다.
+  const linked = (items) => (items.length ? items.map(componentLink).join(", ") : "없음");
   const done = [
     `- 페이지 ${round > 1 ? "다시 만듦" : "추가"}: ${work.pagesAdded.length ? `${work.pagesAdded.length}장 — ${work.pagesAdded.join(", ")}` : "없음"}`,
-    `- 새 컴포넌트: ${none(work.componentsAdded)}`,
-    `- 쓴 컴포넌트: ${none(work.componentsUsed)}`,
+    `- 새 컴포넌트: ${linked(work.componentsAdded)}`,
+    `- 쓴 컴포넌트: ${linked(work.componentsUsed)}`,
     ...work.other.map((item) => `- ${item}`),
     ...(pr ? [`- Pull request: [#${pr.number}](${pr.url})`] : []),
   ];

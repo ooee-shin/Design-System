@@ -22,9 +22,10 @@ test("한 번 처리한 요청은 멈췄어도 다시 처리하지 않는다 —
   assert.notEqual(processKey(20), decisionKey(read({ issue: 20 })), "처리 열쇠와 결정 열쇠가 섞이면 안 된다");
 });
 
-test("깨운 기록은 러너의 상태와 같은 폴더에 다른 파일로 둔다", () => {
+test("열쇠는 러너와 같은 파일 하나에 둔다 — 실패한 결정을 다시 돌릴 때 두 파일을 고치지 않는다", () => {
+  // 2026-09-27: 전에는 감시(dispatched.json)와 러너(decisions.json)가 같은 결정 열쇠를 따로 적었다.
   const file = watchStateFile({ HARNESS_STATE_DIR: "/tmp/ooee" });
-  assert.equal(file, path.join("/tmp/ooee", "dispatched.json"));
+  assert.equal(file, path.join("/tmp/ooee", "decisions.json"));
 });
 
 test("tick 은 러너가 도는 동안 사본을 건드리지 않고, reset 대신 checkout 으로 맞춘다", () => {

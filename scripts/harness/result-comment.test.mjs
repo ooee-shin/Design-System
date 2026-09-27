@@ -52,7 +52,7 @@ test("아래에 화면 표, 작업한 것, 판단이 필요한 것, 검사, 결�
   assert.ok(markdown.includes("| 주문 완료 | web | [/shop-order-complete](https://ooee-sandbox.pages.dev/shop-order-complete) |"));
   assert.doesNotMatch(markdown, /figma/i, "결과 댓글에 Figma 가 남았다");
   assert.ok(markdown.includes("- 페이지 추가: 5장 — 상품 목록, 상품 상세, 장바구니, 주문서, 주문 완료"));
-  assert.ok(markdown.includes("- 쓴 컴포넌트: Button, Input, Select, CheckboxField, Badge"));
+  assert.ok(markdown.includes("- 쓴 컴포넌트: [Button](https://ooee-studio.pages.dev/components/button), [Input](https://ooee-studio.pages.dev/components/input), [Select](https://ooee-studio.pages.dev/components/select), [CheckboxField](https://ooee-studio.pages.dev/components/checkbox), [Badge](https://ooee-studio.pages.dev/components/badge)"));
   assert.ok(markdown.includes("- 프로젝트를 web 하나로 만들었다 — 요청은 web·sto·sv 셋이었다"));
   assert.ok(markdown.includes("- [x] pnpm check"));
 });
@@ -192,4 +192,14 @@ test("CLI: 입력이 모자라면 0 이 아닌 코드로 끝나고 까닭을 알
     () => execFileSync(process.execPath, [path.join(here, "result-comment.mjs"), path.join(here, "fixtures", "issue-9.json")], { encoding: "utf8", stdio: "pipe" }),
     (error) => error.status === 1 && /결과 댓글을 만들지 않는다/.test(error.stderr),
   );
+});
+
+test("컴포넌트는 Studio 문서로 링크하고, 문서가 없는 이름은 그대로 둔다 — 머리 네 줄은 날 글자다", () => {
+  // 2026-09-27 개발자: 「만들었던 페이지 링크 + 컴포넌트 링크도 같이 주는 걸로 하자」.
+  const input = JSON.parse(readFileSync(new URL("fixtures/result-input.example.json", import.meta.url), "utf8"));
+  input.summary.componentsUsed = ["Button", "CheckboxField", "Table"];
+  const body = renderResultComment(input);
+  assert.match(body, /- 쓴 컴포넌트: \[Button\]\(https:\/\/ooee-studio\.pages\.dev\/components\/button\), \[CheckboxField\]\(https:\/\/ooee-studio\.pages\.dev\/components\/checkbox\), Table/);
+  const head = body.split("\n").slice(0, 4).join("\n");
+  assert.ok(!/\]\(/.test(head), "카드에 실리는 머리 네 줄에 markdown 링크가 들어갔다");
 });
