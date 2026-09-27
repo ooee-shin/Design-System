@@ -317,7 +317,27 @@ export const sandboxScreens: SandboxScreen[] = [
     name: "그늘 지도 러닝",
     href: "/shade-map-running",
     prompt:
-      "그늘 지도 러닝 앱의 메인 화면(#113). 시간대 고르기, 코스 3개 카드(그늘 비율 막대·체감 더위 배지), 러닝 시작 버튼. 요청 원문은 기획 문서 전체라 화면 구성의 메인 화면 하나로 읽음.",
+      "그늘 지도 러닝 앱의 메인 화면(#113, 개선 1회차). 시간대 고르기, 코스 3개 카드(그늘 비율 막대·체감 더위 배지, 제목은 코스 상세 링크), 지도로 코스 고르기 링크, 러닝 시작 버튼. 요청 원문은 기획 문서 전체라 화면 구성의 메인 화면 하나로 읽음.",
+    createdAt: "2026-09-27",
+  },
+  {
+    key: "shade-course-map",
+    project: "harness-test",
+    viewports: ["mobile"],
+    name: "그늘 코스 지도",
+    href: "/shade-course-map",
+    prompt:
+      "그늘 지도 러닝 앱의 코스 지도(#113, 개선 1회차). 지도 도식 위에 코스 3개와 그림자를 겹쳐 보이고, 시간·코스를 골라 그늘 비율·체감 더위 요약을 보며 상세로 가거나 그 코스로 러닝을 시작.",
+    createdAt: "2026-09-27",
+  },
+  {
+    key: "shade-course-detail",
+    project: "harness-test",
+    viewports: ["mobile"],
+    name: "그늘 코스 상세",
+    href: "/shade-course-detail",
+    prompt:
+      "그늘 지도 러닝 앱의 코스 상세(#113, 개선 1회차). 서울숲 순환 코스 하나의 요약, 시간대별 그늘 비율·체감 더위, 구간별 그늘 안내, 이 코스로 러닝 시작.",
     createdAt: "2026-09-27",
   },
 ];

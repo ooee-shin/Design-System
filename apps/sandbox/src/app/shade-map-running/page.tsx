@@ -7,12 +7,15 @@
  *
  * 지어냄(부르는 쪽이 정함): 화면은 요청의 기획 문서 전체가 아니라 「화면 구성」의 메인 화면 하나로 읽음. 시간 선택, 코스 3개 카드(코스 이름·거리·그늘 비율 막대·체감 더위 배지), 러닝 시작 버튼, 예시 데이터는 지어냄.
  *
- * 비워 둔 자리: 코스 상세·기록 화면 링크, 실제 그늘·기온 계산, 지도 표시, 러닝 시작 뒤의 동작.
+ * 개선 회차 요구(1회차 결과에 대한 기획자 사유): 러닝 시작은 그늘이 가장 많은 코스로 시작하는 버튼 하나로 두었고 코스를 골라 시작하는 흐름·지도·코스 상세도 만들어줘. 이 회차에 함께 만드는 화면: /shade-course-map (지도에서 코스 고르기), /shade-course-detail (코스 상세). 메인의 코스 카드는 /shade-course-detail 로, 「지도로 코스 고르기」는 /shade-course-map 으로 링크.
+ * 지어냄: 「지도로 코스 고르기」 버튼 문구와 위치, 카드 제목을 상세 링크로 둔 것. 코스 상세는 코스별로 나뉘지 않고 한 장이라 모든 카드가 같은 상세로 간다.
+ *
+ * 비워 둔 자리: 기록 화면 링크, 실제 그늘·기온 계산, 러닝 시작 뒤의 동작.
  */
 
 import { useState } from "react";
 import { AppHeader, Badge, Button, Chip } from "@ooee/ui";
-import { RiPlayFill } from "@remixicon/react";
+import { RiMapPinLine, RiPlayFill } from "@remixicon/react";
 
 const TIMES = ["오후 6시", "오후 7시", "오후 8시", "내일 오전 8시"] as const;
 
@@ -74,6 +77,19 @@ export default function ShadeMapRunningPage() {
             <p className="text-xs text-oe-foreground-tertiary">성동구 기준 · 예시 데이터</p>
           </section>
 
+          <Button
+            render={<a href="/shade-course-map" />}
+            nativeButton={false}
+            role="link"
+            variant="outline"
+            tone="neutral"
+            layout="fill"
+            controlSize="large"
+            leadingIcon={<RiMapPinLine aria-hidden="true" />}
+          >
+            지도로 코스 고르기
+          </Button>
+
           <section aria-labelledby="course-heading" className="flex flex-col gap-3">
             <h2 id="course-heading" className="text-base font-semibold text-oe-foreground-primary">
               {TIMES[timeIndex]}, 그늘이 많은 순
@@ -88,7 +104,14 @@ export default function ShadeMapRunningPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex min-w-0 flex-col gap-1">
-                        <h3 className="text-sm font-semibold text-oe-foreground-primary">{course.name}</h3>
+                        <h3 className="text-sm font-semibold text-oe-foreground-primary">
+                          <a
+                            href="/shade-course-detail"
+                            className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary"
+                          >
+                            {course.name}
+                          </a>
+                        </h3>
                         <p className="text-xs text-oe-foreground-tertiary">
                           {course.area} · {course.distance}
                         </p>

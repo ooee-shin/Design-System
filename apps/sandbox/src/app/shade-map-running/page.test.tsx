@@ -40,6 +40,12 @@ test("시간을 바꾸면 그늘 비율이 바뀐다", () => {
   assert.equal(screen.getAllByText("더움").length, 2, "체감 더위 배지가 바뀌지 않았다");
 });
 
+test("코스 이름이 코스 상세 링크이고 지도로 코스 고르기가 지도 링크다", () => {
+  render(<ShadeMapRunningPage />);
+  assert.equal(screen.getByRole("link", { name: "서울숲 순환 코스" }).getAttribute("href"), "/shade-course-detail");
+  assert.equal(screen.getByRole("link", { name: "지도로 코스 고르기" }).getAttribute("href"), "/shade-course-map");
+});
+
 test("러닝 시작 버튼이 있다", () => {
   render(<ShadeMapRunningPage />);
   assert.ok(screen.getByRole("button", { name: "러닝 시작" }), "러닝 시작 버튼이 없다");
