@@ -16,7 +16,8 @@
     "typecheck": "pnpm -r typecheck",
     "visual": "node scripts/visual/inspect.mjs",
     "test": "node --import tsx --test packages/*/src/*.test.ts packages/*/src/*.test.tsx apps/studio/src/components/*.test.ts apps/studio/src/lib/*.test.ts scripts/docs/*.test.mjs scripts/harness/*.test.mjs plugins/ooee-harness/lib/*.test.mjs",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @ooee/sandbox test && pnpm build"
+    "docs:drift": "node scripts/docs/system-drift.mjs",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm --filter @ooee/sandbox test && pnpm docs:drift && pnpm build"
   },
   "devDependencies": {
     "marked": "^18.0.11",
