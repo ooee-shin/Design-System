@@ -129,13 +129,16 @@ export function ViewportFrame({ children, pathname: given }: { children: ReactNo
         />
       ) : (
         <div className="flex min-h-0 flex-1 justify-center overflow-auto bg-oe-background-secondary px-4 py-6">
+          {/* 높이를 정하는 class 를 붙이지 않는다. `h-fit`(`height: fit-content`) 은 iframe 같은 대체 요소에서 `height`
+              속성을 덮어쓰고 기본 내재 높이 150px 으로 내려앉아 화면이 그만큼만 보였다(2026-09-28). 높이는 `height`
+              속성이 갖고, 담는 칸이 넘치면 `overflow-auto` 로 스크롤한다. */}
           <iframe
             data-sandbox-frame=""
             title={`${name} — ${chosen.name} ${chosen.inspect}`}
             src={src}
             width={size.width}
             height={size.height}
-            className="h-fit max-w-full rounded-lg border border-oe-border-secondary bg-oe-background-primary shadow-lg"
+            className="max-w-full rounded-lg border border-oe-border-secondary bg-oe-background-primary shadow-lg"
           />
         </div>
       )}

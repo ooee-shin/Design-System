@@ -10,7 +10,7 @@ import React from "react";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 
-import { sandboxScreens } from "@/screens";
+import { SANDBOX_VIEWPORTS, sandboxScreens } from "@/screens";
 
 import { defaultViewport, FRAME_GUTTER, frameSize, FRAME_PARAM, ViewportFrame } from "./viewport-frame";
 
@@ -206,4 +206,38 @@ test("서버 첫 그림은 기본 폭 단추가 눌린 막대와 빈 자리만 �
   assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 1, "눌린 단추가 하나여야 한다");
   assert.match(html, /aria-pressed="true"[^>]*>모바일/, "서버 첫 그림에서 눌린 단추가 모바일이 아니다");
   assert.equal(html.includes("<iframe"), false, "서버 첫 그림에 액자를 그렸다");
+});
+
+// `h-fit`(`height: fit-content`) 을 붙였더니 iframe 이 `height` 속성을 버리고 기본 내재 높이 150px 으로 내려앉아
+// 태블릿·모바일 화면이 150px 짜리 띠로만 보였다(2026-09-28). 높이는 `height` 속성만 갖는다.
+test("고정 폭 액자는 폭과 높이를 속성으로 갖고, 높이를 덮어쓰는 class 를 붙이지 않는다", () => {
+  const byViewport = new Map(SANDBOX_VIEWPORTS.map((item) => [item.id, item]));
+  const wide = window.innerWidth;
+  window.innerWidth = 1920;
+  try {
+    for (const id of ["tablet", "mobile"] as const) {
+      const screen = sandboxScreens.find((item) => defaultViewport(item.href) === id);
+      const spec = byViewport.get(id);
+      assert.ok(screen, `기본 폭이 ${id} 인 화면이 목록에 있어야 이 시험이 뜻을 갖는다`);
+      assert.ok(spec);
+      const size = frameSize(spec.inspect);
+      const view = render(
+        <ViewportFrame pathname={screen.href}>
+          <main>
+            <h1>{screen.name}</h1>
+          </main>
+        </ViewportFrame>,
+      );
+      const frame = view.container.querySelector("iframe[data-sandbox-frame]");
+      assert.ok(frame, `${id} 액자를 찾지 못했다`);
+      assert.equal(frame.getAttribute("width"), String(size.width));
+      assert.equal(frame.getAttribute("height"), String(size.height), `${id} 액자에 높이 속성이 없다`);
+      for (const cls of frame.className.split(/\s+/)) {
+        assert.ok(!/^h-|^max-h-|^min-h-/.test(cls), `높이를 정하는 class 「${cls}」 가 붙어 height 속성을 덮어쓴다`);
+      }
+      cleanup();
+    }
+  } finally {
+    window.innerWidth = wide;
+  }
 });
