@@ -41,4 +41,4 @@ ooee의 공용 아이콘 Primary 공급원은 [Remix Icon](https://remixicon.com
 - Secondary 공급원은 패키지를 설치하지 않고 쓰는 아이콘만 파일로 들여온다. 지금 필요한 것이 하나뿐이고, 고른 스타일 축이 그대로 굳어 있어야 한다. 축은 `Outlined`, `FILL 0`, `wght 400`, `GRAD 0`, `opsz 24`다. Remix Icon이 모두 각진 선이라 모서리가 둥근 `Rounded`는 같은 화면에서 다른 규칙으로 보인다. 자리는 `apps/sandbox/src/components/candidates/material-symbols.tsx`에 둔다. 쓰는 아이콘이 여러 개로 늘어나면 그때 패키지를 검토한다.
 - Material Symbols는 `0 -960 960 960` 좌표계를 쓴다. Remix의 `0 0 24 24`와 다르지만 그려지는 크기는 크기 토큰이 정하므로 쓰는 쪽에서는 차이가 없다.
 - 구체적인 아이콘 선택은 각 화면에서 시각 검수하며, 크기는 공용 `oe-icon-*` 토큰을 사용한다.
-- `/foundations/icon`은 현재 실제 코드에서 등록해 사용하는 Remix Icon asset과 공급원 상태를 표시한다.
+- `/foundations/icon`은 `packages/ui`가 실제로 참조하는 Remix Icon asset과 공급원 상태를 표시한다. `apps/sandbox`의 사용처는 세지 않으므로, Material Symbols는 위의 첫 사용처가 있어도 이 화면에서는 「공용 자산에는 사용처 없음」으로 보인다.

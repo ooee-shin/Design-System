@@ -417,3 +417,5 @@ Properties와 Behavior는 불일치가 없었다.
 8. 과정 문장 다수 — `message-bubble.md:3`, `:5`, `:7`, `:9`, `:28`, `:78`, `:80-89`, `:91`
 
 Properties와 Anatomy 요소는 불일치가 없었다.
+
+**진행 상황(`2026-09-28`).** 1·2·3·8 은 명세를 다른 확정 명세와 같은 절 구조(역할과 경계·Anatomy·Properties·색·Guidelines·Specification)로 다시 쓰며 처리했다. 명세에 없던 `unreadRecipientLabel`·`unreadMessageLabel`·`showTime`·`outgoingSenderDescription` 을 「Properties」에 더하고, 「관리자 icon」 은 `outgoingSenderDescription` 을 넘길 때만 그리는 Info trigger 로 고쳤으며, Studio 의 언어·모드 control 을 말하던 문장은 걷어냈다. 코드와 어긋나던 「Outgoing metadata: `oe-foreground-inverse-secondary`」 도 실제 값 `oe-foreground-tertiary` 로 바로잡았다. 걷어낸 「아직 검수할 항목」 은 [working-context.md](working-context.md)의 「남은 작업」 11 에 있다. 4~7 은 Studio 화면 쪽 작업이라 남는다. `scripts/docs/system-drift.mjs` 의 ENUM_TABLE 에 message-bubble 항목을 더해 새 「Properties」 의 열거 줄 일곱을 코드와 대조한다.

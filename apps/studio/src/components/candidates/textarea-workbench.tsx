@@ -100,7 +100,7 @@ export function TextareaWorkbench() {
               <DependentControlGroup className={playgroundAutoSize ? "pointer-events-none opacity-40" : undefined}>
                 <div className="space-y-4">
                   <Toggle label="Resize" value={playgroundResize} onChange={setPlaygroundResize} />
-                  <label className="flex items-center justify-between gap-3 text-[11px] font-medium text-oe-foreground-tertiary">Height <input type="number" min={88} step={4} value={playgroundHeight} onChange={(event) => setPlaygroundHeight(Math.max(88, Number(event.target.value) || 88))} className="h-8 w-20 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-2 text-right text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring" /></label>
+                  <label className="flex items-center justify-between gap-3 text-[11px] font-medium text-oe-foreground-tertiary">Height <input type="number" min={80} step={4} value={playgroundHeight} onChange={(event) => setPlaygroundHeight(Math.max(80, Number(event.target.value) || 80))} className="h-8 w-20 rounded-lg border border-oe-border-secondary bg-oe-background-primary px-2 text-right text-xs text-oe-foreground-primary outline-none focus:border-oe-focus-ring" /></label>
                 </div>
               </DependentControlGroup>
               </ControlSection>
@@ -283,7 +283,7 @@ function TextareaAnatomy() {
         <div className="overflow-x-auto">
           <div className="mx-auto w-[40rem] py-20 text-oe-foreground-secondary">
             <AnatomyFrame className="mx-auto w-[28rem]" gap={44}>
-              <div data-slot="textarea-container" className="h-[5.5rem] w-full overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-placeholder">
+              <div data-slot="textarea-container" className="h-20 w-full overflow-hidden rounded-lg border border-oe-border-primary bg-oe-background-primary px-3 py-2 text-sm leading-5 text-oe-foreground-placeholder">
                 <div data-slot="textarea" className="h-full w-full whitespace-pre-line"><span>여러 줄 값을 입력하는 영역입니다.</span></div>
               </div>
               <AnatomyBoundaryMarker number={1} target="[data-slot=textarea-container]" side="top" connectorLength={24} clearance={20} />
@@ -294,7 +294,7 @@ function TextareaAnatomy() {
       </AnatomySurface>
       <AnatomyLegend items={[{ name: "Container" }, { name: "Textarea field" }]} />
       <AnatomyDescription>
-        <p><span className="font-semibold text-oe-foreground-primary">Container:</span> 전체 입력 영역입니다. 최소 높이는 88px이며 약 3.5줄의 입력 공간을 확보합니다.</p>
+        <p><span className="font-semibold text-oe-foreground-primary">Container:</span> 전체 입력 영역입니다. 최소 높이는 80px이며 내용이 넘칠 때 3.5줄이 보입니다.</p>
         <p><span className="font-semibold text-oe-foreground-primary">Textarea field:</span> 실제 여러 줄 입력 영역입니다. Auto size가 true이면 내용에 따라 Container와 함께 높이가 증가합니다.</p>
       </AnatomyDescription>
     </div>

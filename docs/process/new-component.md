@@ -13,7 +13,7 @@
 | 1 | `packages/ui/src/<name>.tsx` | — |
 | 2 | `packages/ui/src/index.ts` export | 화면이 import하지 못한다 |
 | 3 | `docs/system/components/<name>.md` | **하네스가 이 문서를 읽고 컴포넌트를 고른다.** 없으면 만들어도 쓰지 않는다 |
-| 4 | `component-registry.ts` + `docs/system/README.md`의 Component 표 | Studio 목록에 서지 않는다. `ComponentKey` 유니온에도 이름을 더한다 |
+| 4 | `component-registry.ts` + `docs/system/README.md`의 Component 표 | Studio 목록에 서지 않는다. `ComponentKey` 유니온에도 이름을 더한다. title 알파벳 자리에 넣는다(시험이 잰다) |
 | 5 | Studio Playground | Playground가 변형의 정본이다 |
 
 `llms.txt`의 확정 목록도 함께 고친다 — 테스트가 `component-registry`와 대조한다.

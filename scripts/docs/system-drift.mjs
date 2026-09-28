@@ -80,7 +80,7 @@ const SELF = "scripts/docs/system-drift.mjs";
 
 /** 재지 않는 것과 그 까닭. 보고 끝에 한 줄씩 낸다. 다른 시험이 이미 재는 짝은 어느 시험인지 적는다. */
 export const NOT_MEASURED = Object.freeze([
-  "README 컴포넌트 표 순서 ↔ registry 순서 — docs/system/studio.md 가 title 알파벳순을 정하지만 이 도구는 아직 재지 않는다",
+  "README 컴포넌트 표 순서 ↔ registry 순서 — docs/system/studio.md 가 title 알파벳순을 정하고 registry 쪽은 apps/studio component-registry.test.ts 가 재지만, README 표 쪽 순서는 이 도구가 아직 재지 않는다",
   "CheckboxField 최소 높이 36px ↔ checkbox.md 산문 — 값은 token(oe-control-regular)이 소유하고 문서는 단계 이름을 적으므로, interaction.md 짝이 token 값을 재는 것으로 갈음한다",
   "문서에만 있는 가상 이름(oe-media-*, overlay 템플릿) — 문서가 미래 검토 항목으로 명시한 이름이라 코드에 없는 것이 어긋남이 아니다",
   "switch controlSize(small·medium·large) ↔ switch.md 「### Size」 절 — 문서가 「- `small`: Control `26×16px` …」 로 단계마다 서술하고 「- `controlSize`: `a | b`」 열거 줄이 없어 재지 않는다(그 밖의 Properties 열거 줄은 ENUM_TABLE 로 모두 재며, 표에 없는 줄은 아래에 줄 번호로 낸다)",
@@ -1316,6 +1316,7 @@ export const ENUM_TABLE = Object.freeze({
   "notification-badge": { tone: "NotificationBadgeTone", max: "NotificationBadgeMax" },
   "app-header": { titleAlign: "AppHeaderTitleAlign", titleHidden: BOOLEAN, sticky: BOOLEAN },
   chip: { shape: "ChipShape", controlSize: "ChipSize", leadingTone: "ChipTone", trailingTone: "ChipTone" },
+  "message-bubble": { direction: "MessageDirection", deliveryState: "MessageDeliveryState", deleted: BOOLEAN, showDeletedContent: BOOLEAN, showAvatar: BOOLEAN, grouped: BOOLEAN, showTime: BOOLEAN },
   checkbox: { shape: { cva: "checkboxVariants" }, layout: INLINE },
   radio: { layout: INLINE },
   switch: { labelPosition: INLINE },
@@ -1375,7 +1376,7 @@ export function compareEnums(key, source, doc, readOther = () => null) {
 
 /**
  * 컴포넌트 문서(key → 원문)에서 값에 `|` 가 든 목록 줄(`ENUM_LINE_LOOSE`, 펜스 밖 전체) 가운데 재지 않는 것 — 「재지 않는 것」 한 줄씩.
- * 세 갈래다: 「- `prop`: `a | b`」 꼴이 아닌 줄(message-bubble.md 「- 방향: `incoming | outgoing`」), 그 꼴이지만 「## Properties」 절 밖인 줄,
+ * 세 갈래다: 「- `prop`: `a | b`」 꼴이 아닌 줄(옛 message-bubble.md 「## 현재 API」 의 「- 방향: `incoming | outgoing`」), 그 꼴이지만 「## Properties」 절 밖인 줄,
  * 절 안이지만 ENUM_TABLE 에 읽는 법이 없는 컴포넌트·prop. 절 안의 「값 묶음 둘 이상」 줄은 `compareEnums` 가 ? 로 내므로 여기서 다시 대지 않는다.
  * 이름을 대지 않고 「=」 로 보이는 줄이 없게 하려는 것이다.
  */

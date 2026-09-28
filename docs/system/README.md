@@ -83,7 +83,7 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 | Field | 확정 | [field.md](components/field.md) | Label, 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸 |
 | Input | 확정 | [input.md](components/input.md) | 한 줄 입력 |
 | Input Button | 확정 | [input-button.md](components/input-button.md) | Input과 같은 외관으로 달력·주소·시간 선택 화면을 여는 Trigger |
-| Message Bubble | 확정 | [message-bubble.md](components/message-bubble.md) | 발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action |
+| Message Bubble | 확정 | [message-bubble.md](components/message-bubble.md) | 대화 화면에서 메시지 하나를 방향에 맞춘 말풍선으로 표시. 작성자, 시간, 전달 상태, 읽지 않은 수와 메시지 action 을 소유 |
 | Message Composer | 초안 | 없음 | 메시지를 입력하고 보내는 아래쪽 한 줄 |
 | Message File Attachment | 초안 | 없음 | 메시지에 붙는 파일 카드 |
 | Notification Badge | 확정 | [notification-badge.md](components/notification-badge.md) | 아이콘·버튼·메뉴에 붙어 새 알림이나 읽지 않은 수를 표시 |

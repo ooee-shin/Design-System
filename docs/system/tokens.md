@@ -63,8 +63,11 @@ oe-interaction-hover
 - `border`: outline과 divider의 색상
 - `primary`: 해당 property 안에서 높은 기본 위계
 - `secondary`: 해당 property 안에서 한 단계 낮은 위계
+- `tertiary`: `secondary`보다 한 단계 더 낮은 위계. 중립 위계는 여기서 끝나며 그 아래 칸을 번호로 잇지 않는다
+- `bold`: background와 border에서 가장 진한 solid 단계. 강한 solid fill과 작은 면의 선택은 `background-bold-primary`로, 큰 면의 선택은 `border-bold-primary` 선으로 알린다
 - `disabled`: 사용할 수 없는 상태
 - `inverse`: 진한 표면 위의 범용 반전 foreground
+- `visual`: 이미지와 색상 값처럼 콘텐츠 자체 위에 얹는 내부 경계. border에만 쓰며 테마 surface 색으로 바꾸지 않는다
 
 Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다. Light Neutral background는 primary에서 secondary 순으로 어두워지며, Dark에서는 이름보다 동일한 UI 역할과 계층을 유지한다. **두 경계선은 선이 무엇을 하는지로 갈린다.** `border-primary`는 선 자체가 컨트롤의 모양을 만드는 자리에 쓴다. Checkbox의 네모와 Radio의 원이 그것이며, 16px 안에서 그 선이 사라지면 고를 것이 있다는 사실 자체가 보이지 않는다. `border-secondary`는 이미 면으로 서 있는 것의 테두리와 면을 가르는 divider에 쓴다. Input과 Textarea의 상자, Select·Combobox·Select Box의 트리거, 떠 있는 Popup, 그 사이의 divider가 여기에 해당한다.
 

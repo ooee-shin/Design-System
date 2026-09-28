@@ -55,9 +55,9 @@ Obra를 ooee의 최종 코드 언어로 삼지 않는다. 구현 품질과 구�
 
 화면과 제품 패턴을 발견하는 입력이다. 정보 구조, 레이아웃과 반응형 동작, 콘텐츠 조합, 제품 시나리오와 시각적 아이디어를 본다.
 
-- Breadcrumb page header와 Sliding underline tabs는 본문 머리의 출발점으로 들여왔다. 확인일은 `2026-09-15`이며 `apps/studio/src/components/candidates/page-header.tsx`에 `oe` 토큰으로 다시 썼고 `/screens/admin/layout`이 그것을 쓴다. 앞의 것에서는 경로와 제목, 오른쪽 동작 버튼이 쌓이는 순서와 자리를 보고, 뒤의 것에서는 밑줄이 고른 탭을 따라 미끄러지는 탭 줄을 본다. 앞의 것이 제목 아래에 함께 그리는 소유자·생성일·식별자는 상세 화면이 갖는 값이라 들이지 않았고, 뒤의 것이 좌표를 직접 재어 밑줄을 옮기는 자리는 Base UI 의 `Tabs.Indicator`가 같은 값을 CSS 변수로 내어 주므로 그것으로 바꿨다.
+- Breadcrumb page header와 Sliding underline tabs는 본문 머리의 출발점으로 들여왔다. 확인일은 `2026-09-15`이며 `apps/studio/src/components/candidates/page-header.tsx`에 `oe` 토큰으로 다시 썼고 sandbox 의 `/renewal/admin/layout`(`apps/sandbox/src/app/(renewal)/renewal/admin/layout/page.tsx`)이 그것을 쓴다. 앞의 것에서는 경로와 제목, 오른쪽 동작 버튼이 쌓이는 순서와 자리를 보고, 뒤의 것에서는 밑줄이 고른 탭을 따라 미끄러지는 탭 줄을 본다. 앞의 것이 제목 아래에 함께 그리는 소유자·생성일·식별자는 상세 화면이 갖는 값이라 들이지 않았고, 뒤의 것이 좌표를 직접 재어 밑줄을 옮기는 자리는 Base UI 의 `Tabs.Indicator`가 같은 값을 CSS 변수로 내어 주므로 그것으로 바꿨다.
 
-- Auth split screen은 관리자 로그인 화면의 출발점으로 들여왔다. 확인일은 `2026-09-14`이며 `/screens/admin/login`에 원본 구조 그대로 두었다. 왼쪽 로그인 카드와 오른쪽 브랜드 패널이 `lg`에서 갈리는 구성, 카드 폭 상한, 구분선과 소셜 로그인 버튼의 자리를 본다. 아직 `oe` 토큰으로 바꾸지 않은 2단계 상태다.
+- Auth split screen은 관리자 로그인 화면의 출발점으로 들여왔다. 확인일은 `2026-09-14`이며 `apps/sandbox/src/app/(renewal)/renewal/admin/login/page.tsx`에 원본 구조 그대로 두었다(`2026-09-22`에 Studio `/screens`에서 sandbox로 옮김). 왼쪽 로그인 카드와 오른쪽 브랜드 패널이 `lg`에서 갈리는 구성, 카드 폭 상한, 구분선과 소셜 로그인 버튼의 자리를 본다. 아직 `oe` 토큰으로 바꾸지 않은 2단계 상태다.
 
 외부 프롬프트 자체를 축적하는 것이 핵심은 아니다. 화면을 구현하고 수정한 뒤 그 안에서 재사용 가능한 컴포넌트, 패턴과 템플릿을 추출하는 것이 핵심이다.
 

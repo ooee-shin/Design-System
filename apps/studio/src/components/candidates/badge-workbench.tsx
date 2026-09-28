@@ -11,7 +11,7 @@ import { OnThisPage } from "@/components/component-detail-navigation";
 import { PlaygroundChoice as Choice } from "@/components/playground-element-control";
 
 // semantic token을 쓰는 Tone 여섯과 색 이름을 받는 Custom을 나눠 둔다. Custom은 한 줄에 놓을
-// 색이 정해져 있지 않으므로 색 표에서 22색을 따로 펼친다.
+// 색이 정해져 있지 않으므로 색 표에서 18색을 따로 펼친다.
 const semanticTones = ["brand", "neutral", "warning", "danger", "success", "info"] as const satisfies readonly BadgeTone[];
 const tones = [...semanticTones, "custom"] as const satisfies readonly BadgeTone[];
 const variants = ["fill", "tonal", "outlined"] as const satisfies readonly BadgeVariant[];

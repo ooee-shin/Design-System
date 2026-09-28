@@ -316,7 +316,7 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
 
 `2026-09-04`에 13개 컴포넌트의 명세·구현·Studio 화면을 3중 대조해 109건을 찾았고 폼 요소 10개의 84건을 처리했다. 후순위인 Chip 7건·Badge 10건·Message Bubble 8건 중 앞의 둘은 새로 만들면서 함께 해소했다.
 
-**후순위는 둘이다.** Message Bubble 8건과 Combobox 5건이며 지시가 있을 때 시작한다.
+**후순위는 둘이다.** Message Bubble 8건 가운데 명세 쪽 넷(1·2·3·8)은 `2026-09-28`에 명세를 다시 쓰며 처리했고 Studio 화면 쪽 넷(4~7)이 남았다. Combobox 5건은 지시가 있을 때 시작한다.
 
 ### 남은 작업
 
@@ -330,6 +330,18 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
 8. **언어 전환 잔여.** Switch의 `copy.ko` 고정, 하드코딩 예시 콘텐츠, 영문 고정 접근 가능한 이름, `lang` 미전환. Message Bubble 쪽이 대부분이라 후순위와 함께 다룬다.
 9. **Button의 Ghost.** 세부 규칙을 정하지 않은 채 기존 여섯 자리를 유지하려고 먼저 구현했으므로 화면에서 다시 본다. 그 밖의 미정 항목은 [button.md](../system/components/button.md)의 「현재 정의하지 않은 항목」이 갖는다.
 10. **Chip `xsmall` 의 글자 색이 빠지던 것은 고쳤다(`2026-09-18`).** `cn()`(tailwind-merge)이 `text-oe-label`(글자 크기 토큰)을 색 클래스와 같은 무리로 보고 앞의 색을 지우던 것이 까닭이었다. `switch.tsx` 처럼 arbitrary value 로 우회하는 대신 `packages/ui/src/utils.ts` 에서 `extendTailwindMerge` 로 `text-oe-*` 크기 토큰을 font-size 무리에 넣어 뿌리에서 막았고, `utils.test.ts` 가 고정한다. 우회가 필요한 자리는 이제 없다.
+11. **Message Bubble 명세를 다시 쓰며 걷어낸 검수 항목(`2026-09-28`).** 명세의 「아직 검수할 항목」 절과 과정 문장을 여기로 옮겼다. 정해지면 [message-bubble.md](../system/components/message-bubble.md)로 돌아간다.
+    - bubble tail 유무. 지금 구현에는 tail 이 없다.
+    - 연속 메시지에서 metadata 와 상태 표시를 생략하거나 묶는 기준. 지금은 「같은 발신자, 분 단위까지 같은 시각」 하나다.
+    - 삭제 확인 방식과 복사 완료 feedback.
+    - 이미지, 링크와 긴 URL.
+    - 첨부의 업로드 중, 취소, 실패. Studio 는 전송 완료 파일만 다룬다.
+    - RTL 과 폭이 매우 좁은 화면.
+    - 브랜드 theme 확장. `--oe-message-*` 변수 자리만 있고 값은 Studio 「채팅 테마」 예시에만 있다.
+    - Anatomy 요소 이름(Avatar·Author·Bubble·Content·Sidecar·Metadata row·Action bar)을 `vocabulary.md` 에 올릴지. 명세 초안이 먼저 쓰고 있으며 기획자 확인이 필요하다.
+    - `MessageComposer` 처럼 바깥 Container 가 border 와 focus 를 소유하는 조합에서 안쪽 Textarea Container 를 투명·무테두리로 두고 두 경계를 중첩하지 않는다는 규칙. Composer 가 `초안` 이라 명세가 없어 여기에 둔다.
+    - 읽음 처리의 자동·수동 비교는 Studio 「Read handling」 이 갖고 `MessageBubble` API 로 승격하지 않는다. Studio 통합 예시의 날짜 구분선과 Date Picker 는 검수 control 이며 제품 기능이 아니다.
+    - Studio 화면의 Anatomy·Properties·Property map 부재, 섹션 제목의 언어 처리, 통합 예시 본문의 언어 고정, `MessageFileAttachment` 의 prop 부재는 [component-audit.md](component-audit.md)의 「Message Bubble (8건)」 4~7 이다.
 12. **Studio 의 Chip Playground 가 새 `ariaLabel` 규칙을 스스로 어긴다.** `chip.tsx` 에 「보이는 Label 을 담은 이름만 보탠다」 가드가 들어오면서, copy 가 `label: "Label"`·`ariaLabel: "Chip"` 인 Playground(`apps/studio/src/components/candidates/chip-workbench.tsx:52·72`)가 조건에 걸린다. `next dev` 에서 `/components/chip` 을 열면 렌더마다 콘솔 경고가 찍히고, 디자인 시스템의 정본 예시가 이번에 새로 쓴 규칙을 어기는 예시가 된다. 렌더 결과는 main 과 같아 접근성 회귀는 없고 프로덕션 빌드에도 남지 않는다. copy 의 `ariaLabel` 을 Label 을 포함하는 문구로 바꾸거나 Icon only 일 때만 넘기면 된다. (`2026-09-18` 릴리스 점검)
 
 13. **`color.md` 가 `oe-border-tertiary` 와 `oe-border-disabled` 의 값이 같다고 적던 것은 닫았다(`2026-09-28`).** 문서를 코드 값(tertiary Light `neutral-150`·Dark `neutral-850`, disabled Light `neutral-100`·Dark `neutral-900`, `packages/tokens/src/index.ts:113~114`)에 맞춰 고쳤다.
@@ -401,10 +413,10 @@ Anatomy 연결선 좌표와 범위 표시선 공용화는 `2026-09-08`에 끝냈
 ## 이전부터 이어지는 작업
 
 1. Select Box의 Playground·Anatomy 한정은 최초 검수 단계에만 적용하던 것이며 지금은 다른 컴포넌트와 같은 범위로 다룬다. 명세의 「현재 검수 범위」 절은 걷어냈다.
-2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Message Bubble이 남아 있으며 Message Bubble은 Anatomy·Properties·Property map 자체가 없다.
+2. 폼 요소 10개의 본문 순서·우측 목차·Property 구조는 3중 대조 검수에서 확인하고 맞췄다. 후순위인 Message Bubble 은 `2026-09-28`에 명세가 Anatomy·Properties 를 갖췄고, Studio 화면에는 Anatomy·Properties·Property map 이 아직 없다.
 3. Anatomy 시각 검수는 번호선과 Container 평행선까지 `2026-09-08`에 마쳤다. 열두 화면 전부가 대상을 참조해 자리를 잡으므로 좌표를 다시 확인할 일은 없다. 남은 것은 Surface 안쪽 Container의 배경과 border 규칙이며 위 「남은 작업」 2번이 그것이다.
 4. Checkbox, Radio, Switch와 Combobox의 Neutral `Structure map`을 공용 표시 컴포넌트로 검수한다. 요소명은 같은 Neutral foreground, 연결선과 Optional 표시는 더 옅은 Neutral 위계를 사용한다. Combobox처럼 구조가 복잡한 컴포넌트는 시각 Anatomy를 Trigger와 Content로 분리하고 구조도에서 포함 관계를 연결한다. 다른 컴포넌트로 확대하기 전에는 각 컴포넌트의 실제 포함 관계를 먼저 확인한다.
-5. 현재 Anatomy가 없는 것은 MessageBubble이며 실제 구조 범위를 사용자와 확인한 뒤 추가한다. Badge는 `2026-09-08`에 Container·Icon·Label 셋으로 Anatomy와 Structure map을 넣었다. Field는 `2026-09-09`에 정의했으며 Anatomy와 Structure map을 함께 넣었다.
+5. Studio 에 Anatomy 가 없는 것은 MessageBubble 이다. 명세 초안이 Avatar·Author·Bubble·Content·Sidecar·Metadata row·Action bar 일곱으로 적어 두었으므로 기획자가 그 이름과 범위를 확인한 뒤 `vocabulary.md` 와 Studio 화면에 함께 추가한다. Badge는 `2026-09-08`에 Container·Icon·Label 셋으로 Anatomy와 Structure map을 넣었다. Field는 `2026-09-09`에 정의했으며 Anatomy와 Structure map을 함께 넣었다.
 6. 1차 구조·Property 검수가 끝나면 Guidelines를 별도 2차 순회로 정리한다. 현재 컴포넌트별 Usage 정책을 임의로 채우지 않고 확인된 규칙과 실제 오용 사례만 추가한다.
 7. 공용 상세 shell과 registry는 route·본문 순서·우측 목차·연관 컴포넌트 회귀 테스트를 보완한다. 각 공용 UI는 Pointer, Label 클릭, Keyboard, Disabled, Size와 주요 상태 조합 중 현재 자동 테스트가 없는 항목을 컴포넌트별로 추가한다.
 8. 문서 공통화 뒤 `docs/system/foundations/color.md`의 열린 질문, 여러 Brand seed의 HCT palette 품질과 실제 화면 재검증을 이어간다. MessageBubble은 다른 채팅 화면에서 API를 재검증한다.

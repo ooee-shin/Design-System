@@ -10,6 +10,12 @@ test("component registry is the single complete catalog", () => {
   assert.equal(new Set(componentRegistry.map((item) => item.key)).size, componentRegistry.length);
 });
 
+test("the registry keeps title order alphabetical — docs/system/studio.md owns the rule and the catalog follows it", () => {
+  const titles = componentRegistry.map((item) => item.title);
+  const sorted = [...titles].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  assert.deepEqual(titles, sorted, "component-registry 의 순서가 title 알파벳순이 아니다. docs/system/studio.md 「Component catalog」 를 본다");
+});
+
 test("확정 owns a detail page and 초안 does not", () => {
   const settled = componentRegistry.filter((item) => item.status === "확정");
   const draft = componentRegistry.filter((item) => item.status === "초안");

@@ -15,8 +15,8 @@ export type ComponentKey =
   | "message-bubble"
   | "message-composer"
   | "notification-badge"
-  | "page-header"
   | "number-input"
+  | "page-header"
   | "radio"
   | "select"
   | "select-box"
@@ -56,12 +56,12 @@ export const componentRegistry: ComponentRegistryItem[] = [
   { key: "field", title: "Field", description: "Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸입니다. Control이 들어가는 Input slot은 Swap 영역이며 접근성 연결은 Field가 소유합니다.", status: "확정", href: "/components/field", worksWith: ["input", "textarea", "number-input", "input-button", "select", "combobox", "select-box", "checkbox", "radio", "switch"] },
   { key: "input", title: "Input", description: "한 줄 텍스트를 입력하는 컴포넌트입니다. Label, 도움말과 오류 문구는 Input 내부가 아니라 별도 Field가 담당합니다.", status: "확정", href: "/components/input", similar: ["input-button", "textarea", "number-input"], worksWith: ["field"] },
   { key: "input-button", title: "Input Button", description: "직접 입력하는 대신 달력, 주소 검색, 시간 선택과 같은 후속 화면을 여는 버튼입니다. Input과 같은 외관을 사용하지만 실제 역할과 HTML 요소는 Button입니다.", status: "확정", href: "/components/input-button", similar: ["input", "combobox"], worksWith: ["field"] },
-  { key: "message-attachment", title: "Message File Attachment", description: "메시지에 붙는 파일 카드입니다. Inbox 화면에서 뽑아 두었고 명세와 상세 화면은 아직 없습니다.", status: "초안" },
-  { key: "message-bubble", title: "Message Bubble", description: "발신·수신, grouping, 전달 상태, 읽음 처리와 메시지 action을 검수합니다.", status: "확정", href: "/components/message-bubble" },
+  { key: "message-bubble", title: "Message Bubble", description: "대화 화면에서 메시지 하나를 발신·수신 방향에 맞춘 말풍선으로 표시합니다. 작성자, 시간, 전달 상태, 읽지 않은 수와 메시지 action을 함께 갖습니다.", status: "확정", href: "/components/message-bubble" },
   { key: "message-composer", title: "Message Composer", description: "메시지를 입력하고 보내는 아래쪽 한 줄입니다. Inbox 화면에서 뽑아 두었고 명세와 상세 화면은 아직 없습니다.", status: "초안" },
-  { key: "page-header", title: "Page Header", description: "본문의 맨 위 한 줄입니다. 지금 보고 있는 화면의 경로와 이름을 말하고, 탭과 동작 버튼의 자리를 갖습니다. 상세 화면이 제목 아래 함께 보여 주는 소유자와 생성일 같은 값은 갖지 않습니다.", status: "초안" },
+  { key: "message-attachment", title: "Message File Attachment", description: "메시지에 붙는 파일 카드입니다. Inbox 화면에서 뽑아 두었고 명세와 상세 화면은 아직 없습니다.", status: "초안" },
   { key: "notification-badge", title: "Notification Badge", description: "아이콘·버튼·메뉴에 붙어 새로운 알림이나 읽지 않은 메시지 수를 나타냅니다. 점과 개수 두 형태가 있습니다.", status: "확정", href: "/components/notification-badge", similar: ["badge"] },
   { key: "number-input", title: "Number Input", description: "정확한 숫자를 직접 입력하거나 증감 버튼으로 조절하는 컴포넌트입니다. 범위와 증감 단위가 있는 수량, 순서와 비율 입력에 사용합니다.", status: "확정", href: "/components/number-input", similar: ["input", "textarea"], worksWith: ["field"] },
+  { key: "page-header", title: "Page Header", description: "본문의 맨 위 한 줄입니다. 지금 보고 있는 화면의 경로와 이름을 말하고, 탭과 동작 버튼의 자리를 갖습니다. 상세 화면이 제목 아래 함께 보여 주는 소유자와 생성일 같은 값은 갖지 않습니다.", status: "초안" },
   { key: "radio", title: "Radio", description: "목록이나 폼에서 여러 항목 중 하나를 선택합니다. Control은 16px 단일 크기이며 선택 상태는 Brand로 채운 원과 중앙의 흰 Indicator로 표시합니다.", status: "확정", href: "/components/radio", similar: ["checkbox"], worksWith: ["field"] },
   { key: "select", title: "Select", description: "검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택하는 컴포넌트입니다. 선택값 전체를 펼쳐 편집해야 하면 Combobox를 사용합니다.", status: "확정", href: "/components/select", similar: ["combobox", "input-button", "select-box"], worksWith: ["field"] },
   { key: "select-box", title: "Select Box", description: "정의된 선택지를 화면에 펼쳐 놓고 상세 정보를 비교하며 하나 이상 선택하는 입력 컴포넌트입니다.", status: "확정", href: "/components/select-box", similar: ["select", "chip", "radio", "checkbox"], worksWith: ["field"] },

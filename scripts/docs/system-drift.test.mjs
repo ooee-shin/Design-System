@@ -97,6 +97,7 @@ const CONFIRMED = [
   ["combobox", "Combobox", "검색해서 하나를 고른다"],
   ["input", "Input", "한 줄 입력"],
   ["input-button", "Input Button", "입력란 모양의 버튼"],
+  ["message-bubble", "Message Bubble", "메시지 하나의 말풍선"],
   ["notification-badge", "Notification Badge", "새 알림이나 읽지 않은 수를 표시"],
   ["number-input", "Number Input", "숫자 입력"],
   ["radio", "Radio", "여럿 가운데 하나"],
@@ -149,6 +150,7 @@ const uiIndexSource = [
   'export { Combobox } from "./combobox";',
   'export { Input } from "./input";',
   'export { InputButton } from "./input-button";',
+  'export { MessageBubble, TypingIndicator, type MessageDeliveryState, type MessageDirection } from "./message-bubble";',
   'export { NotificationBadge } from "./notification-badge";',
   'export { NumberInput } from "./number-input";',
   'export { PartialMaskedInput } from "./partial-masked-input";',
@@ -385,6 +387,10 @@ const switchDoc = `${head("switch", "Switch")}## Properties\n\n### Size\n\n- \`s
 const chipSrc = 'type ChipTone = "secondary" | "tertiary"\ntype ChipShape = "rounded" | "circle"\ntype ChipSize = "compact" | "xsmall" | "small" | "regular" | "large" | "xlarge"\n';
 /** 「- `leadingTone`, `trailingTone`: …」 은 실제 chip.md:38 의 꼴 — 한 줄에 prop 이 둘인 열거 줄을 각각 재는지 이것으로 본다. */
 const chipDoc = `${head("chip", "Chip")}## Properties\n\n- \`controlSize\`: \`compact | xsmall | small | regular | large | xlarge\`, 기본값 \`regular\`\n- \`shape\`: \`circle | rounded\`, 기본값 \`circle\`\n- \`leadingTone\`, \`trailingTone\`: \`secondary | tertiary\`, 기본값 \`secondary\`\n\n글자는 \`text-oe-label\` 을 쓴다.\n`;
+
+const bubbleSrc = 'export type MessageDirection = "incoming" | "outgoing";\nexport type MessageDeliveryState = "sending" | "sent" | "read" | "failed";\n\nexport function MessageBubble({\n  deleted = false,\n  showAvatar = true,\n  grouped = false,\n}: {\n  direction: MessageDirection;\n  deliveryState?: MessageDeliveryState;\n  deleted?: boolean;\n  showDeletedContent?: boolean;\n  showAvatar?: boolean;\n  grouped?: boolean;\n  showTime?: boolean;\n}) {}\n';
+/** message-bubble.md 의 「## Properties」 꼴 — 유니온 둘과 boolean 다섯. 13 줄이며 뒤에 절을 덧붙이는 시험이 행 번호를 센다. */
+const bubbleDoc = `${head("message-bubble", "Message Bubble")}## Properties\n\n- \`direction\`: \`incoming | outgoing\`. 필수다\n- \`deliveryState\`: \`sending | sent | read | failed\`. 넘기지 않으면 전달 상태를 그리지 않는다\n- \`deleted\`: \`false | true\`, 기본값 \`false\`\n- \`showDeletedContent\`: \`false | true\`, 기본값은 방향에 따른다\n- \`showAvatar\`: \`false | true\`, 기본값 \`true\`\n- \`grouped\`: \`false | true\`, 기본값 \`false\`\n- \`showTime\`: \`false | true\`, 기본값은 \`grouped\` 의 반대다\n`;
 
 /** packages/tokens/src/index.ts 의 꼴을 줄여 베낀 것. `rgbFromHex` 의 `return {` 가 brand mapping 과 섞이지 않는지도 이것으로 본다. */
 const tokensSrc = `export const BRAND_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
@@ -753,6 +759,7 @@ function baseFiles() {
     [ui("combobox")]: comboboxSrc,
     [ui("radio")]: radioSrc,
     [ui("switch")]: switchSrc,
+    [ui("message-bubble")]: bubbleSrc,
     [`${FILES.uiSrc}/selection-trigger.ts`]: selectionTriggerSrc,
     [ui("partial-masked-input")]: "export function PartialMaskedInput() {}\n",
     [doc("badge")]: badgeDoc,
@@ -771,6 +778,7 @@ function baseFiles() {
     [doc("combobox")]: comboboxDoc,
     [doc("radio")]: radioDoc,
     [doc("switch")]: switchDoc,
+    [doc("message-bubble")]: bubbleDoc,
     "apps/studio/src/components/candidates/material-symbols.tsx": "export const MaterialSymbol = null;\n",
     [`${FILES.studioFoundations}/color/page.tsx`]: "",
     [`${FILES.studioFoundations}/typography/page.tsx`]: "",
@@ -1062,13 +1070,14 @@ test("Properties 열거값: 한 줄에 prop 이 둘인 열거 줄(「- `a`, `b`:
 });
 
 test("값에 `|` 가 든 목록 줄 가운데 「- `prop`: `a | b`」 꼴이 아니거나 Properties 절 밖인 줄은 「재지 않는 것」 에 파일:행으로 낸다", () => {
-  // message-bubble.md:13·:16 의 꼴 — 「## 현재 API」 절의 라벨 줄(백틱 prop 이름 없음)
-  const api = run({ ...baseFiles(), [doc("message-bubble")]: "# Message Bubble\n\n`packages/ui/src/message-bubble.tsx`\n\n## 현재 API\n\n- 방향: `incoming | outgoing`\n- 작성자, 시간과 콘텐츠\n- 전달 상태: `sending | sent | read | failed`\n" });
+  // 옛 message-bubble.md(2026-09-28 재작성 전):13·:16 의 꼴 — 「## 현재 API」 절의 라벨 줄(백틱 prop 이름 없음). 저장소에는 더 없지만 fixture 로 남겨 잰다
+  // 「## Properties」 는 그대로 두고(열거 짝이 = 로 남게) 그 뒤에 옛 꼴의 절을 덧붙인다 — bubbleDoc 이 13 줄이라 라벨 줄은 :17 과 :19 다
+  const api = run({ ...baseFiles(), [doc("message-bubble")]: `${bubbleDoc}\n## 현재 API\n\n- 방향: \`incoming | outgoing\`\n- 작성자, 시간과 콘텐츠\n- 전달 상태: \`sending | sent | read | failed\`\n` });
   expectSame(api, P.enums);
   const skipped = api.notMeasured.filter((entry) => !NOT_MEASURED.includes(entry));
   assert.deepEqual(skipped, [
-    `${doc("message-bubble")}:7 열거 줄 「- 방향: \`incoming | outgoing\`」 — 「- \`prop\`: \`a | b\`」 꼴이 아니라 코드 쪽을 짚을 수 없어 재지 않는다`,
-    `${doc("message-bubble")}:9 열거 줄 「- 전달 상태: \`sending | sent | read | failed\`」 — 「- \`prop\`: \`a | b\`」 꼴이 아니라 코드 쪽을 짚을 수 없어 재지 않는다`,
+    `${doc("message-bubble")}:17 열거 줄 「- 방향: \`incoming | outgoing\`」 — 「- \`prop\`: \`a | b\`」 꼴이 아니라 코드 쪽을 짚을 수 없어 재지 않는다`,
+    `${doc("message-bubble")}:19 열거 줄 「- 전달 상태: \`sending | sent | read | failed\`」 — 「- \`prop\`: \`a | b\`」 꼴이 아니라 코드 쪽을 짚을 수 없어 재지 않는다`,
   ]);
   // 값이 콜론 바로 뒤가 아닌 줄(number-input.md:37 「`min | max`를 전달한다」)도 이름을 댄다
   const late = run(edit(baseFiles(), doc("number-input"), "- `controlsPosition`:", "- `onLimitReached`: 범위 경계에 도달할 때 `min | max`를 전달한다\n- `controlsPosition`:"));
@@ -1490,9 +1499,11 @@ test("못 읽는 파일(§5): 목록에는 있는데 읽지 못한 문서(디렉
   // tokens.md 를 디렉터리로 — 그 파일을 직접 읽는 짝은 「파일을 읽지 못했다」
   const tokensDir = run({ ...baseFiles(), [FILES.tokensDoc]: null });
   for (const name of [P.neutral, P.status, P.alpha]) expectUnreadable(tokensDir, name, FILES.tokensDoc);
-  // 컴포넌트 문서 — ENUM_TABLE 에 없는 문서는 열거 짝이 짝 이름으로, 있는 문서는 「<key> 열거값」 으로 한 번만 낸다
+  // 컴포넌트 문서 — ENUM_TABLE 에 없는 문서(textarea)는 열거 짝이 짝 이름으로, 있는 문서(message-bubble)는 「<key> 열거값」 으로 한 번만 낸다
+  const plain = run({ ...baseFiles(), [doc("textarea")]: null });
+  assert.deepEqual(pairOf(plain, P.enums).unreadable, [{ what: P.enums, detail: "파일을 읽지 못했다", docAt: doc("textarea") }]);
   const bubble = run({ ...baseFiles(), [doc("message-bubble")]: null });
-  assert.deepEqual(pairOf(bubble, P.enums).unreadable, [{ what: P.enums, detail: "파일을 읽지 못했다", docAt: doc("message-bubble") }]);
+  assert.deepEqual(pairOf(bubble, P.enums).unreadable.map((item) => [item.what, item.docAt]), [["message-bubble 열거값", doc("message-bubble")]]);
   const chip = run({ ...baseFiles(), [doc("chip")]: null });
   assert.deepEqual(pairOf(chip, P.enums).unreadable.map((item) => [item.what, item.docAt]), [["chip 열거값", doc("chip")]]);
 });

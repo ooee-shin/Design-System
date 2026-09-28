@@ -114,12 +114,12 @@ oe-focus-ring                        → brand-400
 
 ```text
 Neutral
-oe-foreground-primary / secondary / tertiary / disabled / inverse
+oe-foreground-primary / secondary / tertiary / subtle / placeholder / disabled / inverse
 oe-foreground-inverse-secondary
 oe-background-canvas-primary / canvas-secondary
 oe-background-primary / secondary / disabled / disabled-selected / bold-primary
 oe-background-control-off / control-disabled
-oe-border-primary / secondary / disabled
+oe-border-primary / bold-primary / secondary / tertiary / disabled / visual
 oe-focus-ring
 oe-interaction-hover-subtle
 oe-interaction-hover
@@ -138,7 +138,7 @@ oe-{role}-border-primary / secondary
 - Canvas와 컴포넌트 surface는 독립적으로 테마를 바꿀 수 있도록 분리한다.
 - Light와 Dark semantic token을 교체하는 동안에는 색상 transition을 일시 중지한다. 컴포넌트의 선택·Hover 같은 상태 transition은 유지하되, 서로 다른 테마 값 사이를 보간해 중간색이 노출되지 않게 한다.
 - `background-bold-primary`는 버튼, 배지, 강한 선택 상태처럼 채도가 높거나 어두운 solid fill의 후보 이름이다.
-- `bold`는 background 전용 modifier로 사용한다.
+- `bold`는 background와 border에 쓰는 modifier로, 그 property 안에서 가장 진한 solid 단계를 가리킨다. `oe-background-bold-primary`는 채도가 높거나 어두운 solid fill과 작은 면의 선택에, `oe-border-bold-primary`는 Select Box 카드처럼 큰 면의 선택을 선으로 알릴 때 쓴다. 선으로 알릴지 면을 채워 알릴지는 [interaction.md](../interaction.md)의 「선택 상태와 Hover·Pressed」가 정한다. foreground에는 `bold`를 붙이지 않는다.
 - `interaction-hover`는 기존 background를 교체하지 않고 위에 합성하는 state layer다. 초기값은 Light `black / 5%`, Dark `white / 8%`이며 화면 검증 후 조율한다.
 - 클릭 가능한 아이콘은 공통적으로 hover 시 `interaction-hover` 회색조 state layer를 표시하고, keyboard focus 시 `oe-focus-ring`을 표시한다.
 - Pointer 클릭으로 Control이 실제 DOM focus를 받을 수는 있지만 Focus 시각 표시는 `:focus-visible`을 기준으로 한다. 마우스 클릭만으로 Focus 선을 노출하지 않는다. Focus 경계는 기존 선 구조에 따라 세 방식 중 하나를 사용한다. 1px 경계는 기존 선의 색을 `oe-focus-ring`으로 바꾸고 바깥에 간격 없는 1px을 더해 총 2px로 표시한다. 기존 선택선이 2px이면 위치와 두께를 유지한 채 색만 바꾼다. 분리된 Focus 표시가 필요한 경우에는 기본 2px 간격 뒤에 바깥 2px ring을 사용한다. 한 요소에 선택선과 분리 ring을 중첩하지 않는다.
@@ -155,7 +155,7 @@ oe-{role}-border-primary / secondary
 
 1. ~~Neutral canvas와 component surface의 구조~~: `canvas-primary/secondary`와 `background-primary/secondary`를 분리하는 안으로 현재 검토 화면에 반영했다.
 2. Focus를 border 계열인 `oe-border-focus`로 둘 것인가, 독립 접근성 역할인 `oe-focus-ring`으로 둘 것인가? 현재 추천은 `oe-focus-ring`이다.
-3. ~~강한 solid fill의 modifier 이름~~: `bold`를 background 전용 modifier로 사용하기로 결정했다.
+3. ~~강한 solid fill의 modifier 이름~~: `bold`로 결정했다. 처음에는 background 전용이었으나 `2026-08-24`에 큰 면의 선택을 선으로 알리는 `oe-border-bold-primary`가 생겨 background와 border에 쓴다.
 4. 지금 실제로 반복되는 overlay 용례는 무엇인가? 예: 이미지 위 border, 이미지 hover, 선택 행, brand tint, scrim. 확인 전에는 공통 overlay semantic을 늘리지 않는다.
 5. ~~Status role 명칭~~: `danger`, `warning`, `success`, `info` 네 가지를 공용 명칭으로 사용하고 중복 용어는 만들지 않는다.
 
