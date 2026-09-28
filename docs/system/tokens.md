@@ -2,6 +2,14 @@
 
 `oe`는 ooee가 확정한 semantic decision의 이름이다. 실제 색상 값과 Light/Dark 매핑은 `foundations/color.md`, 실행 가능한 생성 규칙의 원본은 `packages/tokens/src/index.ts`다.
 
+## 패키지 구성
+
+`packages/tokens`의 `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유한다. 소비자는 `@import "@ooee/tokens/styles.css"` 한 줄로 색을 받는다. 값의 단일 원본은 `packages/tokens/src/index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `packages/tokens/src/index.test.ts`가 CSS와의 불일치를 검사한다.
+
+Brand만 예외다. `--brand-*`·`--brand-alpha-*`와 mode별 `--oe-brand-light-*`·`--oe-brand-dark-*`는 Studio의 `BrandThemeProvider`가 `packages/tokens`의 `createBrandPalette`·`createBrandSemanticMapping`으로 seed에서 만들어 런타임에 주입한다. `--oe-brand-*`와 `--oe-focus-ring`은 `apps/studio/src/app/globals.css`가 그 mode별 주입값에 `--color-blue-*` 기본값을 붙여 정의한다. `packages/tokens`는 `DEFAULT_BRAND_SEED`와 생성 함수, `@theme inline`이 `--oe-brand-*`·`--oe-focus-ring`을 Tailwind 색으로 잇는 별칭만 갖고 `:root`·`.dark`의 Brand 실제 값은 갖지 않는다.
+
+Studio는 만든 Brand palette와 semantic CSS 변수를 `ooee-brand-theme-css`에 캐시하고, Root Layout의 선행 script가 첫 paint 전에 복원해 저장된 Brand 색과 기본값 사이의 전환을 막는다. 이 선행 style 주입이 내는 hydration 경고는 `<html suppressHydrationWarning>`으로 억제한다.
+
 ## 기본 원칙
 
 Primitive color는 별도의 `oe` scale로 복제하지 않고 Tailwind 기본 팔레트를 사용한다.
@@ -148,6 +156,7 @@ oe-media-border-secondary
 ## 사용 규칙
 
 - 어두운 solid brand/status 배경 위에는 공통 `oe-foreground-inverse`를 먼저 검토한다. 밝은 배경에는 대비가 확보되는 Neutral foreground를 사용한다. 반복되는 실제 예외가 생기기 전에는 `on-*` token을 만들지 않는다.
+- Bold fill 위의 약한 정보에는 `oe-foreground-inverse-secondary`를 사용한다. `oe-foreground-inverse`에 opacity를 중첩해 위계를 만들지 않는다.
 - semantic token에 이미 alpha나 강조 위계가 포함되어 있으면 컴포넌트에서 임의 opacity를 중첩해 위계를 다시 바꾸지 않는다. 추가 감쇠가 필요하면 기존 token 선택이 맞는지 먼저 확인한다.
 - 폼에서 직접 조작하는 Input, Checkbox 같은 control의 식별 보더는 `oe-border-primary`를 사용한다. 여러 폼 요소나 Label을 하나의 선택·입력 영역으로 감싸는 낮은 위계의 form container는 `oe-border-secondary`를 사용한다.
 - 이미지와 Color swatch처럼 콘텐츠 자체가 배경색을 갖는 값은 고정 Neutral border를 바깥에 두지 않고 내부 Black alpha layer를 중첩해 경계를 만든다.

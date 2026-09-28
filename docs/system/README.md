@@ -40,6 +40,8 @@
 
 채택한 UI는 검증 정도와 관계없이 `packages/*`가 실제 원본을 소유한다. Studio는 공용 package를 import해 표시하며 같은 자산의 Studio 전용 복사본을 만들지 않는다.
 
+`packages/fonts`는 국문 Pretendard Variable, 영문 Inter Variable, 일문 Noto Sans JP Variable 세 글꼴을 소유하며 `--oe-font-family-ko`·`--oe-font-family-en`·`--oe-font-family-ja`로 노출한다. 버전은 패키지 의존성과 lockfile에 고정하고 운영체제의 system font 설치 여부에 의존하지 않는다. 브라우저와 운영체제의 rasterization 차이는 남을 수 있지만 font family, glyph metrics와 줄바꿈 기준은 repository에서 재현 가능하게 유지한다. Studio는 이 글꼴을 검수·소비할 뿐 별도의 글꼴 기준을 갖지 않는다.
+
 Studio는 기획자와 개발자가 컴포넌트를 찾아보는 표준 채널이다. Storybook은 두지 않기로 했으므로(`2026-09-18`) Studio가 그 역할의 주인이며, 화면 구성과 표기 기준은 [studio.md](studio.md)가 소유한다.
 
 ## 자산 분류

@@ -42,8 +42,9 @@
 명세에서 걷어낸 미결 항목을 여기에 모은다. 확정되면 해당 `docs/system/components/*.md`로 옮긴다. 각 명세의 `현재 정의 없음` 항목과 함께 보며, 진행 중인 작업과 우선순위는 [working-context.md](working-context.md)를 본다.
 
 - **Combobox의 2-depth** — 공용 API와 Filter 적용 정책을 정하지 않았다. 현재 Studio 예시는 구조와 선택 흐름만 검수한다.
-- **Select Box의 API와 선택 표현** — 검수용 초안이며 문서 규칙으로 확정하지 않았다.
-- **Select Box의 남은 정책** — Field 결합 API, 최대 선택 개수와 초과 피드백, 모바일에서의 열 수를 정하지 않았다.
+- **Checkbox Playground 의 Indeterminate·Disabled 표시** — Rounded·Square 에만 있는 두 control 을 Ghost 를 고르면 `checkbox-workbench` 가 숨긴다. [studio.md](../system/studio.md) 「Playground 종속 컨트롤 표시」는 「자기 성격의 그룹에 두고 비활성으로 표시한다」이므로 규칙과 다르게 숨기고 있다 — 화면을 규칙에 맞출지, 규칙에 예외를 둘지 정한다.
+- **프리미티브 단계 참조를 다른 컴포넌트로 넓힐지** — Badge 는 `2026-09-09`에 세만틱 token 이름 대신 tone 별 팔레트와 variant 별 단계의 곱으로 색을 정하게 바꿨다(`--brand-{단계}`가 seed 에서 생성되므로 「brand seed 가 바뀌면 따라가지 못한다」는 우려는 성립하지 않았고, 남는 비용은 Light·Dark 단계 쌍을 컴포넌트가 들고 있게 되는 것 하나다). Badge 는 tone 축이 있어 조합이 21개로 불어난 컴포넌트이고, tone 축이 없는 컴포넌트는 세만틱 token 으로도 조합이 파생되지 않으므로 같은 전환이 필요한지 정하지 않았다. 결정과 단계표는 [badge.md](../system/components/badge.md)의 「색」이 갖는다.
+- **Select Box의 남은 정책** — 최대 선택 개수와 그 초과에 대한 피드백, Custom content의 motion을 정하지 않았다. Field 결합과 모바일에서의 열 수는 [select-box.md](../system/components/select-box.md)의 「역할과 경계」와 「현재 구현 규칙」이 정했다.
 - **Input Button의 민감한 값 표시** — 마스킹 장치를 두지 않았다. 지금은 민감한 정보를 키보드로 받는 경로만 있기 때문이다. 클릭으로 번호를 받는 구현이 생기면 그때 Value 마스킹을 검토한다.
 - **Textarea Scrollbar의 Touch 표시** — thumb을 Hover와 Focus에서 보이게 했으나 Touch 기기에는 Hover가 없다. `scrollbar-color`를 투명으로 고정한 것이 브라우저가 스크롤 중에 잠깐 보여 주는 표시까지 막는지 실제 기기에서 확인해야 한다.
 - **관리자 레이아웃에서 뽑은 네 초안** — `/screens/admin/layout`에서 Admin Header, Side Navigation, Page Header와 Tabs 넷을 뽑아 `candidates/`에 두고 Studio에 초안으로 올렸다. 명세와 상세 화면이 없고, 넷 다 아직 `oe` 토큰으로 정규화하지 않았다. 남은 것은 다음과 같다.
@@ -69,7 +70,6 @@
 반복 용례가 확인되면 공용 semantic token으로 승격한다. 승격 기준은 [pipeline.md](pipeline.md)를 따르며, 발견했다는 이유만으로 추가하지 않는다.
 
 - **Combobox 단일 선택 행 배경** — Brand alpha primitive `brand-alpha-08`
-- **Select Box 선택 표현** — Brand alpha 조합
 - **엑셀 액션 버튼의 색** — Button의 `custom` tone이 쓰는 Microsoft Excel 브랜드 그린이다. 팔레트 단계 규칙에 들어오지 않고 Light와 Dark에서 값을 뒤집지 않으므로 `button.tsx`가 로컬 값으로 갖는다. 외부 서비스를 가리키는 색이 두 번째로 필요해질 때 그 색들을 함께 다루는 방식을 정한다.
 - **즐겨찾기와 찜의 색** — ToggleButton의 `custom` tone이 쓰는 별의 노랑과 하트의 빨강이다. 팔레트 단계 규칙에 들어오지 않고 브랜드 seed를 바꿔도 함께 움직이면 안 되는 고정 색이므로 `toggle-button.tsx`가 로컬 값으로 갖는다. 엑셀 색과 성격이 같으며, 밖에서 굳어진 색이 세 번째로 필요해질 때 그 색들을 함께 다루는 방식을 정한다.
 - **Color swatch 경계** — 안쪽에 합성한 Black alpha 10%의 1px inset. Input Button의 선택 전용 Color picker와 Input의 Color input이 함께 쓴다

@@ -38,7 +38,7 @@
 - `placeholder`: 선택값이 없을 때 Trigger에 표시하는 문자열
 - `searchPlaceholder`: Popup 내부 Search input의 placeholder
 - `emptyMessage`: 검색 결과가 없을 때 표시하는 문구
-- `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
+- `ariaLabel`: Trigger의 접근 가능한 이름. 선택 Property이며 Field 없이 단독으로 쓸 때 넘긴다. Field 안에서는 Field가 이름을 소유하므로 넘기지 않는다
 - `name`: native form 연결 속성
 
 Control height는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다.

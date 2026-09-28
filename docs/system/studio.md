@@ -1,6 +1,6 @@
 # Studio 검수 기준
 
-`apps/studio`는 공용 자산을 화면 맥락에서 구현하고 검수하는 애플리케이션이며 그 자체가 전달 대상 자산이다. **컴포넌트를 찾아보고 확인하는 표준 채널이 이 Studio다.** Storybook은 두지 않기로 했다(`2026-09-18`, `docs/process/ai-environment.md`). 이 문서는 Studio 화면을 구성하는 기준이다.
+`apps/studio`는 공용 자산을 화면 맥락에서 구현하고 검수하는 애플리케이션이며 그 자체가 전달 대상 자산이다. **컴포넌트를 찾아보고 확인하는 표준 채널이 이 Studio다.** Storybook은 두지 않기로 했다(`2026-09-18`). 이 문서는 Studio 화면을 구성하는 기준이다.
 
 구조 용어는 [vocabulary.md](vocabulary.md), Focus 표시 규칙은 [interaction.md](interaction.md)를 따른다.
 
@@ -12,11 +12,13 @@
 - 인터랙션과 상태
 - 출처와 oe mapping 상태
 
+공통 검수 설정인 `PC/TB/MB`, `라이트/다크`, `KO/EN`은 sticky Studio header에서 바꾸며 route 이동과 새로고침 뒤에도 유지된다. viewport 설정은 Studio chrome이 아니라 상세 화면의 검수 콘텐츠만 fluid desktop, 768px tablet, 390px mobile 너비로 바꾼다. 모드는 document root와 Studio canvas에 함께 적용해 outer page, navigation, Portal layer가 같은 Light/Dark token을 쓴다.
+
 컴포넌트 Anatomy의 연결선은 Light/Dark 모두 `oe-border-primary` 회색조를 사용한다. 연결선과 숫자 마커의 진한 배경은 서로 다른 역할로 분리하며, 연결선에 foreground 또는 black 직접값을 사용하지 않는다.
 
 Studio 문서 설명은 국문을 유지한다. 언어를 선택하면 컴포넌트 Preview 안의 Label, Value, Placeholder, 제품 사례 문구, 접근 가능한 이름과 해당 범위의 `lang`을 함께 바꾼다. 구조 명칭이 아닌 실제 Component/Example 콘텐츠를 한 언어로 하드코딩하지 않는다. 전체 문서 번역은 국문 문서가 완료된 뒤 별도 작업으로 다룬다.
 
-Component catalog의 title, description, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 목록 순서도 registry가 소유하며 title의 알파벳순으로 둔다. Component를 성격별로 묶는 분류는 아직 정의하지 않았고, 정하지 않은 분류로 순서를 만들면 없는 위계를 암시하게 되므로 분류가 정해질 때까지 알파벳순을 유지한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다.
+Component catalog의 title, description, route와 Similar/Works with 관계는 공용 `component-registry`를 단일 원본으로 사용한다. 목록 순서도 registry가 소유하며 title의 알파벳순으로 둔다. Component를 성격별로 묶는 분류는 아직 정의하지 않았고, 정하지 않은 분류로 순서를 만들면 없는 위계를 암시하게 되므로 분류가 정해질 때까지 알파벳순을 유지한다. 모든 Component route는 공용 상세 page shell을 사용하고, 각 Workbench는 우측 `On this page`와 registry 관계를 연결한다. 상세 페이지의 연관 컴포넌트는 별도 `Related` 제목 없이 비교·대안 관계인 `Similar`과 실제 조합·포함 관계인 `Works with`를 바로 표시하며, 항목이 없는 그룹은 표시하지 않는다. 관계는 코드와 사용 사례로 확인된 것만 연결하고, Form control의 `Works with`에는 공통 조합 요소인 Field를 첫 항목으로 둔다.
 
 Component 상세 화면의 Guidelines 하위 주제 제목은 공용 `GuidelineTitle`을 사용한다. 제목 앞에는 Remix `RiBookOpenLine` 16px을 Tertiary foreground로 배치하고 제목은 14px Semibold, 아이콘과 제목 간격은 8px로 유지한다. 컴포넌트별 Workbench에서 같은 스타일을 다시 만들지 않는다.
 
@@ -25,6 +27,12 @@ Guidelines의 Target area 예시, Do/Don’t 비교, 제출 지연 예시와 불
 Target area를 설명할 때는 실제 컴포넌트를 바꾸지 않고 공용 `TargetArea` Studio 표시를 겹친다. 영역 전체를 점선이나 색면으로 둘러싸지 않고, 실제 최소 조작 높이 또는 Row 높이의 옆에 1px 직선과 양끝 캡을 둔 치수선 및 숫자 Label을 표시한다. 이 측정 표시는 실제 제품 컴포넌트 스타일에 포함하지 않는다.
 
 Studio의 수치 측정 Annotation은 Violet 계열을 공통으로 사용한다. 대상은 width·height·min/max·Target area 같은 크기, padding·gap·inset 같은 내부/외부 간격, radius, font-size·line-height·letter-spacing처럼 수치로 측정하는 Typography 스펙이다. 숫자가 token으로 표현되어도 역할이 치수이면 같은 Violet 표시를 사용한다. Font family·weight 명칭, semantic color 값, 상태, Anatomy 번호와 Swap 영역은 치수 Annotation이 아니므로 Violet 규칙을 적용하지 않는다. 치수 숫자 Pill은 border 없이 옅은 Violet 배경과 진한 Violet 글자만 사용한다.
+
+## 메뉴와 Home
+
+상단 메뉴 순서는 `Home → Foundations → Components → Docs → llms.txt → Presentation`이다. 기반에서 컴포넌트로 올라간 뒤 문서와 AI 색인을 보고 마지막에 작업 의도를 본다. 제품 화면 작업장은 sandbox에 있어 Studio 메뉴에 없다.
+
+Home은 카드를 두 묶음으로 나눈다. 「시스템 자산」에 Foundations·Components·Patterns, 「참고와 전달」에 Docs·Presentation을 둔다. 화면이 없는 `Patterns`는 링크가 아닌 카드로 두고 `준비 중`을 표시한다.
 
 ## 화면 프레임과 그 예외
 
@@ -45,9 +53,11 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 
 ## Playground 종속 컨트롤 표시
 
+- Playground의 선택 버튼과 종속 control 표시는 공용 `playground-element-control`이 소유하며 Workbench마다 다시 만들지 않는다. Anatomy 마커·연결선·경계선·범례·회색 Surface는 `component-anatomy`, Guidelines 비교 카드와 불릿 목록은 `component-guidelines`가 소유한다.
 - 상위 Property가 활성화되어야 사용할 수 있는 하위 Playground control은 상위 control 바로 아래의 종속 그룹으로 묶는다.
 - Playground control은 `Appearance → State → Content → Elements → Behavior` 순서의 그룹으로 묶고 각 그룹에 제목을 둔다. Appearance는 Style·Size·Shape·Layout처럼 시각을 결정하는 Property, State는 Disabled·Read only·Invalid처럼 조작 가능성과 유효성, Content는 값과 문구, Elements는 교체하거나 표시 여부를 정하는 요소, Behavior는 범위·단계·선택 방식처럼 동작을 정하는 Property다. 성격이 다른 Property를 사이에 끼우지 않는다. 값 Property 사이에 시각 Property가 들어가면 무엇을 조절하는 중인지 알기 어려워진다. Appearance에 Property가 많으면 `Style`, `Size`, `Layout`처럼 더 나눌 수 있으나 다섯 그룹의 순서는 유지한다. 그룹은 Property의 성격으로 정하고 종속 관계로 정하지 않는다. 상위 Property가 꺼져 있어야 의미가 없어지는 control은 자기 성격의 그룹에 두고 비활성으로 표시한다. 같은 Property가 컴포넌트마다 다른 그룹에 놓이면 화면을 옮길 때 찾는 자리가 달라진다.
 - Playground control은 실제 public Property의 타입을 그대로 반영한다. Boolean Property만 Toggle을 사용하고 Enum은 선택 버튼, String/Number 값은 각각 Text/Number input을 사용한다. Label·Description처럼 UI를 설명하는 정적 텍스트 요소의 문구는 구조 검수용 Playground에서 편집하지 않고 `Label`, `Description` 같은 고정 문구를 사용한다. 해당 텍스트 요소가 Optional이면 `Show label` 같은 임의 문장 대신 실제 Property 이름인 `Label`, `Description` Boolean Toggle만 제공한다. 실제 문구를 입력하는 Text control은 콘텐츠 길이, 줄바꿈이나 언어별 문구 검수가 목적일 때만 제공한다. Input의 Value·Placeholder처럼 사용자가 실제로 입력하거나 제출하는 데이터는 이 정적 텍스트 규칙에서 제외하고 public Property 타입에 맞는 값 Control을 유지한다. 교체 가능한 ReactNode Slot은 `None / Icon / Image`처럼 검수할 콘텐츠 유형을 선택하며 실제 Property 이름인 `Leading element`, `Trailing element`를 label로 사용한다. 페이지마다 같은 Property를 Toggle, 문장형 label 또는 값 input으로 임의 변경하지 않는다. `Image` 유형은 공통 정사각 Avatar 샘플을 사용하며 페이지마다 임의 이미지를 만들지 않는다.
+- Playground control의 초기값은 공용 컴포넌트 API의 기본값과 같다. Property 문서의 기본값도 같은 값을 적으며, 셋 중 하나만 바꾸지 않는다.
 - Desktop Playground에서는 Preview를 상단에 유지하고 Property panel의 내부 스크롤은 사용하지 않는다. Property panel의 왼쪽 열은 여러 컴포넌트에 공통적인 Appearance, Size, Layout, State를, 오른쪽 열은 컴포넌트 고유 구성이 많은 Content, Elements, Behavior를 표시한다. 좁은 viewport에서는 두 열을 다시 한 열로 합쳐 중첩 스크롤과 가로 압축을 피한다.
 - Preview surface는 Property panel의 전체 높이를 채운다. 그 안에서 컴포넌트를 세로로 어디에 두는지는 컴포넌트의 성격이 정하며, 상단과 가운데 두 방식을 모두 쓴다. 하나를 전체 규칙으로 정하지 않는다.
   - **상단 정렬**은 부모 너비를 채우거나 아래로 자라는 컴포넌트가 쓴다. 한 줄 Form control과 Field, Popup이 열리는 Select·Combobox, 행 수가 달라지는 Textarea가 여기에 해당한다. 가운데에 두면 높이가 자랄 때 위아래가 함께 움직여 무엇이 늘어난 것인지 읽히지 않는다.
@@ -64,7 +74,7 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 신규 컴포넌트의 Studio 화면은 `Playground`, `Anatomy`와 Structure map까지 먼저 만든다. Properties, Examples/Usage, Guidelines와 Property map은 그 화면을 검수한 뒤 사용자가 다음 단계를 요청할 때 추가한다. 이 순서는 Studio 화면 범위에 대한 것이며 공용 package 구현, 접근성과 자동 테스트는 처음부터 함께 검증한다.
 - Anatomy는 컴포넌트의 구성 요소와 명칭을 먼저 이해시키는 영역이므로 Appearance, Style, Size, State, Elements 같은 Properties보다 앞에 둔다.
 - 컴포넌트 특성상 존재하지 않는 섹션은 생략할 수 있지만, 존재하는 섹션의 상대적인 순서는 유지한다.
-- 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다.
+- 우측 `On this page` 항목도 실제 본문과 같은 순서를 사용한다. 목차는 평평한 단일 rail을 사용하며 화면의 활성 구간에 여러 섹션이 걸리면 해당 항목을 모두 강조하고, 활성 선의 위치와 높이는 300ms로 전환한다. 다른 Component로 이동하는 링크는 본문 하단 카드가 아니라 rail 아래의 낮은 위계 Related 링크로 제공한다. 목차는 공용 `OnThisPage` 하나를 컴포넌트 상세와 Presentation이 함께 쓴다. 최대 높이를 뷰포트 안으로 제한하고 넘치면 목차 안에서 스크롤하며, 좁은 검수 viewport에서는 숨긴다.
 - 제목 위계는 페이지 제목 `text-3xl`, Section 제목 `text-xl`, Guidelines 그룹 제목 `text-lg`, Section 하위 그룹 제목과 Guidelines 규칙 제목 `text-sm`, 그룹 안 카드 라벨 `text-xs`를 사용한다. 그룹은 카드 묶음의 조건을, 카드 라벨은 그 한 칸이 무엇인지를 말하므로 두 층을 같은 크기로 쓰지 않는다. Guidelines 하위 주제 제목은 크기가 아니라 공용 `GuidelineTitle`의 아이콘으로 구분하므로 `text-sm`을 유지한다.
 - Guidelines 규칙 제목은 「~하기」 동사형으로 쓴다. 「Target area 확보하기」, 「Resize는 세로만 허용하기」처럼 무엇을 하라는 문장이어야 고르는 사람이 제목만 읽고 규칙을 알 수 있다. 금지하는 규칙도 「Resize와 Auto size는 같이 사용하지 않기」처럼 같은 형태를 유지하고, 「클릭 가능한 요소가 아니다」 같은 서술문으로 두지 않는다. 쓰임별 규칙은 「Chip을 Filter로 사용하기」처럼 컴포넌트 이름을 앞에 둔다. 요소 이름은 Anatomy에서 쓰는 이름을 그대로 쓴다.
 - Guidelines의 규칙 문구와 Do/Don't 라벨은 화면에서 일어나는 현상이 아니라 고르는 사람이 취할 행동으로 쓴다. 「줄이 맞지 않습니다」가 아니라 「다른 크기를 쓰지 않습니다」다. 읽는 사람은 이미 이 컴포넌트를 쓰기로 정하고 무엇을 고를지 판단하는 중이므로, 현상 서술은 그 판단에 쓰이지 않는다. Do는 「~을 씁니다」, Don't는 「~을 쓰지 않습니다」로 형태를 맞추고 왜 그런지는 그 아래 설명 목록이 담당한다.
@@ -99,13 +109,13 @@ Studio는 `docs/system`의 문서를 `Docs` 메뉴에서 그대로 읽을 수 �
 - 같은 방향에 놓인 번호 마커는 하나의 축에 정렬하고 안내선 길이만 서로 다르게 한다. 대상마다 마커 높이가 몇 px씩 어긋나면 번호가 줄을 잃는다. 마커는 도식 바깥에 두어 실제 요소 위로 올라오지 않게 한다.
 - 글자만 담은 요소는 박스가 남은 공간까지 차지할 수 있으므로 번호선의 기준을 박스가 아니라 글자가 실제로 그려진 범위로 삼는다. `flex-1`이나 `block`으로 늘어난 Label과 Value가 여기에 해당한다.
 - Field는 Container 안쪽으로 들어가 글자 또는 글자가 놓이는 자리를 가리킨다. 한 줄 입력 요소는 박스가 Container 안쪽을 거의 다 채우므로 박스를 그대로 쓰면 번호선이 Container의 border에 닿아 끊긴 것처럼 보이고, 그러면 입력 영역이 아니라 외곽선을 가리키는 것으로 읽힌다. 세로 범위를 글자가 앉는 한 줄로 좁혀 Prefix나 Label 같은 다른 글자 요소와 같은 자리에서 안내선이 출발하게 한다.
-- 마커 방향은 그 방향에 놓인 다른 요소를 지나가지 않는 쪽으로 고른다. 같은 방향의 마커는 프레임이 계산한 하나의 rail에 정렬되고 안내선 길이만 서로 달라지므로, 안쪽 요소를 가리키는 긴 안내선이 같은 방향의 바깥쪽 요소를 통과한다. 그러면 두 안내선이 한 줄로 이어져 보여 바깥쪽 마커가 안쪽 요소를 가리키는 것으로 읽힌다. 한 행에 여러 요소가 나란히 있으면 안쪽 요소는 위나 아래로 빼고, 그 방향의 맨 끝 요소만 좌우로 둔다.
+- 마커 방향은 그 방향에 놓인 다른 요소를 지나가지 않는 쪽으로 고른다. 같은 방향의 마커는 프레임이 계산한 하나의 rail에 정렬되고 안내선 길이만 서로 달라지므로, 안쪽 요소를 가리키는 긴 안내선이 같은 방향의 바깥쪽 요소를 통과한다. 그러면 두 안내선이 한 줄로 이어져 보여 바깥쪽 마커가 안쪽 요소를 가리키는 것으로 읽힌다. 한 행에 여러 요소가 나란히 있으면 안쪽 요소는 위나 아래로 빼고, 그 방향의 맨 끝 요소만 좌우로 둔다. 안내선이 컴포넌트나 다른 구성요소를 길게 가로지르게 되면 예시 행을 늘려 번호를 분산하고, 핵심 구조가 아닌 시각적 구분 요소에는 번호를 부여하지 않는다.
 - 마커와 안내선은 프레임 바깥에 놓이므로 Anatomy Surface의 여백이 그것을 담을 만큼 있어야 한다. 프레임을 고정 높이 안에 두지 않는 Anatomy는 Surface에 `overflow-hidden`이 있어 마커가 조용히 잘린다. 마커를 둔 방향마다 안내선 길이와 마커 크기를 합한 만큼 여백을 확보하고, 화면에서 실제로 재어 마커가 Surface 안에 들어오는지 확인한다.
 - 새 컴포넌트의 Anatomy도 같은 방식으로 만든다. 마커에 좌표 class를 직접 주거나 프레임 밖에 두거나 평행선을 `span`으로 그리면 `component-anatomy.test.ts`가 `pnpm check`에서 실패시킨다. 대상을 찾지 못한 마커는 화면에서 사라지므로 개발 중에는 어느 대상을 놓쳤는지 콘솔 경고로 알린다.
 - Anatomy 유형명, 시각 예제와 번호별 요소명 범례는 하나의 Neutral 회색 Surface 안에서 `유형명 → 시각 예제 → 범례` 순서로 구성한다. 범례를 같은 색의 별도 블록이나 회색 Anatomy 영역 밖의 흰 배경에 분리하지 않는다. Optional은 요소 이름 뒤에 옅은 위계로 표시한다.
 - 구조 설명이 더 필요하면 범례 아래 별도 텍스트 블록에 작성한다. 구조와 상태가 겹쳐 복잡해지면 Anatomy Preview를 둘 이상으로 분리한다.
 - 기본 요소와 Optional 요소가 한 Preview에서 같은 대상을 가리키는 것처럼 보이면 `Basic anatomy`와 `Extended anatomy`로 분리한다. Basic에는 최소 구조만 표시하고 Extended에는 Basic 번호를 반복하지 않는다. 여러 텍스트 요소를 감싸는 Content container처럼 단일 Label과 구분하기 어려운 그룹 요소는 Extended에서 Container 평행선으로 범위를 표시한다.
-- Anatomy와 구조 검수용 Playground의 콘텐츠는 제품 사례 문구 대신 `Label`, `Right Description`, `Value / Placeholder`처럼 실제 요소 명칭을 사용한다. 제품 맥락의 실제 문구는 Examples와 Usage에서 보여준다.
+- Anatomy와 구조 검수용 Playground의 콘텐츠는 제품 사례 문구 대신 `Label`, `Right Description`, `Value / Placeholder`처럼 실제 요소 명칭을 사용한다. 제품 맥락의 실제 문구는 Examples와 Usage에서 보여준다. 문구 자체가 검수 대상인 절은 예외로 실제 문구를 유지한다. 오류 문구의 행동 지시형 같은 작성 규칙을 함께 보여야 하는 Field의 `Properties · Header`와 `Properties · Footer` 절이 그 예다.
 
 ## Anatomy Container 표시
 

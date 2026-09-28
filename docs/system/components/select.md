@@ -54,7 +54,7 @@ Option은 Popup 안의 선택 항목이다. 같은 목록에서 Leading element�
 - `readOnly`: 현재 값 변경 제한
 - `invalid`: 오류 상태 표시
 - `required`, `name`: native form 연결 속성
-- `ariaLabel`: Trigger의 접근 가능한 이름이며 필수다
+- `ariaLabel`: Trigger의 접근 가능한 이름. 선택 Property이며 Field 없이 단독으로 쓸 때 넘긴다. Field 안에서는 Field가 이름을 소유하므로 넘기지 않는다
 
 Control height는 [interaction.md](../interaction.md)의 「공통 Control Height」를 따른다. Outline Disabled에서도 외곽 border를 유지한다.
 
