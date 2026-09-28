@@ -80,7 +80,7 @@ const SELF = "scripts/docs/system-drift.mjs";
 
 /** 재지 않는 것과 그 까닭. 보고 끝에 한 줄씩 낸다. 다른 시험이 이미 재는 짝은 어느 시험인지 적는다. */
 export const NOT_MEASURED = Object.freeze([
-  "README 컴포넌트 표 순서 ↔ registry 순서 — 정렬 규칙이 어디에도 적혀 있지 않아 어긋남이라 단정할 수 없다",
+  "README 컴포넌트 표 순서 ↔ registry 순서 — docs/system/studio.md 가 title 알파벳순을 정하지만 이 도구는 아직 재지 않는다",
   "CheckboxField 최소 높이 36px ↔ checkbox.md 산문 — 값은 token(oe-control-regular)이 소유하고 문서는 단계 이름을 적으므로, interaction.md 짝이 token 값을 재는 것으로 갈음한다",
   "문서에만 있는 가상 이름(oe-media-*, overlay 템플릿) — 문서가 미래 검토 항목으로 명시한 이름이라 코드에 없는 것이 어긋남이 아니다",
   "switch controlSize(small·medium·large) ↔ switch.md 「### Size」 절 — 문서가 「- `small`: Control `26×16px` …」 로 단계마다 서술하고 「- `controlSize`: `a | b`」 열거 줄이 없어 재지 않는다(그 밖의 Properties 열거 줄은 ENUM_TABLE 로 모두 재며, 표에 없는 줄은 아래에 줄 번호로 낸다)",

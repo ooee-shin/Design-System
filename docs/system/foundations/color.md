@@ -148,7 +148,7 @@ oe-{role}-border-primary / secondary
 - `background-control-disabled`는 조작할 수 없는 Boolean control의 Track이다. 이전 Off 색상인 Light `neutral-300`, Dark `neutral-600`을 사용해 Enabled Off보다 한 단계 낮은 위계를 만든다.
 - `accent`는 danger나 warning 같은 상태 의미 없이 시선을 끄는 교체 가능한 강조 role이다. shadcn `accent`와 직접 매핑하지 않는다.
 - `oe-accent-background-bold-primary`는 Light `red-600`, Dark `red-400`으로 시작한다.
-- 경계는 세 단계다. `oe-border-primary`가 컨트롤과 면의 경계, `oe-border-secondary`가 그보다 한 단계 물러난 구분, `oe-border-tertiary`가 가장 옅은 구분이다. **Tertiary는 같은 묶음 안을 나누는 자리에 쓴다.** 필터 패널에서 조건 축을 가르는 선이 그 자리이며, 그 선이 Secondary면 상자를 두르는 테두리와 같은 무게가 되어 패널 안이 격자로 보인다. `oe-border-disabled`와 값이 같지만 뜻이 다르므로 이름을 따로 둔다.
+- 경계는 세 단계다. `oe-border-primary`가 컨트롤과 면의 경계, `oe-border-secondary`가 그보다 한 단계 물러난 구분, `oe-border-tertiary`가 가장 옅은 구분이다. **Tertiary는 같은 묶음 안을 나누는 자리에 쓴다.** 필터 패널에서 조건 축을 가르는 선이 그 자리이며, 그 선이 Secondary면 상자를 두르는 테두리와 같은 무게가 되어 패널 안이 격자로 보인다. 값은 Light `neutral-150`, Dark `neutral-850`이다. `oe-border-disabled`(Light `neutral-100`, Dark `neutral-900`)보다 배경과 조금 더 구별되며, 꺼진 상태를 뜻하는 그 이름과는 뜻이 다르므로 이름을 따로 둔다.
 - 이미지와 색상 값의 내부 경계는 일반 Neutral border 대신 공용 `oe-border-visual`을 사용한다. Light/Dark 모두 콘텐츠 자체 위에 중첩되는 1px inset `black 10%`이며, 테마 surface 색상으로 바꾸지 않는다.
 
 ### 다음 작업에서 먼저 답할 질문

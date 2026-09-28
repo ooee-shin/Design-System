@@ -11,8 +11,8 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
 - 공용 자산 소유 구조
   - `packages/tokens`: Neutral·Brand·Accent·Status semantic 정의와 Tailwind 연결 스타일. `styles.css`가 `:root`·`.dark`에 실제 `--oe-*` 값과 `@custom-variant dark`를 함께 소유하므로 `@import "@ooee/tokens/styles.css"` 한 줄로 색이 나온다. 값의 단일 원본은 `index.ts`의 `CORE_SEMANTIC_TOKENS`이며 `index.test.ts`가 CSS와의 불일치를 검사한다. Brand만 예외다. `--brand-*`·`--brand-alpha-*`와 mode별 `--oe-brand-light-*`·`--oe-brand-dark-*`는 Studio의 `BrandThemeProvider`가 mount마다 `packages/tokens`의 생성 함수로 seed에서 만들어 런타임으로 주입하고, `--oe-brand-*`와 `--oe-focus-ring`은 `apps/studio/src/app/globals.css`가 그 mode별 주입값에 `--color-blue-*` 기본값을 붙여 정의한다. `packages/tokens`는 `DEFAULT_BRAND_SEED`와 생성 함수, `styles.css`의 `@theme inline`이 `--oe-brand-*`·`--oe-focus-ring`을 Tailwind 색으로 잇는 별칭만 갖고 `:root`·`.dark`의 실제 값은 갖지 않는다
   - `packages/fonts`: 공용 언어별 font
-  - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, MessageBubble, MessageComposer, MessageFileAttachment
-  - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 19개, 초안 2개(MessageComposer, MessageFileAttachment)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
+  - `packages/ui`: AppHeader, BottomNavigation, Badge, NotificationBadge, Button, ToggleButton, Field, Input, InputButton, NumberInput, PartialMaskedInput, Textarea, Checkbox, Radio, Switch, Chip, Select, SelectBox, Combobox, Calendar, MessageBubble, MessageComposer, MessageFileAttachment
+  - 컴포넌트는 `확정`과 `초안` 두 상태를 가지며 단일 원본은 `component-registry`다. 현재 확정 20개, 초안 6개(AdminHeader, MessageComposer, MessageFileAttachment, PageHeader, SideNavigation, Tabs)이고 Studio의 Components 목록이 두 묶음으로 나누어 표시한다. 상태의 정의는 `docs/system/README.md`의 「Component」가 소유하며, `PartialMaskedInput`은 Input이 소유하므로 목록에 세지 않는다
   - 제품 화면 작업장(블루키 리뉴얼): `2026-09-22` 에 Studio 의 `/screens` 에서 sandbox 의 `/renewal` 로 옮겼다(`apps/sandbox/src/app/(renewal)/renewal/`). 관리자·STO·SV 세 루트를 두고 각 루트는 만들 화면의 목록으로 열린다. 규칙은 `apps/sandbox/src/components/renewal/README.md` 가 갖는다. sandbox 첫 화면의 「블루키 리뉴얼」 탭에서 연다
   - `apps/studio`: 공용 자산을 소비하는 Workbench, 예시 콘텐츠와 검수 control. `Docs` 메뉴에서 `docs/system` 문서를 읽고, 컴포넌트 상세 페이지 하단에 해당 명세 문서를 함께 표시한다. 문서 원본은 저장소가 소유하고 Studio는 표시만 한다
   - `apps/studio`의 `/llms.txt`: 저장소 루트 `llms.txt` 원본을 그대로 낸다. 빌드 끝에 `scripts/docs/mirror-llms-links.mjs`가 그 링크와 실은 문서의 링크를 따라 닿는 시스템 문서(`docs/system/` 아래와 `packages/ui/src/index.ts`, 허용 목록은 `scripts/docs/llms-links.mjs`의 `PUBLISHABLE`)만 `out/`의 같은 경로에 싣는다. 실리는 파일은 git이 추적하는 보통 파일이어야 한다. `out/llms.txt`는 웹판으로 바꾼다 — `localhost:3000`을 배포 주소로, 허용 목록 밖을 가리키는 링크는 「저장소 안에서만」 글자로 풀고 머리에 범위를 한 줄 적는다. 두 사이트 모두 공개로 두기로 했다(`2026-09-22`, [ai-environment.md](ai-environment.md) 「아직 정하지 않은 것」). 뷰어는 `/llms-txt`이고 상단 메뉴도 그 주소를 가리킨다
@@ -65,9 +65,9 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
   - sending/sent/read/failed 및 별도 TypingIndicator 비교
 - `/components/badge`
   - 새로 만드는 중이며 현재는 Playground, Anatomy, Color가 있다
-  - 높이는 24px 하나이고 Tone 일곱과 Style 셋을 조합해 확인하며, Custom Tone에서만 22색 선택이 나타난다
+  - 높이는 Small 20px·Medium 24px 두 단계이고 Tone 일곱과 Style 셋을 조합해 확인하며, Custom Tone에서만 18색 선택이 나타난다
   - 아이콘은 Label 앞에만 붙는다
-  - Color는 왼쪽부터 Fill·Tonal·Outlined 세 열이며, 위쪽에 Tone 여섯, 아래쪽에 Custom 22색을 두고 행 이름은 왼쪽에만 붙인다
+  - Color는 왼쪽부터 Fill·Tonal·Outlined 세 열이며, 위쪽에 Tone 여섯, 아래쪽에 Custom 18색을 두고 행 이름은 왼쪽에만 붙인다
 - `/components/field`
   - Label과 필수 표시, 도움말과 오류 문구를 Form control 하나와 묶는 폼 한 칸. Seed Design Field의 Header·Input slot·Footer 세 층 구조를 참고했고 정한 것은 [field.md](../system/components/field.md)가 소유함
   - Header 순서는 `Requirement → Label → Right description → Trailing element`이며 Trailing element만 오른쪽 끝으로 밀림. Seed가 `Suffix Slot`이라 부르는 자리이지만 `prefix`·`suffix`는 짧은 표기 자리라는 기존 구분 때문에 `trailingElement`로 이름을 바꿔 들임
@@ -120,13 +120,13 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
   - SwitchField는 표시 Label을 `aria-labelledby`로 직접 연결하며 Pointer·Label 클릭, Space 전환, Disabled 값 유지와 Size를 DOM 회귀 테스트로 검증
 - `/components/textarea`
   - Input과 동일한 `outline | filled` Style 및 Focus/Invalid 상태 구조 사용
-  - Layout은 `fill`만 지원하고 최소 높이는 88px(약 3.5줄). `autoSize=false`가 기본이며 이때 Resize는 Boolean, 기본값은 `false`
+  - Layout은 `fill`만 지원하고 최소 높이는 80px(내용이 넘칠 때 3.5줄이 보이는 값). `autoSize=false`가 기본이며 이때 Resize는 Boolean, 기본값은 `true`
   - `autoSize=true`이면 내용에 따라 높이가 증가하고 Resize는 적용하지 않음
-  - `autoSize=false`일 때 초기 높이를 88px 이상으로 설정할 수 있음. 스크롤바 공간은 고정하고 thumb은 Hover에서만 표시해 텍스트 이동을 방지
+  - `autoSize=false`일 때 초기 높이를 80px 이상으로 설정할 수 있음. 스크롤바 공간은 고정하고 thumb은 Hover에서만 표시해 텍스트 이동을 방지
   - Auto size와 Resize 모두 `viewport − reserved layout space`보다 낮은 Max height가 필요함. 고정 헤더·콘텐츠 패딩 등을 포함할 정확한 차감값은 아직 열려 있어 코드에는 임의 수치를 넣지 않음
   - Container와 Textarea field만으로 구성하며 Prefix/Clear/Suffix/Leading/Trailing element는 지원하지 않음. Character count는 Field에서 기본 제어하는 방향으로 보류했고, Textarea 내부 표시가 필요한 실제 사례가 확인될 때 재검토
   - Input과 분리된 여러 줄 입력 컴포넌트와 별도 검수 페이지
-  - 현재 확인된 native 속성, 최소 높이 64px, content sizing과 기본 상태만 문서화
+  - 현재 확인된 native 속성, content sizing과 기본 상태만 문서화
   - Focus/Error는 Input과 같은 단색 1px border + 외부 1px ring 구조를 사용
   - Input과 Textarea는 데스크톱 `On this page` rail 아래의 낮은 위계 Related 링크에서 서로 이동
   - 컴포넌트 상세 페이지는 데스크톱 우측의 sticky `On this page`에서 현재 섹션을 확인하고 바로 이동하며 좁은 검수 viewport에서는 숨김
@@ -332,11 +332,11 @@ Git·환경은 루트 `README.md` 「브랜치」·「현재 환경」, 규칙�
 10. **Chip `xsmall` 의 글자 색이 빠지던 것은 고쳤다(`2026-09-18`).** `cn()`(tailwind-merge)이 `text-oe-label`(글자 크기 토큰)을 색 클래스와 같은 무리로 보고 앞의 색을 지우던 것이 까닭이었다. `switch.tsx` 처럼 arbitrary value 로 우회하는 대신 `packages/ui/src/utils.ts` 에서 `extendTailwindMerge` 로 `text-oe-*` 크기 토큰을 font-size 무리에 넣어 뿌리에서 막았고, `utils.test.ts` 가 고정한다. 우회가 필요한 자리는 이제 없다.
 12. **Studio 의 Chip Playground 가 새 `ariaLabel` 규칙을 스스로 어긴다.** `chip.tsx` 에 「보이는 Label 을 담은 이름만 보탠다」 가드가 들어오면서, copy 가 `label: "Label"`·`ariaLabel: "Chip"` 인 Playground(`apps/studio/src/components/candidates/chip-workbench.tsx:52·72`)가 조건에 걸린다. `next dev` 에서 `/components/chip` 을 열면 렌더마다 콘솔 경고가 찍히고, 디자인 시스템의 정본 예시가 이번에 새로 쓴 규칙을 어기는 예시가 된다. 렌더 결과는 main 과 같아 접근성 회귀는 없고 프로덕션 빌드에도 남지 않는다. copy 의 `ariaLabel` 을 Label 을 포함하는 문구로 바꾸거나 Icon only 일 때만 넘기면 된다. (`2026-09-18` 릴리스 점검)
 
-13. **`color.md` 가 `oe-border-tertiary` 와 `oe-border-disabled` 의 값이 같다고 적지만 다르다.** 실제 값은 tertiary 가 Light `neutral-150`·Dark `neutral-850`, disabled 가 Light `neutral-100`·Dark `neutral-900` 이다(`packages/tokens/src/index.ts:113~114`). 문서를 고칠 일인지 토큰 값을 고칠 일인지는 의도에 달려 있어 그대로 두었다 — 둘을 같은 값으로 두려던 것이었다면 토큰 쪽이 버그다. 근거를 틀린 사실로 적어 두면 「값이 같으니 합치자」는 판단이나 disabled 자리에 tertiary 를 쓰는 오용을 부른다. (`2026-09-18` 릴리스 점검)
+13. **`color.md` 가 `oe-border-tertiary` 와 `oe-border-disabled` 의 값이 같다고 적던 것은 닫았다(`2026-09-28`).** 문서를 코드 값(tertiary Light `neutral-150`·Dark `neutral-850`, disabled Light `neutral-100`·Dark `neutral-900`, `packages/tokens/src/index.ts:113~114`)에 맞춰 고쳤다.
 
 14. **ToggleButton 의 custom tone 색이 토큰이 아니라 날 hex 다.** 즐겨찾기·찜의 색이 `toggle-button.tsx` 의 `CUSTOM_ON_CLASS` 에 `bg-[#fdf5e2]`·`text-[#dfa010]` 처럼 적혀 있다. 그래서 색을 토큰 이름으로 읽는 도구가 이 칠만 이름을 찾지 못했다. 지금은 값 그대로를 이름으로 삼은 `hex-fdf5e2` primitive 로 올려 두었고, 변수 설명에도 「아직 토큰이 아니다」라고 적었다. 이름을 붙일지, 어느 semantic token 으로 보낼지는 디자인 시스템이 정한다. (`2026-09-18`)
 
-16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠한다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 19 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
+16. **MessageBubble 만 색을 손으로 쓴 CSS class 로 칠한다.** 다른 컴포넌트는 `bg-oe-background-secondary` 처럼 Tailwind 토큰 class 로 칠하는데, 이 컴포넌트는 `.oe-message-bubble-incoming`·`.oe-message-bubble-outgoing`(`packages/ui/src/styles.css:61~75`)이 `background-color: var(--oe-message-outgoing-background, var(--oe-background-bold-primary))` 꼴로 칠한다. `dom-extract.js` 는 **class 이름에서** 토큰 후보를 모으므로 그 class 에서는 아무것도 읽지 못하고, 카탈로그에 넣었더니 칠 25 개가 「후보 없음」으로 걸렸다(`2026-09-21`). 그래서 카탈로그에서 뺐다 — 확정 20 종 가운데 Figma 라이브러리에 없는 유일한 컴포넌트다.
 
     고치는 길은 `packages/ui` 가 그 색을 토큰 class 로 칠하는 것이다(`--oe-message-*` 로 갈아 끼우는 길을 남기려면 그 자리만 CSS 변수로 두고 기본값은 토큰 class 로). 다른 컴포넌트와 같아지는 길이고, 정하는 것은 디자인 시스템이다. 같은 자리에 `data-slot` 도 없어 sandbox 가 어떤 컴포넌트인지 읽지 못하므로 함께 보면 좋다.
 

@@ -29,6 +29,7 @@ oe-foreground-primary
 oe-foreground-secondary
 oe-foreground-tertiary
 oe-foreground-subtle
+oe-foreground-placeholder
 oe-foreground-disabled
 oe-foreground-inverse
 oe-foreground-inverse-secondary
@@ -38,12 +39,21 @@ oe-background-canvas-secondary
 oe-background-primary
 oe-background-secondary
 oe-background-bold-primary
+oe-background-control-off
+oe-background-control-disabled
 oe-background-disabled
+oe-background-disabled-selected
 
 oe-border-primary
+oe-border-bold-primary
 oe-border-secondary
+oe-border-tertiary
 oe-border-disabled
+oe-border-visual
 oe-focus-ring
+
+oe-interaction-hover-subtle
+oe-interaction-hover
 ```
 
 의미는 다음과 같다.
@@ -84,11 +94,12 @@ oe-danger-foreground-primary
 oe-danger-foreground-secondary
 oe-danger-background-primary
 oe-danger-background-secondary
+oe-danger-background-bold-primary
 oe-danger-border-primary
 oe-danger-border-secondary
 ```
 
-`warning`, `success`, `info`도 같은 문법을 따른다. Semantic status에서 `primary`는 같은 role/property 안에서 더 높은 강조와 대비, `secondary`는 한 단계 낮은 강조와 대비를 뜻하며 특정 Tailwind 숫자를 뜻하지 않는다. Light theme에서 `danger-foreground-primary`가 `red-800`, Dark theme에서 `red-300`에 연결될 수 있다. 이름은 역할을 나타내고 primitive 값은 테마별 구현이다.
+`warning`, `success`, `info`도 같은 문법을 따른다. Semantic status에서 `primary`는 같은 role/property 안에서 더 높은 강조와 대비, `secondary`는 한 단계 낮은 강조와 대비를 뜻하며 특정 Tailwind 숫자를 뜻하지 않는다. Light theme에서 `danger-foreground-primary`가 `red-800`, Dark theme에서 `red-200`에 연결된다. 이름은 역할을 나타내고 primitive 값은 테마별 구현이다.
 
 ## Opaque와 Overlay
 

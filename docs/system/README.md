@@ -71,6 +71,7 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 
 | 컴포넌트 | 상태 | 문서 | 용도 |
 | --- | --- | --- | --- |
+| Admin Header | 초안 | 없음 | 관리자 웹의 맨 위 한 줄. 왼쪽 로고와 오른쪽 알림·설정·조직도·로그아웃, 로그인한 사람 자리를 소유 |
 | App Header | 확정 | [app-header.md](components/app-header.md) | 모바일 화면 최상단의 한 줄. 제목과 좌우 아이콘 자리를 소유 |
 | Badge | 확정 | [badge.md](components/badge.md) | 다른 요소에 덧붙어 상태나 개수를 표시 |
 | Bottom Navigation | 확정 | [bottom-navigation.md](components/bottom-navigation.md) | 모바일 화면 맨 아래에서 최상위 화면을 오가는 한 줄 |
@@ -87,10 +88,13 @@ Foundation은 다르다. 색상 매핑처럼 아직 확정되지 않은 결정�
 | Message File Attachment | 초안 | 없음 | 메시지에 붙는 파일 카드 |
 | Notification Badge | 확정 | [notification-badge.md](components/notification-badge.md) | 아이콘·버튼·메뉴에 붙어 새 알림이나 읽지 않은 수를 표시 |
 | Number Input | 확정 | [number-input.md](components/number-input.md) | 숫자 직접 입력, 증감 버튼, 범위와 단위 |
+| Page Header | 초안 | 없음 | 본문의 맨 위 한 줄. 화면의 경로와 이름을 말하고 탭과 동작 버튼 자리를 소유 |
 | Radio | 확정 | [radio.md](components/radio.md) | 여러 항목 중 하나를 선택 |
 | Select | 확정 | [select.md](components/select.md) | 검색 없이 짧은 옵션 목록에서 하나 또는 여러 값을 선택 |
 | Select Box | 확정 | [select-box.md](components/select-box.md) | 상세 정보를 펼쳐 놓고 비교하며 하나 이상의 값을 선택 |
+| Side Navigation | 초안 | 없음 | 관리자 웹 왼쪽에서 화면 높이를 채우는 접을 수 있는 메뉴. 검색과 즐겨찾기, 3단계 메뉴를 가짐 |
 | Switch | 확정 | [switch.md](components/switch.md) | 설정이나 기능을 즉시 켜고 끄는 Boolean control |
+| Tabs | 초안 | 없음 | 한 자리에서 내용을 갈아 끼우는 탭. 고른 탭 아래 밑줄이 서고 다른 탭을 고르면 그 자리로 미끄러짐 |
 | Textarea | 확정 | [textarea.md](components/textarea.md) | 여러 줄 입력 |
 | Toggle Button | 확정 | [toggle-button.md](components/toggle-button.md) | 누른 표시가 화면에 남는 아이콘 버튼 |
 
