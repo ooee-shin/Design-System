@@ -5,6 +5,34 @@
 
 @theme inline {
   --font-sans: var(--oe-font-family-ko);
+
+  /* 좌측 내비게이션이 자기 안에서만 쓰는 색이다. 값은 `AdminLayout` 이 고른 메뉴 스타일(다크·브랜드·라이트)을
+     인라인 변수로 덮어 준다. 이 매핑이 없으면 `bg-nav-background` 같은 클래스가 아예 만들어지지 않아,
+     메뉴 스타일이 「다크」인데도 좌측 메뉴가 투명하게 칠해진다(`2026-09-28` 이관 확인). */
+  --color-nav-background: var(--nav-background);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-border: var(--nav-border);
+  --color-nav-hover-background: var(--nav-hover-background);
+  --color-nav-hover-foreground: var(--nav-hover-foreground);
+  --color-nav-active-background: var(--nav-active-background);
+  --color-nav-active-foreground: var(--nav-active-foreground);
+  --color-nav-search-background: var(--nav-search-background);
+  --color-nav-group-foreground: var(--nav-group-foreground);
+
+  /* Studio 에서 옮겨 온 후보 컴포넌트(`components/candidates/`)가 shadcn 이름으로 색을 부른다. 이름만 그대로
+     두고 값은 `oe` 토큰이 갖는다. Studio 처럼 shadcn 팔레트를 따로 두지 않으므로 라이트·다크가 토큰을 따라간다.
+     새 화면은 이 이름을 쓰지 않는다 — 화면 규칙(`screen-rules.mjs` 「2 shadcn visual token」)이 클래스 이름으로
+     막으며, 이 매핑은 그 검사를 느슨하게 하지 않는다. */
+  --color-background: var(--oe-background-primary);
+  --color-foreground: var(--oe-foreground-primary);
+  --color-muted: var(--oe-background-secondary);
+  --color-muted-foreground: var(--oe-foreground-secondary);
+  --color-primary: var(--oe-brand-background-bold-primary);
+  --color-primary-foreground: var(--oe-foreground-inverse);
+  --color-secondary: var(--oe-background-secondary);
+  --color-secondary-foreground: var(--oe-foreground-primary);
+  --color-destructive: var(--oe-danger-background-bold-primary);
+  --color-input: var(--oe-border-primary);
 }
 
 /* Brand 값의 기본값. Studio의 globals.css와 같은 복제이며, 값의 자리를 packages/tokens로 옮길지 정해지면
