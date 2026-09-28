@@ -350,4 +350,14 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt: "STO 사장님 앱의 지원요청 작성 1페이지(#120). 요청 유형·제목·내용 입력과 요청 등록 버튼.",
     createdAt: "2026-09-28",
   },
+  {
+    key: "company-main",
+    project: "harness-test",
+    viewports: ["web", "tablet", "mobile"],
+    name: "회사 메인 페이지",
+    href: "/company-main",
+    prompt:
+      "회사 메인 페이지(#131). 반다이처럼 이미지가 큰 구성. 머리글·히어로·사업 분야 카드 3장·소식 목록·문의 안내·바닥글, 이미지는 SVG 일러스트로 그림.",
+    createdAt: "2026-09-28",
+  },
 ];
