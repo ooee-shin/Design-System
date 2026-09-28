@@ -79,11 +79,12 @@ node scripts/harness/decision.mjs <n>      # reason 이 그 까닭이다
 
 ```bash
 pnpm --filter @ooee/sandbox build
-node scripts/visual/inspect.mjs --serve apps/sandbox/out --path /<key> --viewport <WxH> --shot <key>-<유형>
+node scripts/visual/inspect.mjs --serve apps/sandbox/out --path "/<key>?frame=1" --viewport <WxH> --shot <key>-<유형>
 ```
 
 - 뷰포트는 화면 유형이 정한다 — 웹 `1440x900`, 태블릿 `1024x768`, 모바일 `390x844`. **유형이 여럿이면 폭마다 한 번씩** 찍는다.
 - 기계로 재는 둘: `h1` 이 있는지, 가로 넘침이 없는지(`documentElement.scrollWidth` 가 뷰포트 폭 이하).
+- 화면은 「보기 폭」 액자(iframe) 안에 열리므로 검사는 `?frame=1` 로 액자 안 문서를 직접 연다 — 액자 밖 문서에는 `h1` 이 없다.
 - 찍은 그림을 **눈으로 본다.** 겹침·잘림·빈 화면이 있으면 고치고 다시 잰다. 고친 것은 `other` 에, 고치지 않고 남긴 판단은 `needsDecision` 에 적는다.
 - 화면 위의 「보기 폭」 전환은 sandbox 가 얹는 것이라 화면 코드가 신경 쓰지 않는다.
 
