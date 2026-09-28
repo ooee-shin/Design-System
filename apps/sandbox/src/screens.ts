@@ -15,6 +15,7 @@ export const SANDBOX_PROJECTS = [
   { id: "harness-test", name: "하네스 시험", description: "요청에서 화면까지의 흐름을 시험하며 만든 화면입니다. 제품에 들어가지 않습니다." },
   { id: "신주희-테스트", name: "신주희 테스트", description: "신주희 테스트 화면입니다." },
   { id: "자동-송장-api", name: "자동 송장 API", description: "송장 발급과 배송 현황을 보는 자동 송장 API 화면입니다." },
+  { id: "sto-사장님-앱", name: "STO 사장님 앱", description: "STO 사장님 앱 화면입니다." },
 ] as const;
 
 export type SandboxProject = (typeof SANDBOX_PROJECTS)[number]["id"];
@@ -339,5 +340,14 @@ export const sandboxScreens: SandboxScreen[] = [
     prompt:
       "그늘 지도 러닝 앱의 코스 상세(#113, 개선 1회차). 서울숲 순환 코스 하나의 요약, 시간대별 그늘 비율·체감 더위, 구간별 그늘 안내, 이 코스로 러닝 시작.",
     createdAt: "2026-09-27",
+  },
+  {
+    key: "sto-support-write",
+    project: "sto-사장님-앱",
+    viewports: ["mobile"],
+    name: "STO 지원요청 작성",
+    href: "/sto-support-write",
+    prompt: "STO 사장님 앱의 지원요청 작성 1페이지(#120). 요청 유형·제목·내용 입력과 요청 등록 버튼.",
+    createdAt: "2026-09-28",
   },
 ];
