@@ -1,7 +1,7 @@
 // Chrome을 headless로 띄우고 CDP로 페이지를 조작하는 최소 클라이언트.
 // 기기별 절대경로를 담지 않는다. Chrome 위치는 CHROME_BIN으로 덮어쓸 수 있다.
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -24,38 +24,66 @@ export function resolveChrome() {
   );
 }
 
-const PORT = Number(process.env.CDP_PORT ?? 9222);
+// 포트는 크롬이 고른다(`--remote-debugging-port=0`). 우리가 띄운 크롬의 포트만 쓰려는 것이다:
+// 전에는 9222 에 못을 박고 `/json/version` 이 응답하면 곧 돌아왔으므로, 다른 크롬이 그 포트를
+// 잡고 있으면 말없이 그 낡은 브라우저에 붙어 죽은 페이지를 재었다 — 실측이 두 번 `barExists:false,
+// iframes:0` 을 내어 구현이 깨진 것처럼 보였고, 실행 사이에 `pkill` 을 넣고서야 되풀이가 되었다
+// (`2026-09-29` 확인자). 크롬이 고른 포트는 우리가 갓 만든 빈 프로필의 `DevToolsActivePort` 첫 줄에
+// 적히므로 그 파일을 읽어 붙는다 — 남의 브라우저는 우리 프로필을 쓰지 않는다.
+// `CDP_PORT` 를 주면 그 포트로 띄우되(예전 길), 포트를 못 잡으면 남의 브라우저에 붙는 대신 실패한다.
+let port = null;
+
+function endpoint(path) {
+  if (!port) throw new Error("Chrome 디버깅 포트를 아직 모릅니다 — launch() 를 먼저 부르세요.");
+  return `http://127.0.0.1:${port}${path}`;
+}
 
 async function httpJson(path, init) {
-  const res = await fetch(`http://127.0.0.1:${PORT}${path}`, init);
+  const res = await fetch(endpoint(path), init);
   return res.json();
 }
 
 export async function launch({ width = 1440, height = 900 } = {}) {
   const profile = mkdtempSync(join(tmpdir(), "ooee-visual-"));
+  const asked = Number(process.env.CDP_PORT ?? 0) || 0;
   const proc = spawn(
     resolveChrome(),
     [
       "--headless=new",
       "--disable-gpu",
       "--hide-scrollbars",
-      `--remote-debugging-port=${PORT}`,
+      `--remote-debugging-port=${asked}`,
       `--window-size=${width},${height}`,
       `--user-data-dir=${profile}`,
       "about:blank",
     ],
     { stdio: "ignore" },
   );
+  const portFile = join(profile, "DevToolsActivePort");
   for (let i = 0; i < 100; i += 1) {
-    try {
-      await httpJson("/json/version");
-      return proc;
-    } catch {
-      await new Promise((r) => setTimeout(r, 100));
+    // 크롬이 포트를 못 잡고 죽으면 더 기다릴 것이 없다.
+    if (proc.exitCode !== null || proc.signalCode !== null) break;
+    // 파일은 크롬이 준비를 마친 뒤에 적으므로 아직 없을 수 있다.
+    const found = existsSync(portFile) ? Number(readFileSync(portFile, "utf8").split("\n")[0] ?? "") : 0;
+    if (found > 0) {
+      port = found;
+      // 그 포트가 정말 우리 크롬인지 한 번 묻고 돌아간다.
+      try {
+        await httpJson("/json/version");
+        return proc;
+      } catch {
+        port = null;
+      }
     }
+    await new Promise((r) => setTimeout(r, 100));
   }
   proc.kill();
-  throw new Error("Chrome이 디버깅 포트를 여는 데 실패했습니다.");
+  port = null;
+  throw new Error(
+    asked
+      ? `Chrome이 디버깅 포트 ${asked} 를 여는 데 실패했습니다 — 다른 Chrome이 그 포트를 잡고 있을 수 있습니다(CDP_PORT 를 비우면 빈 포트를 고릅니다).`
+      : "Chrome이 디버깅 포트를 여는 데 실패했습니다.",
+  );
 }
 
 export class Session {
@@ -116,5 +144,5 @@ export async function openPage(url) {
 }
 
 export async function closePage(targetId) {
-  await fetch(`http://127.0.0.1:${PORT}/json/close/${targetId}`);
+  await fetch(endpoint(`/json/close/${targetId}`));
 }
