@@ -229,16 +229,52 @@ test("멈추면 결과 채널에 첫 제목과 문제 줄만 알린다 — 기�
   assert.match(text, /폼으로 다시 내 주세요/);
   assert.match(text, /자세히: https:\/\/github\.com\/x\/y\/issues\/60$/);
   assert.doesNotMatch(text, /막힌 명령/, "보고 전체를 옮기면 카드가 길어진다");
-  assert.match(stopNotice(1, "제목 없는 보고"), /처리가 끝나지 않았다/);
+  assert.match(stopNotice(1, "제목 없는 보고"), /하네스가 마무리하지 못했다/);
 });
 
-test("하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다", () => {
+test("하위 명령의 제목은 성공 제목이든 그다음 절 제목이든 멈춘 까닭이 되지 않는다", () => {
   // 2026-09-24 #85: 화면 하나를 만들고 그 뒤 단계를 하지 않아 실패했는데, 카드는 generate-code 의
   // 「pull request 준비 완료」를 그대로 실어 성공처럼 보였다.
   const report = ["## pull request 준비 완료", "", "제목: feat(sandbox): …", "- page.tsx 를 만들었다"].join("\n");
   const card = stopNotice(85, report, { title: "자동 송장 api 대시보드" });
-  assert.match(card, /— 처리가 끝나지 않았다/);
-  assert.ok(!card.includes("준비 완료"), `성공 제목이 카드에 실렸다:\n${card}`);
+  assert.match(card, /— 하네스가 마무리하지 못했다/);
+  assert.match(card, /보고의 첫 제목은 「pull request 준비 완료」/, "개발자가 어디서 끝났는지 알 단서를 남긴다");
+  assert.ok(!card.startsWith("🙋"), `마무리하지 못한 실행을 물음으로 냈다:\n${card}`);
+
+  // 2026-09-29 #135: 낱말 몇 개만 빼던 때는 성공 제목 다음 제목 「무엇을 변경했나요?」 가 까닭 자리에 올라가고,
+  // 그 아래 「바뀐 파일」 세 줄이 「고를 갈래」로 실렸다. 게다가 「무엇을」 때문에 물음으로 분류됐다.
+  const next = [
+    "## pull request 준비 완료",
+    "제목: feat(sandbox): 설정값 관리 화면 추가",
+    "",
+    "## 무엇을 변경했나요?",
+    "- `apps/sandbox/src/app/setting-value-management/page.tsx` — 설정값 108개를 관리하는 화면",
+    "- `apps/sandbox/src/app/setting-value-management/page.test.tsx` — 테스트",
+    "- `apps/sandbox/src/screens.ts` — 등록",
+    "",
+    "## 매핑표",
+    "| 화면 요소 | 근거 |",
+  ].join("\n");
+  const card135 = stopNotice(135, next, { title: "설정값 관리 화면" });
+  assert.match(card135, /^⚠️ 화면 요청 #135 「설정값 관리 화면」 — 하네스가 마무리하지 못했다\n/);
+  for (const leak of ["무엇을 변경했나요", "page.tsx", "screens.ts", "매핑표"]) {
+    assert.ok(!card135.includes(leak), `하위 명령 보고의 「${leak}」 가 카드에 실렸다:\n${card135}`);
+  }
+  assert.ok(!card135.includes("폼으로 다시 내 주세요"), "만들어진 화면을 두고 폼을 다시 내라고 하면 안 된다");
+  assert.match(card135, /`plan\.json` 을 쓰지 않고/);
+  assert.match(card135, /runs\/` 의 실행 기록/);
+});
+
+test("멈춤 제목이 아닌 낱말로 물음을 가리지 않는다 — 「무엇을」 이 든 실패도 실패로 낸다", () => {
+  // 2026-09-29 #135 에서 판정이 낱말 조각(`무엇을`)에 걸렸다. 스킬이 정한 제목만 본다.
+  const failing = ["## 처리 중 실패", "", "- 무엇을 만들지 고를 수조차 없었다 — `pnpm check` 가 화면 자리 밖에서 실패했다"].join("\n");
+  const card = stopNotice(7, failing, { title: "무엇 화면" });
+  assert.match(card, /^⚠️ /, "제목이 「처리 중 실패」 인데 물음으로 냈다");
+  assert.match(card, /개발자에게 알려 주세요/);
+  assert.ok(!card.includes("(물음)"), "제목에 (물음) 을 붙이지 않는다");
+
+  const asking = ["## 묻고 멈춤", "", "- 고칠 화면을 찾지 못했다", "1. 첫째 갈래", "2. 둘째 갈래"].join("\n");
+  assert.match(stopNotice(7, asking, { title: "무엇 화면" }), /^🙋 화면 요청 #7 「무엇 화면」 — 묻고 멈춤\n/);
 });
 
 test("모델이 까닭을 적었으면 그 보고를 그대로 카드로 보낸다 — 없을 때만 러너의 제목을 쓴다", () => {

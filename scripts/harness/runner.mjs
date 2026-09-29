@@ -91,24 +91,32 @@ export function closingComment(kind, detail) {
   return `처리를 마쳐 닫습니다 — ${what}${detail ? ` (${detail})` : ""}. 다시 요청하려면 Slack 폼으로 새 요청을 냅니다.`;
 }
 
-/** 기획자가 답해야 하는 멈춤인지. 그러면 카드의 꼬리말이 개발자가 아니라 요청자를 가리킨다. */
-const ASKING = /묻고 멈춤|무엇을|알 수 없|새 요구|다시 내/;
+/**
+ * `/make-screens` 이 멈출 때 쓰기로 한 제목 둘. **이 둘만 멈춘 까닭이 될 수 있다.**
+ *
+ * 하위 명령(generate-code·review-design)의 제목은 무엇이 됐든 끝나지 않은 실행이다 — 성공 제목
+ * (「pull request 준비 완료」)도, 그 뒤 절의 제목(「무엇을 변경했나요?」·「매핑표」·「검수 결과」…)도 같다.
+ * 낱말 몇 개를 빼는 식으로 걸렀더니 두 번 새어 나갔다: `2026-09-24` #85 는 성공 제목에, `2026-09-29` #135 는
+ * 그다음 제목에 걸려 「🙋 … 무엇을 변경했나요? (물음)」 카드와 함께 바뀐 파일 목록이 「고를 갈래」로 나갔다.
+ * 그래서 빼는 목록이 아니라 **넣는 목록**으로 바꿨다. 스킬이 제목을 바꾸면 이 목록도 함께 바꾼다.
+ */
+const STOP_HEADINGS = [/^묻고 멈춤/, /^처리 중 실패/];
+
+/** 멈춤 제목이 없는 실행. 화면은 이미 만들어졌을 수 있어 기획자가 폼을 고쳐도 풀리지 않는다. */
+const UNFINISHED = "하네스가 마무리하지 못했다";
 
 /**
- * 멈췄을 때 결과 채널에 올릴 글. 보고의 첫 제목과 그 아래 문제 줄만 뽑는다 — 기획자가 무엇을 다시 내야
+ * 멈췄을 때 결과 채널에 올릴 글. 보고에서 멈춤 제목과 그 아래 문제 줄만 뽑는다 — 기획자가 무엇을 다시 내야
  * 하는지만 보면 된다. 러너가 멈추면 job 로그에만 남아 요청한 사람은 알 길이 없었다(#60).
  */
 export function stopNotice(issue, report, { title = "", url = "", tail } = {}) {
   const lines = String(report ?? "").split("\n");
-  // 하위 명령의 성공 제목을 멈춘 까닭으로 싣지 않는다. `2026-09-24` #85 카드가 「⚠️ … pull request 준비
-  // 완료」로 나갔다 — generate-code 가 화면 하나를 만들고 낸 제목인데, 그 뒤 단계를 하지 않아 실패한 실행
-  // 이었다. 이 명령 자신의 제목이 아니면 무엇이 됐든 끝나지 않은 것이다.
-  const own = (line) => /^## /.test(line) && !/준비 완료|검사 실패|위반/.test(line);
-  const at = lines.findIndex(own);
-  const heading = at >= 0 ? lines[at].replace(/^## /, "") : "처리가 끝나지 않았다";
+  const at = lines.findIndex((line) => /^## /.test(line) && STOP_HEADINGS.some((re) => re.test(line.replace(/^## /, ""))));
+  const first = lines.find((line) => /^## /.test(line));
+  const heading = at >= 0 ? lines[at].replace(/^## /, "") : UNFINISHED;
   // 그 제목의 절만 읽는다. 다음 제목까지 넘어가면 「거친 자리」의 통과한 단계가 까닭 자리에 실린다
   // (`2026-09-23` #62 카드: 멈춘 까닭 대신 `git switch dev — 통과` 넉 줄이 갔다).
-  const section = at >= 0 ? lines.slice(at + 1) : lines;
+  const section = lines.slice(at + 1);
   const end = section.findIndex((line) => /^## /.test(line));
   const rest = (end < 0 ? section : section.slice(0, end)).map((line) => line.trim()).filter(Boolean);
   // 고른 갈래를 반만 보여 주면 물음이 되지 않는다. `2026-09-24` #99 카드가 세 갈래 가운데 「1.」 한 줄만
@@ -117,17 +125,28 @@ export function stopNotice(issue, report, { title = "", url = "", tail } = {}) {
   const numbered = listed.filter((line) => /^\d+\. /.test(line)).length;
   const problems = listed.slice(0, Math.max(6, numbered + 3));
   const picked = problems.length ? problems : rest.slice(0, 4);
-  // 쓸 줄이 하나도 없을 때가 있다 — 하위 명령의 제목만 남기고 끝난 실행(#85)이 그렇다. 빈 카드를 올리면
-  // 기획자는 무엇이 잘못됐는지도, 무엇을 해야 하는지도 알 수 없다.
-  const detail = picked.length
-    ? picked.map((line) => line.replace(/^[-*] /, "· ")).join("\n")
-    : "· 어디서 멈췄는지 보고에 남지 않았습니다. 개발자가 실행 기록을 봐야 합니다.";
+  // 멈춤 제목이 없으면 보고에서 줄을 뽑지 않는다. #135 에서 하위 명령이 적은 「바뀐 파일」 세 줄이 그대로
+  // 「고를 갈래」 자리에 실렸다 — 기획자는 만들어진 화면을 두고 무엇을 고르라는 말인지 알 수 없었다.
+  const detail =
+    at >= 0
+      ? picked.length
+        ? picked.map((line) => line.replace(/^[-*] /, "· ")).join("\n")
+        : "· 어디서 멈췄는지 보고에 남지 않았습니다. 개발자가 실행 기록을 봐야 합니다."
+      : [
+          "· 모델이 `plan.json` 을 쓰지 않고 멈춤 제목도 남기지 않았습니다 — 하위 명령 보고로 끝난 실행입니다.",
+          first ? `· 보고의 첫 제목은 「${first.replace(/^## /, "")}」 입니다.` : null,
+          "· 화면은 이미 만들어졌을 수 있습니다. 개발자가 `~/.ooee-harness/runs/` 의 실행 기록을 봅니다.",
+        ]
+          .filter(Boolean)
+          .join("\n");
   // 「실패」와 「물음」은 다르다. 묻는 것을 실패로 적으면 기획자는 고장 난 줄 알고 개발자를 부른다
-  // (`2026-09-24` #99). 답할 사람이 요청자면 그렇게 말한다.
-  const asking = ASKING.test(heading) || ASKING.test(detail);
+  // (`2026-09-24` #99). 답할 사람이 요청자인지는 **스킬이 정한 제목으로만** 가린다 — 낱말로 가리던 때는
+  // 「무엇을 변경했나요?」 의 「무엇을」 이 하위 명령 보고를 물음으로 만들었다(#135).
+  const asking = at >= 0 && /^묻고 멈춤/.test(heading);
   const mark = asking ? "🙋" : "⚠️";
-  const say = tail ?? (asking ? "위 가운데 무엇인지 한 줄로 적어 폼으로 다시 내 주세요." : "요청을 고쳐 다시 내거나 개발자에게 알려 주세요.");
-  const head = `${mark} 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${asking && !/묻/.test(heading) ? `${heading} (물음)` : heading}`;
+  const fail = at >= 0 ? "요청을 고쳐 다시 내거나 개발자에게 알려 주세요." : "개발자에게 알려 주세요 — 폼을 고쳐 다시 내도 풀리지 않습니다.";
+  const say = tail ?? (asking ? "위 가운데 무엇인지 한 줄로 적어 폼으로 다시 내 주세요." : fail);
+  const head = `${mark} 화면 요청 #${issue}${title ? ` 「${title}」` : ""} — ${heading}`;
   const where = url ? `\n자세히: ${url}` : "";
   return `${head}\n${detail}\n\n${say}${where}`;
 }
