@@ -380,4 +380,14 @@ export const sandboxScreens: SandboxScreen[] = [
       "법인카드 사용내역을 관리하는 테이블(#139). 사용일시·사용처·이름·금액·부가세·총합 열, 사용처만 수정 가능, 상호작용 전에는 일반 표처럼 보이고 hover·focus 상태에서만 input을 노출.",
     createdAt: "2026-09-29",
   },
+  {
+    key: "webtoon-main",
+    project: "harness-test",
+    viewports: ["web", "tablet", "mobile"],
+    name: "웹툰 메인 화면",
+    href: "/webtoon-main",
+    prompt:
+      "네이버 웹툰처럼 해 달라는 요청(#147)으로 읽은 웹툰 메인 화면. 검색·로그인 머리글, 요일별 웹툰 칩, 인기 급상승 웹툰 순위, 요일로 거른 오늘의 웹툰 격자.",
+    createdAt: "2026-09-29",
+  },
 ];
