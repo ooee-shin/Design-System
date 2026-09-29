@@ -35,6 +35,8 @@ allowed-tools: Read, Grep, Glob, Bash(git status:*), Bash(node plugins/ooee-harn
 
 번호마다 판정 규칙이 있다. 규칙에 걸리면 위반이고, 규칙으로 가르기 어려우면 「판단이 필요한 것」이다. 위반만 센다. `${CLAUDE_PLUGIN_ROOT}/lib/check-screens.mjs`가 이 가운데 일부를 기계로 보지만, 이 명령은 그 결과에 기대지 않고 모든 항목을 직접 대조한다.
 
+그 명령을 `--only` 없이 부르면 화면 자리 아래를 재귀로 훑어 검수 대상 밖의 화면까지 본다. **그 결과는 설치한 저장소가 예외로 적어 둔 옛 화면 때문에 붉을 수 있다** — 이 저장소의 목록은 `apps/sandbox/src/screen-rules-legacy.json` 이고 `--allow <그 파일>` 을 주면 빠진다. 검수 대상 밖 화면의 위반은 이 명령의 결과에 적지 않는다.
+
 1. **raw primitive color 0개** (quality.md 「코드」, tokens.md 「기본 원칙」). 다음 중 하나라도 있으면 위반이다.
    - `(bg|text|border|ring|fill|stroke|from|to|via|outline|shadow|decoration|placeholder|accent|caret|divide)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}`
    - `-white`, `-black`이 색 자리에 온 것. `border-transparent`, `bg-transparent`처럼 색을 지우는 용도는 위반이 아니다.
@@ -53,18 +55,20 @@ allowed-tools: Read, Grep, Glob, Bash(git status:*), Bash(node plugins/ooee-harn
    - `focus:`만 쓰고 `focus-visible:`을 안 쓴 것
    - 컴포넌트 Container 밖에 홀로 선, `border` 클래스가 없는 요소가 `focus-visible:ring-2`를 쓰면서 `focus-visible:ring-offset-2`가 없는 것. 유형 3은 2px 간격이 있어야 한다. Input `trailingElement` 안의 action은 이 줄의 대상이 아니다.
 6. **접근 가능한 이름** (quality.md 「접근성」). 보이는 Label이나 `aria-label`·`aria-labelledby`가 없는 입력, `aria-label` 없는 아이콘만 있는 버튼, `alt` 없는 `<img>`가 있으면 위반이다. Placeholder만 있는 입력은 위반이다.
-7. **Control 높이와 모서리** (interaction.md 「공통 Control Height」·「공통 Control Radius」). 높이·배경·경계 중 하나라도 주어 상자 모양을 낸 native `<button>`·`<a>`가 `h-8`·`h-12`처럼 직접 높이를 쓰거나 `rounded-md`·`rounded-lg`처럼 직접 모서리를 쓰면 위반이다. `h-oe-control-*`·`rounded-oe-control`이어야 한다. 상자가 없는 글자 링크와 Input 안 아이콘 버튼은 적용 대상이 아니므로 Focus ring 모서리로 쓴 `rounded-sm`·`rounded-md`는 보지 않는다. `@ooee/ui` 컴포넌트에 `className`으로 높이나 모서리를 덮어쓴 것은 위반이다.
+7. **Control 높이·모서리와 컴포넌트 글자** (interaction.md 「공통 Control Height」·「공통 Control Radius」, 각 컴포넌트 문서의 「Properties」). 높이·배경·경계 중 하나라도 주어 상자 모양을 낸 native `<button>`·`<a>`가 `h-8`·`h-12`처럼 직접 높이를 쓰거나 `rounded-md`·`rounded-lg`처럼 직접 모서리를 쓰면 위반이다. `h-oe-control-*`·`rounded-oe-control`이어야 한다. 상자가 없는 글자 링크와 Input 안 아이콘 버튼은 적용 대상이 아니므로 Focus ring 모서리로 쓴 `rounded-sm`·`rounded-md`는 보지 않는다. `@ooee/ui` 컴포넌트에 `className`으로 높이나 모서리를 덮어쓴 것은 위반이다.
+   - **컴포넌트의 글자를 화면에서 덮어쓴 것도 위반이다.** `@ooee/ui`에서 가져온 컴포넌트에 `className`으로 글자 크기(`text-xs`·`text-sm`·`text-base`·`text-lg`·`text-xl`·`text-2xl`…, `text-[13px]`처럼 길이로 적은 임의 값, `text-oe-label`), 무게(`font-thin`…`font-black`, `font-[550]`) 또는 행간(`leading-*`)을 준 것이다. 글자 크기는 `controlSize` 같은 Property가 정하며, 화면이 덮어쓰면 같은 단계가 화면마다 다른 크기로 선다. 색(`text-oe-foreground-*`)과 계열(`font-mono`)은 화면이 정할 수 있으므로 위반이 아니다. `check-screens.mjs`는 이 부분을 「7 컴포넌트 글자 크기」로 기계로 보며, `className`을 끝까지 풀 수 없으면 판정을 보류한다.
 8. **Disabled와 Read-only** (interaction.md). native 요소에 `disabled`를 두고 색만 흐리게 하거나 외곽선을 지웠으면 위반이다. `cursor-not-allowed`를 Read-only에 쓴 것도 위반이다.
 9. **선택 상태 위 Hover** (interaction.md 「선택 상태와 Hover·Pressed」). 선택된 상태에 `hover:bg-*`를 겹쳤으면 위반이다.
 10. **Form 층** (vocabulary.md 「Form 구성 층」, field.md). Label·도움말·오류를 Control과 묶는 자리에 `Field`를 쓰지 않고 `<label>`과 `<p>`를 직접 놓았으면 위반이다. 제출·검증 로직이 Control이나 Field 안에 들어갔으면 위반이다.
 11. **문구와 자리** (`/generate-code` 규칙, select.md 「Guidelines」). 영어 UI 문구는 위반이다. 머리말 주석의 요청이 「」로 정한 문구와 `Copyright © {…}. All rights reserved.` 같은 저작권 관용구는 언어와 관계없이 위반이 아니다. 환경설정이 소유하는 값(시스템명·브랜드명)을 실제 값으로 박은 것은 위반이다. `{…}` 자리는 위반이 아니다. `Select`·`InputButton`의 `placeholder`가 그 Control을 감싼 `Field`의 label과 같거나 label 뒤에 `선택`만 붙인 것(Label 「요청 유형」에 `요청 유형 선택`)은 위반이다.
-12. **import 경계** (AGENTS.md 「코드 소유 경계」). `packages/ui/src/...`를 경로로 직접 import한 것, `apps/studio`에서 import한 것은 위반이다. `@ooee/ui`에서만 가져온다.
+12. **import 경계** (AGENTS.md 「코드 소유 경계」). `packages/ui/src/...`를 경로로 직접 import한 것, `apps/studio`에서 import한 것은 위반이다. `@ooee/ui`에서만 가져온다. 기계 규칙 「12 import 경계」는 `next/link`·`next/navigation`·`next/router` 도 낸다 — 화면은 링크와 이동을 스스로 정하지 않는다(`/generate-code` 「하지 않는 것」).
 13. **아이콘** (icon.md 「스타일 규칙」·「크기 토큰」). 다음은 위반이다.
     - 아이콘에 `size-4`·`h-4 w-4`·`size-[18px]`처럼 숫자 크기를 직접 준 것. `size-oe-icon-*`여야 한다. `Button`의 `leadingIcon`, `Input`의 `leadingElement`처럼 컴포넌트가 크기를 정하는 자리에 크기 클래스 없이 넘긴 것은 위반이 아니다.
     - native 요소로 만든 클릭 가능한 아이콘에 `hover:bg-oe-interaction-hover` 또는 `hover:bg-oe-interaction-hover-subtle`이 없는 것
     - `Ri*Fill` 아이콘을 선택·활성·성공 상태 표시나 Navigation 항목이 아닌 자리에 쓴 것
     - 글자를 대신하지 않는 아이콘에 `aria-hidden="true"`가 없는 것. `Button`의 `leadingIcon`, `Input`의 `leadingElement`처럼 컴포넌트에 넘긴 아이콘도 같다. 아이콘 자체에 `aria-label`이나 `title`을 준 것은 위반이 아니다.
 14. **초안 컴포넌트** (README.md 「Component」 표). 표에서 상태가 `초안`인 컴포넌트를 import했으면 위반이다. `packages/ui/src/index.ts`가 export해도 표가 기준이다.
+15. **머리말 주석** (`/generate-code` 「파일과 등록」). 화면 파일 머리말에 요청 문단이 없으면 기계 규칙 「머리말」이 위반으로 낸다 — 이 문서의 다른 항목들이 그 문단을 근거로 판정하기 때문이다(32·48·63·74·76행). 요청에서 나오지 않은 화면(`(renewal)` 아래 작업장처럼)은 담을 요청이 없으므로, 없는 요청을 지어 적지 않고 예외 목록에 적는다.
 
 다음은 위반으로 세지 않고 「판단이 필요한 것」에 적는다.
 

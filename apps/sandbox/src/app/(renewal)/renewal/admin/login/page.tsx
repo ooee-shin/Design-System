@@ -52,7 +52,7 @@ export default function AdminLoginScreenPage() {
               <CheckboxField label="아이디 저장" className="-ml-2" />
                 <a
                   href="#"
-                  className="rounded-sm text-sm font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring"
+                  className="rounded-sm text-sm font-medium text-oe-foreground-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary"
                 >
                   비밀번호 찾기
                 </a>

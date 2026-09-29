@@ -8,10 +8,34 @@
  * 보류한다. 걸리지 않았다고 위반이 없다는 뜻은 아니다.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+/**
+ * 화면 자리 아래를 재귀로 훑어 `page.tsx` 를 가진 디렉터리를 `screensDir` 기준 상대 경로로 돌려준다.
+ * 라우트 그룹 괄호 디렉터리(`(renewal)`)도 들어가므로 key 는 `(renewal)/renewal/admin/voice` 처럼 된다.
+ * 한 겹만 훑으면 그 아래 화면이 규칙 검사를 통째로 건너뛴다. 그 구멍이 훑는 자리 두 곳(이 Plugin 의
+ * `check-screens.mjs` 와 저장소의 `screen-rules.test.tsx`)에 같이 있었으므로 훑는 자를 여기 한 벌만
+ * 두고 둘이 함께 쓴다.
+ *
+ * `screensDir` 자신은 넣지 않는다. `apps/sandbox/src/app/page.tsx` 는 화면이 아니라 화면 목록이다.
+ */
+export function screenKeysIn(screensDir) {
+  const keys = [];
+  const descend = (rel) => {
+    for (const entry of readdirSync(rel ? path.join(screensDir, rel) : screensDir, { withFileTypes: true })) {
+      if (!entry.isDirectory() || entry.name === "node_modules" || entry.name.startsWith(".")) continue;
+      const next = rel ? `${rel}/${entry.name}` : entry.name;
+      // 화면 아래 화면이 있을 수 있다(`.../admin` 과 `.../admin/voice`). 찾았어도 계속 내려간다.
+      if (existsSync(path.join(screensDir, next, "page.tsx"))) keys.push(next);
+      descend(next);
+    }
+  };
+  descend("");
+  return keys.sort();
+}
 
 /**
  * 화면 파일에서 위로 올라가며 저장소 루트를 찾는다. `pnpm-workspace.yaml` 이나 `.git` 이 있는
@@ -65,6 +89,15 @@ const RE_BORDER_WIDTH = /^border(-[xytrblse])?(-[1-9]\d*|-\[[^\]]+\])?$/;
 const RE_NUMERIC_SIZE = /^(size|w|h)-(\d+(\.\d+)?|px|\[[^\]]+\])$/;
 const SLOT_PROPS = /^(trailingElement|leadingElement|leadingIcon|trailingIcon)$/;
 
+// 7: 글자 크기·무게·행간. `text-*` 는 크기와 색 둘 다 쓰는 접두사라 크기 이름만 적어 색을 가린다.
+// `text-oe-label` 은 지금 하나뿐인 oe 글자 크기 토큰이고, `text-oe-foreground-*` 는 색이라 잡지 않는다.
+// 임의 값은 길이로 읽히는 것만 크기로 본다(`text-[13px]` 은 크기, `text-[#1d4ed8]` 은 색이다).
+const RE_FONT_SIZE = /^text-(xs|sm|base|lg|xl|[2-9]xl|oe-label)$/;
+const RE_FONT_SIZE_ARBITRARY = /^text-\[(length:[^\]]+|-?\d*\.?\d+(px|rem|em|pt|ch|vw|vh|%))\]$/;
+// 계열 이름(`font-mono`)은 크기가 아니므로 무게 이름만 적는다.
+const RE_FONT_WEIGHT = /^font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black|\[\d+\])$/;
+const RE_LINE_HEIGHT = /^leading-[^\s]+$/;
+
 /** `hover:focus-visible:ring-2/50` 을 variant·utility·opacity로 나눈다. 대괄호·괄호 안의 `:` 는 자르지 않는다. */
 function splitToken(raw) {
   const variants = [];
@@ -98,6 +131,38 @@ function walk(node, visit, parents = []) {
   ts.forEachChild(node, (child) => walk(child, visit, next));
 }
 
+/**
+ * 블록 본문에서 그 함수가 돌려주는 식을 모은다. 중첩 함수(`onClick` 에 넘기는 화살표, 안쪽
+ * `.map()` 의 콜백) 안으로는 들어가지 않는다 — 그 `return` 은 이 함수가 돌려주는 것이 아니다.
+ * `walk` 로 모으면 손자 요소를 같은 줄에 선 것으로 세고(거짓 양성), 곁에 둔 화살표의 `return`
+ * 을 JSX 가 아닌 것으로 읽어 줄 전체를 보류한다(거짓 음성).
+ */
+function returnedExpressions(block) {
+  const out = [];
+  const visit = (node) => {
+    if (
+      ts.isFunctionDeclaration(node) ||
+      ts.isFunctionExpression(node) ||
+      ts.isArrowFunction(node) ||
+      ts.isMethodDeclaration(node) ||
+      ts.isGetAccessorDeclaration(node) ||
+      ts.isSetAccessorDeclaration(node) ||
+      ts.isClassLike(node)
+    )
+      return;
+    if (ts.isReturnStatement(node)) {
+      if (node.expression) out.push(node.expression);
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  ts.forEachChild(block, visit);
+  return out;
+}
+
+/** `<>`·`<Fragment>`·`<React.Fragment key={…}>` 는 모두 줄에 서지 않고 자식만 세운다. */
+const RE_FRAGMENT_TAG = /^(?:[A-Za-z_$][\w$]*\.)?Fragment$/;
+
 function openingOf(node) {
   if (ts.isJsxElement(node)) return node.openingElement;
   if (ts.isJsxSelfClosingElement(node)) return node;
@@ -120,8 +185,11 @@ function stringValue(attribute) {
   return undefined;
 }
 
-/** className 식에서 문자열 조각을 모은다. `cn`·`clsx` 인자, 조건식, 같은 파일의 const는 풀고 나머지는 opaque로 둔다. */
-function classInfo(el, consts) {
+/**
+ * className 식에서 문자열 조각을 모은다. `cn`·`clsx` 인자, 조건식, 같은 파일의 const는 풀고 나머지는 opaque로 둔다.
+ * `gapOf` 처럼 token 목록을 받는 자와 함께 쓰라고 내놓는다.
+ */
+export function classInfo(el, consts) {
   const strings = [];
   let opaque = false;
   const visit = (e, depth) => {
@@ -153,6 +221,192 @@ function classInfo(el, consts) {
   return { tokens: tokensOf(strings), opaque };
 }
 
+/**
+ * 화면 소스 하나를 읽어 AST 와 같은 파일의 `const` 표, 나오는 차례대로의 JSX 요소 목록을 돌려준다.
+ * `checkScreenSource` 가 쓰던 얼개를 내놓은 것이며, 도우미(`rowChildren`)를 규칙 없이 시험할 때도
+ * 같은 꼴로 쓴다. `elements` 의 각 항목은 `{ node, opening, tag }` 다.
+ */
+export function parseScreen(source, filePath) {
+  loadTypeScript(filePath);
+  const sf = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const consts = new Map();
+  const elements = [];
+  walk(sf, (n) => {
+    if (ts.isVariableDeclaration(n) && ts.isIdentifier(n.name) && n.initializer) consts.set(n.name.text, n.initializer);
+    const opening = openingOf(n);
+    if (opening) elements.push({ node: n, opening, tag: opening.tagName.getText() });
+  });
+  return { sf, consts, elements };
+}
+
+/**
+ * 어떤 JSX 요소의 자식 슬롯을 펴서 실제로 한 줄에 서는 것들을 돌려준다. 가로 flex 줄의 절반 가까이가
+ * 버튼을 `{조건 && <X/>}`·`{목록.map(…)}` 안에 두므로, 자식을 그대로 세는 규칙은 그만큼을 조용히
+ * 지나친다. Fragment(`<>`·`<Fragment>`·`<React.Fragment key={…}>`), `&&`, 삼항, `.map()`,
+ * 중첩 Fragment, 같은 파일의 `const` 를 푼다. `.map()` 의 블록 본문은 그 콜백이 돌려주는 식만
+ * 보고 중첩 함수 안으로는 들어가지 않는다.
+ *
+ * 돌려주는 꼴은 `{ items, opaque }` 다. `items` 의 각 항목은 다음을 갖는다.
+ * - `node`·`opening`·`tag` — 요소와 그 여는 태그. 글자 자식은 `opening` 이 `undefined` 이고 `text` 를 갖는다.
+ * - `repeated` — `.map()` 이 돌려준 것. 하나로 적혀 있지만 여럿이 선다.
+ * - `conditional` — `&&` 나 삼항 안에 있어 설 수도, 서지 않을 수도 있다.
+ *
+ * 펴지 못한 꼴(`{children}` 처럼 변수 하나만 넘긴 자식, `{render()}`)이 있으면 `opaque` 가 참이다.
+ * 그때 `items` 에 담긴 것은 맞지만 그것이 전부는 아니므로, 부르는 쪽은 판정을 보류한다.
+ */
+export function rowChildren(el, consts = new Map()) {
+  loadTypeScript();
+  const items = [];
+  let opaque = false;
+  let host = el;
+  if (host && ts.isJsxOpeningElement(host)) host = host.parent;
+  if (!host || !(ts.isJsxElement(host) || ts.isJsxFragment(host))) return { items, opaque };
+
+  const pushText = (node, text, flags) => items.push({ node, opening: undefined, tag: null, text, ...flags });
+  const visit = (node, flags, depth) => {
+    if (!node) return;
+    // 너무 깊이 들어가면 푼 것이 실제 줄과 같다고 말할 수 없다. 거기서 멈추고 보류로 넘긴다.
+    if (depth > 6) {
+      opaque = true;
+      return;
+    }
+    if (ts.isJsxText(node)) {
+      if (node.text.trim()) pushText(node, node.text.trim(), flags);
+      return;
+    }
+    if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+      const opening = openingOf(node);
+      const tag = opening.tagName.getText();
+      // 이름 있는 Fragment(`<React.Fragment key={…}>`)도 푼다. `.map()` 안에서 형제 둘을 돌려줄
+      // 때 `key` 를 받을 수 있는 유일한 꼴이라 실제로 쓰인다(`packages/ui/src/select.tsx`).
+      if (RE_FRAGMENT_TAG.test(tag)) {
+        if (ts.isJsxElement(node)) node.children.forEach((child) => visit(child, flags, depth + 1));
+        return;
+      }
+      items.push({ node, opening, tag, text: null, ...flags });
+      return;
+    }
+    if (ts.isJsxFragment(node)) {
+      node.children.forEach((child) => visit(child, flags, depth + 1));
+      return;
+    }
+    if (ts.isJsxExpression(node) || ts.isParenthesizedExpression(node)) {
+      // `{/* 주석 */}` 과 `{}` 는 expression 이 없다. 서는 것이 없으니 보류도 아니다.
+      if (node.expression) visit(node.expression, flags, depth + 1);
+      return;
+    }
+    if (ts.isStringLiteralLike(node)) {
+      if (node.text.trim()) pushText(node, node.text.trim(), flags);
+      return;
+    }
+    if (ts.isConditionalExpression(node)) {
+      visit(node.whenTrue, { ...flags, conditional: true }, depth + 1);
+      visit(node.whenFalse, { ...flags, conditional: true }, depth + 1);
+      return;
+    }
+    if (ts.isBinaryExpression(node)) {
+      const operator = node.operatorToken.kind;
+      if (operator === ts.SyntaxKind.AmpersandAmpersandToken) {
+        visit(node.right, { ...flags, conditional: true }, depth + 1);
+        return;
+      }
+      if (operator === ts.SyntaxKind.BarBarToken || operator === ts.SyntaxKind.QuestionQuestionToken) {
+        visit(node.left, { ...flags, conditional: true }, depth + 1);
+        visit(node.right, { ...flags, conditional: true }, depth + 1);
+        return;
+      }
+      opaque = true;
+      return;
+    }
+    if (ts.isCallExpression(node)) {
+      const callee = node.expression;
+      const method = ts.isPropertyAccessExpression(callee) ? callee.name.text : null;
+      const fn = node.arguments[0];
+      const body = fn && (ts.isArrowFunction(fn) || ts.isFunctionExpression(fn)) ? fn.body : undefined;
+      if (!(method === "map" || method === "flatMap") || !body) {
+        opaque = true;
+        return;
+      }
+      if (!ts.isBlock(body)) {
+        visit(body, { ...flags, repeated: true }, depth + 1);
+        return;
+      }
+      const returned = returnedExpressions(body);
+      if (!returned.length) opaque = true;
+      returned.forEach((value) => visit(value, { ...flags, repeated: true }, depth + 1));
+      return;
+    }
+    if (node.kind === ts.SyntaxKind.NullKeyword || node.kind === ts.SyntaxKind.FalseKeyword || node.kind === ts.SyntaxKind.TrueKeyword) return;
+    if (ts.isIdentifier(node)) {
+      if (node.text === "undefined") return;
+      const init = consts.get(node.text);
+      if (init && depth < 4) visit(init, flags, depth + 1);
+      else opaque = true;
+      return;
+    }
+    opaque = true;
+  };
+
+  host.children.forEach((child) => visit(child, { repeated: false, conditional: false }, 0));
+  return { items, opaque };
+}
+
+/** Tailwind 기본 간격 한 칸은 `0.25rem` 이고 `rem` 은 화면 기본 글자 크기 `16px` 이다. */
+const SPACING_STEP_PX = 4;
+const REM_PX = 16;
+// `gap-x` 를 `gap` 보다 앞에 두어야 `gap-x-1.5` 의 값을 `x-1.5` 로 읽지 않는다.
+const RE_GAP = /^(gap-x|space-x|gap)-(.+)$/;
+
+/** `6px`·`0.375rem` 같은 임의 값을 픽셀로 읽는다. 단위가 상황에 따라 달라지는 것은 읽지 않는다. */
+function lengthToPx(text) {
+  const match = /^(\d+(?:\.\d+)?)(px|rem)$/.exec(text.trim());
+  if (!match) return null;
+  return Number(match[1]) * (match[2] === "rem" ? REM_PX : 1);
+}
+
+/** 가로 간격을 정하는 utility 면 그 값 조각을 돌려준다. 세로 간격(`gap-y-2`)과 그 밖은 `null` 이다. */
+function horizontalGapValue(utility) {
+  const match = RE_GAP.exec(utility);
+  if (!match) return null;
+  return match[1] === "gap" && match[2].startsWith("y-") ? null : match[2];
+}
+
+/** `gap-1.5`·`gap-px`·`gap-[6px]` 의 값 조각을 픽셀로 읽는다. */
+function gapValueToPx(value) {
+  if (value === "px") return 1;
+  if (value.startsWith("[") && value.endsWith("]")) return lengthToPx(value.slice(1, -1).replace(/_/g, " "));
+  if (/^\d+(\.\d+)?$/.test(value)) return Number(value) * SPACING_STEP_PX;
+  // `gap-oe-…` 처럼 토큰을 가리키는 것은 소스만으로 값을 알 수 없다.
+  return null;
+}
+
+/**
+ * class 목록에서 가로 간격을 읽어 픽셀 수로 돌려준다. `gap-1.5`·`gap-x-1.5`·`space-x-1.5`·`gap-[6px]` 를
+ * 모두 `6` 으로 읽어 저장소에 섞여 있는 두 꼴을 같은 자로 잰다. 없으면 `null`, 읽을 수 없으면 `"unknown"`
+ * 이다. 인수는 class 문자열이어도 되고 `classInfo(...).tokens` 여도 된다.
+ *
+ * 읽을 수 없는 것으로 넘기는 것: 상황마다 달라지는 간격(`sm:gap-2`), 음수(`-space-x-1`),
+ * 토큰을 가리키는 값(`gap-oe-…`), `px`·`rem` 이 아닌 단위와 `calc(…)`. 세로 간격(`gap-y-*`)은 이 자의
+ * 대상이 아니므로 없는 것으로 읽는다. `gap-2 gap-x-1.5` 처럼 두 값이 어긋나면 생성된 CSS 의 차례가
+ * 무엇을 이기는지 소스만으로 정할 수 없으므로 읽을 수 없는 것으로 둔다.
+ */
+export function gapOf(classes) {
+  const list = Array.isArray(classes) ? classes : [classes];
+  const tokens = list
+    .flatMap((item) => (typeof item === "string" ? tokensOf([item]) : item && typeof item.utility === "string" ? [item] : []))
+    .map((token) => ({ token, value: horizontalGapValue(token.utility) }))
+    .filter((entry) => entry.value !== null);
+  if (!tokens.length) return null;
+  if (tokens.some(({ token }) => token.variants.length || token.raw.trimStart().startsWith("-"))) return "unknown";
+  const values = new Set();
+  for (const { value } of tokens) {
+    const px = gapValueToPx(value);
+    if (px === null) return "unknown";
+    values.add(px);
+  }
+  return values.size === 1 ? [...values][0] : "unknown";
+}
+
 /** `docs/system/README.md` 「Component」 표에서 상태가 `초안`인 행의 이름을 export 이름 꼴(`MessageComposer`)로 돌려준다. */
 export function draftComponentNames(readme) {
   const section = readme.split(/^## Component$/m)[1]?.split(/^## /m)[0] ?? "";
@@ -164,16 +418,10 @@ export function draftComponentNames(readme) {
  * `drafts` 는 `draftComponentNames` 의 결과다.
  */
 export function checkScreenSource(source, filePath, drafts) {
-  loadTypeScript(filePath);
-  const sf = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const { sf, consts } = parseScreen(source, filePath);
   const hits = [];
   const add = (rule, node, detail) =>
     hits.push({ rule, line: typeof node === "number" ? node : sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1, detail });
-
-  const consts = new Map();
-  walk(sf, (n) => {
-    if (ts.isVariableDeclaration(n) && ts.isIdentifier(n.name) && n.initializer) consts.set(n.name.text, n.initializer);
-  });
 
   // 1·2: 모듈 경로와 지시문을 뺀 모든 문자열
   walk(sf, (n, parents) => {
@@ -201,6 +449,20 @@ export function checkScreenSource(source, filePath, drafts) {
     if (bindings && ts.isNamedImports(bindings)) bindings.elements.forEach((e) => iconNames.add(e.name.text));
   });
   const isIcon = (el) => ts.isIdentifier(el.tagName) && iconNames.has(el.tagName.text);
+
+  // 7: `@ooee/ui` 에서 가져온 이름. 규칙 14 가 보는 것과 같은 import 다.
+  const uiNames = new Set();
+  walk(sf, (n) => {
+    if (!ts.isImportDeclaration(n) || !ts.isStringLiteral(n.moduleSpecifier) || n.moduleSpecifier.text !== "@ooee/ui") return;
+    const bindings = n.importClause?.namedBindings;
+    if (bindings && ts.isNamedImports(bindings)) bindings.elements.forEach((e) => uiNames.add(e.name.text));
+  });
+  /** `Field.Label` 처럼 점으로 이은 태그는 앞의 이름으로 가린다. */
+  const tagRoot = (tagName) => {
+    let node = tagName;
+    while (ts.isPropertyAccessExpression(node)) node = node.expression;
+    return ts.isIdentifier(node) ? node.text : null;
+  };
 
   walk(sf, (node, parents) => {
     const el = openingOf(node);
@@ -237,6 +499,24 @@ export function checkScreenSource(source, filePath, drafts) {
       );
       const bordered = cls.tokens.some((t) => t.variants.length === 0 && RE_BORDER_WIDTH.test(t.utility));
       if (ring2 && !offset && !bordered && !insideSlot) add("5 Focus", el, `<${tag}>의 focus-visible:ring-2에 ring-offset-2 없음`);
+    }
+
+    // 7: `@ooee/ui` 컴포넌트가 정한 글자 크기·무게·행간을 화면에서 className으로 덮어쓴 것
+    const uiTag = tagRoot(el.tagName);
+    if (uiTag && uiNames.has(uiTag) && !cls.opaque) {
+      const typography = cls.tokens.filter(
+        (t) =>
+          RE_FONT_SIZE.test(t.utility) ||
+          RE_FONT_SIZE_ARBITRARY.test(t.utility) ||
+          RE_FONT_WEIGHT.test(t.utility) ||
+          RE_LINE_HEIGHT.test(t.utility),
+      );
+      if (typography.length)
+        add(
+          "7 컴포넌트 글자 크기",
+          el,
+          `${tag}에 className으로 ${typography.map((t) => t.raw).join(" ")} — 글자 크기·무게·행간은 controlSize 같은 Property가 정한다`,
+        );
     }
 
     // 13: 아이콘

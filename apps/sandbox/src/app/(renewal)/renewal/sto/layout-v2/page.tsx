@@ -49,11 +49,11 @@ const SCREEN_TITLE = "메인";
 // 했으므로 알리는 모양으로 그린다. ⓘ 는 지금 보고 있는 것을 설명하는 표시라 읽을거리가
 // 모인 메뉴와 뜻이 다르므로 쓰지 않는다.
 const NAVIGATION_ITEMS: BottomNavigationItem[] = [
-  { value: "home", label: "홈", icon: <RiHomeLine />, selectedIcon: <RiHomeFill /> },
-  { value: "headquarters", label: "본사소통", icon: <RiChat3Line />, selectedIcon: <RiChat3Fill /> },
-  { value: "store", label: "매장관리", icon: <RiStore2Line />, selectedIcon: <RiStore2Fill /> },
-  { value: "notice", label: "공지·자료", icon: <RiMegaphoneLine />, selectedIcon: <RiMegaphoneFill /> },
-  { value: "all", label: "전체", icon: <RiMenuLine />, selectedIcon: <RiMenuFill /> },
+  { value: "home", label: "홈", icon: <RiHomeLine aria-hidden="true" />, selectedIcon: <RiHomeFill aria-hidden="true" /> },
+  { value: "headquarters", label: "본사소통", icon: <RiChat3Line aria-hidden="true" />, selectedIcon: <RiChat3Fill aria-hidden="true" /> },
+  { value: "store", label: "매장관리", icon: <RiStore2Line aria-hidden="true" />, selectedIcon: <RiStore2Fill aria-hidden="true" /> },
+  { value: "notice", label: "공지·자료", icon: <RiMegaphoneLine aria-hidden="true" />, selectedIcon: <RiMegaphoneFill aria-hidden="true" /> },
+  { value: "all", label: "전체", icon: <RiMenuLine aria-hidden="true" />, selectedIcon: <RiMenuFill aria-hidden="true" /> },
 ];
 
 // 어느 메뉴가 어느 탭에 드는지는 사용자가 정한 구분이다. 「홈」만 하위 메뉴가 아니라 화면 자체가
@@ -79,7 +79,7 @@ export default function StoLayoutV2ScreenPage() {
         title={SCREEN_TITLE}
         titleHidden
         leadingElement={<HeaderLogo />}
-        trailingElement={<HeaderIcon icon={<RiNotification3Line />} label="알림" />}
+        trailingElement={<HeaderIcon icon={<RiNotification3Line aria-hidden="true" />} label="알림" />}
       />
 
       {/* 무엇이 켜져 있는지 하단 표시만으로는 작아서, 지금 고른 메뉴의 이름을 본문 맨 위에 크게

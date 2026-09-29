@@ -45,7 +45,7 @@ export default function StoWriteScreenPage() {
         // 바뀌면 같은 장에 있는데도 다른 화면으로 넘어온 것처럼 읽힌다.
         title="등록"
         leadingElement={
-          <Button variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiArrowLeftLine />} aria-label="뒤로" />
+          <Button variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiArrowLeftLine aria-hidden="true" />} aria-label="뒤로" />
         }
       />
 
@@ -96,7 +96,7 @@ export default function StoWriteScreenPage() {
               다른 바탕을 깔아 구분하고, 아이콘은 글의 첫 줄에 맞춰 위로 붙인다. */}
           {kind === null ? null : (
             <div className="flex items-start gap-2 rounded-lg bg-oe-background-secondary p-3">
-              <RiInformationLine className="mt-0.5 size-4 shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
+              <RiInformationLine className="mt-0.5 size-oe-icon-small shrink-0 text-oe-foreground-tertiary" aria-hidden="true" />
               {/* 아이콘과 같은 tertiary 로 적는다. 채워야 하는 칸이 아니라 한 번 읽고 지나가는
                   안내이므로, 아래 칸들의 라벨보다 한 단계 물러나 있어야 한다. 그 안에서 메뉴 이름만
                   secondary 로 한 단계 올린다. 점주가 찾아가야 할 곳은 그 이름 하나이며, 굵기는
@@ -246,10 +246,10 @@ export default function StoWriteScreenPage() {
                               <img
                                 src={file.preview}
                                 alt=""
-                                className="size-full rounded-lg object-cover shadow-[inset_0_0_0_1px_var(--oe-border-visual)]"
+                                className="size-full rounded-lg object-cover inset-ring inset-ring-oe-border-visual"
                               />
                             ) : (
-                              <RiAttachment2 className="size-5 text-oe-foreground-tertiary" />
+                              <RiAttachment2 className="size-oe-icon-medium text-oe-foreground-tertiary" aria-hidden="true" />
                             )}
                           </span>
                           {/* 이름 아래에 종류와 크기를 한 줄로 붙인다. 용량을 이름 오른쪽에 두면 긴
@@ -276,7 +276,7 @@ export default function StoWriteScreenPage() {
                             tone="neutral"
                             controlSize="large"
                             className="shrink-0"
-                            leadingIcon={<RiCloseLine />}
+                            leadingIcon={<RiCloseLine aria-hidden="true" />}
                             aria-label={`${file.name} 지우기`}
                             onClick={() =>
                               setFiles((previous) =>

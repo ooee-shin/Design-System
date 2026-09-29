@@ -81,7 +81,7 @@ ooee-ui 디자인 시스템으로 화면 코드를 만들고 검수하는 Claude
 | `skills/generate-code/SKILL.md` | ① 디자인 시스템 검색 → ⑧ pull request 준비까지의 절차 |
 | `skills/review-design/SKILL.md` | 검사 항목 14개와 「판단이 필요한 것」 |
 | `lib/screen-rules.mjs` | 검사 항목 가운데 소스만으로 가를 수 있는 것의 판정 |
-| `lib/check-screens.mjs` | 화면 디렉터리를 훑어 위반을 내는 명령 |
+| `lib/check-screens.mjs` | 화면 디렉터리를 재귀로 훑어 위반을 내는 명령. 옛 화면의 예외 목록은 `--allow <목록.json>` 으로 준다 |
 | `lib/screen-rules.test.mjs` | 판정 시험. 저장소 구조에 기대지 않는다 |
 
 만든 배경과 결정은 이 저장소의 `docs/process/ai-environment.md`에 있다. 전달본에는 그 문서가 가지 않는다.

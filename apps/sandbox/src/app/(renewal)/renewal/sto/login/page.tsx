@@ -236,7 +236,7 @@ function AuthLink({ label, emphasis = false }: { label: string; emphasis?: boole
     <a
       href="#"
       className={cn(
-        "rounded-sm text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring",
+        "rounded-sm text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary",
         emphasis ? "text-oe-foreground-primary" : "text-oe-foreground-tertiary",
       )}
     >

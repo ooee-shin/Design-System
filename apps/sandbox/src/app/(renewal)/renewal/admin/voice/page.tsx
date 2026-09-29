@@ -121,12 +121,12 @@ function FilterSection({
               controlSize="compact"
               onClick={onClear}
               ariaLabel={`${label} 조건 ${count}개 지우기`}
-              trailingElement={<RiCloseLine />}
+              trailingElement={<RiCloseLine aria-hidden="true" />}
               trailingTone="tertiary"
             >
               {String(count)}
             </Chip>
-            <button type="button" onClick={toggle} aria-label={`${label} ${open ? "접기" : "펼치기"}`} className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring">
+            <button type="button" onClick={toggle} aria-label={`${label} ${open ? "접기" : "펼치기"}`} className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-oe-focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-oe-background-primary">
               {arrow}
             </button>
           </>
@@ -179,7 +179,7 @@ function StorePicker({
         controlSize="small"
         aria-label="점포 찾기"
         placeholder="점포명으로 찾기"
-        leadingElement={<RiSearchLine />}
+        leadingElement={<RiSearchLine aria-hidden="true" />}
         clearable
         value={query}
         onChange={(event) => setQuery(event.target.value)}
@@ -211,7 +211,7 @@ function StorePicker({
             }`}
           >
             <span className="min-w-0 flex-1 truncate">{region}</span>
-            <RiArrowDownSLine className="size-4 shrink-0 -rotate-90 text-oe-foreground-tertiary" aria-hidden="true" />
+            <RiArrowDownSLine className="size-oe-icon-small shrink-0 -rotate-90 text-oe-foreground-tertiary" aria-hidden="true" />
           </button>
         ))}
       </div>
@@ -440,7 +440,7 @@ export default function Page() {
                   variant="ghost"
                   tone="neutral"
                   controlSize="small"
-                  leadingIcon={<RiEqualizer2Line />}
+                  leadingIcon={<RiEqualizer2Line aria-hidden="true" />}
                   aria-expanded={panelOpen}
                   aria-label={panelOpen ? "필터 닫기" : "필터 열기"}
                   onClick={() => setPanelChoice(!panelOpen)}
@@ -541,7 +541,7 @@ export default function Page() {
                       variant="ghost"
                       tone="neutral"
                       controlSize="xsmall"
-                      leadingIcon={<RiResetLeftLine />}
+                      leadingIcon={<RiResetLeftLine aria-hidden="true" />}
                       // 고른 것을 비우기만 하고 목록은 건드리지 않는다. 값을 고르는 것과 같은
                       // 층의 조작이므로, 이것도 조회를 눌러야 목록에 반영된다. 여기서 목록까지
                       // 함께 되돌리면 조건을 걸 때는 조회를 거치는데 풀 때는 거치지 않게 된다.
@@ -604,7 +604,7 @@ export default function Page() {
                           aria-label="기간"
                           placeholder="시작일 ~ 종료일"
                           value={draft.from && draft.to ? `${draft.from} ~ ${draft.to}` : ""}
-                          leadingElement={<RiCalendarLine />}
+                          leadingElement={<RiCalendarLine aria-hidden="true" />}
                         />
                       </div>
                     </CollapsibleContent>
@@ -648,7 +648,7 @@ export default function Page() {
                     controlSize="small"
                     aria-label="담당자 찾기"
                     placeholder="이름이나 팀으로 찾기"
-                    leadingElement={<RiSearchLine />}
+                    leadingElement={<RiSearchLine aria-hidden="true" />}
                     clearable
                     value={supervisorQuery}
                     onChange={(event) => setSupervisorQuery(event.target.value)}

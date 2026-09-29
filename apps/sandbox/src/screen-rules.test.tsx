@@ -2,12 +2,12 @@
 // 규칙 자체의 시험은 plugins/ooee-harness/lib/screen-rules.test.mjs 가 한다.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { checkScreenFile, checkTestTitles } from "../../../plugins/ooee-harness/lib/screen-rules.mjs";
+import { checkScreenFile, checkTestTitles, screenKeysIn } from "../../../plugins/ooee-harness/lib/screen-rules.mjs";
 
 type RuleHit = { rule: string; line: number; detail: string };
 
@@ -36,26 +36,53 @@ const V0_RECORDS: Record<string, { sha256: string; testSha256: string; mustCatch
   },
 };
 
+/**
+ * 검사 범위를 `app` 의 직계 하위에서 재귀로 넓히며 드러난 옛 화면의 위반이다. 목록과 그것을
+ * 예외로 둔 까닭은 `src/screen-rules-legacy.json` 이 갖는다 — 그 파일을 화면 규칙 검사 명령도
+ * `--allow` 로 읽으므로, 목록을 이 시험 안에 두면 전수 검사가 시험과 다른 답을 낸다.
+ */
+const LEGACY_VIOLATIONS: Record<string, Record<string, number>> = JSON.parse(
+  readFileSync(path.join(SRC, "screen-rules-legacy.json"), "utf8"),
+).screens;
+
 const format = (hits: RuleHit[]) => hits.map((h) => `  L${h.line} [${h.rule}] ${h.detail}`).join("\n");
 const rulesOf = (hits: RuleHit[]) => new Set(hits.map((h) => h.rule));
+const countByRule = (hits: RuleHit[]) =>
+  hits.reduce<Record<string, number>>((acc, hit) => ({ ...acc, [hit.rule]: (acc[hit.rule] ?? 0) + 1 }), {});
 
-const screenKeys = readdirSync(APP, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .filter((key) => readdirSync(path.join(APP, key)).includes("page.tsx"));
+// `app` 아래를 재귀로 훑는다. 한 겹만 훑던 때에는 `(renewal)` 아래 화면 16장이 규칙 검사를
+// 통째로 건너뛰었다. 훑는 자는 규칙 엔진과 `check-screens.mjs` 가 함께 쓰는 것 하나다.
+const screenKeys = screenKeysIn(APP);
 
 const sha256Of = (file: string) => createHash("sha256").update(readFileSync(file)).digest("hex");
+
+// 적어 둔 화면을 훑기에서 놓치면 그 화면의 회차가 아예 만들어지지 않아, 검사를 건너뛴 것이
+// 초록으로 읽힌다(재귀를 끊어도 시험 수만 줄고 전부 통과했다). 그 자를 여기서 지킨다.
+// 훑는 자 자체의 고정 시험은 `plugins/ooee-harness/lib/screen-rules.test.mjs` 에 있다.
+test("적어 둔 화면 key 를 훑기가 모두 찾는다", () => {
+  const found = new Set(screenKeys);
+  for (const key of [...Object.keys(V0_RECORDS), ...Object.keys(LEGACY_VIOLATIONS)])
+    assert.ok(found.has(key), `src/app/${key}/page.tsx 를 화면으로 찾지 못했다 — 훑기가 그 자리까지 내려가지 않는다`);
+  const inRouteGroup = screenKeys.filter((key) => key.startsWith("(renewal)/"));
+  assert.ok(inRouteGroup.length >= 16, `route group 아래 화면을 ${inRouteGroup.length}장만 찾았다 — 재귀로 훑고 있는지 본다`);
+});
 
 for (const key of screenKeys) {
   const file = path.join(APP, key, "page.tsx");
   const testFile = path.join(APP, key, "page.test.tsx");
-  const hasTest = readdirSync(path.join(APP, key)).includes("page.test.tsx");
+  const hasTest = existsSync(testFile);
   const record = V0_RECORDS[key];
+  const legacy = LEGACY_VIOLATIONS[key];
 
   if (record && record.sha256 === sha256Of(file)) {
     test(`v0 기록 ${key}: 규칙이 기록된 틀린 사례를 잡는다`, () => {
       const caught = rulesOf(checkScreenFile(file, README));
       for (const rule of record.mustCatch) assert.ok(caught.has(rule), `${key}에서 「${rule}」을 잡지 못했다`);
+    });
+  } else if (legacy) {
+    test(`옛 위반 ${key}: 예외로 적은 위반만 남아 있다`, () => {
+      const hits = checkScreenFile(file, README);
+      assert.deepEqual(countByRule(hits), legacy, `src/app/${key}/page.tsx 의 위반이 LEGACY_VIOLATIONS 와 다르다\n${format(hits)}`);
     });
   } else {
     test(`${key}: 화면 코드 규칙 위반이 없다`, () => {

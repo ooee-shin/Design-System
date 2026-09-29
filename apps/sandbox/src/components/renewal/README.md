@@ -2,7 +2,7 @@
 
 `/renewal/*` 는 블루키 제품 화면을 한 건씩 구현하는 작업장이다. `2026-09-22` 에 Studio 의 `/screens` 에서 sandbox 로 옮겼다. 화면은 `src/app/(renewal)/renewal/` 아래, 부품은 이 폴더(`screen-chrome` · `screen-registry` · `screen-work-list` · `screen-root-tabs`)와 `src/components/candidates/` 에 있다.
 
-`/make-screens`(안에서 `/ooee-harness:generate-code`)가 만든 화면(`src/screens.ts` 에 등록된 것)과는 다른 자리다. route group `(renewal)` 로 두어 sandbox 의 화면 규칙 검사가 이 화면들을 생성 화면으로 세지 않는다. 까닭은 `src/app/(renewal)/layout.tsx` 에 있다.
+`/make-screens`(안에서 `/ooee-harness:generate-code`)가 만든 화면(`src/screens.ts` 에 등록된 것)과는 다른 자리다. route group `(renewal)` 로 둔 까닭은 브랜드 테마를 이 구역만 감싸는 것이며 `src/app/(renewal)/layout.tsx` 에 적혀 있다. **화면 규칙 검사는 이 화면들도 함께 본다** — 두 검사는 `2026-09-29` 부터 `src/app` 아래를 재귀로 훑고, 넓히기 전에 이미 있던 위반만 `src/screen-rules-legacy.json` 에 예외로 적혀 있다(새 화면은 그 목록에 더하지 않는다).
 
 ## 규칙
 

@@ -116,15 +116,15 @@ export default function AdminSupportRequestScreenPage() {
                   aria-label="제목 검색"
                   value={keyword}
                   onChange={(event) => setKeyword(event.target.value)}
-                  trailingElement={<RiSearchLine />}
+                  trailingElement={<RiSearchLine aria-hidden="true" />}
                 />
                 {/* 조건과 검색을 다 걸고 난 결과가 몇 건인지, 그것을 어떤 차례로 보고 있는지, 그리고
                     그중 내 점포만 볼지가 한 줄에 선다. 셋 다 목록에 무엇이 담겼는지를 말하는 값이라
                     담긴 것 바로 위가 자리다. */}
                 <div className="flex items-center justify-between gap-2">
                   {/* 건수는 이 줄에서 가장 먼저 읽히는 값이다. 크기를 키워 앞세우는 대신 한 단계
-                      내리고 굵기를 올렸다. 옆의 조작들과 같은 14px 이라 줄의 높이가 이 값 때문에
-                      늘어나지 않으면서, 굵기만으로 먼저 읽힌다. */}
+                      내리고 굵기를 올렸다. 줄의 높이는 옆에 선 `Select` 의 Small 이 정하므로
+                      (32px, 잰 값) 이 값이 줄을 늘리지 않고, 굵기만으로 먼저 읽힌다. */}
                   <span className="shrink-0 text-sm font-medium text-oe-foreground-secondary">
                     전체 <span className="text-oe-foreground-primary tabular-nums">{shown.length}</span>건
                   </span>
@@ -146,10 +146,13 @@ export default function AdminSupportRequestScreenPage() {
                         안에서 폼 컨트롤 하나만 상자를 두르면 그 자리만 입력할 값처럼 보인다.
 
                         정렬 기준은 아직 최신순 하나다. 늘어날 자리라 Select 로 두었고, 값이 하나인
-                        동안에는 눌러도 바뀌지 않는다. */}
+                        동안에는 눌러도 바뀌지 않는다.
+
+                        높이와 글자 크기는 `controlSize="small"` 이 정한다. 화면에서 `h-auto`·
+                        `text-oe-label` 로 덮어쓰면 같은 Small 이 화면마다 다른 크기로 서게 된다. */}
                     <Select
                       controlSize="small"
-                      className="text-oe-label h-auto gap-1 border-transparent bg-transparent px-0 text-oe-foreground-secondary hover:bg-transparent"
+                      className="gap-1 border-transparent bg-transparent px-0 text-oe-foreground-secondary hover:bg-transparent"
                       options={SORT_OPTIONS}
                       value={order}
                       onValueChange={(next) => setOrder(next ?? "latest")}
@@ -306,7 +309,7 @@ function FilterBar({
 
       {/* 두 버튼은 줄 끝으로 민다. 조건을 다 세운 다음에 누르는 것이라 읽는 순서의 끝이다. */}
       <div className="ml-auto flex items-center gap-1.5">
-        <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiResetLeftLine />} onClick={onReset}>
+        <Button type="button" variant="ghost" tone="neutral" controlSize="small" leadingIcon={<RiResetLeftLine aria-hidden="true" />} onClick={onReset}>
           초기화
         </Button>
         {/* 줄에서 마지막으로 누르는 주 동작이라 축들보다 한 단계 크다. 같은 32px 로 두면 조건을
@@ -389,7 +392,7 @@ function RequestRow({ request, picked, onPick }: { request: SupportRequest; pick
 function EmptyDetail() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2">
-      <RiInboxLine className="size-8 text-oe-foreground-placeholder" aria-hidden="true" />
+      <RiInboxLine className="size-oe-icon-xlarge text-oe-foreground-placeholder" aria-hidden="true" />
       <p className="mt-1 text-base font-medium text-oe-foreground-secondary">왼쪽 목록에서 요청을 고르세요</p>
       <p className="text-sm text-oe-foreground-tertiary">고른 요청의 내용과 처리 상황이 이 자리에 열립니다.</p>
     </div>

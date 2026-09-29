@@ -1,0 +1,29 @@
+{
+  "asOf": "2026-09-29",
+  "note": [
+    "검사 범위를 `app` 의 직계 하위에서 재귀로 넓히며 드러난 옛 화면의 위반이다. 새 화면은 이 목록에 더하지 않는다 — 넓히기 전에 이미 있던 것만 적는다.",
+    "화면 경로와 규칙 이름, 그 규칙에 걸리는 건수로 적는다. 파일 해시로 잠그지 않은 까닭은 `(renewal)` 아래가 계속 손보는 작업장이어서, 관계없는 한 줄을 고칠 때마다 면제가 풀려 검사가 붉어지는 쪽이 더 나쁘기 때문이다. 건수까지 적으므로 같은 규칙의 위반이 하나라도 늘면 붉어진다. 고쳐서 0이 된 줄을 지우라고 붉어지는 것은 `src/screen-rules.test.tsx` 다 — `--allow` 는 적은 만큼 빼기만 하므로 남은 몫을 따지지 않는다.",
+    "이 파일은 `src/screen-rules.test.tsx` 와 `plugins/ooee-harness/lib/check-screens.mjs --allow` 가 함께 읽는다. 한쪽에만 두면 전수 검사가 시험과 다른 답을 낸다."
+  ],
+  "reasons": [
+    "「머리말」 13장. `(renewal)` 아래는 화면 요청 이슈에서 나온 화면이 아니라 블루키 리뉴얼 작업장이다. 담을 「요청 문단」이 없으므로 없는 요청을 지어 적지 않는다. 이 자리에 규칙을 어떻게 적용할지는 기획자와 정한다.",
+    "`admin/layout` 의 색 2건. 고른 미리보기를 두르는 선이 `brand-600` 의 40% 다. 그 자리를 뜻하는 oe 토큰이 아직 없어 토큰을 하나 정해야 고칠 수 있다(`docs/system` 은 기획자 소유).",
+    "`renewal` 의 import 경계 1건. `/renewal` 은 첫 목록으로 보내는 redirect 전용 라우트이므로 `next/navigation` 의 `redirect` 를 대신할 것이 없다."
+  ],
+  "screens": {
+    "(renewal)/renewal": { "12 import 경계": 1, "머리말": 1 },
+    "(renewal)/renewal/admin": { "머리말": 1 },
+    "(renewal)/renewal/admin/layout": { "1 raw primitive color": 2 },
+    "(renewal)/renewal/admin/login": { "머리말": 1 },
+    "(renewal)/renewal/admin/test": { "머리말": 1 },
+    "(renewal)/renewal/sto": { "머리말": 1 },
+    "(renewal)/renewal/sto/layout": { "머리말": 1 },
+    "(renewal)/renewal/sto/layout-v2": { "머리말": 1 },
+    "(renewal)/renewal/sto/layout-v3": { "머리말": 1 },
+    "(renewal)/renewal/sto/login": { "머리말": 1 },
+    "(renewal)/renewal/sto/test": { "머리말": 1 },
+    "(renewal)/renewal/sto/write": { "머리말": 1 },
+    "(renewal)/renewal/sv": { "머리말": 1 },
+    "(renewal)/renewal/sv/test": { "머리말": 1 }
+  }
+}

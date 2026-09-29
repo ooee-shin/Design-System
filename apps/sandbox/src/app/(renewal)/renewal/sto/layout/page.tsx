@@ -40,8 +40,8 @@ export default function StoLayoutScreenPage() {
         leadingElement={<HeaderLogo />}
         trailingElement={
           <>
-            <HeaderIcon icon={<RiNotification3Line />} label="알림" />
-            <HeaderIcon icon={<RiMenuLine />} label="전체메뉴" />
+            <HeaderIcon icon={<RiNotification3Line aria-hidden="true" />} label="알림" />
+            <HeaderIcon icon={<RiMenuLine aria-hidden="true" />} label="전체메뉴" />
           </>
         }
       />
