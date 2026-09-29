@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { looksLikeDecision, readCommentDecision } from "./decision.mjs";
 
+import { validatePlan } from "./plan.mjs";
 import {
   CHAINED_SKILLS,
   EFFORT,
@@ -24,6 +25,7 @@ import {
   pickActionable,
   pickUnreadLookalikes,
   staleBranches,
+  recoverPlan,
   startNotice,
   stopNotice,
   stopReport,
@@ -320,4 +322,35 @@ test("승인·반려·결과에는 시작 알림을 올리지 않는다 — 결�
   assert.equal(calls.length, 2, "시작 알림을 부르는 자리는 처리와 개선 둘뿐이다");
   const approve = source.slice(source.indexOf("async function approve"), source.indexOf("async function reject"));
   assert.ok(!approve.includes("notifyStart"), "승인에서 시작 알림을 올리면 안 된다");
+});
+
+test("모델이 plan.json 을 안 써도 작업 트리에서 계획을 짓는다 — 만든 화면을 버리지 않는다", () => {
+  // 2026-09-29 #135·#147: 화면과 시험을 다 만들고 검사까지 지난 뒤 하위 명령 보고로 끝냈다. 스킬에 적어도 또 그랬다.
+  const status = [
+    " M apps/sandbox/src/screens.ts",
+    "?? apps/sandbox/src/app/webtoon-main/page.test.tsx",
+    "?? apps/sandbox/src/app/webtoon-main/page.tsx",
+  ].join("\n");
+  const registered = [{ key: "webtoon-main", name: "웹툰 메인 화면", project: "하네스-시험", viewports: ["web", "mobile"] }];
+  const report = [
+    "## pull request 준비 완료",
+    "## 판단이 필요한 것",
+    "- 회차 목록의 개수는 요청에 없어 정했습니다.",
+    "## 미확정 자산 후보",
+    "없음.",
+  ].join("\n");
+  const sources = { "webtoon-main": 'import { Badge, Button as B, Chip } from "@ooee/ui";\nimport { useState } from "react";\n' };
+  const plan = recoverPlan({ issue: 147, report, args: "웹툰 메인 화면. 유형: web, mobile", status, registered, sources });
+  assert.deepEqual(plan.screens, [{ key: "webtoon-main", name: "웹툰 메인 화면", project: "하네스-시험", viewports: ["web", "mobile"], args: "웹툰 메인 화면. 유형: web, mobile" }]);
+  assert.deepEqual(plan.componentsUsed, ["Badge", "Button", "Chip"], "`as` 로 바꿔 쓴 이름도 원래 이름으로 센다");
+  assert.deepEqual(plan.needsDecision, ["회차 목록의 개수는 요청에 없어 정했습니다."], "「없음.」 은 싣지 않는다");
+  assert.match(plan.other[0], /러너가 작업 트리에서 지었습니다/);
+  assert.deepEqual(validatePlan(plan, { issue: 147 }), [], "지은 계획이 검사를 지나야 landScreens 로 간다");
+});
+
+test("지을 근거가 없으면 짓지 않는다 — 화면이 없거나 등록되지 않았으면 멈춘다", () => {
+  const registered = [{ key: "webtoon-main", name: "웹툰 메인 화면", project: "하네스-시험", viewports: ["web"] }];
+  assert.equal(recoverPlan({ issue: 147, report: "", args: "x", status: " M apps/sandbox/src/screens.ts", registered }), null, "새 화면 폴더가 없다");
+  assert.equal(recoverPlan({ issue: 147, report: "", args: "x", status: "?? apps/sandbox/src/app/없는화면/page.tsx", registered }), null, "screens.ts 에 등록되지 않았다");
+  assert.equal(recoverPlan({ issue: 147, report: "", args: "x", status: "", registered }), null, "트리가 비었다");
 });

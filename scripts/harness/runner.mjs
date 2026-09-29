@@ -410,6 +410,63 @@ function readRegistered() {
 /** `screens.ts` 에 등록된 화면 key. 표식 없는 pull request 가 화면을 건드렸는지 볼 때 쓴다. */
 const registeredKeys = () => readRegistered().map((screen) => screen.key);
 
+/** 복구한 계획을 `plan.json` 자리에 쓴다. 지을 수 없으면 false — 부르는 쪽이 멈춘다. */
+function writeRecovered(issue, report, args) {
+  let status = "";
+  try {
+    status = sh("git", ["status", "--porcelain"]);
+  } catch {
+    return false;
+  }
+  const keys = [...new Set(status.split("\n").map((line) => /^\?\?\s+(apps\/sandbox\/src\/app\/[^/()]+)\//.exec(line.trim())?.[1]).filter(Boolean).map((dir) => dir.split("/").at(-1)))];
+  const sources = {};
+  for (const key of keys) {
+    const screen = path.join(repoRoot, "apps/sandbox/src/app", key, "page.tsx");
+    if (existsSync(screen)) sources[key] = readFileSync(screen, "utf8");
+  }
+  const plan = recoverPlan({ issue, report, args, status, registered: readRegistered(), sources });
+  if (!plan) return false;
+  const file = path.join(repoRoot, planPath(issue));
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, `${JSON.stringify(plan, null, 2)}\n`);
+  log(`- 모델이 \`plan.json\` 을 쓰지 않아 작업 트리에서 지었다 — 화면 ${plan.screens.map((screen) => screen.key).join(", ")}`);
+  return true;
+}
+
+/**
+ * 모델이 `plan.json` 을 쓰지 않았을 때 **작업 트리에서 계획을 짓는다.**
+ *
+ * `2026-09-29` 개발자 결정. #135 와 #147 에서 같은 일이 났다 — 모델이 화면과 시험을 다 만들고 검사까지 지난
+ * 뒤, 하위 명령(`generate-code`)의 보고를 그대로 마지막 말로 내며 `plan.json` 을 쓰지 않았다. 스킬에 「하위
+ * 명령의 보고를 네 마지막 말로 옮겨 적지 않는다」 를 적어도 또 그랬다(#147 은 그 문장이 있는 사본에서 돌았다).
+ * 말로 막을 수 없으면 **러너가 대신 읽는다** — 만들어진 화면을 버리고 멈추는 것이 가장 나쁜 답이다.
+ *
+ * 짓는 근거는 셋뿐이다. 새로 생긴 화면 폴더(`git status`), 그 key 의 `screens.ts` 등록값, 그리고 모델 보고의
+ * 「판단이 필요한 것」·「미확정 자산 후보」 절이다. 하나라도 없으면 짓지 않고 `null` 을 돌려준다.
+ */
+export function recoverPlan({ issue, report, args, status, registered, sources = {} }) {
+  const added = [...new Set(String(status ?? "")
+    .split("\n")
+    .map((line) => /^\?\?\s+(apps\/sandbox\/src\/app\/[^/()]+)\//.exec(line.trim())?.[1])
+    .filter(Boolean)
+    .map((dir) => dir.split("/").at(-1)))];
+  if (!added.length) return null;
+  const screens = added.map((key) => registered.find((screen) => screen.key === key)).filter(Boolean);
+  if (screens.length !== added.length) return null;
+  const used = [...new Set(added.flatMap((key) => [...String(sources[key] ?? "").matchAll(/import\s*\{([^}]*)\}\s*from\s*"@ooee\/ui"/g)]
+    .flatMap((hit) => hit[1].split(","))
+    .map((name) => name.replace(/\s+as\s+.*$/, "").trim())
+    .filter((name) => /^[A-Z]/.test(name))))];
+  return {
+    issue,
+    screens: screens.map((screen) => ({ key: screen.key, name: screen.name, project: screen.project, viewports: screen.viewports, args })),
+    componentsAdded: [],
+    componentsUsed: used,
+    other: ["모델이 `plan.json` 을 쓰지 않아 러너가 작업 트리에서 지었습니다(만든 화면은 그대로입니다)."],
+    needsDecision: [...section(report, "판단이 필요한 것"), ...section(report, "미확정 자산 후보")].filter((line) => line !== "없음."),
+  };
+}
+
 /**
  * `plan.json` 의 화면을 `screens.ts` 등록값에 맞춘다(plan.mjs `reconcileScreens`). 덮어쓴 것은 log 에 남기고,
  * 등록에 없는 key 는 멈출 줄로 돌려준다 — 없는 화면은 pull request 에도 결과 댓글에도 실을 것이 없다.
@@ -506,8 +563,11 @@ async function runRequest(issue) {
   // 모델이 하는 유일한 일 — 화면을 만들고 무엇을 만들었는지 적는다.
   const made = runClaude(`/make-screens ${issue} 러너`);
   const file = path.join(repoRoot, planPath(issue));
-  // 모델이 왜 멈췄는지는 그 보고에 있다. 「plan.json 이 없다」만 보내면 기획자는 무엇을 해야 할지 모른다.
-  if (!existsSync(file)) return stopWith(issue, made.result, "화면을 만들지 못했다", meta);
+  // 모델이 계획을 안 썼어도 화면이 있으면 러너가 짓는다. 그래도 없으면 멈춘다 — 모델이 왜 멈췄는지는 그
+  // 보고에 있고, 「plan.json 이 없다」만 보내면 기획자는 무엇을 해야 할지 모른다.
+  if (!existsSync(file) && !writeRecovered(issue, made.result, read.generateArgs ?? "")) {
+    return stopWith(issue, made.result, "화면을 만들지 못했다", meta);
+  }
   const plan = JSON.parse(readFileSync(file, "utf8"));
   const problems = validatePlan(plan, { issue, mode: read.mode });
   if (problems.length) return stop("만든 것을 읽을 수 없다", problems);
@@ -627,7 +687,9 @@ async function improve(issue, read, stop, given) {
   await notifyStart(issue, { title: request.screenName, round: (read.round ?? 0) + 1, kind: "개선" });
   const made = runClaude(`/make-screens ${issue} 개선 러너`);
   const file = path.join(repoRoot, planPath(issue));
-  if (!existsSync(file)) return stopWith(issue, made.result, "다시 만들지 못했다", { title: request.screenName, url: request.url });
+  if (!existsSync(file) && !writeRecovered(issue, made.result, `${request.generateArgs ?? ""} 개선: ${read.reason ?? ""}`.trim())) {
+    return stopWith(issue, made.result, "다시 만들지 못했다", { title: request.screenName, url: request.url });
+  }
   const plan = JSON.parse(readFileSync(file, "utf8"));
   const problems = validatePlan(plan, { issue, mode: request.mode });
   if (problems.length) return stop("다시 만든 것을 읽을 수 없다", problems);
