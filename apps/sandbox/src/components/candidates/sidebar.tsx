@@ -194,9 +194,11 @@ function Sidebar({
         className={cn(
           "fixed inset-y-0 z-10 flex h-svh w-(--nav-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--nav-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--nav-width)*-1)]",
           // Adjust the padding for floating and inset variants.
+          // 레일 오른쪽 선은 메뉴 스타일의 선 색을 쓴다. 색을 주지 않으면 Tailwind v4 에서 글자색을 따라가
+          // 라이트 스타일에서 검게 보였다(`2026-09-29`).
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--nav-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--nav-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
+            : "group-data-[collapsible=icon]:w-(--nav-width-icon) border-nav-border group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className
         )}
         {...props}
@@ -332,12 +334,14 @@ function SidebarSeparator({
 }
 
 function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
+  // 스크롤 막대를 감춘다. shadcn 원본의 `no-scrollbar` 는 이 저장소에 정의가 없어 브라우저 기본 막대가
+  // 레일 옆에 회색 띠로 얹혔다. 손잡이만 남기는 안도 봤지만 세 메뉴 스타일 모두 감추기로 했다(`2026-09-29`).
   return (
     <div
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        "[scrollbar-width:none] flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
       {...props}
