@@ -370,4 +370,14 @@ export const sandboxScreens: SandboxScreen[] = [
       "특정 메뉴의 설정값 108개의 값과 노출 여부를 관리하는 화면(#135, 2회차 개선). 이름 대신 순서 번호로 표시, 번호 열 폭을 줄여 값 입력 너비 확보, 모두 켜기·모두 끄기 추가.",
     createdAt: "2026-09-29",
   },
+  {
+    key: "table-edit-cell",
+    project: "신주희-테스트",
+    viewports: ["web", "tablet"],
+    name: "테이블 수정 셀",
+    href: "/table-edit-cell",
+    prompt:
+      "법인카드 사용내역을 관리하는 테이블(#139). 사용일시·사용처·이름·금액·부가세·총합 열, 사용처만 수정 가능, 상호작용 전에는 일반 표처럼 보이고 hover·focus 상태에서만 input을 노출.",
+    createdAt: "2026-09-29",
+  },
 ];
