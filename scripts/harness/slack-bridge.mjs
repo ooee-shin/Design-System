@@ -42,6 +42,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { sayingFor } from "./estimate.mjs";
 import { REACTION_DECISIONS as GITHUB_REACTIONS } from "./decision.mjs";
 import { buildConfirmBlocks } from "./slack-card.mjs";
 import { HOME_ENV, loadEnv } from "./slack-env.mjs";
@@ -200,6 +201,12 @@ async function replyInThread(token, { channel, ts, text, blocks }) {
 
 /** 까닭을 기다리는 카드들. 다리가 다시 떠도 이어지게 파일에 둔다. */
 const pendingFile = () => path.join(path.dirname(HOME_ENV), "pending.json");
+
+/** 예상 시간을 읽는 자리. `pending.json` 과 같은 폴더이고 그 안의 `runs/` 가 기록이다. */
+const stateDir = () => path.dirname(HOME_ENV);
+
+/** 결정마다 걸리는 시간이 다르다 — 승인·반려는 모델을 부르지 않고 개선은 다시 만든다. */
+const howLong = (decision) => sayingFor(decision, stateDir());
 const readPending = () => {
   try {
     return JSON.parse(readFileSync(pendingFile(), "utf8"));
@@ -236,7 +243,7 @@ async function handleAction(payload, { token, dryRun, channel }) {
 
   if (step === "댓글") {
     comment(issue, buildComment({ decision: "승인", by, permalink, how: "승인 버튼을 눌러" }), { dryRun });
-    await replyInThread(token, { channel: channelId, ts: cardTs, text: `${by} 님이 승인했습니다. GitHub #${issue} 에 남겼습니다.` });
+    await replyInThread(token, { channel: channelId, ts: cardTs, text: `${by} 님이 승인했습니다. GitHub #${issue} 에 남겼습니다. ${howLong("승인")}` });
     return { issue, decision: "승인", by };
   }
 
@@ -263,7 +270,7 @@ async function handleMessage(event, { token, dryRun, channel }) {
   comment(pending.issue, buildComment({ decision: pending.decision, by: pending.by, permalink: pending.permalink, how: `${pending.decision} 버튼을 누르고 까닭을 적어`, reason: event.text }), { dryRun });
   delete all[key];
   writePending(all);
-  await replyInThread(token, { channel: event.channel, ts: event.thread_ts, text: `GitHub #${pending.issue} 에 「${pending.decision}: …」으로 남겼습니다.` });
+  await replyInThread(token, { channel: event.channel, ts: event.thread_ts, text: `GitHub #${pending.issue} 에 「${pending.decision}: …」으로 남겼습니다. ${howLong(pending.decision)}` });
   return { issue: pending.issue, decision: pending.decision, reason: event.text };
 }
 

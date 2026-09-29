@@ -23,6 +23,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { freeBranch, howToUnmix, improveBlocked, isRequestOf, isRevertOf, mainPr, revertPr, screenCommits, sortLanded } from "./decide.mjs";
 import { stateDir } from "./local-run.mjs";
 import { branchName, planPath, prBody, readScreens, reconcileScreens, removeScreens, resultInput, section, title, validatePlan } from "./plan.mjs";
+import { estimate, readRuns, saying } from "./estimate.mjs";
 import { postCard, slackTarget } from "./slack-card.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -358,6 +359,29 @@ function postedResult(issue, before) {
  * 읽은 이슈에서 넘긴다 — 여기서 `gh issue view` 를 다시 부르지 않는다. 제목을 못 읽었어도 카드는 올라간다
  * (options 가 비면 번호만 실린다).
  */
+/**
+ * 처리·개선을 시작할 때 결과 채널에 올리는 한 줄. **첫 요청에 예상 시간을 붙일 자리가 이것이다** — 폼을 내면
+ * 결과 카드가 올 때까지 아무 말이 없었다(`2026-09-29` 개발자). 승인·반려는 결정 답장이 이미 말했고 6분이라
+ * 올리지 않는다.
+ */
+export function startNotice(issue, { title = "", round = 1, kind = "처리", est } = {}) {
+  const what = kind === "개선" ? `${round}회차 개선을 시작했습니다` : "처리를 시작했습니다";
+  const how = est ? ` — ${saying(kind, est)}` : "";
+  return `⏳ 화면 요청 #${issue}${title ? ` 「${title}」` : ""} ${what}${how} 끝나면 이 자리에 결과 카드가 옵니다.`;
+}
+
+/** 시작을 알린다. 알리지 못해도 처리는 계속한다 — 알림이 화면 만들기를 막지 않는다. */
+async function notifyStart(issue, options = {}) {
+  const target = slackTarget();
+  if (!target) return;
+  const kind = options.kind ?? "처리";
+  const est = estimate(kind, readRuns(stateDir()));
+  await postCard(startNotice(issue, { ...options, kind, est }), target).then(
+    () => log(`- 시작을 결과 채널에 알렸다 (${saying(kind, est)})`),
+    (error) => log(`- 시작을 알리지 못했다: ${error.message}`),
+  );
+}
+
 async function notifyStop(issue, report, options = {}) {
   const target = slackTarget();
   if (!target) return;
@@ -476,6 +500,8 @@ async function runRequest(issue) {
   const round = (before.round ?? 0) + 1;
   dropStaleBranches(issue);
   rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
+
+  await notifyStart(issue, { title: read.screenName, round, kind: "처리" });
 
   // 모델이 하는 유일한 일 — 화면을 만들고 무엇을 만들었는지 적는다.
   const made = runClaude(`/make-screens ${issue} 러너`);
@@ -598,6 +624,7 @@ async function improve(issue, read, stop, given) {
   if (!request.fields?.requester) return stop("다시 만들 수 없다", ["요청자가 비어 있다 — 결과 댓글은 요청자 없이 만들어지지 않는다"]);
   dropStaleBranches(issue);
   rmSync(path.join(repoRoot, ".harness-work", `issue-${issue}`), { recursive: true, force: true });
+  await notifyStart(issue, { title: request.screenName, round: (read.round ?? 0) + 1, kind: "개선" });
   const made = runClaude(`/make-screens ${issue} 개선 러너`);
   const file = path.join(repoRoot, planPath(issue));
   if (!existsSync(file)) return stopWith(issue, made.result, "다시 만들지 못했다", { title: request.screenName, url: request.url });

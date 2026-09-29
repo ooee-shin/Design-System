@@ -9,7 +9,12 @@ cd "$(dirname "$0")/../.." || exit 0
 # 실행의 가지와 아직 commit 하지 않은 화면 파일이 날아간다. `2026-09-24` 에 개발자가 손으로 돌린 실행의
 # 가지가 tick 마다 `origin/dev` 로 밀리고 있었다. launchd 는 같은 job 을 겹쳐 띄우지 않지만, 사람이 손으로
 # 돌린 실행은 그 밖이라 겹친다.
-if pgrep -f "scripts/harness/runner.mjs" > /dev/null 2>&1; then exit 0; fi
+# 다만 돌고 있는 실행이 예상보다 길면 그것만 알린다(기록을 읽고 Slack 에 한 번 올릴 뿐 tree 를 건드리지
+# 않는다). 러너는 모델을 동기로 기다려 스스로 타이머를 돌리지 못하므로 이 자리가 유일하게 깨어 있다.
+if pgrep -f "scripts/harness/runner.mjs" > /dev/null 2>&1; then
+  node scripts/harness/slow-notice.mjs > /dev/null 2>&1
+  exit 0
+fi
 
 # `reset --hard` 가 아니라 `checkout -B` 다. 앞 실행이 남긴 feature 가지에 서 있을 때 reset 은 그 가지를
 # origin/dev 로 밀어 버린다.

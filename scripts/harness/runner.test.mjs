@@ -24,6 +24,7 @@ import {
   pickActionable,
   pickUnreadLookalikes,
   staleBranches,
+  startNotice,
   stopNotice,
   stopReport,
 } from "./runner.mjs";
@@ -300,4 +301,23 @@ test("묻는 것과 실패를 가려 카드를 쓴다 — 묻는 것을 실패�
   const bad = stopNotice(99, failing, { title: "수정" });
   assert.match(bad, /^⚠️ /);
   assert.match(bad, /개발자에게 알려 주세요/);
+});
+
+test("시작 알림은 처리와 개선에만, 예상 시간과 함께 올린다", () => {
+  const est = { low: 11, high: 15, median: 12, n: 8, source: "기록" };
+  assert.equal(
+    startNotice(135, { title: "설정값 관리 화면", round: 1, kind: "처리", est }),
+    "⏳ 화면 요청 #135 「설정값 관리 화면」 처리를 시작했습니다 — 보통 11~15분 걸립니다(기록 8건의 중간값 12분). 끝나면 이 자리에 결과 카드가 옵니다.",
+  );
+  assert.match(startNotice(135, { title: "설정값 관리 화면", round: 2, kind: "개선", est }), /2회차 개선을 시작했습니다/);
+  // 예상을 못 재도 시작은 알린다 — 숫자가 없는 것이 아무 말도 없는 것보다 낫다.
+  assert.equal(startNotice(9, {}), "⏳ 화면 요청 #9 처리를 시작했습니다 끝나면 이 자리에 결과 카드가 옵니다.");
+});
+
+test("승인·반려·결과에는 시작 알림을 올리지 않는다 — 결정 답장이 이미 말했고 6분이다", () => {
+  const source = readFileSync(new URL("./runner.mjs", import.meta.url), "utf8");
+  const calls = source.match(/await notifyStart\(/g) ?? [];
+  assert.equal(calls.length, 2, "시작 알림을 부르는 자리는 처리와 개선 둘뿐이다");
+  const approve = source.slice(source.indexOf("async function approve"), source.indexOf("async function reject"));
+  assert.ok(!approve.includes("notifyStart"), "승인에서 시작 알림을 올리면 안 된다");
 });
