@@ -366,7 +366,8 @@ export const sandboxScreens: SandboxScreen[] = [
     viewports: ["web", "mobile"],
     name: "설정값 관리 화면",
     href: "/setting-value-management",
-    prompt: "특정 메뉴의 설정값 108개의 값과 노출 여부를 관리하는 화면(#135). 검색, 값 입력, 노출 스위치, 페이지 이동.",
+    prompt:
+      "특정 메뉴의 설정값 108개의 값과 노출 여부를 관리하는 화면(#135, 2회차 개선). 이름 대신 순서 번호로 표시, 번호 열 폭을 줄여 값 입력 너비 확보, 모두 켜기·모두 끄기 추가.",
     createdAt: "2026-09-29",
   },
 ];
