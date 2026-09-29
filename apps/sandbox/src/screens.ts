@@ -360,4 +360,13 @@ export const sandboxScreens: SandboxScreen[] = [
       "회사 메인 페이지(#131). 반다이처럼 이미지가 큰 구성. 머리글·히어로·사업 분야 카드 3장·소식 목록·문의 안내·바닥글, 이미지는 SVG 일러스트로 그림.",
     createdAt: "2026-09-28",
   },
+  {
+    key: "setting-value-management",
+    project: "신주희-테스트",
+    viewports: ["web", "mobile"],
+    name: "설정값 관리 화면",
+    href: "/setting-value-management",
+    prompt: "특정 메뉴의 설정값 108개의 값과 노출 여부를 관리하는 화면(#135). 검색, 값 입력, 노출 스위치, 페이지 이동.",
+    createdAt: "2026-09-29",
+  },
 ];
